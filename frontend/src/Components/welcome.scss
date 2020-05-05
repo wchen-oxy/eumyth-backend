@@ -1,0 +1,28 @@
+@import  '../main.scss';
+p { 
+    color: $primary-text-color;
+}
+.master-container{
+    width: 100%;
+    
+}
+
+.overview-login-register-container{
+   
+  
+   
+}
+
+.overview-description-container{
+    margin: 0px;
+    width: 65%;
+    
+    display: inline-block;
+
+}
+
+.login-signup-container{
+    margin: 0;
+    width: 35%;
+    display: inline-block;
+}
