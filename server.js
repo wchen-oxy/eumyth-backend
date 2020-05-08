@@ -3,10 +3,15 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+
+const mongoose = require('mongoose');
+const cors = require('cors');
+require('dotenv').config();
+
 var port = process.env.PORT || 5000;
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+var usersRouter = require('./routes/user');
 var testRouter = require('./routes/test');
 var reactRouter = require('./routes/reactTest');
 
@@ -23,8 +28,22 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(cors());
+
+// Mongoose specific code
+const uri = process.env.ATLAS_URI;
+console.log(uri);
+
+
+mongoose.connect(uri, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true }
+);
+const connection = mongoose.connection;
+connection.once('open', () => {
+  console.log("MongoDB database connection established successfully");
+})
+
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/user', usersRouter);
 app.use('/test', testRouter);
 app.use('/react', reactRouter);
 
