@@ -1,7 +1,7 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
-import WelcomePage from './Components/welcome';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import WelcomePage from './Components/welcome/welcome';
 import './App.scss';
 
  
@@ -11,7 +11,10 @@ function App() {
     <Router>
       <div className="container">
       {/* FIXME MODIFY WELCOMEPAGE NAME TO SOMETHING MORE APPROPRIATE. */}
-      <Route path="/" exact component={WelcomePage} />
+      {/* <Switch>  */}
+        <Route path="/" exact component={WelcomePage} />
+        {/* <Route path='/verify' component={VerifyPage} /> */}
+      {/* </Switch> */}
       {/* <Route path="/" exact component={RegisterPage} /> */}
 
       {/* <Route path="/edit/:id" component={EditExercise} />

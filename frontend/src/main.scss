@@ -1,11 +1,8 @@
+// Colors
 $primary-color: #ed4071;
 $primary-text-color: black;
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+
+//Sizes
+$primary-medium-font-size: calc(10px + 2vmin);
+

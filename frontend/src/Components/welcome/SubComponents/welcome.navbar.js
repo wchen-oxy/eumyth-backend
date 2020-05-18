@@ -18,7 +18,7 @@ export default class Navbar extends React.Component {
         return(
             <div className="welcome-navbar">
                 <div className="row">
-                <div className="col">
+                <div id="title-container" className="col">
                     <a>interestHub</a>
                     </div>
                   
