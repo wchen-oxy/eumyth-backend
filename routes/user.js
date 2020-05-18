@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 let User = require('../models/user.model');
 
+
 /* GET users listing. */
 router.get('/login', function(req, res, next) {
   const email = req.body.email;
