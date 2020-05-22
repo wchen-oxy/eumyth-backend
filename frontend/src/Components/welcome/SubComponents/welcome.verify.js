@@ -7,17 +7,16 @@ export default class VerifyPage extends React.Component {
         return(
             <div className="login-signup-container">
             <section>
-              
               <div className="login-register-container">
                  {/* <p>{this.state.currentUser} </p>  */}
               
               <p>Verify Button</p>
-              <p>If you have verified the page, please refresh the page. </p>
+              <p>If you have verified your email, please refresh the page. </p>
               <button onClick={this.props.onSendEmailVerification}>Resend Email</button>
 
               <div className="login-register-button-containers">
               <button onClick={this.props.onLoginRegisterToggle}>Register</button>
-              <button onClick={this.props.onVerifiedEmailStatusChange}>Login as someone else</button>
+              <button onClick={this.props.onSignOut}>Login!</button>
               </div>
               </div>
            
