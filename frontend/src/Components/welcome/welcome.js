@@ -8,6 +8,7 @@ import './welcome.scss';
 import { Route, Redirect } from 'react-router-dom';
 import Isemail from 'isemail';
 
+
 const INITIAL_STATE = {
   currentUser: '',
   email: '',

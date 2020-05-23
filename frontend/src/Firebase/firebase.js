@@ -15,15 +15,24 @@ class Firebase {
   constructor() {
     firebase.initializeApp(firebaseConfig);
     this.auth = firebase.auth();
+    this.doTest = this.doTest.bind(this);
+    this.doCreateUser = this.doCreateUser.bind(this);
+    this.doSignIn = this.doSignIn.bind(this);
+    this.doSignOut = this.doSignOut.bind(this);
+    this.doSendEmailVerification = this.doSendEmailVerification.bind(this);
+    this.doPasswordReset = this.doPasswordReset.bind(this);
+    this.doPasswordUpdate = this.doPasswordUpdate.bind(this);
+    this.doIsEmailVerified = this.doIsEmailVerified.bind(this);
+
   }
 
 
 
-  doTest = () => {
+  doTest(){
     return ("FIREBASE");
   }
 
-  doCreateUser = (email, password) => {
+  doCreateUser(email, password) {
     return this.auth.createUserWithEmailAndPassword(email, password)
       .then(
         (userData) => {
@@ -42,7 +51,7 @@ class Firebase {
       });
   }
 
-  doSignIn = (email, password) => {
+  doSignIn(email, password){
 
     return this.auth.signInWithEmailAndPassword(email, password)
       .catch((error) => {
@@ -53,9 +62,9 @@ class Firebase {
       );
   }
 
-  doSignOut = () => { return this.auth.signOut(); }
+  doSignOut () { return this.auth.signOut(); }
 
-  doSendEmailVerification = () => {
+  doSendEmailVerification(){
     console.log(this.auth.currentUser);
     this.auth.currentUser.sendEmailVerification()
       .catch((error) => {
@@ -69,11 +78,11 @@ class Firebase {
         console.log(error);
       });
   }
-  doPasswordReset = email => this.auth.sendPasswordResetEmail(email);
+  doPasswordReset(email) {this.auth.sendPasswordResetEmail(email);}
 
-  doPasswordUpdate = password => this.auth.currentUser.updatePassword(password);
+  doPasswordUpdate(password) {this.auth.currentUser.updatePassword(password);}
 
-  doIsEmailVerified = () => {
+  doIsEmailVerified() {
     if (this.auth.currentUser) {
       console.log(this.auth.currentUser.emailVerified);
       return this.auth.currentUser.emailVerified;
