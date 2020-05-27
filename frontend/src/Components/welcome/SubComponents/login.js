@@ -1,6 +1,5 @@
 import React from 'react';
 
-
 export default class WelcomeLoginComponent extends React.Component {
 
   render() {

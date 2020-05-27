@@ -26,9 +26,7 @@ class Firebase {
 
   }
 
-
-
-  doTest(){
+  doTest() {
     return ("FIREBASE");
   }
 
@@ -51,7 +49,8 @@ class Firebase {
       });
   }
 
-  doSignIn(email, password){
+  doSignIn(email, password) {
+    console.log("Signing in From Firebase");
 
     return this.auth.signInWithEmailAndPassword(email, password)
       .catch((error) => {
@@ -62,9 +61,13 @@ class Firebase {
       );
   }
 
-  doSignOut () { return this.auth.signOut(); }
+  doSignOut() {
+    console.log("Hit");
+    console.log(this.auth.currentUser);
+    return this.auth.signOut();
+  }
 
-  doSendEmailVerification(){
+  doSendEmailVerification() {
     console.log(this.auth.currentUser);
     this.auth.currentUser.sendEmailVerification()
       .catch((error) => {
@@ -78,9 +81,9 @@ class Firebase {
         console.log(error);
       });
   }
-  doPasswordReset(email) {this.auth.sendPasswordResetEmail(email);}
+  doPasswordReset(email) { this.auth.sendPasswordResetEmail(email); }
 
-  doPasswordUpdate(password) {this.auth.currentUser.updatePassword(password);}
+  doPasswordUpdate(password) { this.auth.currentUser.updatePassword(password); }
 
   doIsEmailVerified() {
     if (this.auth.currentUser) {

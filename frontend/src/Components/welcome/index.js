@@ -1,11 +1,9 @@
 import React from 'react';
-import axios from 'axios';
-import Navbar from './SubComponents/welcome.navbar';
-import WelcomeLoginComponent from './SubComponents/welcome.login';
-import WelcomeRegisterComponent from './SubComponents/welcome.register';
-import VerifyPage from './SubComponents/welcome.verify';
-import './welcome.scss';
-import { Route, Redirect } from 'react-router-dom';
+import Navbar from './SubComponents/navbar';
+import WelcomeLoginComponent from './SubComponents/login';
+import WelcomeRegisterComponent from './SubComponents/register';
+import VerifyPage from './SubComponents/verify';
+import './index.scss';
 import Isemail from 'isemail';
 
 
@@ -38,30 +36,6 @@ export default class WelcomePage extends React.Component {
     this.handleChange = this.handleChange.bind(this);
   }
 
-  componentDidMount() {
-    this.props.firebase.auth.onAuthStateChanged((user) => {
-      if (user) {
-        console.log(user.email);
-        console.log(user.emailVerified);
-        if (!user.emailVerified) {
-          this.setState({
-            loggedIn: true,
-            verified: false
-          });
-        }
-        else {
-          this.setState({
-            loggedIn: true,
-            verified: true
-          });
-        }
-      }
-      else{
-        this.setState({loggedIn: false});
-      }
-    });
-
-  }
 
   handleChange(e) {
     e.preventDefault();
@@ -110,7 +84,9 @@ export default class WelcomePage extends React.Component {
     console.log("Submitted");
     // alert(this.state.password);
     if (!Isemail.validate(this.state.email)) return alert("This is not a valid email!");
-    this.props.firebase.doSignIn(this.state.email, this.state.password);
+    this.props.firebase.doSignIn(this.state.email, this.state.password).then(
+      this.props.history.push("/"));
+
   }
 
   handleRegisterSubmit(e) {
@@ -124,25 +100,22 @@ export default class WelcomePage extends React.Component {
     else {
       console.log("Submitted");
       this.props.firebase.doCreateUser(this.state.email, this.state.password)
-      .then(
-        this.setState({showRegisterSuccess: true})
-      );
+        .then(
+          this.setState({ showRegisterSuccess: true })
+        );
     }
   }
 
 
   render() {
-  
+
     let LoginRegisterHome;
-    //SUCCESS LOGIN
     if (this.state.loggedIn && this.state.verified) {
       LoginRegisterHome = (<div>
         Logged in Successfully!
       </div>)
     }
-    //NON SUCCESSFUL LOGIN
     else {
-      console.log(this.state.showRegisterSuccess);
       if (this.state.showRegisterSuccess) {
         LoginRegisterHome = (
           <div>
@@ -184,9 +157,7 @@ export default class WelcomePage extends React.Component {
         )
       }
     }
-
     return (
-
       <div className="master-container">
         <main>
           <Navbar />

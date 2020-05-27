@@ -1,27 +1,23 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import './welcome.navbar.scss';
+import './navbar.scss';
 
-
-// 
 export default class Navbar extends React.Component {
 
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
             username: '',
             password: ''
-          }
+        }
     }
-
-    render(){
-        return(
+    render() {
+        return (
             <div className="welcome-navbar">
                 <div className="row">
-                <div id="title-container" className="col">
-                    <a>interestHub</a>
+                    <div id="title-container" className="col">
+                        <a>interestHub</a>
                     </div>
-                  
+
                 </div>
             </div>
         )
