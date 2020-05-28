@@ -2,23 +2,23 @@ import React from 'react';
 
 export default class UserHomePage extends React.Component {
 
-    constructor(props){
+    constructor(props) {
         super(props)
         this.handleSignOut = this.handleSignOut.bind(this);
     }
 
-    handleSignOut(e){
+    handleSignOut(e) {
         e.preventDefault();
         this.props.firebase.doSignOut();
     }
 
     render() {
-        return(
+        return (
             <div>
-              TEST SUCCESS
-              <button onClick={this.handleSignOut}>Sign Out</button>
+                TEST SUCCESS
+                <button onClick={this.handleSignOut}>Sign Out</button>
             </div>
-             
-            )
-        }
+
+        )
+    }
 }

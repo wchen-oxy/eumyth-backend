@@ -1,8 +1,7 @@
 import React from 'react';
-import Navbar from './SubComponents/navbar';
-import WelcomeLoginComponent from './SubComponents/login';
-import WelcomeRegisterComponent from './SubComponents/register';
-import VerifyPage from './SubComponents/verify';
+import WelcomeLoginComponent from './sub-components/login';
+import WelcomeRegisterComponent from './sub-components/register';
+import VerifyPage from './sub-components/verify';
 import './index.scss';
 import Isemail from 'isemail';
 
@@ -160,7 +159,7 @@ export default class WelcomePage extends React.Component {
     return (
       <div className="master-container">
         <main>
-          <Navbar />
+       
           <section className="overview-login-register-container">
             <div className="overview-description-container">
               <p>Welcome to interestHub! Login or sign up to get started!</p>
