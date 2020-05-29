@@ -5,7 +5,11 @@ import {withRouter} from 'react-router-dom';
 import {withFirebase} from '../../Firebase/';
 import {AuthUserContext} from '../session';
 
-const HomePage = () => (
+
+const HomePage = (props) => {
+    console.log("home");
+    console.log(props.firebase.auth.currentUser);
+    return(
     <div>
         <AuthUserContext.Consumer>
             {
@@ -14,9 +18,10 @@ const HomePage = () => (
             }
         </AuthUserContext.Consumer>
     </div>
-)
+)};
 
+const condition = authUser => !!authUser;
 const WelcomePageBase = withRouter(withFirebase(WelcomePage));
 const LandingBase =  withRouter(withFirebase(UserHomePage));
 
-export default HomePage;
+export default withFirebase(HomePage);

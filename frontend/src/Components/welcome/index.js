@@ -107,6 +107,9 @@ export default class WelcomePage extends React.Component {
 
 
   render() {
+    console.log("Welcome");
+    console.log(this.props.firebase.auth.currentUser
+      );
 
     let LoginRegisterHome;
     if (this.state.loggedIn && this.state.verified) {

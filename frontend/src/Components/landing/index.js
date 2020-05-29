@@ -1,6 +1,7 @@
 import React from 'react';
+import {withAuthorization} from '../session';
 
-export default class UserHomePage extends React.Component {
+class UserHomePage extends React.Component {
 
     constructor(props) {
         super(props)
@@ -13,6 +14,8 @@ export default class UserHomePage extends React.Component {
     }
 
     render() {
+        console.log("Test");
+        console.log(this.props.firebase.auth.currentUser);
         return (
             <div>
                 TEST SUCCESS
@@ -22,3 +25,8 @@ export default class UserHomePage extends React.Component {
         )
     }
 }
+
+// long vesion is 
+// const condition = authUser => authUser != null;
+const condition = authUser => !!authUser;
+export default withAuthorization(condition)(UserHomePage);
