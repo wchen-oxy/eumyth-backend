@@ -81,7 +81,9 @@ class Firebase {
         console.log(error);
       });
   }
-  doPasswordReset(email) { this.auth.sendPasswordResetEmail(email); }
+  doPasswordReset(email) { 
+    alert("EMAIL");
+    return this.auth.sendPasswordResetEmail(email); }
 
   doPasswordUpdate(password) { this.auth.currentUser.updatePassword(password); }
 

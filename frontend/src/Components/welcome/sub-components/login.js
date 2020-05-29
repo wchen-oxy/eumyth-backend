@@ -1,4 +1,5 @@
 import React from 'react';
+import PasswordForgetPage from '../../password-forget/index'
 
 export default class WelcomeLoginComponent extends React.Component {
 
@@ -20,6 +21,7 @@ export default class WelcomeLoginComponent extends React.Component {
 
             <input type="submit" value="Log in" />
           </form>
+          <PasswordForgetPage />
         </section>
       </div>
     )
