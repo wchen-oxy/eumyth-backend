@@ -1,27 +1,30 @@
 import React from 'react';
 import {withAuthorization} from '../session';
-
+import InitialCustomizationPage from './sub-components/initial-customization'
+import './index.scss';
 class UserHomePage extends React.Component {
 
     constructor(props) {
         super(props)
-        this.handleSignOut = this.handleSignOut.bind(this);
+        // this.handleSignOut = this.handleSignOut.bind(this);
+        this.handleBasicInfoChange = this.handleBasicInfoChange.bind(this);
     }
+    componentDidMount(){
+        // this.props.firebase
+    }
+    handleBasicInfoChange(e){
 
-    handleSignOut(e) {
-        e.preventDefault();
-        this.props.firebase.doSignOut();
     }
+    // handleSignOut(e) {
+    //     e.preventDefault();
+    //     this.props.firebase.doSignOut();
+    // }
 
     render() {
         console.log("Test");
         console.log(this.props.firebase.auth.currentUser);
         return (
-            <div>
-                TEST SUCCESS
-                <button onClick={this.handleSignOut}>Sign Out</button>
-            </div>
-
+           <InitialCustomizationPage/>
         )
     }
 }

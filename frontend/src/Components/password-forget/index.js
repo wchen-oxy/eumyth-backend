@@ -4,7 +4,7 @@ import {Link} from 'react-router-dom';
 
 const PasswordForgetPage = () => (
     <div>
-        <h1>PasswordForget</h1>
+        <h4>Reset Your Password</h4>
         <PasswordForgetForm/>
     </div>
 )
@@ -17,7 +17,6 @@ const INITIAL_STATE = {
 class PasswordForgetFormBase extends React.Component {
     constructor(props){
         super(props);
-
         this.state = { ...INITIAL_STATE};
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
@@ -64,10 +63,6 @@ class PasswordForgetFormBase extends React.Component {
           </form>
         );
     }
-
-       
-
-
 }
 
 const PasswordForgetLink = () => (

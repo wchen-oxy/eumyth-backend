@@ -15,6 +15,7 @@ class Firebase {
   constructor() {
     firebase.initializeApp(firebaseConfig);
     this.auth = firebase.auth();
+    this.db = firebase.database();
     this.doTest = this.doTest.bind(this);
     this.doCreateUser = this.doCreateUser.bind(this);
     this.doSignIn = this.doSignIn.bind(this);
@@ -23,6 +24,8 @@ class Firebase {
     this.doPasswordReset = this.doPasswordReset.bind(this);
     this.doPasswordUpdate = this.doPasswordUpdate.bind(this);
     this.doIsEmailVerified = this.doIsEmailVerified.bind(this);
+    this.user = this.user.bind(this);
+    this.users = this.users.bind(this);
 
   }
 
@@ -93,6 +96,15 @@ class Firebase {
       return this.auth.currentUser.emailVerified;
     }
   };
+
+  //User API
+  user(uid){
+    this.db.ref(`users/${uid}`);
+  }
+  users(){
+    this.db.ref('users');
+  }
+
 }
 
 export default Firebase;

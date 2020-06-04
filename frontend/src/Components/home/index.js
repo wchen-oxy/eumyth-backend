@@ -20,7 +20,6 @@ const HomePage = (props) => {
     </div>
 )};
 
-const condition = authUser => !!authUser;
 const WelcomePageBase = withRouter(withFirebase(WelcomePage));
 const LandingBase =  withRouter(withFirebase(UserHomePage));
 
