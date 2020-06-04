@@ -24,8 +24,8 @@ class Firebase {
     this.doPasswordReset = this.doPasswordReset.bind(this);
     this.doPasswordUpdate = this.doPasswordUpdate.bind(this);
     this.doIsEmailVerified = this.doIsEmailVerified.bind(this);
-    this.user = this.user.bind(this);
-    this.users = this.users.bind(this);
+    this.checkExistingUser = this.checkExistingUser.bind(this);
+    this.writeUserData = this.writeUserData.bind(this);
 
   }
 
@@ -98,10 +98,15 @@ class Firebase {
   };
 
   //User API
-  user(uid){
-    this.db.ref(`users/${uid}`);
+  checkExistingUser(uid){
+    //read from API
+    return this.db.ref('/users/' + uid).once('value').then(
+      (snapshot) => snapshot.val()
+    )
+    // this.db.ref(`users/${uid}`);
   }
-  users(){
+  writeUserData(){
+    //write to API
     this.db.ref('users');
   }
 
