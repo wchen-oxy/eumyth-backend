@@ -18,7 +18,12 @@ class UserHomePage extends React.Component {
     componentDidMount() {
         // this.props.firebase
         //go get the uid and check if existing user
-        this.props.firebase.checkExistingUser(this.props.firebase.auth.currentUser.uid) ? this.setState({ newUser: true }) : this.setState({ newUser: false });
+        // console.log(this.props.firebase.checkExistingUser());
+        this.props.firebase.checkExistingUser().then(
+            result => {
+                result ? this.setState({ newUser: false }) : this.setState({ newUser: true });
+            }
+        ) 
         // this.props.firebase.auth.currentUser;
     }
     handleBasicInfoChange(e) {
@@ -28,16 +33,16 @@ class UserHomePage extends React.Component {
 
     }
 
-   
-
     render() {
-        if (!this.state.newUser) return (<div></div>);
-        console.log("Test");
-        console.log(this.props.firebase.auth.currentUser);
+        console.log(this.state.newUser);
+        // if (!this.state.newUser) return (<div></div>);
+        // console.log("Test");
+        // console.log(this.props.firebase.auth.currentUser);
         return this.state.newUser ?
             <InitialCustomizationPage />
             :
-            <ReturningUserPage />;
+               <ReturningUserPage />
+            ;
 
     }
 }
