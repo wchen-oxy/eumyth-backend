@@ -1,35 +1,25 @@
 const mongoose = require('mongoose');
+let Pursuit = require('./pursuit.model');
 
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
-  email: {
+  uid: {
     type: String,
     required: true,
     unique: true,
     trim: true
    
   },
-  password: {
-    type: String,
-    required:  true,
-    minlength: 6
-  },
-  firstName: {
-    type: String,
-    required: true,
-    minlength: 1
-  },
-  lastName: {
-    type: String,
-    required: true,
-    minlength: 1
-  },
+  pursuits:[Pursuit.Schema]
 
 }, {
   timestamps: true,
 });
 
-const User = mongoose.model('User', userSchema);
+const userModel = mongoose.model('User', userSchema);
 
-module.exports = User;
+module.exports = {
+  Schema : userSchema,
+  Model : userModel
+};
