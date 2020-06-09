@@ -13,7 +13,7 @@ export default class VerifyPage extends React.Component {
                         <button onClick={this.props.onSendEmailVerification}>Resend Email</button>
                         <div className="login-register-button-containers">
                             <button onClick={this.props.onLoginRegisterToggle}>Register</button>
-                            <button onClick={this.props.onSignOut}>Login!</button>
+                            <button onClick={this.props.onSignOut}>Login as someone else</button>
                         </div>
                     </div>
                 </section>

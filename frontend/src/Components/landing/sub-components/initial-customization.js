@@ -38,7 +38,8 @@ class InitialCustomizationPage extends React.Component {
         this.props.firebase.writeBasicUserData(
             this.state.username,
             this.state.firstName,
-            this.state.lastName
+            this.state.lastName, 
+            this.state.pursuits
         );
 
     }

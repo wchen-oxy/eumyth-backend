@@ -35,7 +35,6 @@ export default class WelcomePage extends React.Component {
     this.handleChange = this.handleChange.bind(this);
   }
 
-
   handleChange(e) {
     e.preventDefault();
     this.setState({ [e.target.name]: e.target.value });
@@ -81,7 +80,6 @@ export default class WelcomePage extends React.Component {
   handleLoginSubmit(e) {
     e.preventDefault();
     console.log("Submitted");
-    // alert(this.state.password);
     if (!Isemail.validate(this.state.email)) return alert("This is not a valid email!");
     this.props.firebase.doSignIn(this.state.email, this.state.password).then(
       this.props.history.push("/"));
@@ -108,16 +106,9 @@ export default class WelcomePage extends React.Component {
 
   render() {
     console.log("Welcome");
-    console.log(this.props.firebase.auth.currentUser
-      );
+    console.log(this.props.firebase.auth.currentUser);
 
     let LoginRegisterHome;
-    if (this.state.loggedIn && this.state.verified) {
-      LoginRegisterHome = (<div>
-        Logged in Successfully!
-      </div>)
-    }
-    else {
       if (this.state.showRegisterSuccess) {
         LoginRegisterHome = (
           <div>
@@ -127,7 +118,8 @@ export default class WelcomePage extends React.Component {
         )
       }
       else if (this.state.isLoginMode) {
-        if (this.state.loggedIn && !this.state.verified) {
+        console.log(this.state.loggedIn);
+        if (this.props.firebase.auth.currentUser && !this.state.verified) {
           LoginRegisterHome = (
             <VerifyPage
               current_user={this.state.currentUser}
@@ -158,7 +150,7 @@ export default class WelcomePage extends React.Component {
           />
         )
       }
-    }
+    
     return (
       <div className="master-container">
         <main>

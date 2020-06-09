@@ -1,4 +1,6 @@
 import firebase from 'firebase';
+import axios from 'axios';
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyC9sBHK-evjecmuWQsQHoE-iSJmHUcIBcE",
@@ -110,16 +112,22 @@ class Firebase {
     )
     // this.db.ref(`users/${uid}`);
   }
-  writeBasicUserData(username, firstName, lastName){
+  writeBasicUserData(username, firstName, lastName, pursuitsArray){
     const uid = this.auth.currentUser.uid;
     console.log(uid);
-    //write to API
+    //write username, first, last
     this.db.ref('users/' + uid)
     .set({
       username : username,
       firstName: firstName,
       lastName : lastName
-    });
+    })
+    .catch(err => 'Error: ' + err);
+    console.log(pursuitsArray);
+
+    axios.post('http://localhost:5000/pursuit', {uid: uid, pursuits: pursuitsArray})
+    .catch(err => 'Error: ' + err);
+    
   }
 
 }

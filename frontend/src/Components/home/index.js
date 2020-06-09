@@ -14,7 +14,7 @@ const HomePage = (props) => {
         <AuthUserContext.Consumer>
             {
             authUser => 
-            authUser ? <LandingBase/> : <WelcomePageBase/>
+            authUser && authUser.emailVerified ? <LandingBase/> : <WelcomePageBase emailVerifiedStatus={false}/>
             }
         </AuthUserContext.Consumer>
     </div>
