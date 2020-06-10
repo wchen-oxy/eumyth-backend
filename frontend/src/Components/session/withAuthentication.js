@@ -6,7 +6,6 @@ const withAuthentication = Component => {
   class WithAuthentication extends React.Component {
     constructor(props) {
       super(props);
- 
       this.state = {
         authUser: null,
         isLoading: false,
@@ -18,6 +17,7 @@ const withAuthentication = Component => {
       this.listener = this.props.firebase.auth.onAuthStateChanged(
         authUser => {
           console.log("Authentication Changed");
+          
           authUser
             ? this.setState({ authUser, isLoading: false })
             : this.setState({ authUser: null, isLoading: false });

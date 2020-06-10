@@ -7,8 +7,6 @@ import {AuthUserContext} from '../session';
 
 
 const HomePage = (props) => {
-    console.log("home");
-    console.log(props.firebase.auth.currentUser);
     return(
     <div>
         <AuthUserContext.Consumer>

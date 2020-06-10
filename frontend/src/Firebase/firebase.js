@@ -55,8 +55,6 @@ class Firebase {
   }
 
   doSignIn(email, password) {
-    console.log("Signing in From Firebase");
-
     return this.auth.signInWithEmailAndPassword(email, password)
       .catch((error) => {
         var errorCode = error.code;
@@ -67,13 +65,10 @@ class Firebase {
   }
 
   doSignOut() {
-    console.log("Hit");
-    console.log(this.auth.currentUser);
     return this.auth.signOut();
   }
 
   doSendEmailVerification() {
-    console.log(this.auth.currentUser);
     this.auth.currentUser.sendEmailVerification()
       .catch((error) => {
         var errorCode = error.code;
@@ -90,32 +85,27 @@ class Firebase {
     alert("EMAIL");
     return this.auth.sendPasswordResetEmail(email); }
 
-  doPasswordUpdate(password) { this.auth.currentUser.updatePassword(password); }
+  doPasswordUpdate(password) { 
+    this.auth.currentUser.updatePassword(password); 
+  }
 
   doIsEmailVerified() {
     if (this.auth.currentUser) {
-      console.log(this.auth.currentUser.emailVerified);
       return this.auth.currentUser.emailVerified;
     }
   };
 
-  //User API
   checkExistingUser(){
     const uid = this.auth.currentUser.uid;
     //read from API
     return this.db.ref('users/' + uid).once('value').then(
-      (snapshot) => {
-
-        console.log(snapshot.val());
+      (snapshot) => {    
         return snapshot.val();
       }
     )
-    // this.db.ref(`users/${uid}`);
   }
   writeBasicUserData(username, firstName, lastName, pursuitsArray){
     const uid = this.auth.currentUser.uid;
-    console.log(uid);
-    //write username, first, last
     this.db.ref('users/' + uid)
     .set({
       username : username,
@@ -123,13 +113,9 @@ class Firebase {
       lastName : lastName
     })
     .catch(err => 'Error: ' + err);
-    console.log(pursuitsArray);
-
     axios.post('http://localhost:5000/pursuit', {uid: uid, pursuits: pursuitsArray})
     .catch(err => 'Error: ' + err);
-    
   }
-
 }
 
 export default Firebase;

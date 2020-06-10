@@ -40,6 +40,8 @@ class InitialCustomizationPage extends React.Component {
             this.state.firstName,
             this.state.lastName, 
             this.state.pursuits
+        ).then(
+            window.location.reload()
         );
 
     }
@@ -50,7 +52,8 @@ class InitialCustomizationPage extends React.Component {
         username === '' ||
         firstName === '' ||
         lastName === '' ||
-        pursuits.length === 0;
+        pursuits === null ||
+        pursuits.length === 0 ;
         return (
             <div className="basic-info-container">
                 <form className="basic-info-form-container" onSubmit={this.handleSubmit}>

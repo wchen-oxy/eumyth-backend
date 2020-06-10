@@ -105,9 +105,6 @@ export default class WelcomePage extends React.Component {
 
 
   render() {
-    console.log("Welcome");
-    console.log(this.props.firebase.auth.currentUser);
-
     let LoginRegisterHome;
       if (this.state.showRegisterSuccess) {
         LoginRegisterHome = (
@@ -118,7 +115,6 @@ export default class WelcomePage extends React.Component {
         )
       }
       else if (this.state.isLoginMode) {
-        console.log(this.state.loggedIn);
         if (this.props.firebase.auth.currentUser && !this.state.verified) {
           LoginRegisterHome = (
             <VerifyPage

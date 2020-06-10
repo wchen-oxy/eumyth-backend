@@ -21,11 +21,8 @@ class UserHomePage extends React.Component {
     }
    
     render() {
-        console.log(this.state.newUser);
-        // return this.state.newUser ?
-        //     <InitialCustomizationPage /> : <ReturningUserPage />;
-        return this.state.newUser ?
-           <ReturningUserPage /> :  <InitialCustomizationPage /> ;
+        return (this.state.newUser ?
+            <InitialCustomizationPage /> : <ReturningUserPage />);
     }
 }
 
