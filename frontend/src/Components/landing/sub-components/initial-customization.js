@@ -69,10 +69,7 @@ class InitialCustomizationPage extends React.Component {
         )
         .then( 
             (result) =>
-            {
-            console.log(result.data);
-            this.props.firebase.writeIndexUserData(result.data, this.state.username, false);
-            }
+            this.props.firebase.writeIndexUserData(result.data, this.state.username, false)
         )
         .then(
             (success) => {if (success) window.location.reload()}
@@ -88,18 +85,19 @@ class InitialCustomizationPage extends React.Component {
     }
 
     render() {
+        const available = this.state.username !== '' && !this.state.isTaken ? "Available" : "Taken";
         const {username, firstName, lastName, pursuits} = this.state;
         let isInvalid = 
         username === '' ||
         firstName === '' ||
         lastName === '' ||
         pursuits === null ||
-        pursuits.length === 0 ;
+        pursuits.length === 0 ||
+        this.state.isTaken === true;
         // const isTaken =
         console.log(this.state.isTaken);
 
        
-        const available = this.state.username !== '' && !this.state.isTaken ? "Available" : "Taken";
         //if exist return true
         return (
             <div className="basic-info-container">

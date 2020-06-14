@@ -21,13 +21,12 @@ router.delete('/', (req, res) => {
 })
 
 router.get('/index', (req, res) => {
-
-  console.log(req.query.username);
-  // User.find
+ 
+  // Get Basic Info for User
   const username = req.query.username;
   IndexUser.Model.findOne({username:username}).then(
     result => {
-      res.json(result.username)
+      res.json(result)
     }
   )
   .catch(err => 
