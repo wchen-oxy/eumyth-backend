@@ -8,7 +8,7 @@ import {AuthUserContext} from '../session';
 
 const HomePage = (props) => {
     return(
-    <div>
+    <div >
         <AuthUserContext.Consumer>
             {
             authUser => 

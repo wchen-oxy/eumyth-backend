@@ -3,7 +3,7 @@ import { withAuthorization } from '../session';
 import InitialCustomizationPage from './sub-components/initial-customization'
 import ReturningUserPage from './sub-components/returning-user';
 import { withFirebase } from '../../Firebase';
-import './index.scss';
+
 class UserHomePage extends React.Component {
 
     constructor(props) {

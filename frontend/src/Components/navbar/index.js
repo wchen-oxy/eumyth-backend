@@ -14,16 +14,14 @@ const Navigation = () => (
   );
   
   const NavigationAuth = (props) => (
-    <div className="welcome-navbar">
-    <div className="row">
-        <div id="title-container" className="col">
+    <div className="welcome-navbar-container">
+        <div className="navbar-item">
             <a>interestHub</a>
         </div>
-        <div className="col">
+        <div className="navbar-item no-select">
             <button onClick={props.firebase.doSignOut}>SignOut</button>
         </div>
     </div>
-</div>
     // <ul>
     //   <li>
     //     <Link to={ROUTES.LANDING}>Landing</Link>
@@ -41,13 +39,13 @@ const Navigation = () => (
   );
   
   const NavigationNonAuth = () => (
-    <div className="welcome-navbar">
-    <div className="row">
-        <div id="title-container" className="col">
+    <div className="welcome-navbar-container">
+   
+        <div className="navbar-item no-select">
             <a>intersestHub</a>
         </div>
 
-    </div>
+   
 </div>
 
     // <ul>

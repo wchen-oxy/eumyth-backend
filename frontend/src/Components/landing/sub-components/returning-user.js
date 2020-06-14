@@ -1,7 +1,6 @@
 import React from 'react';
 import { withAuthorization } from '../../session';
 import { withFirebase } from '../../../Firebase';
-import PursuitHolder from './pursuit-holder';
 
 
 class ReturningUserPage extends React.Component{
@@ -12,7 +11,7 @@ class ReturningUserPage extends React.Component{
     render(      
         ){
             return(
-           <PursuitHolder/>
+                    "Temp Home"
                 )
                 
         }

@@ -48,11 +48,11 @@ connection.once('open', () => {
   console.log("MongoDB database connection established successfully");
 })
 
-app.use('/', indexRouter);
+// app.use('/', indexRouter);
 app.use('/pursuit', pursuitsRouter);
 app.use('/user', usersRouter);
-app.use('/test', testRouter);
-app.use('/react', reactRouter);
+// app.use('/test', testRouter);
+// app.use('/react', reactRouter);
 
 // console.log that your server is up and running
 app.listen(port, () => console.log(`Listening on port ${port}`));

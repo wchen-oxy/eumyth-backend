@@ -1,13 +1,14 @@
 var express = require('express');
 var router = express.Router();
 let User = require('../models/user.model');
+let IndexUser = require('../models/index.user.model');
 var firebase = require('firebase');
 const mongoose = require('mongoose');
 
 router.post('/', (req, res) => {
   const uid = req.body.uid;
   const newUser = new User.Model({
-       uid
+       uid:uid 
       });
       newUser.save()
       .then(() => res.json('User added!'))
@@ -19,6 +20,62 @@ router.delete('/', (req, res) => {
   mongoose.connection.deleteModel('User');
 })
 
+router.get('/index', (req, res) => {
+
+  console.log(req.query.username);
+  // User.find
+  const username = req.query.username;
+  IndexUser.Model.findOne({username:username}).then(
+    result => {
+      res.json(result.username)
+    }
+  )
+  .catch(err => 
+    res.send(err))
+            
+})
+
+router.post('/index', (req, res) => {
+  const uid = req.body.uid;
+  const username = req.body.username;
+  const private = req.body.private;
+  const indexUser = IndexUser.Model({
+    uid: uid,
+    username: username,
+    private: private
+  });
+  indexUser.save()
+  .then(() => res.json('User Indexed!'))
+  .catch(err => res.status(400).json('Error: ' + err));
+})
+
+router.post('/available', (req, res) => {
+    const username = req.body.username;
+    console.log(username);
+    IndexUser.Model.findOne({username: username}).then(
+      result => 
+      {
+        console.log(result);
+        if (result) 
+        {
+          console.log("true");
+          res.json(true);
+        }
+        else {
+          res.json(false);
+        }
+      }
+    )
+    .catch(
+      err => {
+        console.log(err);
+        res.send(err);
+      }
+    
+
+    )
+  }
+)
 // router.post('/register', (req, res, next) => {
 //   const email = req.body.email;
 //   const password = req.body.password;
