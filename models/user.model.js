@@ -1,17 +1,18 @@
 const mongoose = require('mongoose');
-let Pursuit = require('./pursuit.model');
+let Pursuits = require('./pursuit.model');
 
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
+
   uid: {
     type: String,
     required: true,
     unique: true,
     trim: true
-   
   },
-  pursuits:[Pursuit.Schema]
+
+  pursuits:[Pursuits.Schema]
 
 }, {
   timestamps: true,

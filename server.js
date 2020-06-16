@@ -15,14 +15,9 @@ var usersRouter = require('./routes/user');
 var testRouter = require('./routes/test');
 var pursuitsRouter = require('./routes/pursuit');
 
-var reactRouter = require('./routes/reactTest');
-
 
 var app = express();
 
-var firebaseInstance = require('./firebase/firebase');
-var firebase = new firebaseInstance();
-console.log(firebase.test());
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -51,7 +46,7 @@ connection.once('open', () => {
 // app.use('/', indexRouter);
 app.use('/pursuit', pursuitsRouter);
 app.use('/user', usersRouter);
-// app.use('/test', testRouter);
+app.use('/test', testRouter);
 // app.use('/react', reactRouter);
 
 // console.log that your server is up and running

@@ -57,19 +57,24 @@ class InitialCustomizationPage extends React.Component {
     
     handleSubmit(e) {
         e.preventDefault();
+        const pursuitsArray = [];
+        for (const pursuit of this.state.pursuits){
+            pursuitsArray.push(pursuit.value);
+        }
        
         this.props.firebase.writeBasicUserData(
             this.state.username,
             this.state.firstName,
-            this.state.lastName, 
-            this.state.pursuits
+            this.state.lastName
+           
         )
         .then(
-            (uid) => axios.post('http://localhost:5000/pursuit', { uid: uid, pursuits: this.state.pursuits })
+            (uid) => axios.post('http://localhost:5000/pursuit', { uid: uid, pursuits: pursuitsArray })
         )
         .then( 
             (result) =>
-            this.props.firebase.writeIndexUserData(result.data, this.state.username, false)
+            axios.post('http://localhost:5000/user/index', { uid: result.data, username: this.state.username, private: false, pursuits: pursuitsArray})
+            // this.props.firebase.writeInitialIndexUserData(result.data, this.state.username, false)
         )
         .then(
             (success) => {if (success) window.location.reload()}

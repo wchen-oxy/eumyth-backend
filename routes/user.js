@@ -4,6 +4,8 @@ let User = require('../models/user.model');
 let IndexUser = require('../models/index.user.model');
 var firebase = require('firebase');
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+
 
 router.post('/', (req, res) => {
   const uid = req.body.uid;
@@ -38,10 +40,23 @@ router.post('/index', (req, res) => {
   const uid = req.body.uid;
   const username = req.body.username;
   const private = req.body.private;
+  const pursuitsArray = req.body.pursuits;
+  console.log(pursuitsArray);
+  let updatedPursuits = []; 
+  const TitleModel = mongoose.model('Title', new Schema({name: String}));
+  for (const pursuit of pursuitsArray){
+    console.log(pursuit);
+    updatedPursuits.push(
+      new TitleModel({
+        name: pursuit
+      })
+    );
+  }
   const indexUser = IndexUser.Model({
     uid: uid,
     username: username,
-    private: private
+    private: private,
+    pursuitNames: updatedPursuits
   });
   indexUser.save()
   .then(() => res.json('User Indexed!'))

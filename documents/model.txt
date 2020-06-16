@@ -1,0 +1,23 @@
+UserSchema{
+	uid: String,
+	pursuits: {
+			name: String,
+			description: String,
+			event: {
+				title: String,
+				subtitle: String,
+				type: String,
+				description: String
+			}
+		}
+}
+
+
+IndexUser{
+	username: String,
+	uid: String,
+	private: boolean,
+	pursuitNames: {
+		name: String
+	}
+}

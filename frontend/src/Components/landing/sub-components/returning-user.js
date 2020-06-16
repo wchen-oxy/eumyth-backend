@@ -8,17 +8,12 @@ class ReturningUserPage extends React.Component{
     constructor(props){
         super(props);
     }
-
     render(      
         ){
-
-
             return(
                     "Temp Home"
-                )
-                
+                )           
         }
-    
 }
 
 const handleCheckUser = () => {

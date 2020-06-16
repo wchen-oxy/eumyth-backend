@@ -2,6 +2,8 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { withFirebase } from '../../Firebase';
+import PursuitHolder from './pursuit-holder';
+import './index.scss';
 
 
 class PursuitProfile extends React.Component {
@@ -14,23 +16,10 @@ class PursuitProfile extends React.Component {
             private: false,
             pursuits: []
         }
-
-
     }
-    // componentDidUpdate(){
-    //     axios.post('http://localhost:5000/pursuit', {uid: this.state.uid}).then(
-    //         (res) => console.log(res)
-    //         //create mongo side profile
-    //     )
-    //     .catch(
-    //         err => console.log(err)
-    //     );
-    // }
-
+   
     componentDidMount() {
         this._isMounted = true;
-        // axios.get('http://localhost:5000/', )
-        //should return uid
         console.log(this.state.username);
         if (this._isMounted) axios.get('http://localhost:5000/pursuit', {
                             params:{
@@ -41,8 +30,7 @@ class PursuitProfile extends React.Component {
                             result => this.setState({
                                 pursuits: result.data
                             })
-                            )
-                        ;
+                            );
         // if (this._isMounted) axios.get('http://localhost:5000/user/index', {
         //     params: {
         //         username: this.state.username
@@ -68,13 +56,20 @@ class PursuitProfile extends React.Component {
 
     }
     render() {
-        const username = this.state.username;
-        var pursuits = [];
-        // console.log(username);
-        console.log(this.state.pursuits);
-
+        var pursuitHolderArray = [];
+        
+        for (const pursuit of this.state.pursuits){
+            console.log(pursuit.name);
+            pursuitHolderArray.push(
+            <PursuitHolder pursuitData={pursuit} key={pursuit.name} value={pursuit.name}/>
+            );
+        }
+        console.log(pursuitHolderArray)
+      
         return (
-            "Pur"
+            <div className="pursuit-board-container">
+            {pursuitHolderArray.map((pursuit) => pursuit)}
+            </div>
         );
     }
 }

@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 let Event = require('./event.model');
-
 const Schema = mongoose.Schema;
 
 const pursuitSchema = new Schema({
@@ -10,10 +9,17 @@ const pursuitSchema = new Schema({
     trim: true
    
   },
+
+  numEvent: {
+    type: Number,
+    required: false
+  },
+  
   description: {
     type: String,
     required:  false,
   },
+
   events: [Event.Schema]
  
 }, {

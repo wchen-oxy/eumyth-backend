@@ -55,21 +55,16 @@ router.route('/').get((req, res) => {
 //   });
   
   router.route('/').post((req, res) => {
-    console.log("HIT POST ROUTE");
     const pursuitsArray = req.body.pursuits;
     const uid = req.body.uid;
-    console.log(pursuitsArray);
     let updatedPursuits = []; 
     for (const pursuit of pursuitsArray){
-      console.log(pursuit.value);
-      
       const entry = new Pursuit.Model({
-        name: pursuit.value
+        name: pursuit
       });
       updatedPursuits.push(entry);
     }
-    console.log(updatedPursuits);
-    console.log(uid);
+    
     //create one, there isnt one rn
     const newUser = new User.Model({
       uid:uid,

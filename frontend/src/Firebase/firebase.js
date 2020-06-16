@@ -28,14 +28,14 @@ class Firebase {
     this.doIsEmailVerified = this.doIsEmailVerified.bind(this);
     this.checkExistingUser = this.checkExistingUser.bind(this);
     this.writeBasicUserData = this.writeBasicUserData.bind(this);
-    this.writeIndexUserData = this.writeIndexUserData.bind(this);
+    this.writeInitialIndexUserData = this.writeInitialIndexUserData.bind(this);
     this.getProfileInfo = this.getProfileInfo.bind(this);
     this.checkAvailableUsername = this.checkAvailableUsername.bind(this);
 
   }
 
   //old one for firebase
-  // writeIndexUserData(uid, username, privateStatus){
+  // writeInitialIndexUserData(uid, username, privateStatus){
   //   this.db.ref('index/' + username)
   //   .set({
   //     uid : uid,
@@ -55,7 +55,7 @@ class Firebase {
     
       .catch(err => "Error: " + err);
   }
-  writeIndexUserData(uid, username, privateStatus) {
+  writeInitialIndexUserData(uid, username, privateStatus) {
     console.log(uid);
     return axios.post('http://localhost:5000/user/index', { uid: uid, username: username, private: privateStatus })
       .then(res => 
@@ -173,7 +173,7 @@ class Firebase {
       }
     )
   }
-  writeBasicUserData(username, firstName, lastName, pursuitsArray) {
+  writeBasicUserData(username, firstName, lastName) {
     const uid = this.auth.currentUser.uid;
     return this.db.ref('users/' + uid)
       .set({
