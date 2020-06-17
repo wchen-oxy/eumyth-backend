@@ -106,51 +106,51 @@ export default class WelcomePage extends React.Component {
 
   render() {
     let LoginRegisterHome;
-      if (this.state.showRegisterSuccess) {
+    if (this.state.showRegisterSuccess) {
+      LoginRegisterHome = (
+        <div>
+          Successfully Registered new account! Please check your email for a verification link.
+          <button onClick={this.handleRegisterSuccess}>Return</button>
+        </div>
+      )
+    }
+    else if (this.state.isLoginMode) {
+      if (this.props.firebase.auth.currentUser && !this.state.verified) {
         LoginRegisterHome = (
-          <div>
-            Successfully Registered new account! Please check your email for a verification link.
-            <button onClick={this.handleRegisterSuccess}>Return</button>
-          </div>
-        )
-      }
-      else if (this.state.isLoginMode) {
-        if (this.props.firebase.auth.currentUser && !this.state.verified) {
-          LoginRegisterHome = (
-            <VerifyPage
-              current_user={this.state.currentUser}
-              onLoginRegisterToggle={this.handleLoginRegisterToggle}
-              onSendEmailVerification={this.handleSendEmailVerication}
-              onSignOut={this.handleSignOut}
-            />
-          )
-        }
-        else {
-          LoginRegisterHome =
-            <WelcomeLoginComponent
-              onLoginRegisterToggle={this.handleLoginRegisterToggle}
-              onLoginEmailChange={this.handleChange}
-              onLoginPasswordChange={this.handleChange}
-              onLoginSubmit={this.handleLoginSubmit}
-            />
-
-        }
-      }
-      else {
-        LoginRegisterHome = (
-          <WelcomeRegisterComponent
+          <VerifyPage
+            current_user={this.state.currentUser}
             onLoginRegisterToggle={this.handleLoginRegisterToggle}
-            onRegisterEmailChange={this.handleChange}
-            onRegisterPasswordChange={this.handleChange}
-            onRegisterSubmit={this.handleRegisterSubmit}
+            onSendEmailVerification={this.handleSendEmailVerication}
+            onSignOut={this.handleSignOut}
           />
         )
       }
-    
+      else {
+        LoginRegisterHome =
+          <WelcomeLoginComponent
+            onLoginRegisterToggle={this.handleLoginRegisterToggle}
+            onLoginEmailChange={this.handleChange}
+            onLoginPasswordChange={this.handleChange}
+            onLoginSubmit={this.handleLoginSubmit}
+          />
+
+      }
+    }
+    else {
+      LoginRegisterHome = (
+        <WelcomeRegisterComponent
+          onLoginRegisterToggle={this.handleLoginRegisterToggle}
+          onRegisterEmailChange={this.handleChange}
+          onRegisterPasswordChange={this.handleChange}
+          onRegisterSubmit={this.handleRegisterSubmit}
+        />
+      )
+    }
+
     return (
       <div className="master-container">
         <main>
-       
+
           <section className="overview-login-register-container">
             <div className="overview-description-container">
               <p>Welcome to interestHub! Login or sign up to get started!</p>

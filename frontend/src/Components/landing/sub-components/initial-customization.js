@@ -3,6 +3,7 @@ import './initial-customization.scss';
 import CustomMultiSelect from "../../custom-clickables/createable-single";
 import { withFirebase } from '../../../Firebase';
 import axios from 'axios';
+import AxiosHelper from '../../../Axios/axios';
 // import {CustomMultiSelect} from '../../custom-clickables/creatable-single';
 
 const INITIAL_STATE = {
@@ -31,9 +32,7 @@ class InitialCustomizationPage extends React.Component {
         console.log(e.target.value);
         this.setState({ [e.target.name]: e.target.value });
         if (e.target.name === "username") {
-            axios.post('http://localhost:5000/user/available', {
-            username: e.target.value
-            })
+            AxiosHelper.checkUsernameAvailable(e.target.name)
             .then(
                 (result) =>
                 {
@@ -69,11 +68,12 @@ class InitialCustomizationPage extends React.Component {
            
         )
         .then(
-            (uid) => axios.post('http://localhost:5000/pursuit', { uid: uid, pursuits: pursuitsArray })
+            (uid) => AxiosHelper.createUserProfile(uid, pursuitsArray)
         )
         .then( 
             (result) =>
-            axios.post('http://localhost:5000/user/index', { uid: result.data, username: this.state.username, private: false, pursuits: pursuitsArray})
+            AxiosHelper.createIndexUserProfile(result.data, this.state.username, pursuitsArray)
+            // axios.post('http://localhost:5000/user/index', { uid: result.data, username: this.state.username, private: false, pursuits: pursuitsArray})
             // this.props.firebase.writeInitialIndexUserData(result.data, this.state.username, false)
         )
         .then(

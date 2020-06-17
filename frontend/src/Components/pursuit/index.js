@@ -1,9 +1,9 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
 import { withFirebase } from '../../Firebase';
 import PursuitHolder from './pursuit-holder';
 import './index.scss';
+import AxiosHelper from '../../Axios/axios';
 
 
 class PursuitProfile extends React.Component {
@@ -17,38 +17,23 @@ class PursuitProfile extends React.Component {
             pursuits: []
         }
     }
-   
+
     componentDidMount() {
         this._isMounted = true;
-        console.log(this.state.username);
-        if (this._isMounted) axios.get('http://localhost:5000/pursuit', {
-                            params:{
-                            username: this.state.username
-                            }
+        AxiosHelper.testString();
+            AxiosHelper.returnPursuitNames(this.state.username)
+                .then(
+                    result => {
+                    if (this._isMounted) {
+
+                        this.setState({
+                            pursuits: result.data.pursuits
                         })
-                        .then(
-                            result => this.setState({
-                                pursuits: result.data
-                            })
-                            );
-        // if (this._isMounted) axios.get('http://localhost:5000/user/index', {
-        //     params: {
-        //         username: this.state.username
-        //     }
-        // })
-        //     .then(
-        //         result =>
-        //         {
-        //             console.log(result.data.uid);
-        //             return axios.get('http://localhost:5000/pursuit', {
-        //                 uid: result.data.uid
-        //             });
-        //         }
-                  
-        //     )
-        //     .then(
-        //         result => console.log(result)
-        //     );
+                    }
+                }
+
+                );
+        
     }
 
     componentWillUnmount() {
@@ -57,20 +42,18 @@ class PursuitProfile extends React.Component {
     }
     render() {
         var pursuitHolderArray = [];
-        
-        for (const pursuit of this.state.pursuits){
-            console.log(pursuit.name);
+
+        for (const pursuit of this.state.pursuits) {
             pursuitHolderArray.push(
-            <PursuitHolder pursuitData={pursuit} key={pursuit.name} value={pursuit.name}/>
+                <PursuitHolder pursuitData={pursuit} key={pursuit.name} value={pursuit.name} />
             );
         }
-        console.log(pursuitHolderArray)
-      
         return (
             <div className="pursuit-board-container">
-            {pursuitHolderArray.map((pursuit) => pursuit)}
+                {pursuitHolderArray.map((pursuit) => pursuit)}
             </div>
         );
+
     }
 }
 

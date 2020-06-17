@@ -17,9 +17,9 @@ class UserHomePage extends React.Component {
             result => {
                 result ? this.setState({ newUser: false }) : this.setState({ newUser: true });
             }
-        ) 
+        )
     }
-   
+
     render() {
         return (this.state.newUser ?
             <InitialCustomizationPage /> : <ReturningUserPage />);

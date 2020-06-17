@@ -28,76 +28,7 @@ class Firebase {
     this.doIsEmailVerified = this.doIsEmailVerified.bind(this);
     this.checkExistingUser = this.checkExistingUser.bind(this);
     this.writeBasicUserData = this.writeBasicUserData.bind(this);
-    this.writeInitialIndexUserData = this.writeInitialIndexUserData.bind(this);
-    this.getProfileInfo = this.getProfileInfo.bind(this);
-    this.checkAvailableUsername = this.checkAvailableUsername.bind(this);
-
   }
-
-  //old one for firebase
-  // writeInitialIndexUserData(uid, username, privateStatus){
-  //   this.db.ref('index/' + username)
-  //   .set({
-  //     uid : uid,
-  //     private : privateStatus
-  //   })
-  //   .catch(err => 'Error: ' + err);
-
-  // }
-  //new one for mongodb
-
-  checkAvailableUsername(username){
-    console.log(username);
-    return axios.post('http://localhost:5000/user/available', {
-        username: username
-    }
-    )
-    
-      .catch(err => "Error: " + err);
-  }
-  writeInitialIndexUserData(uid, username, privateStatus) {
-    console.log(uid);
-    return axios.post('http://localhost:5000/user/index', { uid: uid, username: username, private: privateStatus })
-      .then(res => 
-        {
-          console.log(res);
-          return res;})
-      .catch(err => 'Error: ' + err);
-  }
-
-
-  getProfileInfo(username) {
-    // this.db.ref('users/')
-    //get reference to users/id
-    console.log(username);
-    return axios.get('http://localhost:5000/user/index', {
-      params: {
-        username: username
-      }
-    }
-    )
-    // .then(
-    //   res => res
-    // )
-      .catch(err => "Error: " + err);
-
-    // return( this.db.ref('index/' + username).once('value').then(
-    //   (snapshot) => 
-    //     snapshot.val()
-    // ).catch
-    // (err => "Error: " + err )
-    // // .on('value', (snapshot) => {
-    // //   console.log(snapshot);
-    // //   snapshot.forEach(
-    // //     (childNode) => {
-    // //       if (username === childNode.val().username) return childNode.key;
-    // //     }
-    // //   )
-    // // })
-    // );
-  }
-
-
 
   doTest() {
     return ("FIREBASE");

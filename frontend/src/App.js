@@ -7,6 +7,7 @@ import AccountPage from  './Components/account';
 import {withAuthentication} from './Components/session';
 import Navbar from './Components/navbar/index';
 import PursuitProfile from './Components/pursuit';
+import DetailedPursuit from './Components/pursuit/detailed-pursuit';
 
 
 const App = () => (
@@ -17,6 +18,8 @@ const App = () => (
           <Route exact path ='/account' component={AccountPage} />
           {/* <Route exact path = '/pursuit' component={PursuitPage}/> */}
           <Route exact path = '/:username' component={PursuitProfile} />
+          <Route exact path = '/:username/pursuit/:pursuit' component={DetailedPursuit} />
+
       </Router>
    
 )
