@@ -4,6 +4,7 @@ import { withFirebase } from '../../Firebase';
 import PursuitHolder from './pursuit-holder';
 import './index.scss';
 import AxiosHelper from '../../Axios/axios';
+import NoMatch from '../no-match';
 
 
 class PursuitProfile extends React.Component {
@@ -14,25 +15,26 @@ class PursuitProfile extends React.Component {
         this.state = {
             username: this.props.match.params.username,
             private: false,
-            pursuits: []
+            pursuits: [],
+            fail: false
         }
     }
-
+    //fixme add catch for no found anything
     componentDidMount() {
         this._isMounted = true;
-        AxiosHelper.testString();
-            AxiosHelper.returnPursuitNames(this.state.username)
-                .then(
-                    result => {
-                    if (this._isMounted) {
-
-                        this.setState({
-                            pursuits: result.data.pursuits
-                        })
-                    }
+        AxiosHelper.returnPursuitNames(this.state.username)
+            .then(
+                result => {
+                    console.log(result);
+                if (!result.data) this.setState({ fail: true});
+                else if (this._isMounted) {
+                    this.setState({
+                        pursuits: result.data.pursuits
+                    })
                 }
+            }
 
-                );
+            );
         
     }
 
@@ -41,7 +43,10 @@ class PursuitProfile extends React.Component {
 
     }
     render() {
+        console.log("Pursuit");
         var pursuitHolderArray = [];
+        console.log(this.props.match.params);
+        if (this.state.fail) return NoMatch;
 
         for (const pursuit of this.state.pursuits) {
             pursuitHolderArray.push(

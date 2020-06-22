@@ -1,6 +1,5 @@
 import React from 'react';
-import axios from 'axios';
-
+import './detailed-pursuit.scss';
 class DetailedPursuit extends React.Component{
     _isMounted = false;
 
@@ -10,7 +9,6 @@ class DetailedPursuit extends React.Component{
 
         }
     }
-
     componentDidMount(){
         
     }
@@ -21,7 +19,10 @@ class DetailedPursuit extends React.Component{
 
     render(){
         return(
-            "Detailed"
+            <div className="detailed-pursuit-container">
+                <p>Test</p>
+
+            </div>
         );
     }
 

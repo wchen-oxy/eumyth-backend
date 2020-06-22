@@ -2,6 +2,7 @@ import React from 'react';
 import './index.scss';
 import {AuthUserContext} from '../../Components/session/'
 import { withFirebase } from '../../Firebase';
+import {Link} from 'react-router-dom';
 
 const Navigation = () => (
     <div>
@@ -18,24 +19,13 @@ const Navigation = () => (
         <div className="navbar-item">
             <a>interestHub</a>
         </div>
+        <div className="navbar-item">
+          <Link to={'/account'}>Settings</Link>
+        </div>
         <div className="navbar-item no-select">
             <button onClick={props.firebase.doSignOut}>SignOut</button>
         </div>
     </div>
-    // <ul>
-    //   <li>
-    //     <Link to={ROUTES.LANDING}>Landing</Link>
-    //   </li>
-    //   <li>
-    //     <Link to={ROUTES.HOME}>Home</Link>
-    //   </li>
-    //   <li>
-    //     <Link to={ROUTES.ACCOUNT}>Account</Link>
-    //   </li>
-    //   <li>
-    //     <SignOutButton />
-    //   </li>
-    // </ul>
   );
   
   const NavigationNonAuth = () => (
@@ -47,15 +37,6 @@ const Navigation = () => (
 
    
 </div>
-
-    // <ul>
-    //   <li>
-    //     <Link to={ROUTES.LANDING}>Landing</Link>
-    //   </li>
-    //   <li>
-    //     <Link to={ROUTES.SIGN_IN}>Sign In</Link>
-    //   </li>
-    // </ul>
   );
 
   const NavigationAuthBase = withFirebase(NavigationAuth)

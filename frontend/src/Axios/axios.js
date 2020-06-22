@@ -14,6 +14,12 @@ export default class AxiosHelper{
         });
     }
 
+    static returnIndexUsername(uid){
+        return axios.post('http://localhost:5000/user/username', {
+            uid: uid
+        })
+    }
+
     static checkUsernameAvailable(username){
         return axios.post('http://localhost:5000/user/available', {
                 username: username
