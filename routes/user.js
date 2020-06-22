@@ -43,12 +43,16 @@ router.post('/index', (req, res) => {
   const pursuitsArray = req.body.pursuits;
   console.log(pursuitsArray);
   let updatedPursuits = []; 
-  const TitleModel = mongoose.model('Title', new Schema({name: String}));
+  const TitleModel = mongoose.model('Title', new Schema({
+    name: String,
+    numEvent: 0
+  }));
   for (const pursuit of pursuitsArray){
     console.log(pursuit);
     updatedPursuits.push(
       new TitleModel({
-        name: pursuit
+        name: pursuit,
+        numEvent: 0
       })
     );
   }
@@ -56,7 +60,7 @@ router.post('/index', (req, res) => {
     uid: uid,
     username: username,
     private: private,
-    pursuitNames: updatedPursuits
+    pursuits: updatedPursuits
   });
   indexUser.save()
   .then(() => res.json('User Indexed!'))
@@ -90,6 +94,16 @@ router.post('/available', (req, res) => {
     )
   }
 )
+
+router.post('/username', (req, res) => {
+  const uid = req.body.uid;
+  IndexUser.Model.findOne({uid:uid}).then(
+    result =>
+    {
+      res.json(result.username)
+    }
+  )
+})
 // router.post('/register', (req, res, next) => {
 //   const email = req.body.email;
 //   const password = req.body.password;

@@ -17,14 +17,14 @@ const Navigation = () => (
   const NavigationAuth = (props) => (
     <div className="welcome-navbar-container">
         <div className="navbar-item">
-            <a>interestHub</a>
-        </div>
-        <div className="navbar-item">
-          <Link to={'/account'}>Settings</Link>
+          <Link to={'/'} id="new-entry">interestHub</Link>
+          <Link to={'/new'} id="new-entry">New Entry</Link>
         </div>
         <div className="navbar-item no-select">
-            <button onClick={props.firebase.doSignOut}>SignOut</button>
+          <Link to={'/account'} id="setting" >Settings</Link>
+          <button onClick={props.firebase.doSignOut}>SignOut</button>
         </div>
+       
     </div>
   );
   

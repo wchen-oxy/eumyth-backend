@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
- 
 import { withFirebase } from '../../Firebase';
+import './index.scss';
  
 const INITIAL_STATE = {
   passwordOne: '',
@@ -56,7 +56,7 @@ class PasswordChangeForm extends Component {
           type="password"
           placeholder="Confirm New Password"
         />
-        <button disabled={isInvalid} type="submit">
+        <button id='reset-button' disabled={isInvalid} type="submit">
           Reset My Password
         </button>
  

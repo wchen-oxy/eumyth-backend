@@ -5,22 +5,30 @@ const eventSchema = new Schema({
   title: {
     type: String,
     required: true,
-    trim: true 
+    trim: true
   },
 
   subtitle: {
     type: String,
-    trim: true 
+    trim: true
   },
 
   type: {
     type: String,
-    required:  true,
+    required: true,
   },
   description: {
     type: String,
-    required: false  
-}
+    required: false
+  },
+  durationHour: {
+    type: Number,
+    required: false
+  },
+  durationMin: {
+    type: Number,
+    required: false
+  },
 }, {
   timestamps: true,
 });
@@ -28,6 +36,6 @@ const eventSchema = new Schema({
 const eventModel = mongoose.model('Event', eventSchema);
 
 module.exports = {
-    Schema: eventSchema,
-    Model : eventModel
+  Schema: eventSchema,
+  Model: eventModel
 };

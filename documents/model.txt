@@ -4,6 +4,7 @@ UserSchema{
 			name: String,
 			description: String,
 			event: {
+				order: 
 				title: String,
 				subtitle: String,
 				type: String,

@@ -9,11 +9,6 @@ const pursuitSchema = new Schema({
     trim: true
    
   },
-
-  numEvent: {
-    type: Number,
-    required: false
-  },
   
   description: {
     type: String,

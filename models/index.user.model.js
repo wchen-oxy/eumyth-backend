@@ -1,7 +1,16 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const indexEventSchema = new Schema({name: String}); 
+const indexEventSchema = new Schema({
+    name: String,
+
+    numEvent: {
+        type: Number,
+        required: false
+    },
+    
+
+}); 
 const indexUserSchema = new Schema(
     {
         username: {
@@ -22,7 +31,7 @@ const indexUserSchema = new Schema(
             type: Boolean,
             required: true,
         },
-        pursuitNames: [indexEventSchema]
+        pursuits: [indexEventSchema]
     }
 );
 
