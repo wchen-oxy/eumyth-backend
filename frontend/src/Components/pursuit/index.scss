@@ -1,7 +1,63 @@
 
+@import  '../../main.scss';
+
+#profile-container{ 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#profile-header{
+    min-width: 900px;
+    width: 110vh;
+    background-color: red;
+   
+}
+
+#temp-cover{
+    height: 30vh;
+}
+
+#profile-photo{
+    background-color: grey;
+    display: inline-block;
+    width: 20vh;
+    height: 20vh;
+    min-width: 160px;
+    min-height: 160px;
+    margin-top: -15vh;
+    position: relative;
+    left: -30vh;
+
+    // max-width: 5vh;
+    // height: 10vh;
+}
+
+
+
 .pursuit-board-container{
 display: flex;
-flex-direction: row;
-margin: 10% -5px;
 justify-content: center;
+margin: 10% -5px;
+
+}
+
+#profile-name-container{
+    display: block;
+    margin-top: -5vh;
+    padding-left: 40vh;
+    width: 110vh;
+    background-color: brown;
+}
+
+#profile-name{
+    
+    font-size: $primary-medium-font-size;
+}
+
+#profile-intro-container{
+    display: block;
+    width: 110vh;
+    height: 100px;
+    background-color: blue;
 }

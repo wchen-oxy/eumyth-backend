@@ -54,8 +54,25 @@ class PursuitProfile extends React.Component {
             );
         }
         return (
-            <div className="pursuit-board-container">
+            <div id="profile-container">
+                <div id="profile-header">
+                    <div id="temp-cover">
+                    </div>
+                  
+                </div>
+                <div id="profile-photo">
+                </div>
+                <div id="profile-name-container">
+                    <h4 id='profile-name'>William Chen</h4>
+                </div>
+                <div id="profile-intro-container">
+                    <p>Hello</p>
+                </div>
+                
+           
+            {/* <div className="pursuit-board-container">
                 {pursuitHolderArray.map((pursuit) => pursuit)}
+            </div> */}
             </div>
         );
 
