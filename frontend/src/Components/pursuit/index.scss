@@ -8,26 +8,31 @@
 }
 
 #profile-header{
-    min-width: 900px;
-    width: 110vh;
+    width: 130vh;
     background-color: red;
+    position: relative;
+    z-index: 2;
    
 }
 
 #temp-cover{
     height: 30vh;
+   
 }
 
 #profile-photo{
+    position: absolute;
     background-color: grey;
-    display: inline-block;
     width: 20vh;
     height: 20vh;
     min-width: 160px;
     min-height: 160px;
-    margin-top: -15vh;
-    position: relative;
-    left: -30vh;
+    z-index: 4;
+    top: 14vh;
+    left: 14vh;
+
+    // left: -30vh;
+   
 
     // max-width: 5vh;
     // height: 10vh;
@@ -44,9 +49,8 @@ margin: 10% -5px;
 
 #profile-name-container{
     display: block;
-    margin-top: -5vh;
     padding-left: 40vh;
-    width: 110vh;
+    width: 130vh;
     background-color: brown;
 }
 
@@ -56,8 +60,27 @@ margin: 10% -5px;
 }
 
 #profile-intro-container{
-    display: block;
-    width: 110vh;
+    display: relative;
+    width: 130vh;
     height: 100px;
-    background-color: blue;
+    background-color: #1E51BC;
+    z-index: -1;
+}
+
+#profile-description{
+    display: block;
+}
+
+#pursuit-selection-container{
+    width: 130vh;
+    background-color: #2061E9;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    padding: 2vh;
+}
+
+#new-pursuit-container{
+    background-color: grey;
+    
 }

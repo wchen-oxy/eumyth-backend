@@ -3,6 +3,10 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const Grid = require("gridfs-stream");
+
+let gfs;
+
 
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -14,7 +18,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/user');
 var testRouter = require('./routes/test');
 var pursuitsRouter = require('./routes/pursuit');
-
+var entryRouter = require('./routes/entry');
 
 var app = express();
 
@@ -31,6 +35,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(cors());
 
+const GridFsStorage = require("multer-gridfs-storage");
+const multer = require('multer');
+
 // Mongoose specific code
 const uri = process.env.ATLAS_URI;
 console.log(uri);
@@ -41,12 +48,55 @@ mongoose.connect(uri, { useNewUrlParser: true, useCreateIndex: true, useUnifiedT
 const connection = mongoose.connection;
 connection.once('open', () => {
   console.log("MongoDB database connection established successfully");
+  gfs = Grid(connection.db, mongoose.mongo);
+  gfs.collection('uploads');
+  console.log("GFS image connection succesful");
 })
+
+
+
+// const storage = new GridFsStorage({
+//   url: uri,
+//   file: (req, file) => {
+//     return new Promise((resolve, reject) => {
+//       console.log("Inner Proimse");
+//       // console.log(crypto);
+//       crypto.randomBytes(16, (err, buf) => {
+//         if (err) {
+//             console.log(err);
+//             console.loh(1);
+//           return reject(err)
+//         }
+//         console.log(file);
+//         const filename = file.originalname
+//         const fileInfo = {
+//           filename: filename,
+//           bucketName: 'uploads',
+//         }
+//         resolve(fileInfo)
+//       })
+//     })
+//   },
+// })
+
+// const upload = multer({ storage });
+
 
 // app.use('/', indexRouter);
 app.use('/pursuit', pursuitsRouter);
 app.use('/user', usersRouter);
 app.use('/test', testRouter);
+app.use('/entry', function (req, res, next) {
+  console.log('the response will be sent by the next function ...');
+  req.image_config = {
+    gfs: gfs
+  };
+  next();
+}, entryRouter);
+// app.post('/entry/image', upload.single('img'), (req, res, err) => {
+//   if (err) throw err
+//   res.status(201).send()
+// })
 // app.use('/react', reactRouter);
 
 // console.log that your server is up and running

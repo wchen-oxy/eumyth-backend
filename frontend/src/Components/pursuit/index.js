@@ -53,23 +53,33 @@ class PursuitProfile extends React.Component {
                 <PursuitHolder pursuitData={pursuit} key={pursuit.name} value={pursuit.name} />
             );
         }
+        if (pursuitHolderArray.length !== 5) pursuitHolderArray.push(
+            <div id="new-pursuit-container">
+                New Temp Pursuit Button
+            </div>
+        );
         return (
             <div id="profile-container">
                 <div id="profile-header">
-                    <div id="temp-cover">
+                    <div id="temp-cover">        
                     </div>
-                  
-                </div>
-                <div id="profile-photo">
-                </div>
-                <div id="profile-name-container">
-                    <h4 id='profile-name'>William Chen</h4>
+                    <div id="profile-photo">
+                    </div>
                 </div>
                 <div id="profile-intro-container">
-                    <p>Hello</p>
+                <div id="profile-name-container">
+                    <h4 id="profile-name">William Chen</h4>
+                </div>
+                <div id="profile-description">
+                    <p>Description</p>
                 </div>
                 
-           
+                </div>  
+                <div id="pursuit-selection-container">
+                    {pursuitHolderArray}
+                </div>
+                <div id="event-container">
+                </div> 
             {/* <div className="pursuit-board-container">
                 {pursuitHolderArray.map((pursuit) => pursuit)}
             </div> */}

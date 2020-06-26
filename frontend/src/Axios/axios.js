@@ -36,5 +36,9 @@ export default class AxiosHelper{
 
     }
 
+    static postImage(formData){
+        return axios.post('http://localhost:5000/entry/image', formData)
+    }
+
 }
 

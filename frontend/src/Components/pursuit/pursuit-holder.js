@@ -25,9 +25,9 @@ class PursuitHolder extends React.Component {
         const pursuitName = this.state.pursuitName;
         return (
             <div className="pursuit-container" key={pursuitName} value={pursuitName} onClick={(e) => this.handleBoardChange(e, pursuitName)}>
-                <h2>
+                <h4>
                     {this.props.pursuitData.name}
-                </h2>
+                </h4>
                 <p>
                     Events: {this.props.pursuitData.numEvent}
                 </p>
