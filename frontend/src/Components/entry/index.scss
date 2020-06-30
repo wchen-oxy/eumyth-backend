@@ -2,11 +2,12 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    
 }
 
 #editor-container{
     background-color: grey;
-    width: 130vh;
+    width: 75%;
 }
 
 #button-container{
@@ -23,9 +24,10 @@
     align-items: center;
 }
 #text-editor{
-    display: flex;
-    flex-direction: column;
-    padding-bottom: 1vh;
+    display: block;
+    width: 75%;
+    padding: 10vh;
+    
 }
 
 #editor-form{
