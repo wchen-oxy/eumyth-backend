@@ -35,6 +35,7 @@ class NewEntry extends React.Component {
     }
 
     componentDidMount(){
+        console.log(this.refsEditor);
         this.refsEditor.current.focus();
     }
 
@@ -89,8 +90,8 @@ class NewEntry extends React.Component {
                     </div> */
 
             <div id="milestone-page-container">
-                <link rel="stylesheet" type="text/css" href="https://unpkg.com/medium-draft/dist/medium-draft.css"/>
-                <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css"/>
+                {/* <link rel="stylesheet" type="text/css" href="https://unpkg.com/medium-draft/dist/medium-draft.css"/>
+                <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css"/> */}
                 
 
                 <div id="editor-container">
