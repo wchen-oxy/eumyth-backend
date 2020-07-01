@@ -1,42 +1,27 @@
 import React from 'react';
 import Axios from '../../Axios/axios'
-import { Editor, createEditorState, BLOCK_BUTTONS} from 'medium-draft';
-import CustomImageSideButton from '../custom-image-upload/index';
 import './index.scss';
+import AlloyEditor from 'alloyeditor';
+var AlloyEditorComponent = require('alloyeditor');
 
-const blockButtons = [{
-    label: 'H1',
-    style: 'header-one',
-    icon: 'header',
-    description: 'Heading 1',
-  },].concat(BLOCK_BUTTONS);
-
-// const FormData = require('form-data');
 class NewEntry extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            isMilestone: false,
-            editorState: createEditorState(), // for empty content
-        };
+            isMilestone: false
+           
+                };
 
         this.handleTypeToggle = this.handleTypeToggle.bind(this);
         this.handleImagePost = this.handleImagePost.bind(this);
         this.handleChange = this.handleChange.bind(this);
-        // this.refsEditor = React.createRef();
-
-        this.sideButtons = [{
-            title: 'Image',
-            component: CustomImageSideButton,
-          }];
-      
 
     }
 
     componentDidMount(){
-        // console.log(this.refsEditor);
-        // this.refsEditor.current.focus();
+        console.log(AlloyEditorComponent.AlloyEditor.editable);
+        // console.log(AlloyEditorComponent);
     }
 
     handleTypeToggle(e) {
@@ -71,8 +56,16 @@ class NewEntry extends React.Component {
     
 
     render() {
-        // var editor = new MediumEditor('.editable');
-        const { editorState } = this.state;
+
+        const edit = 
+        
+            <div id='content-section'>
+            </div>
+        ;
+        // var alloyEditor = AlloyEditorComponent.AlloyEditor.editable(edit);
+
+        // var content = alloyEditor.get('nativeEditor').getData();
+        
 
         return (
 
@@ -90,11 +83,9 @@ class NewEntry extends React.Component {
                     </div> */
 
             <div id="milestone-page-container">
-                {/* <link rel="stylesheet" type="text/css" href="https://unpkg.com/medium-draft/dist/medium-draft.css"/>
-                <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css"/> */}
-                
-
-                <div id="editor-container">
+                <script src="alloy-editor/alloy-editor-no-react-min.js"></script>
+                <link href="alloy-editor/assets/alloy-editor-ocean-min.css" rel="stylesheet"/>
+             <div id="editor-container">
                     <div id="button-container">
                         <span id="toggle-button-span">
                             <button id="toggle-button">Toggle Mode</button>
@@ -105,26 +96,8 @@ class NewEntry extends React.Component {
                     </div>
                 </div>
                 <div id="text-editor">
-                       
-                       {/* <Editor
-                           ref={this.refsEditor}
-                           editorState={editorState}
-                           onChange={this.handleChange} 
-                           placeholder='Title'
-                           blockButtons={blockButtons}
-                           sideButtons={this.sideButtons}
-                           />
-                        */}
-                   
-                  
-                       {/* <form id="editor-form">
-                           <label>Title</label>
-                           <input type='text' />
-                           <label>Desc</label>
-                           <input id="description-box" type='text' />
-
-                       </form> */}
-
+                    Hello this is some content
+                    <AlloyEditorComponent.AlloyEditor></AlloyEditorComponent.AlloyEditor>
                    </div>
 
             </div>
