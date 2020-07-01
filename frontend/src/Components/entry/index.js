@@ -1,8 +1,6 @@
 import React from 'react';
 import Axios from '../../Axios/axios'
 import './index.scss';
-import AlloyEditor from 'alloyeditor';
-var AlloyEditorComponent = require('alloyeditor');
 
 class NewEntry extends React.Component {
 
@@ -20,8 +18,7 @@ class NewEntry extends React.Component {
     }
 
     componentDidMount(){
-        console.log(AlloyEditorComponent.AlloyEditor.editable);
-        // console.log(AlloyEditorComponent);
+     
     }
 
     handleTypeToggle(e) {
@@ -57,16 +54,6 @@ class NewEntry extends React.Component {
 
     render() {
 
-        const edit = 
-        
-            <div id='content-section'>
-            </div>
-        ;
-        // var alloyEditor = AlloyEditorComponent.AlloyEditor.editable(edit);
-
-        // var content = alloyEditor.get('nativeEditor').getData();
-        
-
         return (
 
                /* <div id="cover-container">
@@ -96,8 +83,7 @@ class NewEntry extends React.Component {
                     </div>
                 </div>
                 <div id="text-editor">
-                    Hello this is some content
-                    <AlloyEditorComponent.AlloyEditor></AlloyEditorComponent.AlloyEditor>
+                 
                    </div>
 
             </div>
