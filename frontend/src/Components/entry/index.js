@@ -1,6 +1,8 @@
 import React from 'react';
 import Axios from '../../Axios/axios'
 import './index.scss';
+import DanteEditor from 'Dante2';
+import Dante from 'Dante2';
 
 class NewEntry extends React.Component {
 
@@ -70,8 +72,8 @@ class NewEntry extends React.Component {
                     </div> */
 
             <div id="milestone-page-container">
-                <script src="alloy-editor/alloy-editor-no-react-min.js"></script>
-                <link href="alloy-editor/assets/alloy-editor-ocean-min.css" rel="stylesheet"/>
+                
+               
              <div id="editor-container">
                     <div id="button-container">
                         <span id="toggle-button-span">
@@ -82,8 +84,9 @@ class NewEntry extends React.Component {
                         </span>
                     </div>
                 </div>
+               
                 <div id="text-editor">
-                 
+                <DanteEditor/>
                    </div>
 
             </div>
