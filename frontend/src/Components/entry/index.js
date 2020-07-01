@@ -24,7 +24,7 @@ class NewEntry extends React.Component {
         this.handleTypeToggle = this.handleTypeToggle.bind(this);
         this.handleImagePost = this.handleImagePost.bind(this);
         this.handleChange = this.handleChange.bind(this);
-        this.refsEditor = React.createRef();
+        // this.refsEditor = React.createRef();
 
         this.sideButtons = [{
             title: 'Image',
@@ -35,8 +35,8 @@ class NewEntry extends React.Component {
     }
 
     componentDidMount(){
-        console.log(this.refsEditor);
-        this.refsEditor.current.focus();
+        // console.log(this.refsEditor);
+        // this.refsEditor.current.focus();
     }
 
     handleTypeToggle(e) {
@@ -106,7 +106,7 @@ class NewEntry extends React.Component {
                 </div>
                 <div id="text-editor">
                        
-                       <Editor
+                       {/* <Editor
                            ref={this.refsEditor}
                            editorState={editorState}
                            onChange={this.handleChange} 
@@ -114,7 +114,7 @@ class NewEntry extends React.Component {
                            blockButtons={blockButtons}
                            sideButtons={this.sideButtons}
                            />
-                       
+                        */}
                    
                   
                        {/* <form id="editor-form">
