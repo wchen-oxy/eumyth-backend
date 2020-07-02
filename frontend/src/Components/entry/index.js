@@ -88,17 +88,17 @@ class NewEntry extends React.Component {
                 </div> */}
                
                 <div id="text-editor">
-                <Container>
-      <Row>
-        <Col sm={12} className="dante">
-          <DanteEditor 
-            title_placeholder={'Title'}
-            body_placeholder={'Write your article'}
-          />
-        </Col>
-      </Row>
-    </Container>
-                {/* < DanteEditor/> */}
+                {/* <Container>
+                    <Row>
+                        <Col sm={12} className="dante">
+                        <DanteEditor 
+                            title_placeholder={'Title'}
+                            body_placeholder={'Write your article'}
+                        />
+                        </Col>
+                    </Row>
+                </Container> */}
+                < DanteEditor/>
       
                    </div>
 

@@ -8,8 +8,7 @@ const dantet = () => {
       <Row>
         <Col sm={12} className="dante">
           <DanteEditor 
-            title_placeholder={'Title'}
-            body_placeholder={'Write your article'}
+           
           />
         </Col>
       </Row>
