@@ -3,6 +3,8 @@ import Axios from '../../Axios/axios'
 import './index.scss';
 import DanteEditor from 'Dante2';
 import Dante from 'Dante2';
+import dantet from './dante';
+import { Container, Row, Col } from "react-bootstrap";
 
 class NewEntry extends React.Component {
 
@@ -73,7 +75,7 @@ class NewEntry extends React.Component {
 
             <div id="milestone-page-container">
                 
-               
+{/*                
              <div id="editor-container">
                     <div id="button-container">
                         <span id="toggle-button-span">
@@ -83,10 +85,21 @@ class NewEntry extends React.Component {
                             <button id="post-button">Post!</button>
                         </span>
                     </div>
-                </div>
+                </div> */}
                
                 <div id="text-editor">
-                <DanteEditor/>
+                <Container>
+      <Row>
+        <Col sm={12} className="dante">
+          <DanteEditor 
+            title_placeholder={'Title'}
+            body_placeholder={'Write your article'}
+          />
+        </Col>
+      </Row>
+    </Container>
+                {/* < DanteEditor/> */}
+      
                    </div>
 
             </div>

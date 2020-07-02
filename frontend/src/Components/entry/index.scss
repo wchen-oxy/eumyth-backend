@@ -1,6 +1,3 @@
-
- @import url("https://unpkg.com/medium-draft/dist/medium-draft.css");
- @import url("//maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css");
 #milestone-page-container{
     display: flex;
     flex-direction: column;
@@ -19,7 +16,6 @@
 }
 
 #cover-container{
-   
     height: 80vh;
     background-color: green;
     display: flex;
@@ -28,6 +24,7 @@
 }
 #text-editor{
     width: 75%;
+    padding: 25px;
     
 }
 

@@ -5,17 +5,17 @@ import { withFirebase } from '../../Firebase';
 import {Link} from 'react-router-dom';
 
 const Navigation = () => (
-    <div>
+   
       <AuthUserContext.Consumer>
         {authUser =>
           authUser && authUser.emailVerified ? <NavigationAuthBase /> : <NavigationNonAuth />
         }
       </AuthUserContext.Consumer>
-    </div>
+   
   );
   
   const NavigationAuth = (props) => (
-    <div className="welcome-navbar-container">
+    <nav className="welcome-navbar-container">
         <div className="navbar-item">
           <Link to={'/'} id="new-entry">interestHub</Link>
           <Link to={'/new'} id="new-entry">New Entry</Link>
@@ -25,7 +25,7 @@ const Navigation = () => (
           <button onClick={props.firebase.doSignOut}>SignOut</button>
         </div>
        
-    </div>
+    </nav>
   );
   
   const NavigationNonAuth = () => (
