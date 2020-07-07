@@ -1,16 +1,21 @@
 UserSchema{
 	uid: String,
 	pursuits: {
+		num: {
 			name: String,
 			description: String,
 			event: {
-				order: 
-				title: String,
-				subtitle: String,
-				type: String,
-				description: String
+				#: { 
+					title: String,
+					subtitle: String,
+					type: String,
+					description: EditorState,
+					durationHour: String,
+					durationMin: String
+				}
 			}
 		}
+	}
 }
 
 
@@ -18,7 +23,10 @@ IndexUser{
 	username: String,
 	uid: String,
 	private: boolean,
-	pursuitNames: {
-		name: String
+	pursuits: {
+		indexEvent: {
+			name: String,
+			numEvent: Number	
+		}
 	}
 }

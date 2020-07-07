@@ -49,7 +49,8 @@ const connection = mongoose.connection;
 connection.once('open', () => {
   console.log("MongoDB database connection established successfully");
   gfs = Grid(connection.db, mongoose.mongo);
-  gfs.collection('uploads');
+  gfs.collection('posts');
+  gfs.collection('images');
   console.log("GFS image connection succesful");
 })
 

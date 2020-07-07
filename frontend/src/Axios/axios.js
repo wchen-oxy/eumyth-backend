@@ -26,8 +26,8 @@ export default class AxiosHelper{
                 })
     }
 
-    static createUserProfile(uid, pursuitsArray){
-        return axios.post('http://localhost:5000/pursuit', { uid: uid, pursuits: pursuitsArray });
+    static createUserProfile(username, pursuitsArray){
+        return axios.post('http://localhost:5000/user', { username: username, pursuits: pursuitsArray });
 
     }
 
@@ -38,6 +38,10 @@ export default class AxiosHelper{
 
     static postImage(formData){
         return axios.post('http://localhost:5000/entry/image', formData)
+    }
+
+    static saveEntry(content) {
+        return axios.post('http://localhost:5000/entry/', content)
     }
 
 }

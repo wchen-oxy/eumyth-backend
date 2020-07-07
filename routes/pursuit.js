@@ -54,32 +54,32 @@ router.route('/').get((req, res) => {
 //       .catch(err => res.status(400).json('Error: ' + err));
 //   });
 
-router.route('/').post((req, res) => {
-  const pursuitsArray = req.body.pursuits;
-  const uid = req.body.uid;
-  let updatedPursuits = [];
-  for (const pursuit of pursuitsArray) {
-    const entry = new Pursuit.Model({
-      name: pursuit
-    });
-    updatedPursuits.push(entry);
-  }
+// router.route('/').post((req, res) => {
+//   const pursuitsArray = req.body.pursuits;
+//   const uid = req.body.uid;
+//   let updatedPursuits = [];
+//   for (const pursuit of pursuitsArray) {
+//     const entry = new Pursuit.Model({
+//       name: pursuit
+//     });
+//     updatedPursuits.push(entry);
+//   }
 
-  //create one, there isnt one rn
-  const newUser = new User.Model({
-    uid: uid,
-    pursuits: updatedPursuits
-  });
-  return newUser.save().then(() => res.json(uid))
-    .catch(err => res.status(400).json('Error: ' + err));
+//   //create one, there isnt one rn
+//   const newUser = new User.Model({
+//     uid: uid,
+//     pursuits: updatedPursuits
+//   });
+//   return newUser.save().then(() => res.json(uid))
+//     .catch(err => res.status(400).json('Error: ' + err));
 
 
-  // User.Model.findOne({uid: uid}).updateOne({pursuits: updatedPursuits})
-  // .then(
-  //   () => res.json('Updated pursuits!')
-  // ).catch(err => res.status(400).json('Error: ' + err));
+//   // User.Model.findOne({uid: uid}).updateOne({pursuits: updatedPursuits})
+//   // .then(
+//   //   () => res.json('Updated pursuits!')
+//   // ).catch(err => res.status(400).json('Error: ' + err));
 
-});
+// });
 
 module.exports = router;
 

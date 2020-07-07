@@ -68,14 +68,14 @@ class InitialCustomizationPage extends React.Component {
            
         )
         .then(
-            (uid) => AxiosHelper.createUserProfile(uid, pursuitsArray)
+            () => AxiosHelper.createUserProfile(this.state.username, pursuitsArray)
         )
-        .then( 
-            (result) =>
-            AxiosHelper.createIndexUserProfile(result.data, this.state.username, pursuitsArray)
-            // axios.post('http://localhost:5000/user/index', { uid: result.data, username: this.state.username, private: false, pursuits: pursuitsArray})
-            // this.props.firebase.writeInitialIndexUserData(result.data, this.state.username, false)
-        )
+        // .then( 
+        //     (result) =>
+        //     AxiosHelper.createIndexUserProfile(result.data, this.state.username, pursuitsArray)
+        //     // axios.post('http://localhost:5000/user/index', { uid: result.data, username: this.state.username, private: false, pursuits: pursuitsArray})
+        //     // this.props.firebase.writeInitialIndexUserData(result.data, this.state.username, false)
+        // )
         .then(
             (success) => {if (success) window.location.reload()}
         );

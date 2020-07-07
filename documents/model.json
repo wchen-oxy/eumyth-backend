@@ -1,0 +1,52 @@
+	UserSchema{
+		description: String,
+		pursuits: {
+			num: {
+				name: String,
+				totalMin: Number,
+				dataRef: objectId
+				
+			}
+		}
+		events: {
+			objectNum:{
+					#: { 
+						title: String,
+						subtitle: String,
+						type: String,
+						cover: objectId
+						description: EditorState,
+						durationHour: String,
+						durationMin: String
+					}
+				}
+			}
+		
+			draft:{
+				title: String,
+				subtitle: String,
+				type: String,
+				cover: objectId
+				text: EditorState,
+				durationHour: String,
+				durationMin: String
+			}
+	}
+
+
+	IndexUser{
+		username: String,
+		userObjId: ObjectId,
+		private: boolean,
+		pursuits: {
+			indexEvent: {
+				name: String,
+				numEvent: Number	
+			}
+		}
+	}
+
+eventDocuments: {
+		text: EditorState,
+		 
+	}

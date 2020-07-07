@@ -9,13 +9,15 @@ const pursuitSchema = new Schema({
     trim: true
    
   },
-  
-  description: {
-    type: String,
-    required:  false,
-  },
 
-  events: [Event.Schema]
+  eventDataRef: {
+    type: mongoose.Types.ObjectId
+  },
+  
+  totalMin: {
+    type: Number,
+    required:  false,
+  }
  
 }, {
   timestamps: true,

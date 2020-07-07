@@ -20,8 +20,8 @@ const indexUserSchema = new Schema(
             trim: true
 
         },
-        uid: {
-            type: String,
+        userProfileRef: {
+            type: mongoose.Types.ObjectId,
             required: true,
             unique: true,
             trim: true

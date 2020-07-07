@@ -13,6 +13,7 @@ const crypto = require('crypto');
 const storage = new GridFsStorage({
     url: uri,
     file: (req, file) => {
+      console.log(req.body);
       return new Promise((resolve, reject) => {
         crypto.randomBytes(16, (err, buf) => {
           if (err) {
@@ -21,7 +22,7 @@ const storage = new GridFsStorage({
           const filename = file.originalname
           const fileInfo = {
             filename: filename,
-            bucketName: 'uploads',
+            bucketName: 'images',
           }
           resolve(fileInfo)
         })
@@ -31,10 +32,16 @@ const storage = new GridFsStorage({
   
 const upload = multer({ storage });
 
+// router.route('/').post((req, res) => {
+//   console.log(req.body);
+//   console.log("Made it");
+//   res.status(200).send();
+// })
+
 router.route('/image/:filename').get( (req, res) => {
     const gfs = req.image_config.gfs;
     gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
-        console.log("insides");
+       
         console.log(file);
         // Check if file
         if (!file || file.length === 0) {
@@ -56,9 +63,10 @@ router.route('/image/:filename').get( (req, res) => {
       });
 })
 
-router.route('/image').post(upload.single('img'), (req, res) => {
+router.route('/image').post(upload.single('file'), (req, res) => {
     console.log("Made it");
-    res.status(201).send();
+    console.log(req.body)
+    res.status(201).send({url: "https://pngimg.com/uploads/cat/cat_PNG50504.png"});
 })
 
 

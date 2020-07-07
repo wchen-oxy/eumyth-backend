@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
-const eventSchema = new Schema({
+const draftSchema = new Schema({
   title: {
     type: String,
     required: true,
@@ -20,11 +20,11 @@ const eventSchema = new Schema({
 
   cover: {
     type: mongoose.Types.ObjectId,
-    required: false,
+    required: true,
   },
-  
-  postDataRef: {
-    type: mongoose.Types.ObjectId,
+
+  draftData: {
+    type: Schema.Types.Mixed,
     required: false
   },
   durationHour: {
@@ -39,9 +39,9 @@ const eventSchema = new Schema({
   timestamps: true,
 });
 
-const eventModel = mongoose.model('Event', eventSchema);
+const draftModel = mongoose.model('Draft', draftSchema);
 
 module.exports = {
-  Schema: eventSchema,
-  Model: eventModel
+  Schema: draftSchema,
+  Model: draftModel
 };
