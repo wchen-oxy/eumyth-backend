@@ -31,10 +31,10 @@ export default class AxiosHelper{
 
     }
 
-    static createIndexUserProfile(uid, username, pursuits){
-        return axios.post('http://localhost:5000/user/index', { uid: uid, username: username, private: false, pursuits: pursuits})
+    // static createIndexUserProfile(uid, username, pursuits){
+    //     return axios.post('http://localhost:5000/user/index', { uid: uid, username: username, private: false, pursuits: pursuits})
 
-    }
+    // }
 
     static postImage(formData){
         return axios.post('http://localhost:5000/entry/image', formData)

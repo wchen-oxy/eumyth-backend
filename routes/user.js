@@ -18,7 +18,6 @@ router.post('/', (req, res) => {
     numEvent: 0
   }));
 
-  console.log(pursuitsArray);
   for (const pursuit of pursuitsArray) {
     // const entry = new Pursuit.Model({
     //   name: pursuit
@@ -39,15 +38,14 @@ router.post('/', (req, res) => {
     );
 
   }
-  console.log(mainPursuitsHolder);
-  console.log(username);
+
   //create one, there isnt one rn
   const newUser = new User.Model({
     username: username,
     pursuits: mainPursuitsHolder,
     events: []
   });
-  console.log(newUser._id);
+
   const indexUser = new IndexUser.Model({
     
     username: username,
@@ -55,7 +53,7 @@ router.post('/', (req, res) => {
     private: false,
     pursuits: indexPursuitsHolder
   });
-  console.log("Fag");
+ 
   newUser.save().catch(err => res.status(400).json('Error: ' + err));
   indexUser.save().catch(err => res.status(400).json('Error: ' + err));
   return res.status(201).json('New User Added!');

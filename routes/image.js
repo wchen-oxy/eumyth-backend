@@ -22,22 +22,18 @@ const storage = new GridFsStorage({
           const filename = file.originalname
           const fileInfo = {
             filename: filename,
-            bucketName: 'posts',
+            bucketName: 'images',
           }
           resolve(fileInfo)
         })
       })
     },
   })
-  
 const upload = multer({ storage });
 
-
-router.route('/image/:filename').get( (req, res) => {
+router.route('/:id').get( (req, res) => {
     const gfs = req.image_config.gfs;
-    gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
-       
-        console.log(file);
+    gfs.files.findOne({ _id: new mongoose.mongo.ObjectId(req.params.id)}, (err, file) => {
         // Check if file
         if (!file || file.length === 0) {
           return res.status(404).json({
@@ -59,9 +55,7 @@ router.route('/image/:filename').get( (req, res) => {
 })
 
 router.route('/').post(upload.single('file'), (req, res) => {
-    console.log("Made it");
-    console.log(req.body)
-    res.status(201).send({url: "https://pngimg.com/uploads/cat/cat_PNG50504.png"});
+    res.status(201).send({url: 'http://localhost:5000/image/' + req.file.id});
 })
 
 

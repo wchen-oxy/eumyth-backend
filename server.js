@@ -19,7 +19,7 @@ var usersRouter = require('./routes/user');
 var testRouter = require('./routes/test');
 var pursuitsRouter = require('./routes/pursuit');
 var entryRouter = require('./routes/entry');
-
+var imageRouter = require('./routes/image.js');
 var app = express();
 
 
@@ -84,16 +84,17 @@ connection.once('open', () => {
 
 
 // app.use('/', indexRouter);
-app.use('/pursuit', pursuitsRouter);
-app.use('/user', usersRouter);
-app.use('/test', testRouter);
-app.use('/entry', function (req, res, next) {
+app.use('/image',  function (req, res, next) {
   console.log('the response will be sent by the next function ...');
   req.image_config = {
     gfs: gfs
   };
   next();
-}, entryRouter);
+}, imageRouter);
+app.use('/pursuit', pursuitsRouter);
+app.use('/user', usersRouter);
+app.use('/test', testRouter);
+app.use('/entry', entryRouter);
 // app.post('/entry/image', upload.single('img'), (req, res, err) => {
 //   if (err) throw err
 //   res.status(201).send()

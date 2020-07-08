@@ -1,4 +1,5 @@
 	UserSchema{
+		username: String,
 		description: String,
 		pursuits: {
 			num: {
@@ -9,8 +10,8 @@
 			}
 		}
 		events: {
-			objectNum:{
-					#: { 
+			num:{
+					event: { 
 						title: String,
 						subtitle: String,
 						type: String,

@@ -119,7 +119,7 @@ class NewEntry extends React.Component {
                 widgets={[
                     ImageBlockConfig({
                       options: {
-                        upload_url: "http://localhost:5000/entry/image",
+                        upload_url: "http://localhost:5000/image",
                         upload_callback: (ctx, img) => {
                             console.log(ctx);
                             console.log(img);
