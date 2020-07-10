@@ -10,7 +10,7 @@ const draftSchema = new Schema({
 
   subtitle: {
     type: String,
-    trim: true
+    trim: false
   },
 
   type: {
@@ -20,7 +20,7 @@ const draftSchema = new Schema({
 
   cover: {
     type: mongoose.Types.ObjectId,
-    required: true,
+    required: false,
   },
 
   draftData: {

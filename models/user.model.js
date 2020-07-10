@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 let Pursuits = require('./pursuit.model');
 let Event = require('./event.model');
+let Draft = require('./draft.model');
 const Schema = mongoose.Schema;
 
 
@@ -23,6 +24,7 @@ const userSchema = new Schema({
 
   pursuits:[Pursuits.Schema],
   events: [innerPursuitSchema],
+  draft: Draft.Schema
 
 }, {
   timestamps: true,

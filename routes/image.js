@@ -9,8 +9,39 @@ const GridFsStorage = require("multer-gridfs-storage");
 const multer = require('multer');
 const uri = process.env.ATLAS_URI;
 const crypto = require('crypto');
+const fs = require('fs');
 
-const storage = new GridFsStorage({
+// const smallImageStorage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     console.log("small");
+//     cb(null, '/tmp')
+//   },
+//   filename: function (req, file, cb) {
+//     cb(null, file.fieldname + '-' + Date.now())
+//   },
+  
+// })
+// const largeImageStorage = new GridFsStorage({
+//     url: uri,
+//     file: (req, file) => {
+//       console.log("large");
+//       console.log(file);
+//       return new Promise((resolve, reject) => {
+//         crypto.randomBytes(16, (err, buf) => {
+//           if (err) {
+//             return reject(err)
+//           }
+//           const filename = file.originalname
+//           const fileInfo = {
+//             filename: filename,
+//             bucketName: 'images',
+//           }
+//           resolve(fileInfo)
+//         })
+//       })
+//     },
+//   })
+  const storage = new GridFsStorage({
     url: uri,
     file: (req, file) => {
       console.log(req.body);
@@ -54,9 +85,12 @@ router.route('/:id').get( (req, res) => {
       });
 })
 
-router.route('/').post(upload.single('file'), (req, res) => {
-    res.status(201).send({url: 'http://localhost:5000/image/' + req.file.id});
-})
+router.route('/').post( upload.single('file'), (req, res) => {
+    console.log("Finished");
+    console.log(req.file);
+      res.status(201).send({url: 'http://localhost:5000/image/' + req.file.id});
+  })
+
 
 
 

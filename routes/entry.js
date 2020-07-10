@@ -58,10 +58,12 @@ router.route('/image/:filename').get( (req, res) => {
       });
 })
 
-router.route('/').post(upload.single('file'), (req, res) => {
+router.route('/').post( (req, res) => {
     console.log("Made it");
-    console.log(req.body)
-    res.status(201).send({url: "https://pngimg.com/uploads/cat/cat_PNG50504.png"});
+    console.log(req.body.text_content);
+
+    console.log(req.body.editor_content);
+    res.status(201).send();
 })
 
 

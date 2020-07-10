@@ -6,6 +6,7 @@ var logger = require('morgan');
 const Grid = require("gridfs-stream");
 
 let gfs;
+let db;
 
 
 const mongoose = require('mongoose');
@@ -20,6 +21,7 @@ var testRouter = require('./routes/test');
 var pursuitsRouter = require('./routes/pursuit');
 var entryRouter = require('./routes/entry');
 var imageRouter = require('./routes/image.js');
+var draftRouter = require('./routes/draft.js');
 var app = express();
 
 
@@ -43,12 +45,13 @@ const uri = process.env.ATLAS_URI;
 console.log(uri);
 
 
-mongoose.connect(uri, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true }
+mongoose.connect(uri, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true, autoIndex: true }
 );
 const connection = mongoose.connection;
 connection.once('open', () => {
   console.log("MongoDB database connection established successfully");
   gfs = Grid(connection.db, mongoose.mongo);
+  db = connection.db;
   gfs.collection('posts');
   gfs.collection('images');
   console.log("GFS image connection succesful");
@@ -87,10 +90,19 @@ connection.once('open', () => {
 app.use('/image',  function (req, res, next) {
   console.log('the response will be sent by the next function ...');
   req.image_config = {
-    gfs: gfs
+    gfs: gfs,
+    
   };
   next();
 }, imageRouter);
+app.use('/draft',  function (req, res, next) {
+  console.log('the response will be sent by the next function ...');
+  req.draft_config = {
+    gfs: gfs,
+    db : db
+  };
+  next();
+}, draftRouter);
 app.use('/pursuit', pursuitsRouter);
 app.use('/user', usersRouter);
 app.use('/test', testRouter);
