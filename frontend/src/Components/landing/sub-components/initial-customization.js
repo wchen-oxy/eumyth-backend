@@ -1,7 +1,7 @@
 import React from 'react';
 import './initial-customization.scss';
 import CustomMultiSelect from "../../custom-clickables/createable-single";
-import { withFirebase } from '../../../Firebase';
+import Firebase, { withFirebase } from '../../../Firebase';
 import axios from 'axios';
 import AxiosHelper from '../../../Axios/axios';
 // import {CustomMultiSelect} from '../../custom-clickables/creatable-single';
@@ -67,6 +67,9 @@ class InitialCustomizationPage extends React.Component {
             this.state.lastName
            
         )
+        .then(
+            () => this.props.firebase.doUsernameUpdate(this.state.username)
+            )
         .then(
             () => AxiosHelper.createUserProfile(this.state.username, pursuitsArray)
         )

@@ -31,6 +31,18 @@ export default class AxiosHelper{
 
     }
 
+    static saveDraft(username, editorState){
+        return axios.post('http://localhost:5000/draft', {username: username, editorState: editorState});
+    }
+
+    static retrieveDraft(username){
+        return axios.get('http://localhost:5000/draft', 
+        {
+            params: {username: username}
+            }
+        )
+    }
+
     // static createIndexUserProfile(uid, username, pursuits){
     //     return axios.post('http://localhost:5000/user/index', { uid: uid, username: username, private: false, pursuits: pursuits})
 

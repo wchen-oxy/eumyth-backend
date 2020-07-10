@@ -86,7 +86,17 @@ class Firebase {
   }
 
   doPasswordUpdate(password) {
-    this.auth.currentUser.updatePassword(password);
+    return this.auth.currentUser.updatePassword(password);
+  }
+
+  returnUsername() {
+    if (this.auth.currentUser) {
+      return this.auth.currentUser.displayName;
+    }
+  } 
+
+  doUsernameUpdate(username) {
+    return this.auth.currentUser.updateProfile({displayName: username});
   }
 
   doIsEmailVerified() {
