@@ -31,13 +31,16 @@ class InitialCustomizationPage extends React.Component {
         e.preventDefault();
         console.log(e.target.value);
         this.setState({ [e.target.name]: e.target.value });
+
         if (e.target.name === "username") {
-            AxiosHelper.checkUsernameAvailable(e.target.name)
+            console.log(AxiosHelper.testString());
+            AxiosHelper.checkUsernameAvailable(e.target.value)
             .then(
-                (result) =>
+                (response) =>
                 {
-                    console.log(result.data);
-                    result.data ? this.setState({isTaken: true}) : 
+                    console.log(response);
+                    console.log(response.data);
+                    response.data ? this.setState({isTaken: true}) : 
                     this.setState({isTaken: false});
                 
                 }
@@ -93,6 +96,7 @@ class InitialCustomizationPage extends React.Component {
     }
 
     render() {
+        console.log(this.state.username);
         const available = this.state.username !== '' && !this.state.isTaken ? "Available" : "Taken";
         const {username, firstName, lastName, pursuits} = this.state;
         let isInvalid = 
@@ -103,7 +107,8 @@ class InitialCustomizationPage extends React.Component {
         pursuits.length === 0 ||
         this.state.isTaken === true;
         // const isTaken =
-        console.log(this.state.isTaken);
+        console.log(this.state);
+        console.log(isInvalid);
 
        
         //if exist return true

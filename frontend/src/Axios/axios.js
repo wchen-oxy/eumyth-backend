@@ -21,9 +21,7 @@ export default class AxiosHelper{
     }
 
     static checkUsernameAvailable(username){
-        return axios.post('http://localhost:5000/user/available', {
-                username: username
-                })
+        return axios.post('http://localhost:5000/user/available', {username: username});
     }
 
     static createUserProfile(username, pursuitsArray){

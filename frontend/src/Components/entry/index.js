@@ -21,19 +21,26 @@ class NewEntry extends React.Component {
         this.state = {
             isMilestone: false,
             username: this.props.firebase.returnUsername(),
-            prevDraft: null
+            prevDraft: ''
         };
 
         this.handleTypeToggle = this.handleTypeToggle.bind(this);
         this.handleImagePost = this.handleImagePost.bind(this);
-        this.handleChange = this.handleChange.bind(this);
+
     }
     componentDidMount() {
         this._isMounted = true;
-        if (this._isMounted) {
+        if (this._isMounted && this.state.username) {
             Axios.retrieveDraft(this.state.username).then((previousDraft) => {
+                console.log(previousDraft);
                 this.setState({ prevDraft: previousDraft.data });
             })
+                .catch(error => {
+                    console.log(
+                        "Error: " + error
+                    );
+                    this.setState({ prevDraft: null })
+                })
         };
     }
     componentWillUnmount() {
@@ -66,17 +73,22 @@ class NewEntry extends React.Component {
 
     }
 
-    handleChange(editorState) {
-        this.setState({ editorState });
-    }
 
     render() {
         console.log(this.state.username);
         console.log(this.state.prevDraft);
         let mainContent = null;
-        if (this.state.prevDraft) {
+        if (this.state.prevDraft !== '') {
             mainContent = < DanteEditor
                 content={this.state.prevDraft}
+                default_wrappers={[
+                    { className: 'my-custom-h1', block: 'header-one' },
+                    { className: 'my-custom-h2', block: 'header-two' },
+                    { className: 'my-custom-h3', block: 'header-three'},
+
+
+
+                ]}
                 widgets={[
                     ImageBlockConfig({
                         options: {
