@@ -3,29 +3,29 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@emotion/styled": "^10.0.27",
+    "@emotion/core": "10.0.28",
+    "@emotion/styled": "10.0.27",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "Dante2": "^0.5.0-rc25",
-    "alloyeditor": "^2.11.7",
     "axios": "^0.19.2",
     "bootstrap": "^4.5.0",
-    "emotion-theming": "^10.0.27",
+    "draft-convert": "2.1.9",
+    "emotion-theming": "10.0.27",
     "isemail": "^3.2.0",
     "jquery": "^3.5.1",
-    "medium-draft": "^0.6.0-beta1",
     "node-sass": "^4.14.1",
     "popper.js": "^1.16.0",
     "prismjs": "^1.20.0",
-    "react": "^16.13.1",
+    "react": "16.12.0",
     "react-bootstrap": "^1.0.1",
-    "react-dom": "^16.13.1",
+    "react-dom": "16.12.0",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "3.4.1",
+    "react-scripts": "3.0.1",
     "react-select": "^3.1.0",
     "recompose": "^0.30.0",
-    "typescript": "^3.9.6"
+    "@wchen-oxy/dante2": "0.5.0-rc25"
   },
   "babel": {
     "presets": [
@@ -55,6 +55,6 @@
     ]
   },
   "devDependencies": {
-    "@babel/preset-react": "^7.10.1"
+    "typescript": "^3.8.3"
   }
 }
