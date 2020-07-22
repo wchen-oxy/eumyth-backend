@@ -1,8 +1,19 @@
-#milestone-page-container{
+
+.vertical-grouping{ 
     display: flex;
-    flex-direction: column;
+    flex-direction: column;    
     align-items: center;
-    
+    flex-grow: 1;
+
+}
+
+#selection-window{ 
+    display: flex;
+    justify-content: space-between;
+}
+
+.single-button-container{
+    padding: 1vh;
 }
 
 #editor-container{
@@ -13,31 +24,6 @@
 #button-container{
     display: flex;
     justify-content: space-between;
-}
-
-#cover-container{
-    height: 80vh;
-    background-color: green;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-}
-#text-editor{
-    width: 55%;
-    padding: 25px;
-    
-}
-
-#editor-form{
-   
-}
-input{
-    display: block;
-}
-
-#description-box{
-    height: 10vh;
-    width: 70%;
 }
 
 
@@ -56,3 +42,4 @@ input{
 .dante-menu-input {
     background-color: transparent!important;
   }
+

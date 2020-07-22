@@ -1,12 +1,12 @@
 import axios from 'axios';
 import React from 'react';
 
-export default class AxiosHelper{
-    static testString(){
+export default class AxiosHelper {
+    static testString() {
         console.log("TEST SUCCESS");
     }
 
-    static returnPursuitNames(username){
+    static returnPursuitNames(username) {
         return axios.get('http://localhost:5000/user/index', {
             params: {
                 username: username
@@ -14,29 +14,29 @@ export default class AxiosHelper{
         });
     }
 
-    static returnIndexUsername(uid){
+    static returnIndexUsername(uid) {
         return axios.post('http://localhost:5000/user/username', {
             uid: uid
         })
     }
 
-    static checkUsernameAvailable(username){
-        return axios.post('http://localhost:5000/user/available', {username: username});
+    static checkUsernameAvailable(username) {
+        return axios.post('http://localhost:5000/user/available', { username: username });
     }
 
-    static createUserProfile(username, pursuitsArray){
+    static createUserProfile(username, pursuitsArray) {
         return axios.post('http://localhost:5000/user', { username: username, pursuits: pursuitsArray });
 
     }
 
-    static saveDraft(username, editorState){
-        return axios.post('http://localhost:5000/draft', {username: username, editorState: editorState});
+    static saveDraft(username, editorState) {
+        return axios.post('http://localhost:5000/draft', { username: username, editorState: editorState });
     }
 
-    static retrieveDraft(username){
-        return axios.get('http://localhost:5000/draft', 
-        {
-            params: {username: username}
+    static retrieveDraft(username) {
+        return axios.get('http://localhost:5000/draft',
+            {
+                params: { username: username }
             }
         )
     }
@@ -46,7 +46,7 @@ export default class AxiosHelper{
 
     // }
 
-    static postImage(formData){
+    static postImage(formData) {
         return axios.post('http://localhost:5000/entry/image', formData)
     }
 
