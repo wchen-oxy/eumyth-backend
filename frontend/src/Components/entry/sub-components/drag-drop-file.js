@@ -163,7 +163,7 @@ const DragDropFile = () => {
 
     return (
         <>
-            <div className="container">
+            <div className="photo-upload-container">
                 {unsupportedFiles.length === 0 && validFiles.length ? <button className="file-upload-btn" onClick={() => uploadFiles()}>Upload Files</button> : ''} 
                 {unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
                 <div className="drop-container"
@@ -175,7 +175,7 @@ const DragDropFile = () => {
                 >
                     <div className="drop-message">
                         <div className="upload-icon"></div>
-                        Drag & Drop files here or click to select file(s)
+                        Drag and Drop files here or click to select file(s)
                     </div>
                     <input
                         ref={fileInputRef}

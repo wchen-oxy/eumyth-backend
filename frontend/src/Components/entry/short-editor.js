@@ -55,7 +55,10 @@ class ShortEditor extends React.Component {
         }
         return (
             <div id="short-editor-container">
-                <DragDropFiles onImagePost={this.handleImagePost} />
+                <div id="drag-drop-container">
+                <   DragDropFiles onImagePost={this.handleImagePost} />
+                </div>
+                
                 {/* <div className="box__input">
                     <form className="box" method="post" action="" enctype="multipart/form-data">
                             <input
