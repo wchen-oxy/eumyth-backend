@@ -20,10 +20,11 @@ class ShortEditor extends React.Component {
         super(props);
         this.state = {
             content: this.props.content,
-            username: this.props.firebase.returnUsername()
+            username: this.props.firebase.returnUsername(),
+            imageExists: false,
         }
         this.handleImagePost = this.handleImagePost.bind(this);
-
+        this.handleMoveDropzone = this.handleMoveDropzone.bind(this);
 
     }
 
@@ -45,6 +46,11 @@ class ShortEditor extends React.Component {
 
     }
 
+    handleMoveDropzone(e) {
+        e.preventDefault();
+        console.log("3");
+    }
+
     render() {
         // let advBrowserText = (<label for="file"><strong>Choose a file</strong>.</label>);
 
@@ -53,33 +59,42 @@ class ShortEditor extends React.Component {
             //   advBrowserText = (<label for="file"><strong>Choose a file</strong><span className="box__dragndrop"> or drag it here</span>.</label>);
 
         }
-        return (
-            <div id="short-editor-container">
-                <div id="drag-drop-container">
-                <   DragDropFiles onImagePost={this.handleImagePost} />
-                </div>
-                
-                {/* <div className="box__input">
-                    <form className="box" method="post" action="" enctype="multipart/form-data">
-                            <input
-                                name="files[]"
-                                type="file"
-                                multiple
-                                className="custom-file-input box__file"
-                                id="inputGroupFile01 file"
-                                aria-describedby="inputGroupFileAddon01"
-                                data-multiple-caption="{count} files selected"  
-                                onChange={this.handleImagePost}
-                            />
-                            <button className="box__button" type="submit">Upload</button>
-                        </form>
-                    </div> */}
-                <div id="text-container">
-                    <p>Hello</p>
-                </div>
+        if (!this.state.imageExists) {
+            return (
+                <div id="short-editor-container">
+                    <div id="drag-drop-container">
+                        <   DragDropFiles onImagePost={this.handleImagePost} onChange={this.handleMoveDropzone} disablePost={this.props.disablePost} />
+                    </div>
 
-            </div>
-        );
+                    {/* <div className="box__input">
+                            <form className="box" method="post" action="" enctype="multipart/form-data">
+                                    <input
+                                        name="files[]"
+                                        type="file"
+                                        multiple
+                                        className="custom-file-input box__file"
+                                        id="inputGroupFile01 file"
+                                        aria-describedby="inputGroupFileAddon01"
+                                        data-multiple-caption="{count} files selected"  
+                                        onChange={this.handleImagePost}
+                                    />
+                                    <button className="box__button" type="submit">Upload</button>
+                                </form>
+                            </div> */}
+                    <div id="text-container">
+                        <p>Hello</p>
+                    </div>
+
+                </div>
+            );
+        }
+        else{
+            return (
+                <div>
+                    Tester
+                </div>
+            );
+        }
     }
 
 }

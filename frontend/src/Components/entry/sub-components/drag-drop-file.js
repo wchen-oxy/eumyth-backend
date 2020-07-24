@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef} from 'react';
 import PropTypes from 'prop-types';
 import './drag-drop-file.scss';
 
-const DragDropFile = () => {
+const DragDropFile = (props) => {
     const fileInputRef = useRef();
     const modalImageRef = useRef();
     const modalRef = useRef();
@@ -15,6 +15,7 @@ const DragDropFile = () => {
     const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
+        
         let filteredArr = selectedFiles.reduce((acc, current) => {
             const x = acc.find(item => item.name === current.name);
             if (!x) {
@@ -23,8 +24,7 @@ const DragDropFile = () => {
               return acc;
             }
         }, []);
-        setValidFiles([...filteredArr]);
-        
+        setValidFiles([...filteredArr]);       
     }, [selectedFiles]);
 
     const preventDefault = (e) => {
@@ -63,16 +63,19 @@ const DragDropFile = () => {
     }
 
     const handleFiles = (files) => {
+        let invalidFound = false;
         for(let i = 0; i < files.length; i++) {
             if (validateFile(files[i])) {
                 setSelectedFiles(prevArray => [...prevArray, files[i]]);
             } else {
+                invalidFound = true;
                 files[i]['invalid'] = true;
                 setSelectedFiles(prevArray => [...prevArray, files[i]]);
                 setErrorMessage('File type not permitted');
                 setUnsupportedFiles(prevArray => [...prevArray, files[i]]);
             }
         }
+        updateDisabilityState(invalidFound)
     }
 
     const validateFile = (file) => {
@@ -80,7 +83,6 @@ const DragDropFile = () => {
         if (validTypes.indexOf(file.type) === -1) {
             return false;
         }
-
         return true;
     }
 
@@ -110,6 +112,18 @@ const DragDropFile = () => {
             unsupportedFiles.splice(index3, 1);
             setUnsupportedFiles([...unsupportedFiles]);
         }
+        console.log(validFiles.length);
+        console.log(unsupportedFiles.length);
+        if (validFiles.length > 0 && unsupportedFiles.length === 0) updateDisabilityState(false);
+        else{
+            updateDisabilityState(true);
+        }
+    }
+
+    const updateDisabilityState = (invalidFound) => {
+        console.log("UnsupprtedFile Length: " + unsupportedFiles.length);
+        console.log("ValidFile Length: " + validFiles.length);
+        invalidFound ? props.disablePost(true) : props.disablePost(false);
     }
 
     const openImageModal = (file) => {
@@ -160,46 +174,54 @@ const DragDropFile = () => {
         uploadModalRef.current.style.display = 'none';
     }
 
+    const dropContainer = (
+        <div className="drop-container"
+        onDragOver={dragOver}
+        onDragEnter={dragEnter}
+        onDragLeave={dragLeave}
+        onDrop={fileDrop}
+        onClick={fileInputClicked}
+    >
+        <div className="drop-message">
+            <div className="upload-icon"></div>
+            Drag and Drop files here or click to select file(s)
+        </div>
+        <input
+            ref={fileInputRef}
+            className="file-input"
+            type="file"
+            multiple
+            onChange={filesSelected}
+        />
+    </div>
+    );
 
+    const fileDisplayContainer = (
+        <div className="file-display-container">
+        {
+            validFiles.map((data, i) => 
+                <div className="file-status-bar" key={i}>
+                    <div onClick={!data.invalid ? () => openImageModal(data) : () => removeFile(data.name)}>
+                        <div className="file-type-logo"></div>
+                        <div className="file-type">{fileType(data.name)}</div>
+                        <span className={`file-name ${data.invalid ? 'file-error' : ''}`}>{data.name}</span>
+                        <span className="file-size">({fileSize(data.size)})</span> {data.invalid && <span className='file-error-message'>({errorMessage})</span>}
+                    </div>
+                    <div className="file-remove" onClick={() => removeFile(data.name)}>X</div>
+                </div>
+            )
+        }
+    </div>
+    );
+    console.log("Valid Files: " + validFiles.length );
+        
     return (
         <>
             <div className="photo-upload-container">
                 {unsupportedFiles.length === 0 && validFiles.length ? <button className="file-upload-btn" onClick={() => uploadFiles()}>Upload Files</button> : ''} 
                 {unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
-                <div className="drop-container"
-                    onDragOver={dragOver}
-                    onDragEnter={dragEnter}
-                    onDragLeave={dragLeave}
-                    onDrop={fileDrop}
-                    onClick={fileInputClicked}
-                >
-                    <div className="drop-message">
-                        <div className="upload-icon"></div>
-                        Drag and Drop files here or click to select file(s)
-                    </div>
-                    <input
-                        ref={fileInputRef}
-                        className="file-input"
-                        type="file"
-                        multiple
-                        onChange={filesSelected}
-                    />
-                </div>
-                <div className="file-display-container">
-                    {
-                        validFiles.map((data, i) => 
-                            <div className="file-status-bar" key={i}>
-                                <div onClick={!data.invalid ? () => openImageModal(data) : () => removeFile(data.name)}>
-                                    <div className="file-type-logo"></div>
-                                    <div className="file-type">{fileType(data.name)}</div>
-                                    <span className={`file-name ${data.invalid ? 'file-error' : ''}`}>{data.name}</span>
-                                    <span className="file-size">({fileSize(data.size)})</span> {data.invalid && <span className='file-error-message'>({errorMessage})</span>}
-                                </div>
-                                <div className="file-remove" onClick={() => removeFile(data.name)}>X</div>
-                            </div>
-                        )
-                    }
-                </div>
+                {dropContainer}       
+                {fileDisplayContainer}
             </div>
             <div className="modal" ref={modalRef}>
                 <div className="overlay"></div>

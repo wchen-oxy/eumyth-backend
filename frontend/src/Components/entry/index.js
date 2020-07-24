@@ -17,11 +17,13 @@ class NewEntry extends React.Component {
             isMilestone: false,
             username: this.props.firebase.returnUsername(),
             prevDraft: '',
-            windowType: 'main'
+            windowType: 'main',
+            postDisabled: true,
         };
 
         this.handleTypeToggle = this.handleTypeToggle.bind(this);
         this.handleClick = this.handleClick.bind(this);
+        this.handleDisablePost = this.handleDisablePost.bind(this);
         // this.handleImagePost = this.handleImagePost.bind(this);
 
     }
@@ -79,6 +81,10 @@ class NewEntry extends React.Component {
 
     // }
 
+    handleDisablePost(disabled){
+        this.setState({postDisabled : disabled});
+    }
+
 
     render() {
         console.log(this.state.username);
@@ -124,17 +130,17 @@ class NewEntry extends React.Component {
             topButtons = (
                 <div id="button-container">
                     <span id="toggle-button-span">
-                        <button id="toggle-button">Toggle Mode</button>
+                        <button id="toggle-button" value="main" onClick={e => this.handleClick(e, e.target.value)}>Return</button>
                     </span>
                     <span id="post-button-span">
-                        <button id="post-button">Post!</button>
+                        <button id="post-button" disabled={this.state.postDisabled}>Post!</button>
                     </span>
                 </div>
             );
 
             if (this.state.windowType === 'short') {
 
-                editorType = (<ShortEditor />);
+                editorType = (<ShortEditor disablePost={this.handleDisablePost}/>);
             }
 
             else if (this.state.windowType === 'long') {
