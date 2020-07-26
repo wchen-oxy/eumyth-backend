@@ -11,36 +11,7 @@ const uri = process.env.ATLAS_URI;
 const crypto = require('crypto');
 const fs = require('fs');
 
-// const smallImageStorage = multer.diskStorage({
-//   destination: function (req, file, cb) {
-//     console.log("small");
-//     cb(null, '/tmp')
-//   },
-//   filename: function (req, file, cb) {
-//     cb(null, file.fieldname + '-' + Date.now())
-//   },
-  
-// })
-// const largeImageStorage = new GridFsStorage({
-//     url: uri,
-//     file: (req, file) => {
-//       console.log("large");
-//       console.log(file);
-//       return new Promise((resolve, reject) => {
-//         crypto.randomBytes(16, (err, buf) => {
-//           if (err) {
-//             return reject(err)
-//           }
-//           const filename = file.originalname
-//           const fileInfo = {
-//             filename: filename,
-//             bucketName: 'images',
-//           }
-//           resolve(fileInfo)
-//         })
-//       })
-//     },
-//   })
+
   const storage = new GridFsStorage({
     url: uri,
     file: (req, file) => {
@@ -85,10 +56,11 @@ router.route('/:id').get( (req, res) => {
       });
 })
 
-router.route('/').post( upload.single('file'), (req, res) => {
+router.route('/').post( upload.single('file'), (req, res, err) => {
     console.log("Finished");
     console.log(req.file);
-      res.status(201).send({url: 'http://localhost:5000/image/' + req.file.id});
+    if (err) throw err;
+    res.status(201).send({url: 'http://localhost:5000/image/' + req.file.id});
   })
 
 

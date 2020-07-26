@@ -57,49 +57,19 @@ connection.once('open', () => {
   console.log("GFS image connection succesful");
 })
 
-
-
-// const storage = new GridFsStorage({
-//   url: uri,
-//   file: (req, file) => {
-//     return new Promise((resolve, reject) => {
-//       console.log("Inner Proimse");
-//       // console.log(crypto);
-//       crypto.randomBytes(16, (err, buf) => {
-//         if (err) {
-//             console.log(err);
-//             console.loh(1);
-//           return reject(err)
-//         }
-//         console.log(file);
-//         const filename = file.originalname
-//         const fileInfo = {
-//           filename: filename,
-//           bucketName: 'uploads',
-//         }
-//         resolve(fileInfo)
-//       })
-//     })
-//   },
-// })
-
-// const upload = multer({ storage });
-
-
-// app.use('/', indexRouter);
-app.use('/image',  function (req, res, next) {
+app.use('/image', function (req, res, next) {
   console.log('the response will be sent by the next function ...');
   req.image_config = {
     gfs: gfs,
-    
+
   };
   next();
 }, imageRouter);
-app.use('/draft',  function (req, res, next) {
+app.use('/draft', function (req, res, next) {
   console.log('the response will be sent by the next function ...');
   req.draft_config = {
     gfs: gfs,
-    db : db
+    db: db
   };
   next();
 }, draftRouter);
@@ -107,23 +77,18 @@ app.use('/pursuit', pursuitsRouter);
 app.use('/user', usersRouter);
 app.use('/test', testRouter);
 app.use('/entry', entryRouter);
-// app.post('/entry/image', upload.single('img'), (req, res, err) => {
-//   if (err) throw err
-//   res.status(201).send()
-// })
-// app.use('/react', reactRouter);
 
 // console.log that your server is up and running
 app.listen(port, () => console.log(`Listening on port ${port}`));
 
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};

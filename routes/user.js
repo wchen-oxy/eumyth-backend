@@ -130,7 +130,7 @@ router.post('/index', (req, res) => {
 
 router.post('/available', (req, res) => {
     const username = req.body.username;
-    console.log(username);
+    console.log(req.body);
     IndexUser.Model.findOne({username: username}).then(
       result => 
       {
