@@ -6,8 +6,11 @@
     padding: 5vh;
 }
 
+// https://github.com/kenwheeler/slick/issues/982
 #drag-drop-container {
     flex-grow: 2;
+    min-width: 0;
+    min-height: 0;
     
 }
 
