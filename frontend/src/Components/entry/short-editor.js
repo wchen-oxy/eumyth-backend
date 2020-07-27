@@ -26,8 +26,6 @@ class ShortEditor extends React.Component {
         this.handleImagePost = this.handleImagePost.bind(this);
         this.handleMoveDropzone = this.handleMoveDropzone.bind(this);
         
-     
-
     }
 
     handleImagePost(e) {

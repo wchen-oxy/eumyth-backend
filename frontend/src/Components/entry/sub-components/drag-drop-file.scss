@@ -7,6 +7,15 @@
     text-align: center;
 }
 
+.mini-drop-image-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    height: calc(50% - 8px);
+    border: 4px dashed #4aa1f3;
+}
+
 .drop-image-container {
     display: flex;
     align-items: center;

@@ -177,7 +177,7 @@ const DragDropFile = (props) => {
     }
 
     const dropContainer = (
-        <div className="drop-image-container"
+        <div className="mini-drop-image-container"
             onDragOver={dragOver}
             onDragEnter={dragEnter}
             onDragLeave={dragLeave}
@@ -242,8 +242,26 @@ const DragDropFile = (props) => {
             <div className="photo-upload-container">
                 {/* {unsupportedFiles.length === 0 && validFiles.length ? <button className="file-upload-btn" onClick={() => uploadFiles()}>Upload Files</button> : ''} */}
                 {unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
-                {dropContainer}
-                {fileDisplayContainer}
+                <div className="drop-image-container"
+                    onDragOver={dragOver}
+                    onDragEnter={dragEnter}
+                    onDragLeave={dragLeave}
+                    onDrop={fileDrop}
+                    onClick={fileInputClicked}
+                >
+                    <div className="drop-message">
+                        <div className="upload-icon"></div>
+                    Drag and Drop files here or click to select file(s)
+                </div>
+                    <input
+                        ref={fileInputRef}
+                        className="file-input"
+                        type="file"
+                        multiple
+                        onChange={filesSelected}
+                    />
+                </div>
+                {/* {fileDisplayContainer} */}
             </div>
             {/* {modal}
             {heroModal} */}
@@ -271,13 +289,11 @@ const DragDropFile = (props) => {
                     //     /* {if is first in gallery <button/> : '} */
                     // )
                     }
-
                     {/* </div>   */}
                     <ImageSlider fileArray={validFiles} setImageArray={props.setImageArray}/>
-
-                    {/* {dropContainer}
-                    {fileDisplayContainer} */}
-                </div>
+                </div> 
+                {dropContainer}
+                {fileDisplayContainer}
                     {/* {modal}
                     {heroModal} */}
             </>

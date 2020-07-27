@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
 import Slider from "react-slick";
+import './index.scss';
 
 // https://css-tricks.com/centering-css-complete-guide/#center-vertically
 //Explains the weird -50% and top 50% thing
@@ -29,7 +30,9 @@ const settings = {
   prevArrow: <PrevArrow />,
   speed: 500,
   slidesToShow: 1,
-  slidesToScroll: 1
+  slidesToScroll: 1,
+  centerPadding: 0,
+  className: 'photo-container'
 };
 class ImageSlider extends React.Component {
   _isMounted = false;
@@ -63,9 +66,9 @@ class ImageSlider extends React.Component {
       newArray =>
         newArray.map(item =>
           item = (
-            <div className="photo-container">
+            // <div className="photo-container">
               <img className="photo" src={item} alt='image not loaded' />
-            </div>
+            // </div>
           ))
     ).then(result => {
       console.log(result);

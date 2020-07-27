@@ -8,14 +8,15 @@
 
 // https://github.com/kenwheeler/slick/issues/982
 #drag-drop-container {
-    flex-grow: 2;
-    min-width: 0;
+    max-width: 70%;
+    min-width: 70%;
     min-height: 0;
     
 }
 
 #text-container {
-    flex-grow: 3;
+    max-width: 30%;
+    min-width: 30%;
     background-color: grey;
 }
 
