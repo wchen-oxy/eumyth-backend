@@ -19,11 +19,14 @@ class NewEntry extends React.Component {
             prevDraft: '',
             windowType: 'main',
             postDisabled: true,
+            imageArray: null
         };
 
         this.handleTypeToggle = this.handleTypeToggle.bind(this);
         this.handleClick = this.handleClick.bind(this);
         this.handleDisablePost = this.handleDisablePost.bind(this);
+        this.setImageArray = this.setImageArray.bind(this);
+        
         // this.handleImagePost = this.handleImagePost.bind(this);
 
     }
@@ -48,6 +51,8 @@ class NewEntry extends React.Component {
 
     handleTypeToggle(e) {
         e.preventDefault();
+        console.log(this.state.imageArray);
+
         this.setState(state => ({
             isMilestone: !state.isMilestone
         }))
@@ -60,6 +65,11 @@ class NewEntry extends React.Component {
 
     handleWindowSelection(e) {
 
+    }
+
+    setImageArray(imageArray){
+        // if (!!imageArray)
+         this.setState({imageArray: imageArray});
     }
 
     // handleImagePost(e) {
@@ -87,8 +97,6 @@ class NewEntry extends React.Component {
 
 
     render() {
-        console.log(this.state.username);
-        console.log(this.state.prevDraft);
         let editorType = null;
         let topButtons = null;
         if (this.state.windowType === 'main') {
@@ -132,6 +140,9 @@ class NewEntry extends React.Component {
                     <span id="toggle-button-span">
                         <button id="toggle-button" value="main" onClick={e => this.handleClick(e, e.target.value)}>Return</button>
                     </span>
+                    <span id="toggle-button-span">
+                        <button id="toggle-button" value="main" onClick={this.handleTypeToggle}>Test</button>
+                    </span>
                     <span id="post-button-span">
                         <button id="post-button" disabled={this.state.postDisabled}>Post!</button>
                     </span>
@@ -140,7 +151,7 @@ class NewEntry extends React.Component {
 
             if (this.state.windowType === 'short') {
 
-                editorType = (<ShortEditor disablePost={this.handleDisablePost}/>);
+                editorType = (<ShortEditor disablePost={this.handleDisablePost} setImageArray={this.setImageArray}/>);
             }
 
             else if (this.state.windowType === 'long') {
@@ -154,8 +165,6 @@ class NewEntry extends React.Component {
         }
 
 
-
-
         return (
 
             <div className="vertical-grouping">
@@ -163,9 +172,6 @@ class NewEntry extends React.Component {
                     {topButtons}
                     {editorType}
                 </div>
-
-
-
             </div>
         )
     }

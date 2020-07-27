@@ -16,6 +16,7 @@ const DragDropFile = (props) => {
     const [validFiles, setValidFiles] = useState([]);
     const [unsupportedFiles, setUnsupportedFiles] = useState([]);
     const [errorMessage, setErrorMessage] = useState('');
+  
 
     useEffect(() => {
 
@@ -78,7 +79,7 @@ const DragDropFile = (props) => {
                 setUnsupportedFiles(prevArray => [...prevArray, files[i]]);
             }
         }
-        updateDisabilityState(invalidFound)
+        updateDisabilityState(invalidFound);
     }
 
     const validateFile = (file) => {
@@ -116,15 +117,15 @@ const DragDropFile = (props) => {
             setUnsupportedFiles([...unsupportedFiles]);
         }
 
-        if (validFiles.length > 0 && unsupportedFiles.length === 0) updateDisabilityState(false);
+        if (validFiles.length > 0 && unsupportedFiles.length === 0) {
+            updateDisabilityState(false);
+        }
         else {
             updateDisabilityState(true);
         }
     }
 
     const updateDisabilityState = (invalidFound) => {
-        console.log("UnsupprtedFile Length: " + unsupportedFiles.length);
-        console.log("ValidFile Length: " + validFiles.length);
         invalidFound ? props.disablePost(true) : props.disablePost(false);
     }
 
@@ -149,7 +150,6 @@ const DragDropFile = (props) => {
             const formData = new FormData();
             formData.append('image', validFiles[i]);
             formData.append('key', '638938ef024e80a8c24baa6d42cae8ee');
-
             // axios.post('https://api.imgbb.com/1/upload', formData, {
             //     onUploadProgress: (progressEvent) => {
             //         const uploadPercentage = Math.floor((progressEvent.loaded / progressEvent.total) * 100);
@@ -250,7 +250,6 @@ const DragDropFile = (props) => {
         </>
     );
     else {
-        console.log(validFiles);
         return (
             <>
                 <div className="photo-upload-container">
@@ -274,7 +273,7 @@ const DragDropFile = (props) => {
                     }
 
                     {/* </div>   */}
-                    <ImageSlider fileArray={validFiles} />
+                    <ImageSlider fileArray={validFiles} setImageArray={props.setImageArray}/>
 
                     {/* {dropContainer}
                     {fileDisplayContainer} */}

@@ -45,7 +45,10 @@ class ImageSlider extends React.Component {
   componentDidMount() {
     this._isMounted = true;
     console.log(this.props.fileArray);
-    if (this._isMounted && this.props.fileArray.length !== 0) this.transformImageProp(); 
+    if (this._isMounted && this.props.fileArray.length !== 0) {
+      this.props.setImageArray(this.props.fileArray);
+      this.transformImageProp();
+    } 
   }
 
   componentWillUnmount() {
@@ -76,7 +79,6 @@ class ImageSlider extends React.Component {
       reader.onload = function (e) {
         resolve(e.target.result);
       };
-
       reader.onerror = function () {
         reject(reader.error);
       }
@@ -84,18 +86,12 @@ class ImageSlider extends React.Component {
     });
   }
   render() {
-
     const container =
-      (
-        !!this.state.transformedImageArray ? this.state.transformedImageArray : <p>IMAGE IS STILL LOADING</p>
-      );
-    
+      (!!this.state.transformedImageArray ? this.state.transformedImageArray : <p>IMAGE IS STILL LOADING</p>);
     return (
-
       <Slider {...settings}>
         {container}
       </Slider>
-
     );
   }
 }

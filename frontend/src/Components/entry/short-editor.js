@@ -25,6 +25,8 @@ class ShortEditor extends React.Component {
         }
         this.handleImagePost = this.handleImagePost.bind(this);
         this.handleMoveDropzone = this.handleMoveDropzone.bind(this);
+        
+     
 
     }
 
@@ -53,7 +55,7 @@ class ShortEditor extends React.Component {
 
     render() {
         // let advBrowserText = (<label for="file"><strong>Choose a file</strong>.</label>);
-
+        
         if (!isAdvancedUpload) {
             console.log("It's not a modern browser!");
             //   advBrowserText = (<label for="file"><strong>Choose a file</strong><span className="box__dragndrop"> or drag it here</span>.</label>);
@@ -63,7 +65,7 @@ class ShortEditor extends React.Component {
             return (
                 <div id="short-editor-container">
                     <div id="drag-drop-container">
-                        <   DragDropFiles onImagePost={this.handleImagePost} onChange={this.handleMoveDropzone} disablePost={this.props.disablePost} />
+                        <DragDropFiles onImagePost={this.handleImagePost} onChange={this.handleMoveDropzone} disablePost={this.props.disablePost} setImageArray={this.props.setImageArray}/>
                     </div>
 
                     {/* <div className="box__input">
