@@ -19,15 +19,16 @@ class NewEntry extends React.Component {
             prevDraft: '',
             windowType: 'main',
             postDisabled: true,
-            imageArray: null
+            imageArray: null,
+
         };
 
         this.handleTypeToggle = this.handleTypeToggle.bind(this);
         this.handleClick = this.handleClick.bind(this);
         this.handleDisablePost = this.handleDisablePost.bind(this);
         this.setImageArray = this.setImageArray.bind(this);
-        
         // this.handleImagePost = this.handleImagePost.bind(this);
+       
 
     }
     componentDidMount() {
@@ -95,6 +96,9 @@ class NewEntry extends React.Component {
         this.setState({postDisabled : disabled});
     }
 
+    
+
+
 
     render() {
         let editorType = null;
@@ -151,7 +155,22 @@ class NewEntry extends React.Component {
 
             if (this.state.windowType === 'short') {
 
-                editorType = (<ShortEditor disablePost={this.handleDisablePost} setImageArray={this.setImageArray}/>);
+                editorType = (
+                <ShortEditor 
+                    // selectedFiles={this.state.selectedFiles}
+                    // validFiles={this.state.validFiles}
+                    // unsupportedFiles={this.state.unsupportedFiles}
+                    // errorMessage={this.state.errorMessage}
+                    username={this.state.username}
+                    disablePost={this.handleDisablePost} 
+                    setImageArray={this.setImageArray}
+
+                    // setSelectedFiles = {this.setSelectedfiles}
+                    // setValidFiles = {this.setValidFiles}
+                    // setUnsupportedFiles = {this.setUnsupportedFiles}
+                    // setErrorMessage = {this.setErrorMessage}
+                />
+                );
             }
 
             else if (this.state.windowType === 'long') {

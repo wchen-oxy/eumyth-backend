@@ -28,6 +28,7 @@ const DragDropFile = (props) => {
                 return acc;
             }
         }, []);
+        console.log("Effect is used");
         setValidFiles([...filteredArr]);
     }, [selectedFiles]);
 
@@ -70,7 +71,11 @@ const DragDropFile = (props) => {
         let invalidFound = false;
         for (let i = 0; i < files.length; i++) {
             if (validateFile(files[i])) {
-                setSelectedFiles(prevArray => [...prevArray, files[i]]);
+                setSelectedFiles(prevArray => 
+                  {  console.log(prevArray);
+                    console.log(files[i]);
+                    return [...prevArray, files[i]];}
+                    );
             } else {
                 invalidFound = true;
                 files[i]['invalid'] = true;
@@ -80,6 +85,7 @@ const DragDropFile = (props) => {
             }
         }
         updateDisabilityState(invalidFound);
+        // indicateImageExists(true);
     }
 
     const validateFile = (file) => {
@@ -122,6 +128,7 @@ const DragDropFile = (props) => {
         }
         else {
             updateDisabilityState(true);
+            props.indicateImageExists(false);
         }
     }
 
@@ -176,7 +183,7 @@ const DragDropFile = (props) => {
         uploadModalRef.current.style.display = 'none';
     }
 
-    const dropContainer = (
+    const miniDropContainer = (
         <div className="mini-drop-image-container"
             onDragOver={dragOver}
             onDragEnter={dragEnter}
@@ -236,7 +243,6 @@ const DragDropFile = (props) => {
             </div>
         </div>
     );
-
     if (validFiles.length === 0) return (
         <>
             <div className="photo-upload-container">
@@ -292,7 +298,7 @@ const DragDropFile = (props) => {
                     {/* </div>   */}
                     <ImageSlider fileArray={validFiles} setImageArray={props.setImageArray}/>
                 </div> 
-                {dropContainer}
+                {miniDropContainer}
                 {fileDisplayContainer}
                     {/* {modal}
                     {heroModal} */}
