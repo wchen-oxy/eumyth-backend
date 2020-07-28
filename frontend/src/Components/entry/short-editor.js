@@ -238,7 +238,7 @@ class ShortEditor extends React.Component {
     }
 
     render() {
-        console.log(this.state.selectedFiles);
+        console.log(this.state.validFiles);
 
         const miniDropContainer = (
             <div className="mini-drop-image-container"
