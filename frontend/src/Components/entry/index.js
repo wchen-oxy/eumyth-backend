@@ -17,7 +17,7 @@ class NewEntry extends React.Component {
             isMilestone: false,
             username: this.props.firebase.returnUsername(),
             shortPostText: '',
-            previousLongDraft: '',
+            previousLongDraft: null,
             windowType: 'main',
             postDisabled: true,
             imageArray: [],
@@ -33,6 +33,7 @@ class NewEntry extends React.Component {
         this.setImageArray = this.setImageArray.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.closeUploadModal = this.closeUploadModal.bind(this);
+        this.openSubmitLongPostModal = this.openSubmitLongPostModal.bind(this);
 
         this.handleSubmitPost = this.handleSubmitPost.bind(this);
 
@@ -48,7 +49,7 @@ class NewEntry extends React.Component {
                     console.log(
                         "Error: " + error
                     );
-                    this.setState({ previousLongDraft: null })
+                   
                 })
         };
     }
@@ -83,6 +84,11 @@ class NewEntry extends React.Component {
         this.setState({ imageArray: imageArray });
     }
 
+    openSubmitLongPostModal(){
+      
+        this.modalRef.current.style.display = "block";
+        
+    }
     handleSubmitPost(e) {
         e.preventDefault()
         if (this.state.windowType === 'short') {
@@ -96,6 +102,7 @@ class NewEntry extends React.Component {
                 });
         }
         if (this.state.windowType === 'long'){
+            this.openModal();
             //open modal
             
            
@@ -238,6 +245,7 @@ class NewEntry extends React.Component {
                     editorType = 
                     <LongEditor
                         content={this.state.previousLongDraft}
+                        disablePost={this.handleDisablePost}
                     />;
                 }
                 else {
@@ -254,6 +262,13 @@ class NewEntry extends React.Component {
                     {topButtons}
                     {editorType}
                 </div>
+                
+                <div className="modal" ref={this.modalRef}>
+                    <div className="overlay"></div>
+                    <span className="close" onClick={(() => this.closeModal())}>X</span>
+                    <div className="modal-image" ref={this.modalImageRef}></div>
+                </div>
+        
             </div>
         )
     }

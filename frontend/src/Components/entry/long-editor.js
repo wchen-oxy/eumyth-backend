@@ -12,8 +12,11 @@ import './long-editor.scss';
 class LongEditor extends React.Component {
     constructor(props) {
         super(props);
+        console.log(this.props.content);
+        const hasContent = this.props.content !== null;
         this.state = {
             content: this.props.content,
+            hasContent: hasContent,
             username: this.props.firebase.returnUsername()
         }
     }
@@ -22,31 +25,48 @@ class LongEditor extends React.Component {
         return (
             <div id="long-editor-container">
                 < DanteEditor
-                    // onChange={
-                    //     editor => {
-                    //     //     console.log(convertToHTML({}));
-                    //     // console.log(editor.state.editorState._immutable.currentContent);
-                    //     console.log(editor.state.editorState.getCurrentContent());
-                    //     const html = convertToHTML({
-                    //         styleToHTML: (style) => {
-                    //           if (style === 'BOLD') {
-                    //             return <span style={{color: 'blue'}} />;
-                    //           }
-                    //         },
-                    //         blockToHTML: (block) => {
-                    //           if (block.type === 'PARAGRAPH') {
-                    //             return <p />;
-                    //           }
-                    //         },
-                    //         entityToHTML: (entity, originalText) => {
-                    //           if (entity.type === 'LINK') {
-                    //             return <a href='google.com'>{originalText}</a>;
-                    //           }
-                    //           return originalText;
-                    //         }
-                    //       })(editor.state.editorState.getCurrentContent());
-                    //       console.log(html);
-                    // }}
+                    onChange={
+                        (editor) => {
+                            const editorState = editor.emitSerializedOutput().blocks;
+                            console.log(this.state.hasContent);
+                            console.log(editorState.length !== 1);
+                            console.log(editorState[0].text === '');
+
+                            if (this.state.hasContent === false) {
+            
+                                if (editorState[0].text !== '')
+                                {
+                                    console.log('TR1');
+                                    this.setState({ hasContent: true }, this.props.disablePost(false));
+                                }
+                                else if (editorState[0].text === '' && editorState.length > 1) {
+                                    console.log('TR2');
+                                    this.setState({ hasContent: true }, this.props.disablePost(false));
+                                }
+                            }
+                            //     //     console.log(convertToHTML({}));
+                            //     // console.log(editor.state.editorState._immutable.currentContent);
+                            //     console.log(editor.state.editorState.getCurrentContent());
+                            //     const html = convertToHTML({
+                            //         styleToHTML: (style) => {
+                            //           if (style === 'BOLD') {
+                            //             return <span style={{color: 'blue'}} />;
+                            //           }
+                            //         },
+                            //         blockToHTML: (block) => {
+                            //           if (block.type === 'PARAGRAPH') {
+                            //             return <p />;
+                            //           }
+                            //         },
+                            //         entityToHTML: (entity, originalText) => {
+                            //           if (entity.type === 'LINK') {
+                            //             return <a href='google.com'>{originalText}</a>;
+                            //           }
+                            //           return originalText;
+                            //         }
+                            //       })(editor.state.editorState.getCurrentContent());
+                            //       console.log(html);
+                        }}
                     content={this.state.content}
                     default_wrappers={[
                         { className: 'my-custom-h1', block: 'header-one' },

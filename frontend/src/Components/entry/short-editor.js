@@ -290,9 +290,6 @@ class ShortEditor extends React.Component {
             </div>
         );
 
-
-        // let advBrowserText = (<label for="file"><strong>Choose a file</strong>.</label>);
-
         if (!isAdvancedUpload) {
             console.log("It's not a modern browser!");
             //   advBrowserText = (<label for="file"><strong>Choose a file</strong><span className="box__dragndrop"> or drag it here</span>.</label>);
@@ -355,33 +352,12 @@ class ShortEditor extends React.Component {
                     <div className="short-editor-container vertical-grouping">
                         <div id="post-preview-container">
                             <div className="photo-upload-container">
-                                {/* {unsupportedFiles.length === 0 && validFiles.length ? <button className="file-upload-btn" onClick={() => uploadFiles()}>Upload Files</button> : ''} */}
                                 {this.state.unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
-                                {/* <div className="drop-image-container"> */}
-                                {
-                                    // validFiles.map((data, i) =>
-                                    //     <div className="file-status-bar" key={i}>
-                                    //         <div onClick={!data.invalid ? () => openImageModal(data) : () => removeFile(data.name)}>
-                                    //             <div className="file-type-logo"></div>
-                                    //             <div className="file-type">{fileType(data.name)}</div>
-                                    //             <span className={`file-name ${data.invalid ? 'file-error' : ''}`}>{data.name}</span>
-                                    //             <span className="file-size">({fileSize(data.size)})</span> {data.invalid && <span className='file-error-message'>({errorMessage})</span>}
-                                    //         </div>
-                                    //         <div className="file-remove" onClick={() => removeFile(data.name)}>X</div>
-                                    //     </div>
-                                    //      /* {if not last img in gallery <button/> : '} */
-                                    //     /* {if is first in gallery <button/> : '} */
-                                    // )
-                                }
-                                {/* </div>   */}
                                 <ImageSlider fileArray={this.state.validFiles} setImageArray={this.props.setImageArray} />
                             </div>
                             {textContainer}
                         </div>
-
-
-
-                        {/* {heroModal} */}
+                        {modal}
                     </div>
                     <div className="short-editor-container ">
                         <div className="uploaded-file-container vertical-grouping">
