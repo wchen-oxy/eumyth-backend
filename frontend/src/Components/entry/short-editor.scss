@@ -13,6 +13,9 @@
     flex-direction: column;
 }
 
+.uploaded-file-container{
+    display: flex;
+}
 #short-post-text{
 height: 100%;
 box-sizing: border-box;
@@ -25,15 +28,17 @@ box-sizing: border-box;
 
 // https://github.com/kenwheeler/slick/issues/982
 #post-preview-container {
-    max-width: 90%;
-    min-width: 90%;
+    max-width: 900px;
+    min-width: 80%;
     min-height: 0;
     display: flex;
+   
 }
 
 #text-container {
-    max-width: 30%;
-    min-width: 30%;
+    max-width: 300px;
+    min-width: 300px;
+    width: 300px;
     background-color: grey;
     padding: 1vh;
     display: flex;
@@ -68,21 +73,12 @@ box-sizing: border-box;
     background-position: center;
 }
 
-.close {
-    position: absolute;
-    top: 15px;
-    right: 35px;
-    color: #f1f1f1;
-    font-size: 40px;
-    font-weight: bold;
-    transition: 0.3s;
-}
 
 // Drag Drop Scss
 .photo-upload-container {
     // transform: translateY(-100%);
     height: 100%;
-    width: 100%;
+    width: 600px;
 }
 
 .photo-upload-container p {

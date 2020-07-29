@@ -47,7 +47,29 @@ export default class AxiosHelper {
     // }
 
     static postImage(formData) {
-        return axios.post('http://localhost:5000/entry/image', formData)
+        return axios.post('http://localhost:5000/entry/image', formData);
+    }
+
+    static postShortPost(formData, progressRef, uploadRef, textOnly){
+        if (textOnly) return axios.post('http://localhost:5000/entry/short', formData);
+        else{
+            return axios.post('http://localhost:5000/entry/short', formData, {
+            onUploadProgress: (progressEvent) => {
+                const uploadPercentage = Math.floor((progressEvent.loaded / progressEvent.total) * 100);
+                progressRef.current.innerHTML = `${uploadPercentage}%`;
+                progressRef.current.style.width = `${uploadPercentage}%`;
+
+                if (uploadPercentage === 100) {
+                    uploadRef.current.innerHTML = 'File(s) Uploaded';
+                    // alert("Upload Complete!")
+                    // validFiles.length = 0;
+                    // setValidFiles([...validFiles]);
+                    // setSelectedFiles([...validFiles]);
+                    // setUnsupportedFiles([...validFiles]);
+                }
+            },
+        });
+        }
     }
 
     static saveEntry(content) {

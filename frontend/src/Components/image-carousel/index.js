@@ -48,14 +48,13 @@ class ImageSlider extends React.Component {
 
   componentDidMount() {
     this._isMounted = true;
-    console.log(this.props.fileArray);
     if (this._isMounted) {
       this.props.setImageArray(this.props.fileArray);
       this.transformImageProp();
-    } 
+    }
   }
 
-  componentDidUpdate(prevProps){
+  componentDidUpdate(prevProps) {
     if (this.props.fileArray !== prevProps.fileArray) {
       this.props.setImageArray(this.props.fileArray);
       this.transformImageProp();
@@ -68,22 +67,20 @@ class ImageSlider extends React.Component {
     this._isMounted = false;
   }
 
-
-  transformImageProp(){
+  transformImageProp() {
     let imageArray = this.props.fileArray;
     Promise.all(imageArray.map((file) => this.loadImage(file)))
-    .then(
-      newArray =>
-        newArray.map(item =>
-          item = (
-            // <div className="photo-container">
+      .then(
+        newArray =>
+          newArray.map(item =>
+            item = (
+              // <div className="photo-container">
               <img className="photo" src={item} alt='image not loaded' />
-            // </div>
-          ))
-    ).then(result => {
-      console.log(result);
-      this.setState({ transformedImageArray: result, displayedItemCount : result.length })
-    });
+              // </div>
+            ))
+      ).then(result => {
+        this.setState({ transformedImageArray: result, displayedItemCount: result.length })
+      });
   }
 
   loadImage(file) {

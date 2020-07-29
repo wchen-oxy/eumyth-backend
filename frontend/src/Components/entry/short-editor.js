@@ -22,14 +22,13 @@ class ShortEditor extends React.Component {
         this.fileInputRef = React.createRef();
         this.modalImageRef = React.createRef();
         this.modalRef = React.createRef();
-        this.progressRef = React.createRef();
-        this.uploadRef = React.createRef();
-        this.uploadModalRef = React.createRef();
+       
 
         this.state = {
             content: this.props.content,
             username: this.props.firebase.returnUsername(),
             imageExists: false,
+           
 
 
             selectedFiles: [],
@@ -47,6 +46,8 @@ class ShortEditor extends React.Component {
         this.generateValidFiles = this.generateValidFiles.bind(this);
 
     }
+
+    
     componentDidMount() {
 
     }
@@ -70,7 +71,6 @@ class ShortEditor extends React.Component {
 
     generateValidFiles() {
         let selectedFiles = this.state.selectedFiles;
-        console.log(selectedFiles);
         let filteredArr = selectedFiles.reduce((acc, current) => {
             const x = acc.find(item => item.name === current.name);
             if (!x) {
@@ -79,7 +79,6 @@ class ShortEditor extends React.Component {
                 return acc;
             }
         }, []);
-        console.log("Effect is used");
         this.setValidFiles(filteredArr);
     }
 
@@ -93,15 +92,12 @@ class ShortEditor extends React.Component {
         formData.append('file', file[0]);
         if (file[0]) AxiosHelper.postImage(formData)
             .then(result => {
-                console.log(result)
             }).then(
                 () =>
                     document
                         .getElementById('img')
                         .setAttribute('src', `http://localhost:5000/entry/image/${file[0].name}`)
             );
-        console.log(file[0]);
-
     }
 
     // handleMoveDropzone(e) {
@@ -148,11 +144,7 @@ class ShortEditor extends React.Component {
         let invalidFound = false;
         for (let i = 0; i < files.length; i++) {
             if (this.validateFile(files[i])) {
-                // console.log(files[i]);
-                // console.log(this.state.selectedFiles.concat(files[i]));
                 this.setState((state) => ({ selectedFiles: state.selectedFiles.concat(files[i]) }), this.generateValidFiles);
-                console.log(this.state.selectedFiles);
-
             } else {
                 invalidFound = true;
                 files[i]['invalid'] = true;
@@ -218,12 +210,10 @@ class ShortEditor extends React.Component {
 
     openImageModal = (file) => {
         const that = this;
-        console.log(this.modalImageRef.current.style);
         const reader = new FileReader();
         this.modalRef.current.style.display = "block";
         reader.readAsDataURL(file);
         reader.onload = function (e) {
-            console.log(that.modalImageRef.current.style);
             that.modalImageRef.current.style.backgroundImage = `url(${e.target.result})`;
         }
     }
@@ -233,13 +223,11 @@ class ShortEditor extends React.Component {
         this.modalImageRef.current.style.backgroundImage = 'none';
     }
 
-    closeUploadModal = () => {
-        this.uploadModalRef.current.style.display = 'none';
-    }
+    // closeUploadModal = () => {
+    //     this.uploadModalRef.current.style.display = 'none';
+    // }
 
     render() {
-        console.log(this.state.validFiles);
-
         const miniDropContainer = (
             <div className="mini-drop-image-container"
                 onDragOver={this.dragOver}
@@ -292,7 +280,7 @@ class ShortEditor extends React.Component {
                 <div className="description-container">
                     <h4>{this.props.username}</h4>
                     <div id="description-input-container" >
-                        <textarea id='short-post-text' placeholder='Write something here.'/>
+                        <textarea id='short-post-text' placeholder='Write something here.' value={this.state.value} onChange={this.props.handleChange}/>
                         {/* <form>
                             <input id='short-post-text' type='text' placeholder='Write something here.'>
                             </input>
@@ -364,7 +352,7 @@ class ShortEditor extends React.Component {
         else {
             return (
                 <>
-                    <div className="short-editor-container">
+                    <div className="short-editor-container vertical-grouping">
                         <div id="post-preview-container">
                             <div className="photo-upload-container">
                                 {/* {unsupportedFiles.length === 0 && validFiles.length ? <button className="file-upload-btn" onClick={() => uploadFiles()}>Upload Files</button> : ''} */}
@@ -395,10 +383,25 @@ class ShortEditor extends React.Component {
 
                         {/* {heroModal} */}
                     </div>
-                    <div className="short-editor-container vertical-grouping">
+                    <div className="short-editor-container ">
+                        <div className="uploaded-file-container vertical-grouping">
                         {miniDropContainer}
                         {fileDisplayContainer}
-                        {modal}
+                        </div>
+                        <div className='vertical-grouping'>
+                            <h3>Optional Fields</h3>
+                                <label>Title</label>
+                                <input placeholder='Title' />
+                                <label for="start">Start date:</label>
+                                <input 
+                                    type="date" 
+                                    id="start" 
+                                    name="trip-start"
+                                    min="1900-01-01"/>
+                                <label>Minutes Spent</label>
+                                <input type='number' min='0'/>
+                        </div>
+                        
                     </div>
                 </>
             );

@@ -16,44 +16,53 @@ class NewEntry extends React.Component {
         this.state = {
             isMilestone: false,
             username: this.props.firebase.returnUsername(),
-            prevDraft: '',
+            shortPostText: '',
+            previousLongDraft: '',
             windowType: 'main',
             postDisabled: true,
-            imageArray: null,
+            imageArray: [],
 
         };
+        this.progressRef = React.createRef();
+        this.uploadRef = React.createRef();
+        this.uploadModalRef = React.createRef();
 
         this.handleTypeToggle = this.handleTypeToggle.bind(this);
         this.handleClick = this.handleClick.bind(this);
         this.handleDisablePost = this.handleDisablePost.bind(this);
         this.setImageArray = this.setImageArray.bind(this);
-        // this.handleImagePost = this.handleImagePost.bind(this);
-       
+        this.handleChange = this.handleChange.bind(this);
+        this.closeUploadModal = this.closeUploadModal.bind(this);
+
+        this.handleSubmitPost = this.handleSubmitPost.bind(this);
+
 
     }
     componentDidMount() {
         this._isMounted = true;
         if (this._isMounted && this.state.username) {
             Axios.retrieveDraft(this.state.username).then((previousDraft) => {
-                console.log(previousDraft);
-                this.setState({ prevDraft: previousDraft.data });
+                this.setState({ previousLongDraft: previousDraft.data });
             })
                 .catch(error => {
                     console.log(
                         "Error: " + error
                     );
-                    this.setState({ prevDraft: null })
+                    this.setState({ previousLongDraft: null })
                 })
         };
     }
     componentWillUnmount() {
         this._isMounted = false;
     }
-
+    closeUploadModal = () => {
+        this.uploadModalRef.current.style.display = 'none';
+    }
+    handleChange(e) {
+        this.setState({ shortPostText: e.target.value })
+    }
     handleTypeToggle(e) {
         e.preventDefault();
-        console.log(this.state.imageArray);
-
         this.setState(state => ({
             isMilestone: !state.isMilestone
         }))
@@ -61,44 +70,80 @@ class NewEntry extends React.Component {
 
     handleClick(e, value) {
         e.preventDefault();
-        this.setState({ windowType: value })
+        this.setState({ windowType: value, postDisabled: true })
     }
 
     handleWindowSelection(e) {
 
     }
 
-    setImageArray(imageArray){
+    setImageArray(imageArray) {
         // if (!!imageArray)
-         this.setState({imageArray: imageArray});
+        console.log(imageArray);
+        this.setState({ imageArray: imageArray });
     }
 
-    // handleImagePost(e) {
-    //     e.preventDefault()
-    //     const file = document.getElementById('inputGroupFile01').files;
-    //     const formData = new FormData();
-    //     formData.append('img', file[0]);
-    //     if (file[0]) Axios.postImage(formData)
-    //         .then(r => {
-    //             console.log(r)
-    //         }).then(
+    handleSubmitPost(e) {
+        e.preventDefault()
+        if (this.state.windowType === 'short') {
+            const formData = new FormData();
+            formData.append('images', this.state.imageArray);
+            formData.append('short-post-text', this.state.shortPostText);
+            formData.append('text-only', false);
+            if (this.state.imageArray) Axios.postShortPost(formData, this.progressRef, this.uploadRef, false)
+                .then(r => {
+                    console.log(r)
+                });
+        }
+        if (this.state.windowType === 'long'){
+            //open modal
+            
+           
+        }
+        // .then(
 
-    //             () =>
-    //                 document
-    //                     .getElementById('img')
-    //                     .setAttribute('src', `http://localhost:5000/entry/image/${file[0].name}`)
-    //         );
-    //     console.log(file[0]);
+        //     () =>
+        //         document
+        //             .getElementById('img')
+        //             .setAttribute('src', `http://localhost:5000/entry/image/${file[0].name}`)
+        // )
 
-    // }
+        // console.log(file[0]);
 
-    handleDisablePost(disabled){
-        this.setState({postDisabled : disabled});
+        // const uploadFiles = async () => {
+        //     uploadModalRef.current.style.display = 'block';
+        //     uploadRef.current.innerHTML = 'File(s) Uploading...';
+        //     for (let i = 0; i < validFiles.length; i++) {
+        //         const formData = new FormData();
+        //         formData.append('image', validFiles[i]);
+        //         formData.append('key', '638938ef024e80a8c24baa6d42cae8ee');
+        // axios.post('https://api.imgbb.com/1/upload', formData, {
+        //     onUploadProgress: (progressEvent) => {
+        //         const uploadPercentage = Math.floor((progressEvent.loaded / progressEvent.total) * 100);
+        //         progressRef.current.innerHTML = `${uploadPercentage}%`;
+        //         progressRef.current.style.width = `${uploadPercentage}%`;
+
+        //         if (uploadPercentage === 100) {
+        //             uploadRef.current.innerHTML = 'File(s) Uploaded';
+        //             validFiles.length = 0;
+        //             setValidFiles([...validFiles]);
+        //             setSelectedFiles([...validFiles]);
+        //             setUnsupportedFiles([...validFiles]);
+        //         }
+        //     },
+        // })
+        // .catch(() => {
+        //     uploadRef.current.innerHTML = `<span class="error">Error Uploading File(s)</span>`;
+        //     progressRef.current.style.backgroundColor = 'red';
+        // })
+        // }
+        // }
+
     }
 
-    
-
-
+    handleDisablePost(disabled) {
+        this.setState({ postDisabled: disabled });
+    }
 
     render() {
         let editorType = null;
@@ -148,7 +193,7 @@ class NewEntry extends React.Component {
                         <button id="toggle-button" value="main" onClick={this.handleTypeToggle}>Test</button>
                     </span>
                     <span id="post-button-span">
-                        <button id="post-button" disabled={this.state.postDisabled}>Post!</button>
+                        <button id="post-button" disabled={this.state.postDisabled} onClick={this.handleSubmitPost}>Post!</button>
                     </span>
                 </div>
             );
@@ -156,26 +201,44 @@ class NewEntry extends React.Component {
             if (this.state.windowType === 'short') {
 
                 editorType = (
-                <ShortEditor 
-                    // selectedFiles={this.state.selectedFiles}
-                    // validFiles={this.state.validFiles}
-                    // unsupportedFiles={this.state.unsupportedFiles}
-                    // errorMessage={this.state.errorMessage}
-                    username={this.state.username}
-                    disablePost={this.handleDisablePost} 
-                    setImageArray={this.setImageArray}
+                    <>
+                        <ShortEditor
+                            // selectedFiles={this.state.selectedFiles}
+                            // validFiles={this.state.validFiles}
+                            // unsupportedFiles={this.state.unsupportedFiles}
+                            // errorMessage={this.state.errorMessage}
+                            username={this.state.username}
+                            disablePost={this.handleDisablePost}
+                            setImageArray={this.setImageArray}
+                            handleChange={this.handleChange}
 
-                    // setSelectedFiles = {this.setSelectedfiles}
-                    // setValidFiles = {this.setValidFiles}
-                    // setUnsupportedFiles = {this.setUnsupportedFiles}
-                    // setErrorMessage = {this.setErrorMessage}
-                />
+                        // setSelectedFiles = {this.setSelectedfiles}
+                        // setValidFiles = {this.setValidFiles}
+                        // setUnsupportedFiles = {this.setUnsupportedFiles}
+                        // setErrorMessage = {this.setErrorMessage}
+                        />
+
+                        <div className="upload-modal" ref={this.uploadModalRef}>
+                            <div className="overlay"></div>
+                            {/* <div className="close" onClick={(() => this.closeUploadModal())}>X</div> */}
+                            <div className="progress-container">
+                                <span ref={this.uploadRef}></span>
+                                <div className="progress">
+                                    <div className="progress-bar" ref={this.progressRef}></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </>
                 );
             }
 
             else if (this.state.windowType === 'long') {
-                if (this.state.prevDraft !== '') {
-                    editorType = <LongEditor content={this.state.prevDraft} />;
+                if (this.state.previousLongDraft !== '') {
+                    editorType = 
+                    <LongEditor
+                        content={this.state.previousLongDraft}
+                    />;
                 }
                 else {
                     editorType = (<div>Loading...</div>);
