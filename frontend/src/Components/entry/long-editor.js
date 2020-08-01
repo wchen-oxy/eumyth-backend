@@ -36,11 +36,9 @@ class LongEditor extends React.Component {
             
                                 if (editorState[0].text !== '')
                                 {
-                                    console.log('TR1');
                                     this.setState({ hasContent: true }, this.props.disablePost(false));
                                 }
                                 else if (editorState[0].text === '' && editorState.length > 1) {
-                                    console.log('TR2');
                                     this.setState({ hasContent: true }, this.props.disablePost(false));
                                 }
                             }

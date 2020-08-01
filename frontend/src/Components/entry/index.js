@@ -26,6 +26,9 @@ class NewEntry extends React.Component {
         this.progressRef = React.createRef();
         this.uploadRef = React.createRef();
         this.uploadModalRef = React.createRef();
+        this.modalRef = React.createRef();
+        this.modalImageRef = React.createRef();
+        this.closeModal = this.closeModal.bind(this);
 
         this.handleTypeToggle = this.handleTypeToggle.bind(this);
         this.handleClick = this.handleClick.bind(this);
@@ -89,6 +92,12 @@ class NewEntry extends React.Component {
         this.modalRef.current.style.display = "block";
         
     }
+
+    closeModal(){
+        this.modalRef.current.style.display = "none";
+        this.modalImageRef.current.style.backgroundImage = 'none';
+    }
+
     handleSubmitPost(e) {
         e.preventDefault()
         if (this.state.windowType === 'short') {
@@ -102,7 +111,7 @@ class NewEntry extends React.Component {
                 });
         }
         if (this.state.windowType === 'long'){
-            this.openModal();
+            this.openSubmitLongPostModal();
             //open modal
             
            
@@ -266,6 +275,27 @@ class NewEntry extends React.Component {
                 <div className="modal" ref={this.modalRef}>
                     <div className="overlay"></div>
                     <span className="close" onClick={(() => this.closeModal())}>X</span>
+                    <div className='vertical-grouping' id='option-modal'>
+                        <div id='buttons-container'>
+                            <div className='button-group'>
+                            <label>Title</label>
+                            <input type='text'/>
+                            </div>
+                            <div className='button-group'>
+                            <label>Cover Photo</label>
+                            <input type='file' />
+                            </div>
+                            <div className='button-group'>
+                            <label>Date</label>
+                            <input type='date'></input>
+                            </div>
+                            <div className='button-group'>
+                            <label>Minutes Spent</label>
+                            <input type='number'/>
+                            </div>
+                        </div>
+                        <button>Publish Now!</button>
+                    </div>
                     <div className="modal-image" ref={this.modalImageRef}></div>
                 </div>
         

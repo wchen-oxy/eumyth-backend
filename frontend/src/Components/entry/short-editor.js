@@ -28,9 +28,8 @@ class ShortEditor extends React.Component {
             content: this.props.content,
             username: this.props.firebase.returnUsername(),
             imageExists: false,
+            postType: '',
            
-
-
             selectedFiles: [],
             validFiles: [],
             unsupportedFiles: [],
@@ -81,7 +80,6 @@ class ShortEditor extends React.Component {
         }, []);
         this.setValidFiles(filteredArr);
     }
-
 
 
 
