@@ -148,21 +148,14 @@ export default class WelcomePage extends React.Component {
     }
 
     return (
-      <div className="master-container">
         <main>
-
           <section className="overview-login-register-container">
             <div className="overview-description-container">
               <p>Welcome to interestHub! Login or sign up to get started!</p>
             </div>
-
             {LoginRegisterHome}
-
           </section>
         </main>
-      </div>
-
-
     )
   }
 }

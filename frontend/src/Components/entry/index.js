@@ -1,12 +1,12 @@
-import React from 'react';
-import Axios from '../../Axios/axios';
-import './index.scss';
-import LongEditor from './long-editor';
-import ShortEditor from './short-editor';
+import React from "react";
+import Axios from "../../Axios/axios";
+import "./index.scss";
+import LongEditor from "./long-editor";
+import ShortEditor from "./short-editor";
 
 import { Container, Row, Col } from "react-bootstrap";
-import debounce from 'lodash/debounce';
-import { withFirebase } from '../../Firebase';
+import debounce from "lodash/debounce";
+import { withFirebase } from "../../Firebase";
 
 
 class NewEntry extends React.Component {
@@ -16,9 +16,9 @@ class NewEntry extends React.Component {
         this.state = {
             isMilestone: false,
             username: this.props.firebase.returnUsername(),
-            shortPostText: '',
+            shortPostText: "",
             previousLongDraft: null,
-            windowType: 'main',
+            windowType: "main",
             postDisabled: true,
             imageArray: [],
 
@@ -60,7 +60,7 @@ class NewEntry extends React.Component {
         this._isMounted = false;
     }
     closeUploadModal = () => {
-        this.uploadModalRef.current.style.display = 'none';
+        this.uploadModalRef.current.style.display = "none";
     }
     handleChange(e) {
         this.setState({ shortPostText: e.target.value })
@@ -95,22 +95,22 @@ class NewEntry extends React.Component {
 
     closeModal(){
         this.modalRef.current.style.display = "none";
-        this.modalImageRef.current.style.backgroundImage = 'none';
+        this.modalImageRef.current.style.backgroundImage = "none";
     }
 
     handleSubmitPost(e) {
         e.preventDefault()
-        if (this.state.windowType === 'short') {
+        if (this.state.windowType === "short") {
             const formData = new FormData();
-            formData.append('images', this.state.imageArray);
-            formData.append('short-post-text', this.state.shortPostText);
-            formData.append('text-only', false);
+            formData.append("images", this.state.imageArray);
+            formData.append("short-post-text", this.state.shortPostText);
+            formData.append("text-only", false);
             if (this.state.imageArray) Axios.postShortPost(formData, this.progressRef, this.uploadRef, false)
                 .then(r => {
                     console.log(r)
                 });
         }
-        if (this.state.windowType === 'long'){
+        if (this.state.windowType === "long"){
             this.openSubmitLongPostModal();
             //open modal
             
@@ -120,27 +120,27 @@ class NewEntry extends React.Component {
 
         //     () =>
         //         document
-        //             .getElementById('img')
-        //             .setAttribute('src', `http://localhost:5000/entry/image/${file[0].name}`)
+        //             .getElementById("img")
+        //             .setAttribute("src", `http://localhost:5000/entry/image/${file[0].name}`)
         // )
 
         // console.log(file[0]);
 
         // const uploadFiles = async () => {
-        //     uploadModalRef.current.style.display = 'block';
-        //     uploadRef.current.innerHTML = 'File(s) Uploading...';
+        //     uploadModalRef.current.style.display = "block";
+        //     uploadRef.current.innerHTML = "File(s) Uploading...";
         //     for (let i = 0; i < validFiles.length; i++) {
         //         const formData = new FormData();
-        //         formData.append('image', validFiles[i]);
-        //         formData.append('key', '638938ef024e80a8c24baa6d42cae8ee');
-        // axios.post('https://api.imgbb.com/1/upload', formData, {
+        //         formData.append("image", validFiles[i]);
+        //         formData.append("key", "638938ef024e80a8c24baa6d42cae8ee");
+        // axios.post("https://api.imgbb.com/1/upload", formData, {
         //     onUploadProgress: (progressEvent) => {
         //         const uploadPercentage = Math.floor((progressEvent.loaded / progressEvent.total) * 100);
         //         progressRef.current.innerHTML = `${uploadPercentage}%`;
         //         progressRef.current.style.width = `${uploadPercentage}%`;
 
         //         if (uploadPercentage === 100) {
-        //             uploadRef.current.innerHTML = 'File(s) Uploaded';
+        //             uploadRef.current.innerHTML = "File(s) Uploaded";
         //             validFiles.length = 0;
         //             setValidFiles([...validFiles]);
         //             setSelectedFiles([...validFiles]);
@@ -150,7 +150,7 @@ class NewEntry extends React.Component {
         // })
         // .catch(() => {
         //     uploadRef.current.innerHTML = `<span class="error">Error Uploading File(s)</span>`;
-        //     progressRef.current.style.backgroundColor = 'red';
+        //     progressRef.current.style.backgroundColor = "red";
         // })
         // }
         // }
@@ -164,7 +164,7 @@ class NewEntry extends React.Component {
     render() {
         let editorType = null;
         let topButtons = null;
-        if (this.state.windowType === 'main') {
+        if (this.state.windowType === "main") {
             editorType = (
                 <div id="selection-window">
                     <div className="vertical-grouping">
@@ -214,7 +214,7 @@ class NewEntry extends React.Component {
                 </div>
             );
 
-            if (this.state.windowType === 'short') {
+            if (this.state.windowType === "short") {
 
                 editorType = (
                     <>
@@ -249,8 +249,8 @@ class NewEntry extends React.Component {
                 );
             }
 
-            else if (this.state.windowType === 'long') {
-                if (this.state.previousLongDraft !== '') {
+            else if (this.state.windowType === "long") {
+                if (this.state.previousLongDraft !== "") {
                     editorType = 
                     <LongEditor
                         content={this.state.previousLongDraft}
@@ -275,23 +275,23 @@ class NewEntry extends React.Component {
                 <div className="modal" ref={this.modalRef}>
                     <div className="overlay"></div>
                     <span className="close" onClick={(() => this.closeModal())}>X</span>
-                    <div className='vertical-grouping' id='option-modal'>
-                        <div id='buttons-container'>
-                            <div className='button-group'>
+                    <div className="vertical-grouping" id="option-modal">
+                        <div id="buttons-container">
+                            <div className="button-group">
                             <label>Title</label>
-                            <input type='text'/>
+                            <input type="text"/>
                             </div>
-                            <div className='button-group'>
+                            <div className="button-group">
                             <label>Cover Photo</label>
-                            <input type='file' />
+                            <input type="file" />
                             </div>
-                            <div className='button-group'>
+                            <div className="button-group">
                             <label>Date</label>
-                            <input type='date'></input>
+                            <input type="date"></input>
                             </div>
-                            <div className='button-group'>
+                            <div className="button-group">
                             <label>Minutes Spent</label>
-                            <input type='number'/>
+                            <input type="number"/>
                             </div>
                         </div>
                         <button>Publish Now!</button>

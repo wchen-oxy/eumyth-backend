@@ -1,8 +1,8 @@
 @import "../../main.scss";
+
 .welcome-navbar-container {
     background-color: $primary-color;
     // min-width: 100%;
-    
     display: flex;
     padding-left: 1vh;
     padding-right: 1vh;
@@ -11,9 +11,11 @@
 
 .navbar-item{
     font-size: $primary-medium-font-size;
+    padding-left: 1vh;
+    padding-right: 1vh;
 }
 
-#setting{
+#settings-link{
     padding-right: 1vh;
 }
 
@@ -21,13 +23,13 @@
     padding-left: 1vh;
 }
 
-.no-select {
-    -webkit-touch-callout: none; /* iOS Safari */
-      -webkit-user-select: none; /* Safari */
-       -khtml-user-select: none; /* Konqueror HTML */
-         -moz-user-select: none; /* Old versions of Firefox */
-          -ms-user-select: none; /* Internet Explorer/Edge */
-              user-select: none; /* Non-prefixed version, currently
-                                    supported by Chrome, Edge, Opera and Firefox */
-  }
+// .no-select {
+//     -webkit-touch-callout: none; /* iOS Safari */
+//       -webkit-user-select: none; /* Safari */
+//        -khtml-user-select: none; /* Konqueror HTML */
+//          -moz-user-select: none; /* Old versions of Firefox */
+//           -ms-user-select: none; /* Internet Explorer/Edge */
+//               user-select: none; /* Non-prefixed version, currently
+//                                     supported by Chrome, Edge, Opera and Firefox */
+//   }
 
