@@ -3,7 +3,7 @@
     height: 60vh;
     display: flex;
     width: auto;
-    padding: 5vh;
+    padding: 1vh;
     justify-content: center;
 }
 
@@ -31,7 +31,7 @@ box-sizing: border-box;
 // https://github.com/kenwheeler/slick/issues/982
 #post-preview-container {
     max-width: 900px;
-    min-width: 80%;
+    min-width: 600px;
     min-height: 0;
     display: flex;
    
@@ -46,34 +46,34 @@ box-sizing: border-box;
     display: flex;
 }
 
-.modal {
-    z-index: 999;
-    display: none;
-    overflow: hidden;
-}
+// .modal {
+//     z-index: 999;
+//     display: none;
+//     overflow: hidden;
+// }
 
-.modal .overlay {
-    width: 100%;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.66);
-    position: absolute;
-    top: 0;
-    left: 0;
-}
+// .modal .overlay {
+//     width: 100%;
+//     height: 100vh;
+//     background: rgba(0, 0, 0, 0.66);
+//     position: absolute;
+//     top: 0;
+//     left: 0;
+// }
 
-.modal .modal-image {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    overflow: hidden;
-    object-fit: cover;
-    width: 100%;
-    height: 300px;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-}
+// .modal .modal-image {
+//     position: absolute;
+//     top: 50%;
+//     left: 50%;
+//     transform: translate(-50%, -50%);
+//     overflow: hidden;
+//     object-fit: cover;
+//     width: 100%;
+//     height: 300px;
+//     background-size: contain;
+//     background-repeat: no-repeat;
+//     background-position: center;
+// }
 
 
 // Drag Drop Scss

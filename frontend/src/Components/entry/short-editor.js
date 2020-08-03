@@ -1,11 +1,4 @@
 import React, { useRef, createRef } from 'react';
-import DanteEditor from 'Dante2';
-import { convertToHTML } from 'draft-convert';
-import { ImageBlockConfig } from "Dante2/package/es/components/blocks/image.js";
-import { VideoBlockConfig } from "Dante2/package/es/components/blocks/video";
-import { PlaceholderBlockConfig } from "Dante2/package/es/components/blocks/placeholder";
-import { EmbedBlockConfig } from "Dante2/package/es/components/blocks/embed";
-import DragDropFiles from './sub-components/drag-drop-file';
 import { withFirebase } from '../../Firebase';
 import AxiosHelper from '../../Axios/axios';
 import ImageSlider from '../image-carousel';
@@ -20,92 +13,36 @@ class ShortEditor extends React.Component {
     constructor(props) {
         super(props);
         this.fileInputRef = React.createRef();
-        this.modalImageRef = React.createRef();
-        this.modalRef = React.createRef();
-       
-
         this.state = {
-            content: this.props.content,
-            username: this.props.firebase.returnUsername(),
-            imageExists: false,
-            postType: '',
-           
-            selectedFiles: [],
-            validFiles: [],
-            unsupportedFiles: [],
             errorMessage: ''
         }
-        this.handleImagePost = this.handleImagePost.bind(this);
-        // this.handleMoveDropzone = this.handleMoveDropzone.bind(this);
-        this.setSelectedFiles = this.setSelectedFiles.bind(this);
-        this.setValidFiles = this.setValidFiles.bind(this);
-        this.setUnsupportedFiles = this.setUnsupportedFiles.bind(this);
+        // this.handleImagePost = this.handleImagePost.bind(this);
         this.setErrorMessage = this.setErrorMessage.bind(this);
-        this.indicateImageExists = this.indicateImageExists.bind(this);
-        this.generateValidFiles = this.generateValidFiles.bind(this);
-
+        this.validateFile = this.validateFile.bind(this);
+   
     }
 
-    
-    componentDidMount() {
-
-    }
-    indicateImageExists(boolean) {
-        this.setState({ imageExists: boolean })
-    }
-    setSelectedFiles(value) {
-        this.setState({ selectedFiles: value },
-            this.generateValidFiles
-        )
-    }
-    setValidFiles(value) {
-        this.setState({ validFiles: value })
-    }
-    setUnsupportedFiles(value) {
-        this.setState({ unsupportedFiles: value })
-    }
     setErrorMessage(value) {
         this.setState({ value });
     }
 
-    generateValidFiles() {
-        let selectedFiles = this.state.selectedFiles;
-        let filteredArr = selectedFiles.reduce((acc, current) => {
-            const x = acc.find(item => item.name === current.name);
-            if (!x) {
-                return acc.concat([current]);
-            } else {
-                return acc;
-            }
-        }, []);
-        this.setValidFiles(filteredArr);
-    }
-
-
-
-    handleImagePost(e) {
-        e.preventDefault();
-        const file = document.getElementById('inputGroupFile01').files;
-        const formData = new FormData();
-        formData.append('file', file[0]);
-        if (file[0]) AxiosHelper.postImage(formData)
-            .then(result => {
-            }).then(
-                () =>
-                    document
-                        .getElementById('img')
-                        .setAttribute('src', `http://localhost:5000/entry/image/${file[0].name}`)
-            );
-    }
-
-    // handleMoveDropzone(e) {
+    // handleImagePost(e) {
     //     e.preventDefault();
-    //     console.log("3");
+    //     const file = document.getElementById('inputGroupFile01').files;
+    //     const formData = new FormData();
+    //     formData.append('file', file[0]);
+    //     if (file[0]) AxiosHelper.postImage(formData)
+    //         .then(result => {
+    //         }).then(
+    //             () =>
+    //                 document
+    //                     .getElementById('img')
+    //                     .setAttribute('src', `http://localhost:5000/entry/image/${file[0].name}`)
+    //         );
     // }
 
     preventDefault = (e) => {
         e.preventDefault();
-        // e.stopPropagation();
     }
 
     dragOver = (e) => {
@@ -142,13 +79,17 @@ class ShortEditor extends React.Component {
         let invalidFound = false;
         for (let i = 0; i < files.length; i++) {
             if (this.validateFile(files[i])) {
-                this.setState((state) => ({ selectedFiles: state.selectedFiles.concat(files[i]) }), this.generateValidFiles);
+                // this.setState((state) => ({ selectedFiles: state.selectedFiles.concat(files[i]) }), this.generateValidFiles);
+                this.props.onSelectedFileChange(files[i]);
+
             } else {
                 invalidFound = true;
                 files[i]['invalid'] = true;
-                this.setState((state) => ({ selectedFiles: state.selectedFiles.concat(files[i]) }), this.generateValidFiles);
+                // this.setState((state) => ({ selectedFiles: state.selectedFiles.concat(files[i]) }), this.generateValidFiles);
+                this.props.onSelectedFileChange(files[i]);
                 this.setErrorMessage('File type not permitted');
-                this.setState((state) => ({ unsupportedFiles: state.unsupportedFiles.concat(files[i]) }));
+                // this.setState((state) => ({ unsupportedFiles: state.unsupportedFiles.concat(files[i]) }));
+                this.props.onUnsupportedFileChange(files[i]);
             }
         }
         this.updateDisabilityState(invalidFound);
@@ -178,23 +119,23 @@ class ShortEditor extends React.Component {
     }
 
     removeFile = (name) => {
-        const index = this.state.validFiles.findIndex(e => e.name === name);
-        const index2 = this.state.selectedFiles.findIndex(e => e.name === name);
-        const index3 = this.state.unsupportedFiles.findIndex(e => e.name === name);
-        let validFiles = this.state.validFiles;
-        let selectedFiles = this.state.selectedFiles;
-        let unsupportedFiles = this.state.unsupportedFiles;
+        const index = this.props.validFiles.findIndex(e => e.name === name);
+        const index2 = this.props.selectedFiles.findIndex(e => e.name === name);
+        const index3 = this.props.unsupportedFiles.findIndex(e => e.name === name);
+        let validFiles = this.props.validFiles;
+        let selectedFiles = this.props.selectedFiles;
+        let unsupportedFiles = this.props.unsupportedFiles;
 
         validFiles.splice(index, 1);
         selectedFiles.splice(index2, 1);
-        this.setValidFiles(validFiles);
-        this.setSelectedFiles(selectedFiles);
+        this.props.setValidFiles(validFiles);
+        this.props.setSelectedFiles(selectedFiles);
         if (index3 !== -1) {
             unsupportedFiles.splice(index3, 1);
-            this.setUnsupportedFiles(unsupportedFiles);
+            this.props.setUnsupportedFiles(unsupportedFiles);
         }
 
-        if (validFiles.length > 0 && unsupportedFiles.length === 0) {
+        if (validFiles.length > 0 && unsupportedFiles.length === 0 ) {
             this.updateDisabilityState(false);
         }
         else {
@@ -203,7 +144,7 @@ class ShortEditor extends React.Component {
     }
 
     updateDisabilityState = (invalidFound) => {
-        invalidFound ? this.props.disablePost(true) : this.props.disablePost(false);
+        invalidFound && this.props.text.length === 0 ? this.props.onDisablePost(true) : this.props.onDisablePost(false);
     }
 
     openImageModal = (file) => {
@@ -220,10 +161,6 @@ class ShortEditor extends React.Component {
         this.modalRef.current.style.display = "none";
         this.modalImageRef.current.style.backgroundImage = 'none';
     }
-
-    // closeUploadModal = () => {
-    //     this.uploadModalRef.current.style.display = 'none';
-    // }
 
     render() {
         const miniDropContainer = (
@@ -251,7 +188,7 @@ class ShortEditor extends React.Component {
         const fileDisplayContainer = (
             <div className="file-display-container">
                 {
-                    this.state.validFiles.map((data, i) =>
+                    this.props.validFiles.map((data, i) =>
                         <div className="file-status-bar" key={i}>
                             <div onClick={!data.invalid ? () => this.openImageModal(data) : () => this.removeFile(data.name)}>
                                 <div className="file-type-logo"></div>
@@ -265,20 +202,13 @@ class ShortEditor extends React.Component {
                 }
             </div>
         );
-        const modal = (
-            <div className="modal" ref={this.modalRef}>
-                <div className="overlay"></div>
-                <span className="close" onClick={(() => this.closeModal())}>X</span>
-                <div className="modal-image" ref={this.modalImageRef}></div>
-            </div>
-        );
-
+     
         const textContainer = (
             <div id="text-container">
                 <div className="description-container">
                     <h4>{this.props.username}</h4>
                     <div id="description-input-container" >
-                        <textarea id='short-post-text' placeholder='Write something here.' value={this.state.value} onChange={this.props.handleChange}/>
+                        <textarea id='short-post-text' placeholder='Write something here.' onChange={this.props.handleTextChange}/>
                         {/* <form>
                             <input id='short-post-text' type='text' placeholder='Write something here.'>
                             </input>
@@ -293,13 +223,13 @@ class ShortEditor extends React.Component {
             //   advBrowserText = (<label for="file"><strong>Choose a file</strong><span className="box__dragndrop"> or drag it here</span>.</label>);
 
         }
-        if (this.state.validFiles.length === 0) {
+        if (this.props.validFiles.length === 0) {
             return (
                 <div className="short-editor-container">
                     <div id="post-preview-container">
                         <div className="photo-upload-container">
                             {/* {unsupportedFiles.length === 0 && validFiles.length ? <button className="file-upload-btn" onClick={() => uploadFiles()}>Upload Files</button> : ''} */}
-                            {this.state.unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
+                            {this.props.unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
                             <div className="drop-image-container"
                                 onDragOver={this.dragOver}
                                 onDragEnter={this.dragEnter}
@@ -350,19 +280,19 @@ class ShortEditor extends React.Component {
                     <div className="short-editor-container vertical-grouping">
                         <div id="post-preview-container">
                             <div className="photo-upload-container">
-                                {this.state.unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
-                                <ImageSlider fileArray={this.state.validFiles} setImageArray={this.props.setImageArray} />
+                                {this.props.unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
+                                <ImageSlider fileArray={this.props.validFiles} setImageArray={this.props.setImageArray} />
                             </div>
                             {textContainer}
                         </div>
-                        {modal}
+                        {/* {modal} */}
                     </div>
                     <div className="short-editor-container ">
                         <div className="uploaded-file-container vertical-grouping">
                         {miniDropContainer}
                         {fileDisplayContainer}
                         </div>
-                        <div className='vertical-grouping'>
+                        {/* <div className='vertical-grouping'>
                             <h3>Optional Fields</h3>
                                 <label>Title</label>
                                 <input placeholder='Title' />
@@ -375,7 +305,7 @@ class ShortEditor extends React.Component {
                                 <label>Minutes Spent</label>
                                 <input type='number' min='0'/>
                         </div>
-                        
+                         */}
                     </div>
                 </>
             );

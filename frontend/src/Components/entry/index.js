@@ -27,9 +27,9 @@ class NewEntry extends React.Component {
         this.uploadRef = React.createRef();
         this.uploadModalRef = React.createRef();
         this.modalRef = React.createRef();
-        this.modalImageRef = React.createRef();
+        
+        // this.modalImageRef = React.createRef();
         this.closeModal = this.closeModal.bind(this);
-
         this.handleTypeToggle = this.handleTypeToggle.bind(this);
         this.handleClick = this.handleClick.bind(this);
         this.handleDisablePost = this.handleDisablePost.bind(this);
@@ -95,7 +95,7 @@ class NewEntry extends React.Component {
 
     closeModal(){
         this.modalRef.current.style.display = "none";
-        this.modalImageRef.current.style.backgroundImage = "none";
+        // this.modalImageRef.current.style.backgroundImage = "none";
     }
 
     handleSubmitPost(e) {
@@ -296,7 +296,6 @@ class NewEntry extends React.Component {
                         </div>
                         <button>Publish Now!</button>
                     </div>
-                    <div className="modal-image" ref={this.modalImageRef}></div>
                 </div>
         
             </div>
