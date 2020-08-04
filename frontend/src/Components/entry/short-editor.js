@@ -2,6 +2,8 @@ import React, { useRef, createRef } from 'react';
 import { withFirebase } from '../../Firebase';
 import AxiosHelper from '../../Axios/axios';
 import ImageSlider from '../image-carousel';
+import TextareaAutosize from 'react-textarea-autosize';
+
 import './short-editor.scss';
 
 var isAdvancedUpload = function () {
@@ -208,7 +210,7 @@ class ShortEditor extends React.Component {
                 <div className="description-container">
                     <h4>{this.props.username}</h4>
                     <div id="description-input-container" >
-                        <textarea id='short-post-text' placeholder='Write something here.' onChange={this.props.handleTextChange}/>
+                        <TextareaAutosize id='short-post-text' placeholder='Write something here.' onChange={this.props.handleTextChange} minRows={5} value={this.props.text}/>
                         {/* <form>
                             <input id='short-post-text' type='text' placeholder='Write something here.'>
                             </input>
@@ -226,11 +228,14 @@ class ShortEditor extends React.Component {
         if (this.props.validFiles.length === 0) {
             return (
                 <div className="short-editor-container">
-                    <div id="post-preview-container">
-                        <div className="photo-upload-container">
+                    <div className="post-preview-container" id="before-image-container">
+                        {textContainer} 
+                    </div>
+
+                    <div className="photo-upload-container">
                             {/* {unsupportedFiles.length === 0 && validFiles.length ? <button className="file-upload-btn" onClick={() => uploadFiles()}>Upload Files</button> : ''} */}
                             {this.props.unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
-                            <div className="drop-image-container"
+                            <div className="drop-image-container" id="drop-image-container-before"
                                 onDragOver={this.dragOver}
                                 onDragEnter={this.dragEnter}
                                 onDragLeave={this.dragLeave}
@@ -251,9 +256,6 @@ class ShortEditor extends React.Component {
                             </div>
                             {/* {fileDisplayContainer} */}
                         </div>
-                        {textContainer}
-                    </div>
-
                     {/* <div className="box__input">
                             <form className="box" method="post" action="" enctype="multipart/form-data">
                                     <input
@@ -278,34 +280,19 @@ class ShortEditor extends React.Component {
             return (
                 <>
                     <div className="short-editor-container vertical-grouping">
-                        <div id="post-preview-container">
+                        <div className="post-preview-container" id="after-image-container">
                             <div className="photo-upload-container">
                                 {this.props.unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
                                 <ImageSlider fileArray={this.props.validFiles} setImageArray={this.props.setImageArray} />
                             </div>
                             {textContainer}
                         </div>
-                        {/* {modal} */}
                     </div>
-                    <div className="short-editor-container ">
+                    <div className="short-editor-container">
                         <div className="uploaded-file-container vertical-grouping">
                         {miniDropContainer}
                         {fileDisplayContainer}
                         </div>
-                        {/* <div className='vertical-grouping'>
-                            <h3>Optional Fields</h3>
-                                <label>Title</label>
-                                <input placeholder='Title' />
-                                <label for="start">Start date:</label>
-                                <input 
-                                    type="date" 
-                                    id="start" 
-                                    name="trip-start"
-                                    min="1900-01-01"/>
-                                <label>Minutes Spent</label>
-                                <input type='number' min='0'/>
-                        </div>
-                         */}
                     </div>
                 </>
             );

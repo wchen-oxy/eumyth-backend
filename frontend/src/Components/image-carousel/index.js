@@ -1,6 +1,8 @@
 import React, { useRef } from "react";
 import Slider from "react-slick";
 import './index.scss';
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 // https://css-tricks.com/centering-css-complete-guide/#center-vertically
 //Explains the weird -50% and top 50% thing
@@ -69,13 +71,14 @@ class ImageSlider extends React.Component {
 
   transformImageProp() {
     let imageArray = this.props.fileArray;
+    let count = 0;
     Promise.all(imageArray.map((file) => this.loadImage(file)))
       .then(
         newArray =>
           newArray.map(item =>
             item = (
               // <div className="photo-container">
-              <img className="photo" src={item} alt='image not loaded' />
+              <img className="photo" key={count++} src={item} alt='image not loaded' />
               // </div>
             ))
       ).then(result => {
@@ -98,6 +101,7 @@ class ImageSlider extends React.Component {
   render() {
     const container =
       (!!this.state.transformedImageArray ? this.state.transformedImageArray : <p>IMAGE IS STILL LOADING</p>);
+      console.log(this.state.transformedImageArray);
     return (
       <Slider {...settings}>
         {container}
