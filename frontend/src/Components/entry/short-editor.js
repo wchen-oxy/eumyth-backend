@@ -279,7 +279,7 @@ class ShortEditor extends React.Component {
         else {
             return (
                 <>
-                    <div className="short-editor-container vertical-grouping">
+                    <div className="editor-component-container vertical-grouping">
                         <div className="post-preview-container" id="after-image-container">
                             <div className="photo-upload-container">
                                 {this.props.unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
@@ -288,7 +288,7 @@ class ShortEditor extends React.Component {
                             {textContainer}
                         </div>
                     </div>
-                    <div className="short-editor-container">
+                    <div className="editor-component-container">
                         <div className="uploaded-file-container vertical-grouping">
                         {miniDropContainer}
                         {fileDisplayContainer}
