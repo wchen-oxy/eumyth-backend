@@ -43,30 +43,30 @@ class NavigationAuth extends React.Component {
     this.modalRef = React.createRef();
     this.closeModal = this.closeModal.bind(this);
     this.openModal = this.openModal.bind(this);
-    this.handleDisablePost = this.handleDisablePost.bind(this);
+    // this.handleDisablePost = this.handleDisablePost.bind(this);
     // this.handleChange = this.handleChange.bind(this);
-    this.handleSubmitPost = this.handleSubmitPost.bind(this);
-    this.handleClick = this.handleClick.bind(this);
+    // this.handleSubmitPost = this.handleSubmitPost.bind(this);
+    // this.handleClick = this.handleClick.bind(this);
 
 
   }
-  componentDidMount() {
-    this._isMounted = true;
-    if (this._isMounted && this.state.username) {
-      Axios.retrieveDraft(this.state.username).then((previousDraft) => {
-        this.setState({ previousLongDraft: previousDraft.data });
-      })
-        .catch(error => {
-          console.log(
-            "Error: " + error
-          );
+  // componentDidMount() {
+  //   this._isMounted = true;
+  //   if (this._isMounted && this.state.username) {
+  //     Axios.retrieveDraft(this.state.username).then((previousDraft) => {
+  //       this.setState({ previousLongDraft: previousDraft.data });
+  //     })
+  //       .catch(error => {
+  //         console.log(
+  //           "Error: " + error
+  //         );
 
-        })
-    };
-  }
-  componentWillUnmount() {
-    this._isMounted = false;
-  }
+  //       })
+  //   };
+  // }
+  // componentWillUnmount() {
+  //   this._isMounted = false;
+  // }
 
   openModal() {
     this.modalRef.current.style.display = "block";
@@ -77,44 +77,42 @@ class NavigationAuth extends React.Component {
     this.setState({ window: 'main' });
   }
 
-  // handleChange(e) {
-  //   this.setState({ shortPostText: e.target.value })
+
+
+  // handleClick(e, value, disableBoolean) {
+  //   e.preventDefault();
+  //   if (value === 'short' || value === 'long') this.setState({currentPostType : value});
+  //   this.setState({ window: value, postDisabled: disableBoolean });
   // }
 
-  handleClick(e, value, disableBoolean) {
-    e.preventDefault();
-    if (value === 'short' || value === 'long') this.setState({currentPostType : value});
-    this.setState({ window: value, postDisabled: disableBoolean });
-  }
-
  
-  handleSubmitPost(e) {
-    alert("PRESSED SUBMIT");
-  }
-  handleDisablePost(disabled) {
-    this.setState({ postDisabled: disabled });
-  }
+  // handleSubmitPost(e) {
+  //   alert("PRESSED SUBMIT");
+  // }
+  // handleDisablePost(disabled) {
+  //   this.setState({ postDisabled: disabled });
+  // }
   render() {
-    let window = '';
-    switch (this.state.window) {
-      case ("main"):
-        window = (<NewPost setWindow={this.handleClick} />);
-        break;
-      case ("short"):
-        window = (<ShortPost
-          username={this.state.username}
-          disablePost={this.handleDisablePost}
-          setImageArray={this.setImageArray}
-          // handleChange={this.handleChange}
-          handleClick={this.handleClick}
-        />);
-        break;
-      case ("long"):
-        window = <LongPost
-          content={this.state.previousLongDraft}
-          disablePost={this.handleDisablePost}
-        />;
-        break;
+    // let window = '';
+    // switch (this.state.window) {
+    //   case ("main"):
+    //     window = (<NewPost setWindow={this.handleClick} />);
+    //     break;
+    //   case ("short"):
+    //     window = (<ShortPost
+    //       username={this.state.username}
+    //       disablePost={this.handleDisablePost}
+    //       setImageArray={this.setImageArray}
+    //       // handleChange={this.handleChange}
+    //       handleClick={this.handleClick}
+    //     />);
+    //     break;
+    //   case ("long"):
+    //     window = <LongPost
+    //       content={this.state.previousLongDraft}
+    //       disablePost={this.handleDisablePost}
+    //     />;
+    //     break;
       // case ("review"):
       //   window = <ReviewPost
       //     content={this.state.previousLongDraft}
@@ -123,9 +121,9 @@ class NavigationAuth extends React.Component {
       //     currentPostType={this.state.currentPostType}
       //   />
         // break;
-      default:
-        throw Error("No window options matched :(");
-    }
+      // default:
+      //   throw Error("No window options matched :(");
+    // }
     return (
       <>
         <nav className="welcome-navbar-container">
@@ -142,7 +140,7 @@ class NavigationAuth extends React.Component {
         <div className="modal" ref={this.modalRef}>
           <div className="overlay"></div>
           <span className="close" onClick={(() => this.closeModal())}>X</span>
-          {window}
+          <NewPost />
         </div>
       </>
     );
