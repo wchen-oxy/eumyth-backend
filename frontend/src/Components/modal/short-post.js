@@ -99,7 +99,7 @@ class ShortPost extends React.Component {
             <h2>Placeholder for short</h2>
             <div id="button-container">
               <span id="toggle-button-span">
-                <button id="toggle-button" value="main" onClick={e => this.props.handleClick(e, e.target.value)}>Return</button>
+                <button id="toggle-button" value="main" onClick={e => this.props.handleClick(e, e.target.value, true)}>Return</button>
               </span>
               <span id="post-button-span">
                 <button id="post-button" value="review" disabled={this.state.postDisabled} onClick={e => this.handleClick(e, e.target.value)}>Review Post</button>
@@ -127,7 +127,7 @@ class ShortPost extends React.Component {
     else{
 
       return (
-       <ReviewPost onClick={this.handleClick} imageArray={this.state.imageArray} postText={this.state.postDescription}/>
+       <ReviewPost postType="short" onClick={this.handleClick} imageArray={this.state.imageArray} postText={this.state.postDescription}/>
       );
     }
   }

@@ -13,10 +13,10 @@ class NewPost extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-     
+
       username: this.props.firebase.returnUsername(),
       previousLongDraft: null,
-      window: "main",
+      windowType: "main",
       currentPostType: 'main',
       // imageArray: [],
     };
@@ -25,35 +25,53 @@ class NewPost extends React.Component {
     // this.handleChange = this.handleChange.bind(this);
     this.handleSubmitPost = this.handleSubmitPost.bind(this);
     this.handleClick = this.handleClick.bind(this);
+    this.saveDraft = this.saveDraft.bind(this);
+    this.retrieveDraft = this.retrieveDraft.bind(this);
+    this.confirmNewDialog = this.confirmNewDialog.bind(this);
     // this.setImageArray = this.setImageArray.bind(this);
 
   }
   componentDidMount() {
     this._isMounted = true;
     if (this._isMounted && this.state.username) {
-      Axios.retrieveDraft(this.state.username).then((previousDraft) => {
-        console.log(previousDraft.data);
-        this.setState({ previousLongDraft: previousDraft.data });
-      })
-        .catch(error => {
-          console.log(
-            "Error: " + error
-          );
 
-        })
     };
   }
   componentWillUnmount() {
     this._isMounted = false;
   }
 
-  handleClick(e, value, disableBoolean) {
-    e.preventDefault();
-    if (value === 'short' || value === 'long') this.setState({currentPostType : value});
-    this.setState({ window: value, postDisabled: disableBoolean });
+  retrieveDraft() {
+    console.log("Retrieve new draft");
+    Axios.retrieveDraft(this.state.username).then((previousDraft) => {
+      console.log(previousDraft.data);
+      this.saveDraft(previousDraft.data);
+      // this.setState({ previousLongDraft: previousDraft.data });
+    })
+      .catch(error => {
+        console.log(
+          "Error: " + error
+        );
+
+      })
   }
 
- 
+  saveDraft(draft) {
+    this.setState({ previousLongDraft: draft });
+  }
+
+  handleClick(e, value, updateLocalLongPost) {
+    e.preventDefault();
+    // if (value === 'short' || value === 'long') this.setState({currentPostType : value});
+    if (updateLocalLongPost) this.retrieveDraft();
+    this.setState({ windowType: value });
+  }
+
+  confirmNewDialog(){
+
+  }
+
+
   handleSubmitPost(e) {
     alert("PRESSED SUBMIT");
   }
@@ -66,63 +84,71 @@ class NewPost extends React.Component {
   //   }
 
   render() {
-    let window = '';
-    switch (this.state.window) {
+    let windowType = '';
+    switch (this.state.windowType) {
       case ("main"):
-        window = (
+        windowType = (
           <div className="new-post-container" id="new-post-container">
-        <h3>Document Your Progress</h3>
-        <div className="vertical-grouping">
-          <h4>
-            Begin a New Check-In!
+            <h3>Document Your Progress</h3>
+            <div className="vertical-grouping">
+              <h4>
+                Begin a New Check-In!
           </h4>
-          <div className="single-button-container">
-            <button value="short" onClick={(e) => this.handleClick(e, e.target.value, true)}>
-              New Short
+              <div className="single-button-container">
+                <button value="short" onClick={(e) => this.handleClick(e, e.target.value)}>
+                  New Short
             </button>
-          </div>
-        </div>
+              </div>
+            </div>
 
-        <div className="vertical-grouping">
-          <h4>
-            Begin a New Post! (Will Delete Saved data)
+            <div className="vertical-grouping">
+              <h4>
+                Begin a New Post! (Will Delete Saved data)
           </h4>
-          <div className="single-button-container">
-            <button value="long" onClick={e => this.handleClick(e, e.target.value, true)}>
-              New Entry
+              <div className="single-button-container">
+                <button value="newLong" onClick={e =>
+        window.confirm("Starting a new Long Post will erase your saved draft. Continue anyway?") &&
+        this.handleClick(e, e.target.value)}>
+                  New Entry
             </button>
-          </div>
-          <div className="single-button-container">
-            <button value="long" onClick={e => this.handleClick(e, e.target.value, false)}>
-              Continue Previous Draft?
+              </div>
+              <div className="single-button-container">
+                <button value="oldLong" onClick={e => this.handleClick(e, e.target.value)}>
+                  Continue Previous Draft?
             </button>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
         );
         break;
       case ("short"):
-        window = (
+        windowType = (
           <>
-        <ShortPost
-          username={this.state.username}
-          disablePost={this.handleDisablePost}
-          setImageArray={this.setImageArray}
-          // handleChange={this.handleChange}
-          handleClick={this.handleClick}
-        />
-        </>
+            <ShortPost
+              username={this.state.username}
+              disablePost={this.handleDisablePost}
+              setImageArray={this.setImageArray}
+              // handleChange={this.handleChange}
+              handleClick={this.handleClick}
+            />
+          </>
         );
         break;
-      case ("long"):
-        window = <LongPost
+      case ("newLong"):
+        windowType = <LongPost
+          handleClick={this.handleClick}
+          disablePost={this.handleDisablePost}
+        />;
+        break;
+      case ("oldLong"):
+        windowType = <LongPost
           content={this.state.previousLongDraft}
           handleClick={this.handleClick}
           disablePost={this.handleDisablePost}
         />;
         break;
       case ("review"):
-        window = <ReviewPost
+        windowType = <ReviewPost
           content={this.state.previousLongDraft}
           disablePost={this.handleDisablePost}
           handleClick={this.handleClick}
@@ -130,13 +156,13 @@ class NewPost extends React.Component {
         />
         break;
       default:
-        throw Error("No window options matched :(");
+        throw Error("No windowType options matched :(");
     }
 
-    // console.log(window)
+    // console.log(windowType)
     return (
       <>
-      {window}
+        {windowType}
       </>
     );
   }
