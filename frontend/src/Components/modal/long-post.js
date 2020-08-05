@@ -9,7 +9,8 @@ const handleDisablePost = (disabled) => (
 
 const LongPost = (props) => 
 {
-  const [postDisabled, setDisablePost] = useState(true);
+  // const [postDisabled, setDisablePost] = useState(true);
+  const [hasContent, setHasContent] = useState(props.content !== null);
 return (
   <div className="long-post-container" id="post-modal">
     <div>
@@ -19,14 +20,16 @@ return (
           <button id="toggle-button" value="main" onClick={e => props.handleClick(e, e.target.value)}>Return</button>
         </span>
         <span id="post-button-span">
-          <button id="post-button" value="review" disabled={props.text}>Review Post</button>
+          <button id="post-button" value="review" disabled={!hasContent}>Review Post</button>
         </span>
       </div>
     </div>
 
     <LongEditor
       content={props.content}
-      disablePost={props.disablePost}
+      // disablePost={props.disablePost}
+      hasContent = {hasContent}
+      setHasContent = {setHasContent}
     />
 
   </div>

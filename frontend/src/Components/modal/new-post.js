@@ -18,20 +18,21 @@ class NewPost extends React.Component {
       previousLongDraft: null,
       window: "main",
       currentPostType: 'main',
-      imageArray: [],
+      // imageArray: [],
     };
 
     this.handleDisablePost = this.handleDisablePost.bind(this);
     // this.handleChange = this.handleChange.bind(this);
     this.handleSubmitPost = this.handleSubmitPost.bind(this);
     this.handleClick = this.handleClick.bind(this);
-    this.setImageArray = this.setImageArray.bind(this);
+    // this.setImageArray = this.setImageArray.bind(this);
 
   }
   componentDidMount() {
     this._isMounted = true;
     if (this._isMounted && this.state.username) {
       Axios.retrieveDraft(this.state.username).then((previousDraft) => {
+        console.log(previousDraft.data);
         this.setState({ previousLongDraft: previousDraft.data });
       })
         .catch(error => {
@@ -60,9 +61,9 @@ class NewPost extends React.Component {
     this.setState({ postDisabled: disabled });
   }
 
-  setImageArray(imageArray){
-    this.setState({ imageArray: imageArray });
-    }
+  // setImageArray(imageArray){
+  //   this.setState({ imageArray: imageArray });
+  //   }
 
   render() {
     let window = '';

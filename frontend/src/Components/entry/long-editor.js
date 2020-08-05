@@ -12,60 +12,30 @@ import './long-editor.scss';
 class LongEditor extends React.Component {
     constructor(props) {
         super(props);
-        console.log(this.props.content);
-        const hasContent = this.props.content !== null;
         this.state = {
-            content: this.props.content,
-            hasContent: hasContent,
+            
             username: this.props.firebase.returnUsername()
         }
     }
 
     render() {
+        console.log(this.props.content);
         return (
             <div id="long-editor-container">
                 < DanteEditor
                     onChange={
                         (editor) => {
                             const editorState = editor.emitSerializedOutput().blocks;
-                            console.log(this.state.hasContent);
-                            console.log(editorState.length !== 1);
-                            console.log(editorState[0].text === '');
-
-                            if (this.state.hasContent === false) {
-            
-                                if (editorState[0].text !== '')
-                                {
-                                    this.setState({ hasContent: true }, this.props.disablePost(false));
-                                }
-                                else if (editorState[0].text === '' && editorState.length > 1) {
-                                    this.setState({ hasContent: true }, this.props.disablePost(false));
+                            if (this.props.hasContent === false) {
+                                for (let block of editorState){
+                                    if (block.text !== ''){
+                                        this.props.setHasContent(true); 
+                                        break;
+                                    }
                                 }
                             }
-                            //     //     console.log(convertToHTML({}));
-                            //     // console.log(editor.state.editorState._immutable.currentContent);
-                            //     console.log(editor.state.editorState.getCurrentContent());
-                            //     const html = convertToHTML({
-                            //         styleToHTML: (style) => {
-                            //           if (style === 'BOLD') {
-                            //             return <span style={{color: 'blue'}} />;
-                            //           }
-                            //         },
-                            //         blockToHTML: (block) => {
-                            //           if (block.type === 'PARAGRAPH') {
-                            //             return <p />;
-                            //           }
-                            //         },
-                            //         entityToHTML: (entity, originalText) => {
-                            //           if (entity.type === 'LINK') {
-                            //             return <a href='google.com'>{originalText}</a>;
-                            //           }
-                            //           return originalText;
-                            //         }
-                            //       })(editor.state.editorState.getCurrentContent());
-                            //       console.log(html);
                         }}
-                    content={this.state.content}
+                    content={this.props.content}
                     default_wrappers={[
                         { className: 'my-custom-h1', block: 'header-one' },
                         { className: 'my-custom-h2', block: 'header-two' },
