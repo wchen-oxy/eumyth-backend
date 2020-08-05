@@ -18,17 +18,13 @@ class NewPost extends React.Component {
       previousLongDraft: null,
       windowType: "main",
       currentPostType: 'main',
-      // imageArray: [],
     };
 
     this.handleDisablePost = this.handleDisablePost.bind(this);
-    // this.handleChange = this.handleChange.bind(this);
     this.handleSubmitPost = this.handleSubmitPost.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.saveDraft = this.saveDraft.bind(this);
     this.retrieveDraft = this.retrieveDraft.bind(this);
-    this.confirmNewDialog = this.confirmNewDialog.bind(this);
-    // this.setImageArray = this.setImageArray.bind(this);
 
   }
   componentDidMount() {
@@ -46,7 +42,6 @@ class NewPost extends React.Component {
     Axios.retrieveDraft(this.state.username).then((previousDraft) => {
       console.log(previousDraft.data);
       this.saveDraft(previousDraft.data);
-      // this.setState({ previousLongDraft: previousDraft.data });
     })
       .catch(error => {
         console.log(
@@ -62,15 +57,9 @@ class NewPost extends React.Component {
 
   handleClick(e, value, updateLocalLongPost) {
     e.preventDefault();
-    // if (value === 'short' || value === 'long') this.setState({currentPostType : value});
     if (updateLocalLongPost) this.retrieveDraft();
     this.setState({ windowType: value });
   }
-
-  confirmNewDialog(){
-
-  }
-
 
   handleSubmitPost(e) {
     alert("PRESSED SUBMIT");
@@ -78,10 +67,6 @@ class NewPost extends React.Component {
   handleDisablePost(disabled) {
     this.setState({ postDisabled: disabled });
   }
-
-  // setImageArray(imageArray){
-  //   this.setState({ imageArray: imageArray });
-  //   }
 
   render() {
     let windowType = '';
@@ -107,8 +92,8 @@ class NewPost extends React.Component {
           </h4>
               <div className="single-button-container">
                 <button value="newLong" onClick={e =>
-        window.confirm("Starting a new Long Post will erase your saved draft. Continue anyway?") &&
-        this.handleClick(e, e.target.value)}>
+                  window.confirm("Starting a new Long Post will erase your saved draft. Continue anyway?") &&
+                  this.handleClick(e, e.target.value)}>
                   New Entry
             </button>
               </div>
@@ -128,7 +113,6 @@ class NewPost extends React.Component {
               username={this.state.username}
               disablePost={this.handleDisablePost}
               setImageArray={this.setImageArray}
-              // handleChange={this.handleChange}
               handleClick={this.handleClick}
             />
           </>
@@ -159,7 +143,6 @@ class NewPost extends React.Component {
         throw Error("No windowType options matched :(");
     }
 
-    // console.log(windowType)
     return (
       <>
         {windowType}

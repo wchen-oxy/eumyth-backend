@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const eventSchema = new Schema({
   title: {
     type: String,
-    required: true,
+    required: false,
     trim: true
   },
 
@@ -13,7 +13,7 @@ const eventSchema = new Schema({
     trim: true
   },
 
-  type: {
+  postType: {
     type: String,
     required: true,
   },
@@ -27,10 +27,7 @@ const eventSchema = new Schema({
     type: mongoose.Types.ObjectId,
     required: false
   },
-  durationHour: {
-    type: Number,
-    required: false
-  },
+  
   durationMin: {
     type: Number,
     required: false

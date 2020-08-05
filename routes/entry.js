@@ -61,11 +61,14 @@ router.route('/image/:filename').get( (req, res) => {
 router.route('/').post( (req, res) => {
     console.log("Made it");
     console.log(req.body.text_content);
-
     console.log(req.body.editor_content);
     res.status(201).send();
 })
 
+router.route('/short').post((req, res) => {
+  console.log(req);
+  res.status(200);
+})
 
 
 module.exports = router;

@@ -66,7 +66,7 @@ class LongEditor extends React.Component {
                         failure_handler: function () { console.log("fail") },
                         url: "http://localhost:5000/draft",
                         method: "POST",
-                        interval: 1000, //original is 4000 sec
+                        interval: 4000, //original is 4000 sec
                         withCredentials: false,
                         crossDomain: true,
                         headers: {

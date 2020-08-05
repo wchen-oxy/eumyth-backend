@@ -10,6 +10,13 @@ const pursuitSchema = new Schema({
    
   },
 
+  experienceLevel: {
+    type: String,
+    required: false,
+    trim: true
+   
+  },
+
   eventDataRef: {
     type: mongoose.Types.ObjectId
   },

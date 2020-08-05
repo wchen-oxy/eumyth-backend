@@ -33,7 +33,7 @@ class NavigationAuth extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-     
+
       username: this.props.firebase.returnUsername(),
       previousLongDraft: null,
       window: "main",
@@ -85,7 +85,7 @@ class NavigationAuth extends React.Component {
   //   this.setState({ window: value, postDisabled: disableBoolean });
   // }
 
- 
+
   // handleSubmitPost(e) {
   //   alert("PRESSED SUBMIT");
   // }
@@ -113,16 +113,16 @@ class NavigationAuth extends React.Component {
     //       disablePost={this.handleDisablePost}
     //     />;
     //     break;
-      // case ("review"):
-      //   window = <ReviewPost
-      //     content={this.state.previousLongDraft}
-      //     disablePost={this.handleDisablePost}
-      //     handleClick={this.handleClick}
-      //     currentPostType={this.state.currentPostType}
-      //   />
-        // break;
-      // default:
-      //   throw Error("No window options matched :(");
+    // case ("review"):
+    //   window = <ReviewPost
+    //     content={this.state.previousLongDraft}
+    //     disablePost={this.handleDisablePost}
+    //     handleClick={this.handleClick}
+    //     currentPostType={this.state.currentPostType}
+    //   />
+    // break;
+    // default:
+    //   throw Error("No window options matched :(");
     // }
     return (
       <>
