@@ -1,2 +1,12 @@
 
-// @import "../../main.scss";
+@import "../../main.scss";
+
+.long-post-container{
+    background-color: white;
+    width: 100%;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    
+    // margin: auto;
+}

@@ -33,13 +33,10 @@ class NavigationAuth extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      // isMilestone: false,
+     
       username: this.props.firebase.returnUsername(),
-      // shortPostText: "",
       previousLongDraft: null,
       window: "main",
-      
-      
       currentPostType: 'main'
     };
 
@@ -125,7 +122,7 @@ class NavigationAuth extends React.Component {
       //     handleClick={this.handleClick}
       //     currentPostType={this.state.currentPostType}
       //   />
-        break;
+        // break;
       default:
         throw Error("No window options matched :(");
     }
