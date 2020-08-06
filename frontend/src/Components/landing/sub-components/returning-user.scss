@@ -1,3 +1,59 @@
-.returning-user-master-container{
-    height: 100%;
+.home-page-container{
+display: flex;
+flex-direction: column;
+width: 100%;
+}
+
+.home-row-container{
+display: flex;
+width: 100%;
+}
+
+#home-profile-row{
+    flex-direction: row;
+}
+
+.home-profile-column-container{
+    margin: auto;
+    // display: inline-block;
+    // width: 100%;
+    // height: 300px;
+}
+
+.home-works-row-container{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+.home-works-column-container{
+    display: flex;
+    flex-direction:column;
+}
+
+#home-photo-container{
+    // background-color: red;
+    // display: block;
+    // position: relative;
+    // overflow: hidden;
+    // height: 100%;
+}
+
+
+#home-profile-photo{
+    object-fit: cover;
+    border-radius: 50%;
+    height: 100px;
+    width: 100px;
+}
+
+#placeholder-dummy{
+    height: 200px;
+    width: 800px;
+}
+
+#placeholder-feed{
+    background-color: red;
+    height: 500px;
+    width: 400px;
+    margin: auto;
 }

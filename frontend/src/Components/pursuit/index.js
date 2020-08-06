@@ -59,18 +59,18 @@ class PursuitProfile extends React.Component {
             </div>
         );
         return (
-            <div id="profile-container">
-                <div id="profile-header">
+            <div id="personal-profile-container">
+                <div id="personal-profile-header">
                     <div id="temp-cover">        
                     </div>
-                    <div id="profile-photo">
+                    <div id="personal-profile-photo">
                     </div>
                 </div>
-                <div id="profile-intro-container">
-                <div id="profile-name-container">
-                    <h4 id="profile-name">William Chen</h4>
+                <div id="personal-profile-intro-container">
+                <div id="personal-profile-name-container">
+                    <h4 id="personal-profile-name">William Chen</h4>
                 </div>
-                <div id="profile-description">
+                <div id="personal-profile-description">
                     <p>Description</p>
                 </div>
                 

@@ -36,6 +36,7 @@ const ReviewPost = (props) => {
                     <span>
                         Public Feed:<input type="checkbox" onClick={() => setToPublicPost(!postToPublic)}></input>
                     </span>
+                    <button onClick={() => console.log(props.imageArray)}>Post!</button>
                 </div>
             </div>
         );
@@ -67,6 +68,8 @@ const ReviewPost = (props) => {
                 <span>
                     Public Feed:<input type="checkbox" onClick={() => setToPublicPost(!postToPublic)}></input>
                 </span>
+                <button onClick={() => console.log("POST")}>Post!</button>
+
             </div>
         </div>
         )

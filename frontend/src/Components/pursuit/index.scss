@@ -1,13 +1,13 @@
 
 @import  '../../main.scss';
 
-#profile-container{ 
+#personal-profile-container{ 
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-#profile-header{
+#personal-profile-header{
     width: 130vh;
     background-color: red;
     position: relative;
@@ -20,7 +20,7 @@
    
 }
 
-#profile-photo{
+#personal-profile-photo{
     position: absolute;
     background-color: grey;
     width: 20vh;
@@ -47,19 +47,19 @@ margin: 10% -5px;
 
 }
 
-#profile-name-container{
+#personal-profile-name-container{
     display: block;
     padding-left: 40vh;
     width: 130vh;
     background-color: brown;
 }
 
-#profile-name{
+#personal-profile-name{
     
     font-size: $primary-medium-font-size;
 }
 
-#profile-intro-container{
+#personal-profile-intro-container{
     display: relative;
     width: 130vh;
     height: 100px;
@@ -67,7 +67,7 @@ margin: 10% -5px;
     z-index: -1;
 }
 
-#profile-description{
+#personal-profile-description{
     display: block;
 }
 
