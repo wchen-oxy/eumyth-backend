@@ -30,6 +30,7 @@ class NewPost extends React.Component {
   componentDidMount() {
     this._isMounted = true;
     if (this._isMounted && this.state.username) {
+      this.retrieveDraft();
 
     };
   }
