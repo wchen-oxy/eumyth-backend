@@ -15,15 +15,14 @@ require('dotenv').config();
 var port = process.env.PORT || 5000;
 
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/user');
-var testRouter = require('./routes/test');
-var pursuitsRouter = require('./routes/pursuit');
-var entryRouter = require('./routes/entry');
-var imageRouter = require('./routes/image.js');
-var draftRouter = require('./routes/draft.js');
+var indexRouter = require('./routes/v0/index');
+var usersRouter = require('./routes/v0/user');
+var testRouter = require('./routes/v0/test');
+var pursuitsRouter = require('./routes/v0/pursuit');
+var entryRouter = require('./routes/v0/entry');
+var imageRouter = require('./routes/v0/image.js');
+var draftRouter = require('./routes/v0/draft.js');
 var app = express();
-
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -36,9 +35,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(cors());
-
-const GridFsStorage = require("multer-gridfs-storage");
-const multer = require('multer');
 
 // Mongoose specific code
 const uri = process.env.ATLAS_URI;

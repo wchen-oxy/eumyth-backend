@@ -1,5 +1,7 @@
 import axios from 'axios';
 import React from 'react';
+import {IMAGE_UPLOAD_URL, DRAFT_UPLOAD_URL} from "../Components/constants/index";
+
 
 export default class AxiosHelper {
     static testString() {

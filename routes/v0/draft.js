@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
-let User = require('../models/user.model');
-let Draft = require('../models/draft.model');
+let User = require('../../models/user.model');
+let Draft = require('../../models/draft.model');
 // let IndexUser = require('../models/index.user.model');
 var firebase = require('firebase');
 const mongoose = require('mongoose');
@@ -10,7 +10,7 @@ const GridFsStorage = require("multer-gridfs-storage");
 const multer = require('multer');
 const uri = process.env.ATLAS_URI;
 const crypto = require('crypto');
-let IndexUser = require('../models/index.user.model');
+let IndexUser = require('../../models/index.user.model');
 
 
 const storage = new GridFsStorage({
