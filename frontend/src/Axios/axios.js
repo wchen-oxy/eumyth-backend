@@ -1,6 +1,9 @@
 import axios from 'axios';
 import React from 'react';
 import {IMAGE_UPLOAD_URL, DRAFT_UPLOAD_URL} from "../Components/constants/index";
+import * as UserEndpoint from "../Components/constants/user";
+import * as EntryEndpoint from "../Components/constants/entry";
+
 
 
 export default class AxiosHelper {
@@ -9,7 +12,7 @@ export default class AxiosHelper {
     }
 
     static returnPursuitNames(username) {
-        return axios.get('http://localhost:5000/user/index', {
+        return axios.get(UserEndpoint.INDEX_INFO_URL, {
             params: {
                 username: username
             }
@@ -17,26 +20,26 @@ export default class AxiosHelper {
     }
 
     static returnIndexUsername(uid) {
-        return axios.post('http://localhost:5000/user/username', {
+        return axios.post(UserEndpoint.USERNAME_URL, {
             uid: uid
         })
     }
 
     static checkUsernameAvailable(username) {
-        return axios.post('http://localhost:5000/user/available', { username: username });
+        return axios.post(UserEndpoint.USERNAME_AVAILABLE_URL, { username: username });
     }
 
     static createUserProfile(username, pursuitsArray) {
-        return axios.post('http://localhost:5000/user', { username: username, pursuits: pursuitsArray });
+        return axios.post(UserEndpoint.NEW_USER_URL, { username: username, pursuits: pursuitsArray });
 
     }
 
     static saveDraft(username, editorState) {
-        return axios.post('http://localhost:5000/draft', { username: username, editorState: editorState });
+        return axios.post(DRAFT_UPLOAD_URL, { username: username, editorState: editorState });
     }
 
     static retrieveDraft(username) {
-        return axios.get('http://localhost:5000/draft',
+        return axios.get(DRAFT_UPLOAD_URL,
             {
                 params: { username: username }
             }
@@ -49,13 +52,13 @@ export default class AxiosHelper {
     // }
 
     static postImage(formData) {
-        return axios.post('http://localhost:5000/entry/image', formData);
+        return axios.post(EntryEndpoint.IMAGE_POST, formData);
     }
 
     static postShortPost(formData, progressRef, uploadRef, textOnly){
-        if (textOnly) return axios.post('http://localhost:5000/entry/short', formData);
+        if (textOnly) return axios.post(EntryEndpoint.SHORT_POST_URL, formData);
         else{
-            return axios.post('http://localhost:5000/entry/short', formData, {
+            return axios.post(EntryEndpoint.SHORT_POST_URL, formData, {
             onUploadProgress: (progressEvent) => {
                 const uploadPercentage = Math.floor((progressEvent.loaded / progressEvent.total) * 100);
                 progressRef.current.innerHTML = `${uploadPercentage}%`;
@@ -75,7 +78,7 @@ export default class AxiosHelper {
     }
 
     static saveEntry(content) {
-        return axios.post('http://localhost:5000/entry/', content)
+        return axios.post(EntryEndpoint.NEW_ENTRY_URL, content)
     }
 
 }
