@@ -1,15 +1,8 @@
 const mongoose = require('mongoose');
-let Pursuits = require('./pursuit.model');
-let Event = require('./event.model');
-let Draft = require('./draft.model');
+const Pursuits = require('./pursuit.model');
+const Post = require('./post.model');
 const Schema = mongoose.Schema;
 
-
-const innerPursuitSchema = new Schema({
-  name: String,
-  eventData: [Event.Schema],
-
-}); 
 const userSchema = new Schema({
   username: {
     type: String,
@@ -21,16 +14,20 @@ const userSchema = new Schema({
     type: String,
     trim: true
   },
-
+  private: {
+    type: Boolean,
+    required: true,
+  },
+  pinned: [Post.Schema],
   pursuits:[Pursuits.Schema],
-  events: [innerPursuitSchema],
-  draft: Draft.Schema
+  recent_posts: [Post.Schema],
+  draft: Post.Schema
 
 }, {
   timestamps: true,
 });
 
-const userModel = mongoose.model('User', userSchema);
+const userModel = mongoose.model('user', userSchema);
 
 module.exports = {
   Schema : userSchema,

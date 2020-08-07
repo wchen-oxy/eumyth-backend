@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React from 'react';
-import {IMAGE_UPLOAD_URL, DRAFT_UPLOAD_URL} from "../Components/constants/index";
+import {DRAFT_UPLOAD_URL} from "../Components/constants/index";
 import * as UserEndpoint from "../Components/constants/user";
 import * as EntryEndpoint from "../Components/constants/entry";
 

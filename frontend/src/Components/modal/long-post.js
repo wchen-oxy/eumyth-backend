@@ -11,7 +11,6 @@ const handleDisablePost = (disabled) => (
 
 const LongPost = (props) => 
 {
-  // const [postDisabled, setDisablePost] = useState(true);
   const [window, setWindow] = useState("initial");
   const [hasContent, setHasContent] = useState(props.content !== null);
   if (window === "initial")

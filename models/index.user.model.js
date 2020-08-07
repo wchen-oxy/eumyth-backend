@@ -1,13 +1,31 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const Post = require("./post.model");
 
 const indexEventSchema = new Schema({
     name: String,
 
-    numEvent: {
+    experience_level: {
+        type: String,
+        required: false,
+        trim: true
+       
+      },
+
+    num_posts: {
         type: Number,
         required: false
     },
+
+    num_milestones: {
+        type: Number,
+        required: false
+    },
+
+    total_min: {
+        type: Number,
+        required:  false,
+      }
     
 
 }); 
@@ -21,7 +39,8 @@ const indexUserSchema = new Schema(
             trim: true
 
         },
-        userProfileRef: {
+
+        user_profile_ref: {
             type: mongoose.Types.ObjectId,
             required: true,
             unique: true,
@@ -32,11 +51,13 @@ const indexUserSchema = new Schema(
             type: Boolean,
             required: true,
         },
-        pursuits: [indexEventSchema]
+
+        pursuits: [indexEventSchema],
+        latestPosts: [Post.Schema]
     }
 );
 
-const indexUserModel = mongoose.model('Index-User', indexUserSchema);
+const indexUserModel = mongoose.model('indexUser', indexUserSchema);
 
 module.exports = {
     Schema: indexUserSchema,

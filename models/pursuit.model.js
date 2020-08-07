@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-let Event = require('./event.model');
 const Schema = mongoose.Schema;
 
 const pursuitSchema = new Schema({
@@ -7,32 +6,41 @@ const pursuitSchema = new Schema({
     type: String,
     required: false,
     trim: true
-   
+
   },
 
-  experienceLevel: {
+  private: {
+    type: Boolean,
+    required: true,
+  },
+
+  experience_level: {
     type: String,
     required: false,
     trim: true
-   
   },
 
-  eventDataRef: {
-    type: mongoose.Types.ObjectId
-  },
-  
-  totalMin: {
+  total_min: {
     type: Number,
-    required:  false,
+    required: false,
+  },
+  num_posts: {
+    type: Number,
+    required: false
+  },
+
+  num_milestones: {
+    type: Number,
+    required: false
   }
- 
+
 }, {
   timestamps: true,
 });
 
-const pursuitModel = mongoose.model('Pursuit', pursuitSchema);
+const pursuitModel = mongoose.model('pursuit', pursuitSchema);
 
 module.exports = {
   Schema: pursuitSchema,
-  Model : pursuitModel
+  Model: pursuitModel
 };
