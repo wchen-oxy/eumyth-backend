@@ -7,6 +7,7 @@ width: 100%;
 .home-row-container{
 display: flex;
 width: 100%;
+padding: 2vh;
 }
 
 #home-profile-row{
@@ -30,21 +31,26 @@ width: 100%;
     flex-direction:column;
 }
 
-#home-photo-container{
-    // background-color: red;
-    // display: block;
-    // position: relative;
-    // overflow: hidden;
-    // height: 100%;
+
+.home-profile-text{
+    text-align: center;
 }
 
 
-#home-profile-photo{
+.home-profile-photo{
     object-fit: cover;
     border-radius: 50%;
     height: 100px;
     width: 100px;
 }
+
+.home-feed-photo{
+    object-fit: cover;
+    border-radius: 50%;
+    height: 70px;
+    width: 70px;
+}
+
 
 #placeholder-dummy{
     height: 200px;
@@ -53,7 +59,18 @@ width: 100%;
 
 #placeholder-feed{
     background-color: red;
-    height: 500px;
-    width: 400px;
+    width: 75%;
     margin: auto;
+}
+
+//table
+#profile-info-table{
+    width: 100%;
+    border-collapse: collapse;
+
+    
+}
+
+td, th {
+    padding: 8px;
 }

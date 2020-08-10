@@ -9,7 +9,7 @@ export default class WelcomeLoginComponent extends React.Component {
         <section >
           <div className="signin-signup-title">Sign In</div>
           <div className="login-register-container">
-            <button onClick={this.props.onLoginRegisterToggle}>Create Account</button>
+            <button onClick={this.props.onToggleLoginRegisterWindow}>Create Account</button>
           </div>
           <form onSubmit={this.props.onLoginSubmit}>
             <div>

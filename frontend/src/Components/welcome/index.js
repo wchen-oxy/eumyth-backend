@@ -17,28 +17,29 @@ const INITIAL_STATE = {
 export default class WelcomePage extends React.Component {
   constructor(props) {
     super(props);
-
     this.state = {
       loggedIn: false,
-      verified: false,
+      verified: null,
       isLoginMode: true,
       showRegisterSuccess: false,
       ...INITIAL_STATE
     }
 
-    this.handleLoginRegisterToggle = this.handleLoginRegisterToggle.bind(this);
+    this.toggleLoginRegisterWindow = this.toggleLoginRegisterWindow.bind(this);
     this.handleLoginSubmit = this.handleLoginSubmit.bind(this);
     this.handleRegisterSubmit = this.handleRegisterSubmit.bind(this);
     this.handleSendEmailVerication = this.handleSendEmailVerication.bind(this);
     this.handleSignOut = this.handleSignOut.bind(this);
     this.handleRegisterSuccess = this.handleRegisterSuccess.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.handleVerifiedState = this.handleVerifiedState.bind(this);
   }
 
   handleChange(e) {
     e.preventDefault();
     this.setState({ [e.target.name]: e.target.value });
   }
+
   handleRegisterSuccess(e) {
     e.preventDefault();
     this.setState(state => ({
@@ -53,7 +54,6 @@ export default class WelcomePage extends React.Component {
     }));
   }
 
-
   handleSendEmailVerication(e) {
     e.preventDefault();
     this.props.firebase.doSendEmailVerification();
@@ -66,10 +66,15 @@ export default class WelcomePage extends React.Component {
     });
   }
 
+  handleVerifiedState(isVerified){
+    this.setState({
+      verified : isVerified
+    })
+  }
 
-  handleLoginRegisterToggle(e) {
+
+  toggleLoginRegisterWindow(e) {
     e.preventDefault();
-    console.log(this.state.email);
     this.setState(state => ({
       isLoginMode: !state.isLoginMode
     })
@@ -80,8 +85,16 @@ export default class WelcomePage extends React.Component {
     e.preventDefault();
     if (!Isemail.validate(this.state.email)) return alert("This is not a valid email!");
     this.props.firebase.doSignIn(this.state.email, this.state.password).then(
-      this.props.history.push("/"));
-
+      (result) => {
+        if (result) {
+          console.log(result.user.emailVerified);
+          if (result.user.emailVerified) this.props.history.push("/");
+          else{
+            this.handleVerifiedState(result.user.emailVerified);
+          }
+          
+        }
+      });
   }
 
   handleRegisterSubmit(e) {
@@ -101,43 +114,45 @@ export default class WelcomePage extends React.Component {
     }
   }
 
-
   render() {
+    console.log(this.state.isLoginMode);
     let LoginRegisterHome;
     if (this.state.showRegisterSuccess) {
-      LoginRegisterHome = (
-        <div>
-          Successfully Registered new account! Please check your email for a verification link.
-          <button onClick={this.handleRegisterSuccess}>Return</button>
-        </div>
-      )
+      return (
+        <main>
+          <section className="overview-login-register-container">
+            <div className="overview-description-container">
+              <p>Welcome to interestHub! Login or sign up to get started!</p>
+            </div>
+            <div>
+              Please check your email for a verification link.
+              <span>Didn't see the link?  <button onClick={this.props.firebase.doSendEmailVerification}>Resend!</button></span>
+              <button onClick={this.handleRegisterSuccess}>Return</button>
+            </div>
+          </section>
+        </main>
+      );
     }
-    else if (this.state.isLoginMode) {
-      if (this.props.firebase.auth.currentUser && !this.state.verified) {
-        LoginRegisterHome = (
-          <VerifyPage
-            current_user={this.state.currentUser}
-            onLoginRegisterToggle={this.handleLoginRegisterToggle}
-            onSendEmailVerification={this.handleSendEmailVerication}
-            onSignOut={this.handleSignOut}
-          />
-        )
-      }
-      else {
-        LoginRegisterHome =
-          <WelcomeLoginComponent
-            onLoginRegisterToggle={this.handleLoginRegisterToggle}
-            onLoginEmailChange={this.handleChange}
-            onLoginPasswordChange={this.handleChange}
-            onLoginSubmit={this.handleLoginSubmit}
-          />
-
-      }
+    if (this.state.isLoginMode) {
+      LoginRegisterHome = (this.props.firebase.auth.currentUser && !this.state.verified) ?
+        <VerifyPage
+          current_user={this.state.currentUser}
+          onToggleLoginRegisterWindow={this.toggleLoginRegisterWindow}
+          onSendEmailVerification={this.handleSendEmailVerication}
+          onSignOut={this.handleSignOut}
+        />
+        :
+        <WelcomeLoginComponent
+          onToggleLoginRegisterWindow={this.toggleLoginRegisterWindow}
+          onLoginEmailChange={this.handleChange}
+          onLoginPasswordChange={this.handleChange}
+          onLoginSubmit={this.handleLoginSubmit}
+        />;
     }
     else {
       LoginRegisterHome = (
         <WelcomeRegisterComponent
-          onLoginRegisterToggle={this.handleLoginRegisterToggle}
+          onToggleLoginRegisterWindow={this.toggleLoginRegisterWindow}
           onRegisterEmailChange={this.handleChange}
           onRegisterPasswordChange={this.handleChange}
           onRegisterSubmit={this.handleRegisterSubmit}
@@ -146,14 +161,14 @@ export default class WelcomePage extends React.Component {
     }
 
     return (
-        <main>
-          <section className="overview-login-register-container">
-            <div className="overview-description-container">
-              <p>Welcome to interestHub! Login or sign up to get started!</p>
-            </div>
-            {LoginRegisterHome}
-          </section>
-        </main>
+      <main>
+        <section className="overview-login-register-container">
+          <div className="overview-description-container">
+            <p>Welcome to interestHub! Login or sign up to get started!</p>
+          </div>
+          {LoginRegisterHome}
+        </section>
+      </main>
     )
   }
 }

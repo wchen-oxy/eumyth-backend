@@ -10,6 +10,14 @@ export default class AxiosHelper {
     static testString() {
         console.log("TEST SUCCESS");
     }
+    static checkUsernameAvailable(username) {
+        return axios.post(UserEndpoint.USERNAME_AVAILABLE_URL, { username: username });
+    }
+
+    static createUserProfile(username, pursuitsArray) {
+        return axios.post(UserEndpoint.NEW_USER_URL, { username: username, pursuits: pursuitsArray });
+
+    }
 
     static returnPursuitNames(username) {
         return axios.get(UserEndpoint.INDEX_INFO_URL, {
@@ -24,32 +32,6 @@ export default class AxiosHelper {
             uid: uid
         })
     }
-
-    static checkUsernameAvailable(username) {
-        return axios.post(UserEndpoint.USERNAME_AVAILABLE_URL, { username: username });
-    }
-
-    static createUserProfile(username, pursuitsArray) {
-        return axios.post(UserEndpoint.NEW_USER_URL, { username: username, pursuits: pursuitsArray });
-
-    }
-
-    static saveDraft(username, editorState) {
-        return axios.post(DRAFT_UPLOAD_URL, { username: username, editorState: editorState });
-    }
-
-    static retrieveDraft(username) {
-        return axios.get(DRAFT_UPLOAD_URL,
-            {
-                params: { username: username }
-            }
-        )
-    }
-
-    // static createIndexUserProfile(uid, username, pursuits){
-    //     return axios.post('http://localhost:5000/user/index', { uid: uid, username: username, private: false, pursuits: pursuits})
-
-    // }
 
     static postImage(formData) {
         return axios.post(PostEndpoint.IMAGE_POST, formData);
@@ -80,6 +62,19 @@ export default class AxiosHelper {
     static savePost(content) {
         return axios.post(PostEndpoint.NEW_POST_URL, content)
     }
+    
+    static saveDraft(username, editorState) {
+        return axios.post(DRAFT_UPLOAD_URL, { username: username, editorState: editorState });
+    }
+
+    static retrieveDraft(username) {
+        return axios.get(DRAFT_UPLOAD_URL,
+            {
+                params: { username: username }
+            }
+        )
+    }
+
 
 }
 

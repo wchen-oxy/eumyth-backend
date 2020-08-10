@@ -12,7 +12,7 @@ const Menu = props => {
       {optionSelectedLength < 5 ? (
         props.children
       ) : (
-        <div>Max limit achieved</div>
+        <div>Please just choose 5</div>
       )}
     </components.Menu>
   );
@@ -21,14 +21,6 @@ const Menu = props => {
 
 export default class CustomMultiSelect extends Component {
 
- 
-
-  // handleChange(newValue, actionMeta){
-  //   console.group('Value Changed');
-  //     console.log(newValue);
-  //     console.log(`action: ${actionMeta.action}`);
-  //     console.groupEnd();
-  // }
   isValidNewOption = (inputValue, selectValue) =>
         inputValue.length > 0 && selectValue.length < 5;
       

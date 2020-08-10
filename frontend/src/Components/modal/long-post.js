@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import LongEditor from "../entry/long-editor";
+import LongEditor from "../post/long-editor";
 import './long-post.scss';
 import ReviewPost from "./review-post";
 

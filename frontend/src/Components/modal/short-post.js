@@ -1,5 +1,5 @@
 import React from 'react';
-import ShortEditor from "../entry/short-editor";
+import ShortEditor from "../post/short-editor";
 import ReviewPost from "./review-post";
 import './short-post.scss';
 

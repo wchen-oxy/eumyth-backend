@@ -12,8 +12,9 @@ class UserHomePage extends React.Component {
             newUser: null
         }
     }
+    
     componentDidMount() {
-        this.props.firebase.checkExistingUser().then(
+        this.props.firebase.checkIsExistingUser().then(
             result => {
                 result ? this.setState({ newUser: false }) : this.setState({ newUser: true });
             }

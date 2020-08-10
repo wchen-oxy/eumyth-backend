@@ -7,7 +7,7 @@ export default class WelcomeRegisterComponent extends React.Component {
         <section >
           <div className="signin-signup-title">Sign Up</div>
           <div className="login-register-container">
-            <button onClick={this.props.onLoginRegisterToggle}>Sign In</button>
+            <button onClick={this.props.onToggleLoginRegisterWindow}>Sign In</button>
           </div>
           <form onSubmit={this.props.onRegisterSubmit}>
             <div className="text-input-wrapper">

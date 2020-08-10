@@ -26,7 +26,7 @@ class Firebase {
     this.doPasswordReset = this.doPasswordReset.bind(this);
     this.doPasswordUpdate = this.doPasswordUpdate.bind(this);
     this.doIsEmailVerified = this.doIsEmailVerified.bind(this);
-    this.checkExistingUser = this.checkExistingUser.bind(this);
+    this.checkIsExistingUser = this.checkIsExistingUser.bind(this);
     this.writeBasicUserData = this.writeBasicUserData.bind(this);
   }
 
@@ -34,6 +34,7 @@ class Firebase {
     return ("FIREBASE");
   }
 
+  //yes
   doCreateUser(email, password) {
     return this.auth.createUserWithEmailAndPassword(email, password)
       .then(
@@ -53,6 +54,7 @@ class Firebase {
       });
   }
 
+  //yes
   doSignIn(email, password) {
     return this.auth.signInWithEmailAndPassword(email, password)
       .catch((error) => {
@@ -63,10 +65,12 @@ class Firebase {
       );
   }
 
+  //yes
   doSignOut() {
     return this.auth.signOut();
   }
 
+  //yes
   doSendEmailVerification() {
     this.auth.currentUser.sendEmailVerification()
       .catch((error) => {
@@ -80,32 +84,38 @@ class Firebase {
         console.log(error);
       });
   }
+  //yes
   doPasswordReset(email) {
     alert("EMAIL");
     return this.auth.sendPasswordResetEmail(email);
   }
 
+  //yes
   doPasswordUpdate(password) {
     return this.auth.currentUser.updatePassword(password);
   }
 
+  //yes
   returnUsername() {
     if (this.auth.currentUser) {
       return this.auth.currentUser.displayName;
     }
   } 
 
+  //yes
   doUsernameUpdate(username) {
     return this.auth.currentUser.updateProfile({displayName: username});
   }
 
+  //yes
   doIsEmailVerified() {
     if (this.auth.currentUser) {
       return this.auth.currentUser.emailVerified;
     }
   };
 
-  checkExistingUser() {
+  //yes
+  checkIsExistingUser() {
     const uid = this.auth.currentUser.uid;
     //read from API
     return this.db.ref('users/' + uid).once('value').then(
@@ -114,6 +124,7 @@ class Firebase {
       }
     )
   }
+  //yes
   writeBasicUserData(username, firstName, lastName) {
     const uid = this.auth.currentUser.uid;
     return this.db.ref('users/' + uid)
