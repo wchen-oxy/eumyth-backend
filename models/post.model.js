@@ -19,7 +19,7 @@ const postSchema = new Schema({
     required: true
   },
 
-  cover: {
+  cover_photo_url: {
     type: String,
     required: false,
   },

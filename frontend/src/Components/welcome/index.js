@@ -48,7 +48,6 @@ export default class WelcomePage extends React.Component {
 
   handleSignOut(e) {
     e.preventDefault();
-    console.log("signout");
     this.props.firebase.doSignOut().then(this.setState({
       ...INITIAL_STATE
     }));
@@ -79,7 +78,6 @@ export default class WelcomePage extends React.Component {
 
   handleLoginSubmit(e) {
     e.preventDefault();
-    console.log("Submitted");
     if (!Isemail.validate(this.state.email)) return alert("This is not a valid email!");
     this.props.firebase.doSignIn(this.state.email, this.state.password).then(
       this.props.history.push("/"));

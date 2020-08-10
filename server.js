@@ -19,7 +19,7 @@ var indexRouter = require('./routes/v0/index');
 var usersRouter = require('./routes/v0/user');
 var testRouter = require('./routes/v0/test');
 var pursuitsRouter = require('./routes/v0/pursuit');
-var entryRouter = require('./routes/v0/entry');
+var postRouter = require('./routes/v0/post');
 var imageRouter = require('./routes/v0/image.js');
 var draftRouter = require('./routes/v0/draft.js');
 var app = express();
@@ -61,6 +61,7 @@ app.use('/image', function (req, res, next) {
   };
   next();
 }, imageRouter);
+
 app.use('/draft', function (req, res, next) {
   console.log('the response will be sent by the next function ...');
   req.draft_config = {
@@ -72,7 +73,7 @@ app.use('/draft', function (req, res, next) {
 app.use('/pursuit', pursuitsRouter);
 app.use('/user', usersRouter);
 app.use('/test', testRouter);
-app.use('/entry', entryRouter);
+app.use('/post', postRouter);
 
 // console.log that your server is up and running
 app.listen(port, () => console.log(`Listening on port ${port}`));

@@ -8,6 +8,10 @@ const pursuitSchema = new Schema({
     trim: true
 
   },
+  display_photo : {
+    type: String,
+    required: false,
+  },
 
   private: {
     type: Boolean,

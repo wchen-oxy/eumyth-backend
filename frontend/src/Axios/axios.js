@@ -2,7 +2,7 @@ import axios from 'axios';
 import React from 'react';
 import {DRAFT_UPLOAD_URL} from "../Components/constants/index";
 import * as UserEndpoint from "../Components/constants/user";
-import * as EntryEndpoint from "../Components/constants/entry";
+import * as PostEndpoint from "../Components/constants/post";
 
 
 
@@ -52,13 +52,13 @@ export default class AxiosHelper {
     // }
 
     static postImage(formData) {
-        return axios.post(EntryEndpoint.IMAGE_POST, formData);
+        return axios.post(PostEndpoint.IMAGE_POST, formData);
     }
 
     static postShortPost(formData, progressRef, uploadRef, textOnly){
-        if (textOnly) return axios.post(EntryEndpoint.SHORT_POST_URL, formData);
+        if (textOnly) return axios.post(PostEndpoint.SHORT_POST_URL, formData);
         else{
-            return axios.post(EntryEndpoint.SHORT_POST_URL, formData, {
+            return axios.post(PostEndpoint.SHORT_POST_URL, formData, {
             onUploadProgress: (progressEvent) => {
                 const uploadPercentage = Math.floor((progressEvent.loaded / progressEvent.total) * 100);
                 progressRef.current.innerHTML = `${uploadPercentage}%`;
@@ -77,8 +77,8 @@ export default class AxiosHelper {
         }
     }
 
-    static saveEntry(content) {
-        return axios.post(EntryEndpoint.NEW_ENTRY_URL, content)
+    static savePost(content) {
+        return axios.post(PostEndpoint.NEW_POST_URL, content)
     }
 
 }

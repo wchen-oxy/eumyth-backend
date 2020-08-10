@@ -8,7 +8,7 @@ import {withAuthentication} from './Components/session';
 import Navbar from './Components/navbar/index';
 import PursuitProfile from './Components/pursuit';
 import DetailedPursuit from './Components/pursuit/detailed-pursuit';
-import NewEntry from './Components/entry/index';
+import NewPost from './Components/post/index';
 
 
 const App = () => (
@@ -17,7 +17,7 @@ const App = () => (
          <Switch>
           <Route exact path ='/' component={HomePage}/>
           <Route exact path ='/account' component={AccountPage} />
-          <Route exact path ='/new' component={NewEntry} />
+          <Route exact path ='/new' component={NewPost} />
           {/* <Route exact path = '/pursuit' component={PursuitPage}/> */}
           <Route exact path = '/:username' component={PursuitProfile} />
           <Route exact path = '/:username/pursuit/:pursuit' component={DetailedPursuit} />

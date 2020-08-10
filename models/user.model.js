@@ -20,6 +20,7 @@ const userSchema = new Schema({
   },
   pinned: [Post.Schema],
   pursuits:[Pursuits.Schema],
+  posts: [mongoose.Types.ObjectId],
   recent_posts: [Post.Schema],
   draft: Post.Schema
 
