@@ -70,10 +70,12 @@ class NavigationAuth extends React.Component {
 
   openModal() {
     this.modalRef.current.style.display = "block";
+    document.body.style.overflow = "hidden";
   }
 
   closeModal() {
     this.modalRef.current.style.display = "none";
+    document.body.style.overflow = "visible";
     this.setState({ window: 'main' });
   }
 

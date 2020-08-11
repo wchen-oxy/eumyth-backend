@@ -12,8 +12,10 @@ const FeedObject = (props) => {
                 <div id="home-feed-profile-column-container" className="home-feed-profile-column-container">
                         <p className="home-feed-no-margin-text">Username</p>
                         <h6 className="home-feed-no-margin-text">William Chen</h6>
-              
                 </div>
+            </div>
+            <div className="feed-object-row">
+                
             </div>
         </div>
     )
