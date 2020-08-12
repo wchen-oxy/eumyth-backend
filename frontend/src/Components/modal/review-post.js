@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import AxiosHelper from '../../Axios/axios';
 import './short-post.scss';
 
 const ReviewPost = (props) => {
@@ -8,9 +9,14 @@ const ReviewPost = (props) => {
     const [postToPrivate, setToPrivatePost] = useState(false);
     const [postToPublic, setToPublicPost] = useState(false);
 
-    const handlePostSubmit = (e, postType) => (
-        console.log(postType)
-    )
+    const handlePostSubmit = (e, postType) => {
+        e.preventDefault();
+        console.log(props.imageArray);
+        if (postType === "short") AxiosHelper.createPost("short", props.postText, props.imageArray, date, min, milestone);
+        else{
+            AxiosHelper.createPost("long", props.postText, props.imageArray, date, min, milestone);
+        }
+    }
 
     const metaData = (
         <div className="vertical-grouping">

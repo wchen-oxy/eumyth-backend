@@ -1,34 +1,8 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const Post = require("./post.model");
+const IndexPursuit = require("./index.pursuit.model");
 
-const indexEventSchema = new Schema({
-    name: String,
-
-    experience_level: {
-        type: String,
-        required: false,
-        trim: true
-       
-      },
-
-    num_posts: {
-        type: Number,
-        required: false
-    },
-
-    num_milestones: {
-        type: Number,
-        required: false
-    },
-
-    total_min: {
-        type: Number,
-        required:  false,
-      }
-    
-
-}); 
 const indexUserSchema = new Schema(
     {
         username: {
@@ -52,7 +26,7 @@ const indexUserSchema = new Schema(
             required: true,
         },
 
-        pursuits: [indexEventSchema],
+        pursuits: [IndexPursuit.Schema],
         latestPosts: [Post.Schema]
     }
 );

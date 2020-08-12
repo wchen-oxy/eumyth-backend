@@ -72,7 +72,9 @@ class InitialCustomizationPage extends React.Component {
                 () => AxiosHelper.createUserProfile(this.state.username, pursuitsArray)
             )
             .then(
-                (success) => { if (success) window.location.reload() }
+                (success) => {
+                    console.log(success);
+                    if (success) window.location.reload(); }
             );
     }
 

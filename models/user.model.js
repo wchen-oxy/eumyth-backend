@@ -22,7 +22,7 @@ const userSchema = new Schema({
   pursuits:[Pursuits.Schema],
   posts: [mongoose.Types.ObjectId],
   recent_posts: [Post.Schema],
-  draft: Post.Schema
+  draft: Post.Schema,
 
 }, {
   timestamps: true,

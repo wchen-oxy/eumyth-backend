@@ -11,7 +11,7 @@ const postSchema = new Schema({
 
   private: {
     type: Boolean,
-    required: true,
+    required: false,
   },
 
   author_id: {
@@ -37,7 +37,7 @@ const postSchema = new Schema({
 
   is_milestone: {
     type: Boolean,
-    required: true,
+    required: false,
   },
   
   text_data: {

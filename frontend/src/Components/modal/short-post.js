@@ -127,7 +127,11 @@ class ShortPost extends React.Component {
     else{
 
       return (
-       <ReviewPost postType="short" onClick={this.handleClick} imageArray={this.state.imageArray} postText={this.state.postDescription}/>
+       <ReviewPost 
+       postType={"short"} 
+       onClick={this.handleClick} 
+       imageArray={this.state.imageArray} 
+       postText={this.state.postDescription}/>
       );
     }
   }

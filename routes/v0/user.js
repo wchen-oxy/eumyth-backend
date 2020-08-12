@@ -1,8 +1,9 @@
 var express = require('express');
 var router = express.Router();
-let User = require('../models/user.model');
-let IndexUser = require('../models/index.user.model');
-let Pursuit = require('../models/pursuit.model');
+let User = require('../../models/user.model');
+let IndexUser = require('../../models/index.user.model');
+let Pursuit = require('../../models/pursuit.model');
+let IndexPursuit = require('../../models/index.pursuit.model');
 var firebase = require('firebase');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
@@ -13,88 +14,64 @@ router.post('/', (req, res) => {
   const username = req.body.username;
   let mainPursuitsHolder = [];
   let indexPursuitsHolder = [];
-  const TitleModel = mongoose.model('Title', new Schema({
-    name: String,
-    numEvent: 0
-  }));
-
+ 
   for (const pursuit of pursuitsArray) {
-    // const entry = new Pursuit.Model({
-    //   name: pursuit
-    // });
-    // const TitleModel = mongoose.model('Title', new Schema({
-    //   name: String,
-    //   numEvent: 0
-    // }));
     mainPursuitsHolder.push(
       new Pursuit.Model({
-      name: pursuit
-    }));
-   
+        name: pursuit,
+        display_photo: "",
+        private: false,
+        experience_level: "",
+        total_min: 0,
+        num_posts: 0,
+        num_milestones: 0,
+      }));
+
     indexPursuitsHolder.push(
-     new TitleModel({
-        name: pursuit
+      new IndexPursuit.Model({
+        experience_level: "",
+        num_posts: 0,
+        num_milestones: 0,
+        total_min: 0,
       })
     );
-
   }
 
-  //create one, there isnt one rn
   const newUser = new User.Model({
     username: username,
     pursuits: mainPursuitsHolder,
-    events: []
+    private: false
   });
 
-  const indexUser = new IndexUser.Model({
-    
+  const newIndexUser = new IndexUser.Model({
     username: username,
-    userProfileRef: newUser._id,
+    user_profile_ref: newUser._id,
     private: false,
     pursuits: indexPursuitsHolder
   });
- 
-  newUser.save().catch(err => res.status(400).json('Error: ' + err));
-  indexUser.save().catch(err => res.status(400).json('Error: ' + err));
-  return res.status(201).json('New User Added!');
-
-
-  // User.Model.findOne({uid: uid}).updateOne({pursuits: updatedPursuits})
-  // .then(
-  //   () => res.json('Updated pursuits!')
-  // ).catch(err => res.status(400).json('Error: ' + err));
-
-//TODO DELETE THIS AFTER COMBINING INDEXUSER AND USER
-  //OLD CODE
-
-
-
-  // const uid = req.body.uid;
-  // const newUser = new User.Model({
-  //      uid:uid 
-  //     });
-  //     newUser.save()
-  //     .then(() => res.json('User added!'))
-  //     .catch(err => res.status(400).json('Error: ' + err));
+  
+  newUser.save().catch(err => res.status(500).json(err));
+  newIndexUser.save().catch(err => res.status(500).json(err));
+  return res.status(201).json("Success!");
 });
 
-router.delete('/', (req, res) => {
-  User.Model.deleteMany().then(()=> res.json("Deleted All!"));
-  mongoose.connection.deleteModel('User');
-})
+// router.delete('/', (req, res) => {
+//   User.Model.deleteMany().then(() => res.json("Deleted All!"));
+//   mongoose.connection.deleteModel('User');
+// })
 
 router.get('/index', (req, res) => {
- 
+
   // Get Basic Info for User
   const username = req.query.username;
-  IndexUser.Model.findOne({username:username}).then(
+  IndexUser.Model.findOne({ username: username }).then(
     result => {
       res.json(result)
     }
   )
-  .catch(err => 
-    res.send(err))
-            
+    .catch(err =>
+      res.send(err))
+
 })
 
 router.post('/index', (req, res) => {
@@ -103,12 +80,12 @@ router.post('/index', (req, res) => {
   const private = req.body.private;
   const pursuitsArray = req.body.pursuits;
   console.log(pursuitsArray);
-  let updatedPursuits = []; 
+  let updatedPursuits = [];
   const TitleModel = mongoose.model('Title', new Schema({
     name: String,
     numEvent: 0
   }));
-  for (const pursuit of pursuitsArray){
+  for (const pursuit of pursuitsArray) {
     console.log(pursuit);
     updatedPursuits.push(
       new TitleModel({
@@ -124,45 +101,42 @@ router.post('/index', (req, res) => {
     pursuits: updatedPursuits
   });
   indexUser.save()
-  .then(() => res.json('User Indexed!'))
-  .catch(err => res.status(400).json('Error: ' + err));
+    .then(() => res.json('User Indexed!'))
+    .catch(err => res.status(400).json('Error: ' + err));
 })
 
 router.post('/available', (req, res) => {
-    const username = req.body.username;
-    console.log(req.body);
-    IndexUser.Model.findOne({username: username}).then(
-      result => 
-      {
-        console.log(result);
-        if (result) 
-        {
-          console.log("true");
-          res.json(true);
-        }
-        else {
-          res.json(false);
-        }
+  const username = req.body.username;
+  console.log(req.body);
+  IndexUser.Model.findOne({ username: username }).then(
+    result => {
+      console.log(result);
+      if (result) {
+        console.log("true");
+        res.json(true);
       }
-    )
+      else {
+        res.json(false);
+      }
+    }
+  )
     .catch(
       err => {
         console.log(err);
         res.send(err);
       }
-    
+
 
     )
-  }
+}
 )
 
 router.post('/username', (req, res) => {
   const username = req.body.username;
-  IndexUser.Model.findOne({username:username}).then(
-    result =>
-    {
+  IndexUser.Model.findOne({ username: username }).then(
+    result => {
       if (result) res.status(200).json(result);
-      else{
+      else {
         res.status(400);
       }
     }
@@ -173,14 +147,14 @@ router.post('/username', (req, res) => {
 //   const password = req.body.password;
 
 //       firebase.auth().createUserWithEmailAndPassword(email, password)
-    
+
 //       .then(
 //         ()=> {
 //           //FIXME WHY DOESN'T (user) => {} work anymore?
 //           // userData.user.sendEmailVerification();
 //           firebase.auth().currentUser.sendEmailVerification();
 //           res.send("Succesfully registed! Check you email for a verification link.")
-          
+
 //         }
 //         )
 //           // .then(window.location.replace('/'))
@@ -216,7 +190,7 @@ router.post('/username', (req, res) => {
 //     email,
 //     password,
 //   });
-  
+
 //   User.find({email: user.email})
 //   .then(users => res.json(users))
 //   .catch(err => res.status(400).json('Error: ' + err));
@@ -236,7 +210,7 @@ router.post('/username', (req, res) => {
 //     firstName,
 //     lastName,
 //   });
-  
+
 //   newUser.save().then(() => res.json('User added!'))
 //   .catch(err => res.status(400).json('Error: ' + err));
 

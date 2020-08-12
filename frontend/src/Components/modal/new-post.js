@@ -27,6 +27,7 @@ class NewPost extends React.Component {
     this.retrieveDraft = this.retrieveDraft.bind(this);
 
   }
+
   componentDidMount() {
     this._isMounted = true;
     if (this._isMounted && this.state.username) {
@@ -40,8 +41,10 @@ class NewPost extends React.Component {
 
   retrieveDraft() {
     console.log("Retrieve new draft");
-    Axios.retrieveDraft(this.state.username).then((previousDraft) => {
-      console.log(previousDraft.data);
+    Axios.retrieveDraft(this.state.username).then(
+      (previousDraft) => {
+        console.log(previousDraft);
+        console.log(previousDraft.data);
       this.saveDraft(previousDraft.data);
     })
       .catch(error => {
@@ -92,9 +95,12 @@ class NewPost extends React.Component {
                 Begin a New Post! (Will Delete Saved data)
           </h4>
               <div className="single-button-container">
-                <button value="newLong" onClick={e =>
-                  window.confirm("Starting a new Long Post will erase your saved draft. Continue anyway?") &&
-                  this.handleClick(e, e.target.value)}>
+                <button value="newLong" onClick={e => {
+                  console.log(this.state.previousLongDraft);
+                  !!this.state.previousLongDraft ?
+                    window.confirm("Starting a new Long Post will erase your saved draft. Continue anyway?") &&
+                    this.handleClick(e, e.target.value) : this.handleClick(e, e.target.value);
+                }}>
                   New Entry
             </button>
               </div>

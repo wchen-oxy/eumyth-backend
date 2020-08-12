@@ -7,7 +7,7 @@ import { PlaceholderBlockConfig } from "Dante2/package/es/components/blocks/plac
 import { EmbedBlockConfig } from "Dante2/package/es/components/blocks/embed";
 import { withFirebase } from '../../Firebase';
 import './long-editor.scss';
-import {IMAGE_UPLOAD_URL, DRAFT_UPLOAD_URL} from "../constants/index";
+import { IMAGE_URL, DRAFT_URL } from "../constants/index";
 
 
 class LongEditor extends React.Component {
@@ -27,9 +27,9 @@ class LongEditor extends React.Component {
                         (editor) => {
                             const editorState = editor.emitSerializedOutput().blocks;
                             if (this.props.hasContent === false) {
-                                for (let block of editorState){
-                                    if (block.text !== ''){
-                                        this.props.setHasContent(true); 
+                                for (let block of editorState) {
+                                    if (block.text !== '') {
+                                        this.props.setHasContent(true);
                                         break;
                                     }
                                 }
@@ -44,7 +44,7 @@ class LongEditor extends React.Component {
                     widgets={[
                         ImageBlockConfig({
                             options: {
-                                upload_url: IMAGE_UPLOAD_URL,
+                                upload_url: IMAGE_URL,
                                 upload_callback: (ctx, img) => {
                                     console.log(ctx);
                                     console.log(img);
@@ -65,9 +65,9 @@ class LongEditor extends React.Component {
                     data_storage={{
                         success_handler: function () { console.log("Reached") },
                         failure_handler: function () { console.log("fail") },
-                        url: DRAFT_UPLOAD_URL,
+                        url: DRAFT_URL,
                         method: "POST",
-                        interval: 4000, //original is 4000 sec
+                        interval: 1000, //original is 4000 sec
                         withCredentials: false,
                         crossDomain: true,
                         headers: {

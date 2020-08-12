@@ -73,18 +73,17 @@ const crypto = require('crypto');
 
 // New Stuff
 router.route('/').post((req, res) => {
-  console.log("Made it");
   const username = req.body.username;
   const title = !!req.body.title ? req.body.title : '';
   const private = req.body.private;
   const coverPhotoURL = req.body.cover
   const pursuitCategory = req.body.pursuitCategory;
   const minDuration = req.body.minDuration;
-  const postFormat = req.body.post_format;
+  const postType = req.body.postType;
   const isMilestone = req.body.isMilestone;
 
   let post = null;
-  let authorId = null;
+  // let authorId = null;
   let authorId = IndexUser.Model.findOne({ username: username }).then(
     indexUser => indexUser.user_profile_ref
   ).catch(
@@ -111,19 +110,19 @@ router.route('/').post((req, res) => {
 
   //create new post
 
-  switch (postFormat) {
-    case ("text"):
-      post = new Post.Model({
-        title: title,
-        private: private,
-        author_id: authorId,
-        pursuit_category: pursuitCategory,
-        post_format: postFormat,
-        is_milestone: isMilestone,
-        text_data: req.body.textData,
-        min_duration: minDuration
-      });
-      break;
+  switch (postType) {
+    // case ("text"):
+    //   post = new Post.Model({
+    //     title: title,
+    //     private: private,
+    //     author_id: authorId,
+    //     pursuit_category: pursuitCategory,
+    //     post_format: postFormat,
+    //     is_milestone: isMilestone,
+    //     text_data: req.body.textData,
+    //     min_duration: minDuration
+    //   });
+    //   break;
     case ("short"):
       post = new Post.Model({
         title: title,

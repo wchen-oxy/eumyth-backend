@@ -1,7 +1,7 @@
 var router = require('express').Router();
-let Pursuit = require('../models/pursuit.model');
-let User = require('../models/user.model');
-let IndexUser = require('../models/index.user.model');
+let Pursuit = require('../../models/pursuit.model');
+let User = require('../../models/user.model');
+let IndexUser = require('../../models/index.user.model');
 
 
 // router.route('/'.get((req, res) => {

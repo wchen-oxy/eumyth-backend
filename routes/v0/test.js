@@ -1,8 +1,8 @@
 var express = require('express');
 var router = express.Router();
-let Pursuit = require('../models/pursuit.model');
-let User = require('../models/user.model');
-let IndexUser = require('../models/index.user.model');
+let Pursuit = require('../../models/pursuit.model');
+let User = require('../../models/user.model');
+let IndexUser = require('../../models/index.user.model');
 
 
 /* GET users listing. */
