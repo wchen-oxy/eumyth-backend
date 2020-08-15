@@ -10,6 +10,30 @@ const GridFsStorage = require("multer-gridfs-storage");
 const multer = require('multer');
 const uri = process.env.ATLAS_URI;
 const crypto = require('crypto');
+const AWS = require('aws-sdk');
+const AwsConstants = require('../../constants/aws');
+const multerS3 = require('multer-s3');
+
+
+const s3 = new AWS.S3({
+  accessKeyId: AwsConstants.ID,
+  secretAccessKey: AwsConstants.SECRET
+});
+
+
+var upload = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: AwsConstants.BUCKET_NAME,
+    contentType: multerS3.AUTO_CONTENT_TYPE,
+    metadata: function (req, file, cb) {
+      cb(null, {fieldName: file.fieldname});
+    },
+    key: function (req, file, cb) {
+      cb(null, "images" + "/" + Date.now().toString() + Math.floor(Math.random() * Math.floor(2000)))
+    }
+  })
+});
 
 // const storage = new GridFsStorage({
 //     url: uri,
@@ -72,20 +96,33 @@ const crypto = require('crypto');
 // })
 
 // New Stuff
-router.route('/').post((req, res) => {
+
+const getImageUrls = (array) => {
+  let imageArray = [];
+  for (const imageFile of array){
+    imageArray.push(imageFile.location);
+  }
+  return imageArray;
+}
+router.route('/').post(upload.fields([{name: "images"}, {name: "coverPhoto"}]), (req, res) => {
+ 
+  console.log(req.files);
+  console.log(req.file);
+  console.log(req.body.min);
   const username = req.body.username;
-  const title = !!req.body.title ? req.body.title : '';
-  const private = req.body.private;
-  const coverPhotoURL = req.body.cover
-  const pursuitCategory = req.body.pursuitCategory;
-  const minDuration = req.body.minDuration;
-  const postType = req.body.postType;
-  const isMilestone = req.body.isMilestone;
+  const title = !!req.body.title ? req.body.title : null;
+  const private = !!req.body.private ? req.body.private : null;
+  const coverPhotoURL = !!req.file ? req.file.cover.location : null;
+  const pursuitCategory = !!req.body.pursuitCategory ? req.body.pursuitCategory  : null;
+  const minDuration = !!req.body.minDuration ? req.body.minDuration : null;
+  const postType = !!req.body.postType ? req.body.postType : null;
+  const isMilestone = !!req.body.isMilestone ? req.body.isMilestone : null;
+  const imageData = !!req.files ? getImageUrls(req.files.images) : [];
 
   let post = null;
-  // let authorId = null;
-  let authorId = IndexUser.Model.findOne({ username: username }).then(
-    indexUser => indexUser.user_profile_ref
+  let resolveAuthorId = IndexUser.Model.findOne({ username: username }).then(
+    indexUser => {
+      return indexUser.user_profile_ref;}
   ).catch(
     err => {
       console.log(err);
@@ -93,47 +130,19 @@ router.route('/').post((req, res) => {
     }
   );
 
-  // let user = IndexUser.Model.findOne({ username: username },
-  //   (err, indexUser) => {
-  //     if (err) res.status(500).send(err);
-  //     authorId = new mongoose.mongo.ObjectId(indexUser.user_profile_ref);
-  //     return User.Model.findById(authorId);
-  //   }
-  // )
-  // .catch(
-  //   err => {
-  //     console.log(err);
-  //     res.status(500).send(err);
-  //   }
-  // );
-
-
-  //create new post
-
+  let resolveNewPost = resolveAuthorId.then( resolvedAuthorID => {
   switch (postType) {
-    // case ("text"):
-    //   post = new Post.Model({
-    //     title: title,
-    //     private: private,
-    //     author_id: authorId,
-    //     pursuit_category: pursuitCategory,
-    //     post_format: postFormat,
-    //     is_milestone: isMilestone,
-    //     text_data: req.body.textData,
-    //     min_duration: minDuration
-    //   });
-    //   break;
     case ("short"):
       post = new Post.Model({
         title: title,
         private: private,
-        author_id: authorId,
+        author_id: resolvedAuthorID,
         pursuit_category: pursuitCategory,
         cover_photo_url: coverPhotoURL,
-        post_format: postFormat,
+        post_format: postType,
         is_milestone: isMilestone,
         text_data: req.body.textData,
-        image_data: req.body.imageData,
+        image_data: imageData,
         min_duration: minDuration
       });
       break;
@@ -141,10 +150,10 @@ router.route('/').post((req, res) => {
       post = new Post.Model({
         title: title,
         private: private,
-        author_id: authorId,
+        author_id: resolvedAuthorID,
         pursuit_category: pursuitCategory,
         cover_photo_url: coverPhotoURL,
-        post_format: postFormat,
+        post_format: postType,
         is_milestone: isMilestone,
         text_data: req.body.textData,
         min_duration: minDuration
@@ -152,18 +161,26 @@ router.route('/').post((req, res) => {
       break;
     default:
       res.status(500).send();
-
   }
 
+  return resolvedAuthorID;
+}
+);
+
+
   //save new post
-  post.save().catch(err => res.status(500).json('Error: ' + err));
-  User.Model.findById(authorId).then(
-    user => {
-      // let posts = user.posts;
-      // let recentPosts = user.recent_posts;
-      // let pursuits = user.pursuits;
-      user.posts.append(post._id);
-      user.recent_posts.append(post);
+  let resolveUser = resolveNewPost.then(
+    (result) => 
+     {
+       console.log(result);
+      return User.Model.findById(result);}
+  );
+
+  resolveUser.then(
+    resolvedUser => {
+      const user = resolvedUser;
+      user.posts.push(post._id);
+      user.recent_posts.push(post);
       //check if pursuits exists already
       if (minDuration) {
         for (const pursuit of user.pursuits) {
@@ -175,12 +192,26 @@ router.route('/').post((req, res) => {
           }
         }
       }
-      user.save(err => res.status(500).send(err));
+      return user;
     }
-  );
-  console.log(req.body.text_content);
-  console.log(req.body.editor_content);
-  res.status(201).send();
+  ).
+  then( user => 
+    {
+      user.save().catch(err => res.status(500).json('Error: ' + err));
+      post.save().catch(err => res.status(500).json('Error: ' + err));
+    }
+    
+    )
+  .then(
+    () =>  res.status(201).send()
+  ).
+  catch(
+    (err) => {
+      console.log(err);
+      res.status(500).json(err);
+    }
+  )
+
 })
 
 

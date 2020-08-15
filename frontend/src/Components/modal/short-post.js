@@ -14,7 +14,7 @@ class ShortPost extends React.Component {
       postDescription: '',
       postDisabled: true,
       window: 'initial',
-      title: ''
+      previewTitle: ''
     };
 
     this.setSelectedFiles = this.setSelectedFiles.bind(this);
@@ -138,7 +138,7 @@ class ShortPost extends React.Component {
 
       return (
        <ReviewPost 
-       title = {this.state.title}
+       previewTitle = {this.state.previewTitle}
        postType={"short"} 
        onClick={this.handleClick} 
        imageArray={this.state.imageArray} 

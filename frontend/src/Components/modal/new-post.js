@@ -43,22 +43,22 @@ class NewPost extends React.Component {
   }
 
   onPreferredPostTypeChange(type) {
-    this.setState({preferredPostType: type});
+    this.setState({ preferredPostType: type });
   }
 
-  setIndexUserData(){
+  setIndexUserData() {
     AxiosHelper.returnIndexUser(this.state.username)
-    .then(
-      (result) => {
-        let pursuitArray = [];
-        for (const pursuit of result.data.pursuits) {
-          pursuitArray.push(pursuit.name);
-        }
-        this.setState({
-          pursuitArray : pursuitArray,
-          preferredPostType : result.data.preferredPostType
-        })
-      });
+      .then(
+        (result) => {
+          let pursuitArray = [];
+          for (const pursuit of result.data.pursuits) {
+            pursuitArray.push(pursuit.name);
+          }
+          this.setState({
+            pursuitArray: pursuitArray,
+            preferredPostType: result.data.preferredPostType
+          })
+        });
   }
 
   retrieveDraft() {
@@ -66,8 +66,8 @@ class NewPost extends React.Component {
       (previousDraft) => {
         console.log(previousDraft);
         console.log(previousDraft.data);
-      this.saveDraft(previousDraft.data);
-    })
+        this.saveDraft(previousDraft.data);
+      })
       .catch(error => {
         console.log(
           "Error: " + error
@@ -143,8 +143,8 @@ class NewPost extends React.Component {
               disablePost={this.handleDisablePost}
               setImageArray={this.setImageArray}
               handleClick={this.handleClick}
-              preferredPostType= {this.state.preferredPostType}
-              handlePreferredPostTypeChange = {this.onPreferredPostTypeChange}
+              preferredPostType={this.state.preferredPostType}
+              handlePreferredPostTypeChange={this.onPreferredPostTypeChange}
 
             />
           </>
@@ -154,10 +154,10 @@ class NewPost extends React.Component {
         windowType = <LongPost
           handleClick={this.handleClick}
           disablePost={this.handleDisablePost}
-          username = {this.state.username}
-          pursuits = {this.state.pursuits}
-          preferredPostType= {this.state.preferredPostType }
-          handlePreferredPostTypeChange = {this.onPreferredPostTypeChange}
+          username={this.state.username}
+          pursuits={this.state.pursuits}
+          preferredPostType={this.state.preferredPostType}
+          handlePreferredPostTypeChange={this.onPreferredPostTypeChange}
 
 
         />;
@@ -167,9 +167,10 @@ class NewPost extends React.Component {
           content={this.state.previousLongDraft}
           handleClick={this.handleClick}
           disablePost={this.handleDisablePost}
-          username = {this.state.username}
-          preferredPostType= {this.state.preferredPostType }
-          handlePreferredPostTypeChange = {this.onPreferredPostTypeChange}
+          username={this.state.username}
+          preferredPostType={this.state.preferredPostType}
+          handlePreferredPostTypeChange={this.onPreferredPostTypeChange}
+          previewTitle={this.state.previewTitle}
 
 
         />;

@@ -21,11 +21,11 @@ const indexUserSchema = new Schema(
             trim: true
         },
 
-        private: {
-            type: Boolean,
+        preferredPostType: {
+            type: String,
             required: true,
         },
-
+        draft: Post.Schema,
         pursuits: [IndexPursuit.Schema],
         latestPosts: [Post.Schema]
     }

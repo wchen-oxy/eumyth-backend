@@ -9,12 +9,13 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 
+//create user and indexUser
 router.post('/', (req, res) => {
   const pursuitsArray = req.body.pursuits;
   const username = req.body.username;
   let mainPursuitsHolder = [];
   let indexPursuitsHolder = [];
- 
+
   for (const pursuit of pursuitsArray) {
     mainPursuitsHolder.push(
       new Pursuit.Model({
@@ -29,6 +30,7 @@ router.post('/', (req, res) => {
 
     indexPursuitsHolder.push(
       new IndexPursuit.Model({
+        name: pursuit,
         experience_level: "",
         num_posts: 0,
         num_milestones: 0,
@@ -49,7 +51,7 @@ router.post('/', (req, res) => {
     private: false,
     pursuits: indexPursuitsHolder
   });
-  
+
   newUser.save().catch(err => res.status(500).json(err));
   newIndexUser.save().catch(err => res.status(500).json(err));
   return res.status(201).json("Success!");
@@ -60,88 +62,41 @@ router.post('/', (req, res) => {
 //   mongoose.connection.deleteModel('User');
 // })
 
-router.get('/index', (req, res) => {
-
-  // Get Basic Info for User
-  const username = req.query.username;
-  IndexUser.Model.findOne({ username: username }).then(
-    result => {
-      res.json(result)
-    }
-  )
-    .catch(err =>
-      res.send(err))
-
-})
-
-router.post('/index', (req, res) => {
-  const uid = req.body.uid;
-  const username = req.body.username;
-  const private = req.body.private;
-  const pursuitsArray = req.body.pursuits;
-  console.log(pursuitsArray);
-  let updatedPursuits = [];
-  const TitleModel = mongoose.model('Title', new Schema({
-    name: String,
-    numEvent: 0
-  }));
-  for (const pursuit of pursuitsArray) {
-    console.log(pursuit);
-    updatedPursuits.push(
-      new TitleModel({
-        name: pursuit,
-        numEvent: 0
-      })
-    );
-  }
-  const indexUser = IndexUser.Model({
-    uid: uid,
-    username: username,
-    private: private,
-    pursuits: updatedPursuits
-  });
-  indexUser.save()
-    .then(() => res.json('User Indexed!'))
-    .catch(err => res.status(400).json('Error: ' + err));
-})
-
-router.post('/available', (req, res) => {
-  const username = req.body.username;
-  console.log(req.body);
-  IndexUser.Model.findOne({ username: username }).then(
-    result => {
-      console.log(result);
-      if (result) {
-        console.log("true");
-        res.json(true);
-      }
-      else {
-        res.json(false);
-      }
-    }
-  )
-    .catch(
-      err => {
-        console.log(err);
-        res.send(err);
-      }
 
 
-    )
-}
-)
+//create indexed user
+// router.post('/index', (req, res) => {
+//   const uid = req.body.uid;
+//   const username = req.body.username;
+//   const private = req.body.private;
+//   const pursuitsArray = req.body.pursuits;
+//   console.log(pursuitsArray);
+//   let updatedPursuits = [];
+//   const TitleModel = mongoose.model('Title', new Schema({
+//     name: String,
+//     numEvent: 0
+//   }));
+//   for (const pursuit of pursuitsArray) {
+//     console.log(pursuit);
+//     updatedPursuits.push(
+//       new TitleModel({
+//         name: pursuit,
+//         numEvent: 0
+//       })
+//     );
+//   }
+//   const indexUser = IndexUser.Model({
+//     uid: uid,
+//     username: username,
+//     private: private,
+//     pursuits: updatedPursuits
+//   });
+//   indexUser.save()
+//     .then(() => res.json('User Indexed!'))
+//     .catch(err => res.status(400).json('Error: ' + err));
+// })
 
-router.post('/username', (req, res) => {
-  const username = req.body.username;
-  IndexUser.Model.findOne({ username: username }).then(
-    result => {
-      if (result) res.status(200).json(result);
-      else {
-        res.status(400);
-      }
-    }
-  )
-})
+
 // router.post('/register', (req, res, next) => {
 //   const email = req.body.email;
 //   const password = req.body.password;

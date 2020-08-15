@@ -6,8 +6,7 @@ const ReviewPost = (props) => {
     const [date, setDate] = useState();
     const [min, setMin] = useState();
     const [milestone, setMilestone] = useState(false);
-    const [postToPrivate, setToPrivatePost] = useState(false);
-    const [postToPublic, setToPublicPost] = useState(false);
+    const [previewTitle, setPreviewTitle] = useState(props.previewTitle);
     const [postPrivacyType, setPostPrivacyType] = useState("public-feed")
     const [coverPhoto, setCover] = useState();
 
@@ -15,18 +14,17 @@ const ReviewPost = (props) => {
         e.preventDefault();
         console.log(props.imageArray);
         AxiosHelper.createPost(
-            props.username, 
-            postType === "short" ? "short" : "long", 
-            props.postText, 
-            props.imageArray, 
-            coverPhoto, 
-            date, 
-            min, 
-            milestone, 
-            props.title,
+            props.username,
+            postType === "short" ? "short" : "long",
+            props.postText,
+            props.imageArray,
+            coverPhoto,
+            date,
+            min,
+            milestone,
+            previewTitle,
             postPrivacyType
-            
-            );
+        );
 
     }
 
@@ -37,6 +35,8 @@ const ReviewPost = (props) => {
 
     const metaData = (
         <div className="vertical-grouping">
+            <label>Preview Title</label>
+            <input type="text" onChange={(e) => setPreviewTitle(e.target.value)}></input>
             <label>Cover</label>
             <input type="file" onChange={(e) => setCover(e.target.value)}></input>
             <label>Date</label>
@@ -53,9 +53,9 @@ const ReviewPost = (props) => {
                 <option value="private">make post private on your page</option>
                 <option value="personal-page" selected>make post public on your page:</option>
                 <option value="public-feed">Post to your feed and page</option>
-                </select>
+            </select>
         </div>);
-    const invalidPostOption = !postToPublic && !postToPrivate;
+   
     const returnToShortButton = (<button id="toggle-button" value="initial" onClick={e => props.onClick(e, e.target.value)}>Return</button>);
     const returnToLongButton = (<button id="toggle-button" value="initial" onClick={e => props.setWindow(e.target.value)}>Return</button>);
     return (
@@ -72,7 +72,7 @@ const ReviewPost = (props) => {
             <div className="vertical-grouping">
                 <p>Post to:</p>
                 {postData}
-                <button disabled={invalidPostOption} onClick={(e) => handlePostSubmit(e, props.postType)}>Post!</button>
+                <button onClick={(e) => handlePostSubmit(e, props.postType)}>Post!</button>
             </div>
         </div>
     );

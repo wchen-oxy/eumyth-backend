@@ -101,18 +101,24 @@ var upload = multer({
       cb(null, {fieldName: file.fieldname});
     },
     key: function (req, file, cb) {
-      cb(null, Date.now().toString())
+      cb(null, "images" + "/" + Date.now().toString() + Math.floor(Math.random() * Math.floor(2000)))
     }
   })
 });
 
-router.route('/').post(upload.array('files'), (req, res, err) => {
+router.route('/single').post(upload.single('file'), (req, res, err) => {
+  console.log(req.file);
+  return res.status(200).json({'imageUrl': req.file.location});
+});
+
+
+router.route('/multiple').post(upload.array('files'), (req, res, err) => {
   console.log(req.files);
-  // res.status(200).send("Successful Upload!");
-  // console.log(req.body);
-  // uploadFile(req.body.imageArray);
-  // if (err) console.log(err);
-  return res.status(200).json({'imageUrls': req.files});
+  let imageArray = [];
+  for (const imageFile of req.files){
+    imageArray.push(imageFile.location);
+  }
+  return res.status(200).json({'imageUrls': imageArray});
 });
 
 
