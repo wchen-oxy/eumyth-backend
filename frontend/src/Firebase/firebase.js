@@ -124,6 +124,18 @@ class Firebase {
       }
     )
   }
+
+  //yes
+  returnName(){
+    const uid = this.auth.currentUser.uid;
+    //read from API
+    return this.db.ref('users/' + uid).once('value').then(
+      (snapshot) => {
+        return snapshot.val();
+      }
+    )
+  }
+
   //yes
   writeBasicUserData(username, firstName, lastName) {
     const uid = this.auth.currentUser.uid;

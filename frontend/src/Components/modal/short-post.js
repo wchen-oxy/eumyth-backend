@@ -13,7 +13,8 @@ class ShortPost extends React.Component {
       imageArray: [],
       postDescription: '',
       postDisabled: true,
-      window: 'initial'
+      window: 'initial',
+      title: ''
     };
 
     this.setSelectedFiles = this.setSelectedFiles.bind(this);
@@ -28,6 +29,9 @@ class ShortPost extends React.Component {
     this.generateValidFiles = this.generateValidFiles.bind(this);
 
   }
+
+  // handleTitleChange(e)
+
   setImageArray(imageArray) {
     this.setState({ imageArray: imageArray });
   }
@@ -49,10 +53,14 @@ class ShortPost extends React.Component {
   handleTextChange(e) {
     // console.log(e.target.value);
     const text = e.target.value;
+    if (e.target.name === "title") {
+      console.log(text);
+      return this.setState({title : text});}
+
     console.log(text.length);
     this.setState((state) => ({ 
       postDescription: text,
-      postDisabled: (text.length === 0) && (this.state.validFiles.length === 0 || this.state.unsupportedFiles.length > 0 )
+      postDisabled: (text.length === 0) && (state.validFiles.length === 0 || state.unsupportedFiles.length > 0 )
      })
      )
   }
@@ -106,14 +114,16 @@ class ShortPost extends React.Component {
               </span>
             </div>
           </div>
+       
           <ShortEditor
             username={this.props.username}
             selectedFiles={this.state.selectedFiles}
             validFiles={this.state.validFiles}
             unsupportedFiles={this.state.unsupportedFiles}
             setImageArray={this.setImageArray}
+            title={this.state.title}
             text={this.state.postDescription}
-            handleTextChange={this.handleTextChange}
+            onTextChange={this.handleTextChange}
             onSelectedFileChange={this.handleSelectedFileChange}
             onUnsupportedFileChange={this.handleUnsupportedFileChange}
             onDisablePost={this.handleDisablePost}
@@ -128,10 +138,17 @@ class ShortPost extends React.Component {
 
       return (
        <ReviewPost 
+       title = {this.state.title}
        postType={"short"} 
        onClick={this.handleClick} 
        imageArray={this.state.imageArray} 
-       postText={this.state.postDescription}/>
+       postText={this.state.postDescription}
+       username={this.props.username}
+       preferredPostType= {this.props.preferredPostType }
+       pursuits = {this.props.pursuits}
+       handlePreferredPostTypeChange = {this.props.handlePreferredPostTypeChange}
+       />
+       
       );
     }
   }

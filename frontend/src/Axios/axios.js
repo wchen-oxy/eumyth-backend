@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { DRAFT_URL } from "../Components/constants/index";
+import * as IndexUserEndpoint from "../Components/constants/index-user";
 import * as UserEndpoint from "../Components/constants/user";
 import * as PostEndpoint from "../Components/constants/post";
 
@@ -10,19 +11,27 @@ export default class AxiosHelper {
         console.log("TEST SUCCESS");
     }
     static checkUsernameAvailable(username) {
-        return axios.post(UserEndpoint.USERNAME_AVAILABLE_URL, { username: username });
+        return axios.post(IndexUserEndpoint.USERNAME_AVAILABLE_URL, { username: username });
     }
 
     static createUserProfile(username, pursuitsArray) {
         return axios.post(UserEndpoint.USER_URL, { username: username, pursuits: pursuitsArray });
     }
 
-    static returnPursuitNames(username) {
-        return axios.get(UserEndpoint.INDEX_INFO_URL, {
+    // static returnPursuitNames(username) {
+    //     return axios.get(UserEndpoint.INDEX_INFO_URL, {
+    //         params: {
+    //             username: username
+    //         }
+    //     });
+    // }
+
+    static returnIndexUser(username){
+        return axios.get(IndexUserEndpoint.INDEX_USER_URL, {
             params: {
                 username: username
             }
-        });
+        })
     }
 
     // static returnIndexUsername(uid) {
@@ -35,15 +44,29 @@ export default class AxiosHelper {
     //     return axios.post(PostEndpoint.IMAGE_POST, formData);
     // }
 
-    static createPost(postType, textData, imageArray, date, min, milestone) {
+    static createPost(username, postType, textData, imageArray, coverPhoto, date, min, milestone, title, postPrivacyType, pursuitCategory) {
+        console.log(imageArray);
         let formData = new FormData();
+        formData.append("postType", postType);
+        formData.append("username", username);
+        console.log(min);
+        if (title) formData.append("title", title);
+        if (postPrivacyType) formData.append("postPrivacyType", postPrivacyType);
+        if (pursuitCategory) formData.append("pursuitCategory", pursuitCategory)
         if (date) formData.append("date", date);
         if (min) formData.append("min", min);
         if (milestone) formData.append("milestone", milestone);
         if (textData) formData.append("textData", textData);
-        if (imageArray && imageArray.length > 0) { formData.append("imageArray", imageArray); }
-        formData.append("postType", postType);
-        axios.post(PostEndpoint.POST_URL, formData);
+        if (coverPhoto) formData.append("coverPhoto", coverPhoto);
+        if (imageArray && imageArray.length > 0) {
+            console.log("HERE");
+            for (const image of imageArray){
+                formData.append("images", image);
+            }
+            return axios.post(PostEndpoint.POST_URL, formData);
+        }
+        console.log("This hut");
+        return axios.post(PostEndpoint.POST_URL, formData);
     }
     //FIXME 
     //STEAL THE UPLOAD THING FROM HERE

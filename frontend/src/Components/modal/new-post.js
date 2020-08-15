@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './new-post.scss';
-import Axios from "../../Axios/axios";
+import AxiosHelper from "../../Axios/axios";
 import ShortPost from "../modal/short-post";
 import LongPost from "../modal/long-post";
 import ReviewPost from "../modal/review-post";
@@ -18,6 +18,8 @@ class NewPost extends React.Component {
       previousLongDraft: null,
       windowType: "main",
       currentPostType: 'main',
+      pursuits: null,
+      indexUserData: null,
     };
 
     this.handleDisablePost = this.handleDisablePost.bind(this);
@@ -25,23 +27,42 @@ class NewPost extends React.Component {
     this.handleClick = this.handleClick.bind(this);
     this.saveDraft = this.saveDraft.bind(this);
     this.retrieveDraft = this.retrieveDraft.bind(this);
-
+    this.setIndexUserData = this.setIndexUserData.bind(this);
+    this.onPreferredPostTypeChange = this.onPreferredPostTypeChange.bind(this);
   }
 
   componentDidMount() {
     this._isMounted = true;
     if (this._isMounted && this.state.username) {
       this.retrieveDraft();
-
+      this.setIndexUserData();
     };
   }
   componentWillUnmount() {
     this._isMounted = false;
   }
 
+  onPreferredPostTypeChange(type) {
+    this.setState({preferredPostType: type});
+  }
+
+  setIndexUserData(){
+    AxiosHelper.returnIndexUser(this.state.username)
+    .then(
+      (result) => {
+        let pursuitArray = [];
+        for (const pursuit of result.data.pursuits) {
+          pursuitArray.push(pursuit.name);
+        }
+        this.setState({
+          pursuitArray : pursuitArray,
+          preferredPostType : result.data.preferredPostType
+        })
+      });
+  }
+
   retrieveDraft() {
-    console.log("Retrieve new draft");
-    Axios.retrieveDraft(this.state.username).then(
+    AxiosHelper.retrieveDraft(this.state.username).then(
       (previousDraft) => {
         console.log(previousDraft);
         console.log(previousDraft.data);
@@ -73,6 +94,7 @@ class NewPost extends React.Component {
   }
 
   render() {
+    console.log(this.state.pursuits);
     let windowType = '';
     switch (this.state.windowType) {
       case ("main"):
@@ -121,6 +143,9 @@ class NewPost extends React.Component {
               disablePost={this.handleDisablePost}
               setImageArray={this.setImageArray}
               handleClick={this.handleClick}
+              preferredPostType= {this.state.preferredPostType}
+              handlePreferredPostTypeChange = {this.onPreferredPostTypeChange}
+
             />
           </>
         );
@@ -129,6 +154,12 @@ class NewPost extends React.Component {
         windowType = <LongPost
           handleClick={this.handleClick}
           disablePost={this.handleDisablePost}
+          username = {this.state.username}
+          pursuits = {this.state.pursuits}
+          preferredPostType= {this.state.preferredPostType }
+          handlePreferredPostTypeChange = {this.onPreferredPostTypeChange}
+
+
         />;
         break;
       case ("oldLong"):
@@ -136,16 +167,21 @@ class NewPost extends React.Component {
           content={this.state.previousLongDraft}
           handleClick={this.handleClick}
           disablePost={this.handleDisablePost}
+          username = {this.state.username}
+          preferredPostType= {this.state.preferredPostType }
+          handlePreferredPostTypeChange = {this.onPreferredPostTypeChange}
+
+
         />;
         break;
-      case ("review"):
-        windowType = <ReviewPost
-          content={this.state.previousLongDraft}
-          disablePost={this.handleDisablePost}
-          handleClick={this.handleClick}
-          currentPostType={this.state.currentPostType}
-        />
-        break;
+      // case ("review"):
+      //   windowType = <ReviewPost
+      //     content={this.state.previousLongDraft}
+      //     disablePost={this.handleDisablePost}
+      //     handleClick={this.handleClick}
+      //     currentPostType={this.state.currentPostType}
+      //   />
+      //   break;
       default:
         throw Error("No windowType options matched :(");
     }

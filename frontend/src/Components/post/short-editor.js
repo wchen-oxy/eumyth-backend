@@ -209,8 +209,11 @@ class ShortEditor extends React.Component {
             <div id="text-container">
                 <div className="description-container">
                     <h4>{this.props.username}</h4>
+                   
+                    {/* <input name="title" type="text" maxlength="140" placeholder="Optional Title" onChange={(e) => this.props.onTextChange(e)}></input> */}
+                    <TextareaAutosize name="title" id='short-post-text' placeholder='Write something here.' maxRows={2} onChange={this.props.onTextChange}  value={this.props.title} maxLength={140}/>
                     <div id="description-input-container" >
-                        <TextareaAutosize id='short-post-text' placeholder='Write something here.' onChange={this.props.handleTextChange} minRows={5} value={this.props.text}/>
+                        <TextareaAutosize id='short-post-text' placeholder='Write something here.' onChange={this.props.onTextChange} minRows={5} value={this.props.text}/>
                         {/* <form>
                             <input id='short-post-text' type='text' placeholder='Write something here.'>
                             </input>

@@ -34,7 +34,15 @@ const LongPost = (props) => {
     );
   else {
     return (
-      <ReviewPost postType="long" setWindow={setWindow} />
+      <ReviewPost 
+        postType="long" 
+        setWindow={setWindow} 
+        username={props.username}
+        preferredPostType= {this.props.preferredPostType }
+        pursuits = {this.props.pursuits}
+        handlePreferredPostTypeChange = {this.props.handlePreferredPostTypeChange}
+
+      />
     )
   }
 }

@@ -5,12 +5,16 @@ import AxiosHelper from '../../../Axios/axios';
 import './returning-user.scss';
 import RecentWorkObject from "./recent-work-object";
 import FeedObject from "./feed-object";
+import Axios from 'axios';
 class ReturningUserPage extends React.Component {
     _isMounted = false;
     constructor(props) {
         super(props);
         this.state = {
-            username: ''
+            username: this.props.firebase.returnUsername(),
+            firstName: null,
+            lastName: null,
+            indexUserData : null
         }
         this.handlePursuitClick = this.handlePursuitClick.bind(this);
         this.handleRecentWorkClick = this.handleRecentWorkClick.bind(this);
@@ -19,6 +23,10 @@ class ReturningUserPage extends React.Component {
 
     componentDidMount() {
         this._isMounted = true;
+        if (this._isMounted) this.props.firebase.returnName().then((result) => this.setState({firstName : result.firstName, lastName: result.lastName}));
+        if (this._isMounted && this.state.username) {
+            AxiosHelper.returnIndexUser(this.state.username).then((result) => this.setState({indexUserData : result.data}));
+        }
     }
 
     componentWillUnmount() {
@@ -37,7 +45,26 @@ class ReturningUserPage extends React.Component {
     }
 
     render() {
-        //FIXME replace recentwork with actual values
+
+        let pursuitInfoArray = [];
+        let totalMin = 0;
+        if (this.state.indexUserData) 
+        {
+
+            console.log(this.state.indexUserData);
+            for (const pursuit of this.state.indexUserData.pursuits){
+                totalMin += pursuit.total_min;
+                const hobbyTableData = (
+                            <tr>
+                                <th>{pursuit.name}</th>
+                                <td>{pursuit.experience_level}</td>
+                                <td>{pursuit.total_min}</td>
+                                <td>{pursuit.num_posts}</td>
+                                <td>{pursuit.num_milestones}</td>
+                            </tr>);
+                pursuitInfoArray.push(hobbyTableData);
+        }
+    }
         const recentWork = (<RecentWorkObject value="test" onRecentWorkClick={this.handleRecentWorkClick} />);
         return (
             <div id="home-page-container">
@@ -47,17 +74,18 @@ class ReturningUserPage extends React.Component {
                         <img className="home-profile-photo" src="https://i.redd.it/73j1cgr028u21.jpg"></img>
 
                         <div className="home-profile-text">
-                            <p>Username</p>
+                            <p>{this.state.username}</p>
+                            <p>{this.state.firstName}</p>
                         </div>
 
                     </div>
 
                     <div className="home-profile-column-container">
                         <div className="home-profile-text">
-                            Total Hours Spent
+                            Total Hours Spent: {Math.floor(totalMin / 60)}
                         </div>
                         <div className="home-profile-text">
-                            50!
+                            {}
                         </div>
                     </div>
                     <div className="home-profile-column-container">
@@ -69,24 +97,8 @@ class ReturningUserPage extends React.Component {
                                 <th>Posts</th>
                                 <th>Milestones</th>
                             </tr>
-                            <tr>
-                                <th>Hobby1</th>
-                                <td>20</td>
-                                <td>50</td>
-                                <td>10</td>
-                            </tr>
-                            <tr>
-                                <th>Hobby2</th>
-                                <td>20</td>
-                                <td>50</td>
-                                <td>10</td>
-                            </tr>
-                            <tr>
-                                <th>Hobby3</th>
-                                <td>20</td>
-                                <td>50</td>
-                                <td>10</td>
-                            </tr>
+                            {pursuitInfoArray}
+                            
                         </table>
                     </div>
 

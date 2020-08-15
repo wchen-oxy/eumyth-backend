@@ -8,18 +8,37 @@ const ReviewPost = (props) => {
     const [milestone, setMilestone] = useState(false);
     const [postToPrivate, setToPrivatePost] = useState(false);
     const [postToPublic, setToPublicPost] = useState(false);
+    const [postPrivacyType, setPostPrivacyType] = useState("public-feed")
+    const [coverPhoto, setCover] = useState();
 
     const handlePostSubmit = (e, postType) => {
         e.preventDefault();
         console.log(props.imageArray);
-        if (postType === "short") AxiosHelper.createPost("short", props.postText, props.imageArray, date, min, milestone);
-        else{
-            AxiosHelper.createPost("long", props.postText, props.imageArray, date, min, milestone);
-        }
+        AxiosHelper.createPost(
+            props.username, 
+            postType === "short" ? "short" : "long", 
+            props.postText, 
+            props.imageArray, 
+            coverPhoto, 
+            date, 
+            min, 
+            milestone, 
+            props.title,
+            postPrivacyType
+            
+            );
+
+    }
+
+    const setPostPrivacyTypes = (type) => {
+        setPostPrivacyType(type);
+        props.handlePreferredPostTypeChange(type);
     }
 
     const metaData = (
         <div className="vertical-grouping">
+            <label>Cover</label>
+            <input type="file" onChange={(e) => setCover(e.target.value)}></input>
             <label>Date</label>
             <input type="date" onChange={(e) => setDate(e.target.value)}></input>
             <label>Total Minutes</label>
@@ -30,12 +49,11 @@ const ReviewPost = (props) => {
     );
     const postData = (
         <div className="vertical-grouping">
-            <span>
-                Profile:<input type="checkbox" onClick={() => setToPrivatePost(!postToPrivate)}></input>
-            </span>
-            <span>
-                Public Feed:<input type="checkbox" onClick={() => setToPublicPost(!postToPublic)}></input>
-            </span>
+            <select name="cars" id="cars" value={props.preferredPostType ? props.preferredPostType : "public-feed"} onChange={(e) => setPostPrivacyTypes(e.target.value)}>
+                <option value="private">make post private on your page</option>
+                <option value="personal-page" selected>make post public on your page:</option>
+                <option value="public-feed">Post to your feed and page</option>
+                </select>
         </div>);
     const invalidPostOption = !postToPublic && !postToPrivate;
     const returnToShortButton = (<button id="toggle-button" value="initial" onClick={e => props.onClick(e, e.target.value)}>Return</button>);
