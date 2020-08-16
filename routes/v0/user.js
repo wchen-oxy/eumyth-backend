@@ -11,8 +11,8 @@ const Schema = mongoose.Schema;
 
 //create user and indexUser
 router.post('/', (req, res) => {
-  const pursuitsArray = req.body.pursuits;
   const username = req.body.username;
+  const pursuitsArray = req.body.pursuits;
   let mainPursuitsHolder = [];
   let indexPursuitsHolder = [];
 
