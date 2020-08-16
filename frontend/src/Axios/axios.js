@@ -6,6 +6,7 @@ import * as PostEndpoint from "../Components/constants/post";
 
 
 
+
 export default class AxiosHelper {
     static testString() {
         console.log("TEST SUCCESS");
@@ -16,6 +17,10 @@ export default class AxiosHelper {
 
     static createUserProfile(username, pursuitsArray) {
         return axios.post(UserEndpoint.USER_URL, { username: username, pursuits: pursuitsArray });
+    }
+
+    static setDraftPreviewTitle(previewTitle) {
+        return axios.post(DRAFT_URL, {previewTitle : previewTitle});
     }
 
     // static returnPursuitNames(username) {

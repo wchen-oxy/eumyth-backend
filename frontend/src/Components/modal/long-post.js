@@ -27,10 +27,11 @@ const LongPost = (props) => {
         </div>
 
         <LongEditor
+          username={props.username}
           content={props.content}
           hasContent={hasContent}
           setHasContent={setHasContent}
-          handlePreviewTitleChange={onPreviewTitleChange}
+          handlePreviewTitleChange={setPreviewTitle}
         />
 
       </div>
@@ -38,7 +39,7 @@ const LongPost = (props) => {
   else {
     return (
       <ReviewPost 
-        previewTitle={this.state.previewTitle}
+        previewTitle={previewTitle}
         postType="long" 
         setWindow={setWindow} 
         username={props.username}

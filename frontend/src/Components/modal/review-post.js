@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AxiosHelper from '../../Axios/axios';
 import './short-post.scss';
 
@@ -10,6 +10,11 @@ const ReviewPost = (props) => {
     const [postPrivacyType, setPostPrivacyType] = useState("public-feed")
     const [coverPhoto, setCover] = useState();
 
+    useEffect(() => (
+        console.log("Effect ran")
+        // AxiosHelper.setDraftPreviewTitle()
+    ));
+    
     const handlePostSubmit = (e, postType) => {
         e.preventDefault();
         console.log(props.imageArray);
@@ -33,10 +38,17 @@ const ReviewPost = (props) => {
         props.handlePreferredPostTypeChange(type);
     }
 
+    const handlePreviewTitleChange = (previewTitle) => {
+        setPreviewTitle(previewTitle);
+        
+    }
+
+
+
     const metaData = (
         <div className="vertical-grouping">
             <label>Preview Title</label>
-            <input type="text" onChange={(e) => setPreviewTitle(e.target.value)}></input>
+            <input type="text" onChange={(e) => handlePreviewTitleChange(e.target.value)}></input>
             <label>Cover</label>
             <input type="file" onChange={(e) => setCover(e.target.value)}></input>
             <label>Date</label>

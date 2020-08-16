@@ -13,8 +13,6 @@ class NewPost extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-
-      username: this.props.firebase.returnUsername(),
       previousLongDraft: null,
       windowType: "main",
       currentPostType: 'main',
@@ -139,11 +137,11 @@ class NewPost extends React.Component {
         windowType = (
           <>
             <ShortPost
-              username={this.state.username}
+              username={this.state.indexUserData.username}
               disablePost={this.handleDisablePost}
               setImageArray={this.setImageArray}
               handleClick={this.handleClick}
-              preferredPostType={this.state.preferredPostType}
+              preferredPostType={this.state.indexUserData.preferredPostType}
               handlePreferredPostTypeChange={this.onPreferredPostTypeChange}
 
             />
@@ -154,10 +152,11 @@ class NewPost extends React.Component {
         windowType = <LongPost
           handleClick={this.handleClick}
           disablePost={this.handleDisablePost}
-          username={this.state.username}
+          username={this.state.indexUserData.username}
           pursuits={this.state.pursuits}
-          preferredPostType={this.state.preferredPostType}
+          preferredPostType={this.state.indexUserData.preferredPostType}
           handlePreferredPostTypeChange={this.onPreferredPostTypeChange}
+          previewTitle=""
 
 
         />;
@@ -167,10 +166,10 @@ class NewPost extends React.Component {
           content={this.state.previousLongDraft}
           handleClick={this.handleClick}
           disablePost={this.handleDisablePost}
-          username={this.state.username}
-          preferredPostType={this.state.preferredPostType}
+          username={this.state.indexUserData.username}
+          preferredPostType={this.state.indexUserData.preferredPostType}
           handlePreferredPostTypeChange={this.onPreferredPostTypeChange}
-          previewTitle={this.state.previewTitle}
+          previewTitle={this.state.indexUserData.draft.previewTitle}
 
 
         />;

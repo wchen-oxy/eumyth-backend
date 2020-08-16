@@ -14,7 +14,7 @@ class LongEditor extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            username: this.props.firebase.returnUsername()
+            username: this.props.username,
         }
     }
 
@@ -72,7 +72,7 @@ class LongEditor extends React.Component {
                         crossDomain: true,
                         headers: {
                             'Content-Type': 'application/json',
-                            'username': this.state.username
+                            'username': this.state.username,
                         }
 
                     }}
