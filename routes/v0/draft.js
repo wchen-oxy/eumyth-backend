@@ -48,7 +48,6 @@ router.route('/').get((req, res) => {
             res.send(user.draft.text_data);
         })
         .catch(err => console.log('ERROR' + err));
-
 })
 
 router.route('/').post((req, res) => {
@@ -56,7 +55,6 @@ router.route('/').post((req, res) => {
     IndexUser.Model.findOne({ username: username },
         (err, indexUserProfile) => {
             if (err) {
-                // console.log("Error");
                 console.log(err);
                 res.status(500).json("Error: " + err)
             }

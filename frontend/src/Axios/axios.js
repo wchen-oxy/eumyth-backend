@@ -12,15 +12,16 @@ export default class AxiosHelper {
         console.log("TEST SUCCESS");
     }
     static checkUsernameAvailable(username) {
-        return axios.post(IndexUserEndpoint.USERNAME_AVAILABLE_URL, { username: username });
+        console.log(IndexUserEndpoint.CHECK_USERNAME_URL);
+        return axios.get(IndexUserEndpoint.CHECK_USERNAME_URL, { params: { username: username } });
     }
 
-    static createUserProfile(username, pursuitsArray) {
-        return axios.post(UserEndpoint.USER_URL, { username: username, pursuits: pursuitsArray });
+    static createUserProfile(username, pursuits) {
+        return axios.post(UserEndpoint.USER_URL, { username: username, pursuits: pursuits });
     }
 
     static setDraftPreviewTitle(previewTitle) {
-        return axios.post(DRAFT_URL, {previewTitle : previewTitle});
+        return axios.post(DRAFT_URL, { previewTitle: previewTitle });
     }
 
     // static returnPursuitNames(username) {
@@ -31,7 +32,7 @@ export default class AxiosHelper {
     //     });
     // }
 
-    static returnIndexUser(username){
+    static returnIndexUser(username) {
         return axios.get(IndexUserEndpoint.INDEX_USER_URL, {
             params: {
                 username: username
@@ -65,7 +66,7 @@ export default class AxiosHelper {
         if (coverPhoto) formData.append("coverPhoto", coverPhoto);
         if (imageArray && imageArray.length > 0) {
             console.log("HERE");
-            for (const image of imageArray){
+            for (const image of imageArray) {
                 formData.append("images", image);
             }
             return axios.post(PostEndpoint.POST_URL, formData);

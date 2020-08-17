@@ -39,11 +39,8 @@ const ReviewPost = (props) => {
     }
 
     const handlePreviewTitleChange = (previewTitle) => {
-        setPreviewTitle(previewTitle);
-        
+        setPreviewTitle(previewTitle);        
     }
-
-
 
     const metaData = (
         <div className="vertical-grouping">

@@ -14,7 +14,7 @@ class ReturningUserPage extends React.Component {
             username: this.props.firebase.returnUsername(),
             firstName: null,
             lastName: null,
-            indexUserData : null
+            indexUserData: null
         }
         this.handlePursuitClick = this.handlePursuitClick.bind(this);
         this.handleRecentWorkClick = this.handleRecentWorkClick.bind(this);
@@ -23,9 +23,10 @@ class ReturningUserPage extends React.Component {
 
     componentDidMount() {
         this._isMounted = true;
-        if (this._isMounted) this.props.firebase.returnName().then((result) => this.setState({firstName : result.firstName, lastName: result.lastName}));
+
+        if (this._isMounted) this.props.firebase.returnName().then((result) => { if (result) this.setState({ firstName: result.firstName, lastName: result.lastName }) });
         if (this._isMounted && this.state.username) {
-            AxiosHelper.returnIndexUser(this.state.username).then((result) => this.setState({indexUserData : result.data}));
+            AxiosHelper.returnIndexUser(this.state.username).then((result) => this.setState({ indexUserData: result.data }));
         }
     }
 
@@ -45,26 +46,26 @@ class ReturningUserPage extends React.Component {
     }
 
     render() {
+        console.log("return user");
 
         let pursuitInfoArray = [];
         let totalMin = 0;
-        if (this.state.indexUserData) 
-        {
+        if (this.state.indexUserData) {
 
             console.log(this.state.indexUserData);
-            for (const pursuit of this.state.indexUserData.pursuits){
+            for (const pursuit of this.state.indexUserData.pursuits) {
                 totalMin += pursuit.total_min;
                 const hobbyTableData = (
-                            <tr>
-                                <th>{pursuit.name}</th>
-                                <td>{pursuit.experience_level}</td>
-                                <td>{pursuit.total_min}</td>
-                                <td>{pursuit.num_posts}</td>
-                                <td>{pursuit.num_milestones}</td>
-                            </tr>);
+                    <tr>
+                        <th>{pursuit.name}</th>
+                        <td>{pursuit.experience_level}</td>
+                        <td>{pursuit.total_min}</td>
+                        <td>{pursuit.num_posts}</td>
+                        <td>{pursuit.num_milestones}</td>
+                    </tr>);
                 pursuitInfoArray.push(hobbyTableData);
+            }
         }
-    }
         const recentWork = (<RecentWorkObject value="test" onRecentWorkClick={this.handleRecentWorkClick} />);
         return (
             <div id="home-page-container">
@@ -98,7 +99,7 @@ class ReturningUserPage extends React.Component {
                                 <th>Milestones</th>
                             </tr>
                             {pursuitInfoArray}
-                            
+
                         </table>
                     </div>
 

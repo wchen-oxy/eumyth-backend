@@ -15,7 +15,7 @@ require('dotenv').config();
 var port = process.env.PORT || 5000;
 
 
-var indexRouter = require('./routes/v0/index');
+var indexUserRouter = require('./routes/v0/index');
 var usersRouter = require('./routes/v0/user');
 var testRouter = require('./routes/v0/test');
 var pursuitsRouter = require('./routes/v0/pursuit');
@@ -70,7 +70,9 @@ app.use('/draft', function (req, res, next) {
   };
   next();
 }, draftRouter);
+
 app.use('/pursuit', pursuitsRouter);
+app.use('/index', indexUserRouter);
 app.use('/user', usersRouter);
 app.use('/test', testRouter);
 app.use('/post', postRouter);

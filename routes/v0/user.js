@@ -15,14 +15,17 @@ router.post('/', (req, res) => {
   const pursuitsArray = req.body.pursuits;
   let mainPursuitsHolder = [];
   let indexPursuitsHolder = [];
-
+  console.log(pursuitsArray);
   for (const pursuit of pursuitsArray) {
+    console.log(pursuit);
+    console.log(pursuit.name);
+
     mainPursuitsHolder.push(
       new Pursuit.Model({
-        name: pursuit,
+        name: pursuit.name,
         display_photo: "",
         private: false,
-        experience_level: "",
+        experience_level: pursuit.experience,
         total_min: 0,
         num_posts: 0,
         num_milestones: 0,
@@ -30,8 +33,8 @@ router.post('/', (req, res) => {
 
     indexPursuitsHolder.push(
       new IndexPursuit.Model({
-        name: pursuit,
-        experience_level: "",
+        name: pursuit.name,
+        experience_level: pursuit.experience,
         num_posts: 0,
         num_milestones: 0,
         total_min: 0,
@@ -48,13 +51,22 @@ router.post('/', (req, res) => {
   const newIndexUser = new IndexUser.Model({
     username: username,
     user_profile_ref: newUser._id,
+    preferredPostType: "public-feed",
     private: false,
     pursuits: indexPursuitsHolder
   });
 
-  newUser.save().catch(err => res.status(500).json(err));
-  newIndexUser.save().catch(err => res.status(500).json(err));
-  return res.status(201).json("Success!");
+    const resovlvedUser = newUser.save();
+    const resolvedIndexUser = resovlvedUser.then(() => newIndexUser.save());
+    resolvedIndexUser.then(() => res.status(201).json("Success!")).catch(err => 
+      {
+        console.log(err);
+      res.status(500).json(err);
+    });
+  // newUser.save().then(() => console.log("Saved 1")).catch(err => res.status(500).json(err));
+  // console.log("123123");
+  // newIndexUser.save().then(() => console.log("Saved 2")).catch(err => res.status(500).json(err));
+  // console.log("343");
 });
 
 // router.delete('/', (req, res) => {

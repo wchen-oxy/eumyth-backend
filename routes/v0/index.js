@@ -1,5 +1,7 @@
 var router = require('express').Router();
 let User = require('../../models/user.model');
+let IndexUser = require('../../models/index.user.model');
+
 
 
 // router.route('/').get((req, res) => {
@@ -16,7 +18,7 @@ router.get('/', (req, res) => {
       res.status(200).json(result)
   )
     .catch(err =>
-      res.send(err))
+      res.status(400).json(err))
 })
 
 // router.post('/available', (req, res) => {
@@ -44,16 +46,23 @@ router.get('/', (req, res) => {
 // )
 
 //check if username is available
-router.post('/username', (req, res) => {
-  const username = req.body.username;
+router.get('/username', (req, res) => {
+  console.log("username");
+  const username = req.query.username;
+  console.log(username);
   IndexUser.Model.findOne({ username: username }).then(
     result => {
-      if (result) res.status(200).json(result);
-      else {
-        res.status(400);
-      }
+    console.log(result);
+    if (result) res.status(200).json("Is Taken");
+    else{
+      res.status(204).json("Username not Found. Is not taken!");
+
     }
-  )
+  }
+  ).catch((err) => {
+    console.log("Error: " + err);
+    res.status(500).json("Error: " + err);
+  })
 })
 
 // router.route('/add').post((req, res) => {
