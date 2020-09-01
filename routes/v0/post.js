@@ -104,11 +104,12 @@ const getImageUrls = (array) => {
   }
   return imageArray;
 }
-router.route('/').post(upload.fields([{name: "images"}, {name: "coverPhoto"}]), (req, res) => {
+
+router.route('/').post(upload.fields([{name: "images"}, {name: "coverPhoto", maxCount: 1}]), (req, res) => {
  
   console.log(req.files);
   console.log(req.file);
-  console.log(req.body.min);
+  console.log(req.body);
   const username = req.body.username;
   const title = !!req.body.title ? req.body.title : null;
   const private = !!req.body.private ? req.body.private : null;
@@ -129,6 +130,7 @@ router.route('/').post(upload.fields([{name: "images"}, {name: "coverPhoto"}]), 
       res.status(500).send(err);
     }
   );
+  console.log("Here");
 
   let resolveNewPost = resolveAuthorId.then( resolvedAuthorID => {
   switch (postType) {
@@ -175,7 +177,6 @@ router.route('/').post(upload.fields([{name: "images"}, {name: "coverPhoto"}]), 
        console.log(result);
       return User.Model.findById(result);}
   );
-
   resolveUser.then(
     resolvedUser => {
       const user = resolvedUser;

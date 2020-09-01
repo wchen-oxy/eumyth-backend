@@ -1,8 +1,6 @@
 import React from 'react';
-import axios from 'axios';
 import './pursuit-holder.scss';
 import { withRouter } from 'react-router-dom';
-import { compose } from 'recompose';
 
 
 class PursuitHolder extends React.Component {

@@ -1,5 +1,4 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
 import { withFirebase } from '../../Firebase';
 import PursuitHolder from './pursuit-holder';
 import './index.scss';
@@ -26,16 +25,15 @@ class PursuitProfile extends React.Component {
             .then(
                 result => {
                     console.log(result);
-                if (!result.data) this.setState({ fail: true});
-                else if (this._isMounted) {
-                    this.setState({
-                        pursuits: result.data.pursuits
-                    })
+                    if (!result.data) this.setState({ fail: true });
+                    else if (this._isMounted) {
+                        this.setState({
+                            pursuits: result.data
+                        })
+                    }
                 }
-            }
-
             );
-        
+
     }
 
     componentWillUnmount() {
@@ -47,6 +45,7 @@ class PursuitProfile extends React.Component {
         var pursuitHolderArray = [];
         console.log(this.props.match.params);
         if (this.state.fail) return NoMatch;
+
 
         for (const pursuit of this.state.pursuits) {
             pursuitHolderArray.push(
@@ -61,26 +60,26 @@ class PursuitProfile extends React.Component {
         return (
             <div id="personal-profile-container">
                 <div id="personal-profile-header">
-                    <div id="temp-cover">        
+                    <div id="temp-cover">
                     </div>
                     <div id="personal-profile-photo">
                     </div>
                 </div>
                 <div id="personal-profile-intro-container">
-                <div id="personal-profile-name-container">
-                    <h4 id="personal-profile-name">William Chen</h4>
+                    <div id="personal-profile-name-container">
+                        <h4 id="personal-profile-name">William Chen</h4>
+                    </div>
+                    <div id="personal-profile-description">
+                        <p>Description</p>
+                    </div>
+
                 </div>
-                <div id="personal-profile-description">
-                    <p>Description</p>
-                </div>
-                
-                </div>  
                 <div id="pursuit-selection-container">
                     {pursuitHolderArray}
                 </div>
                 <div id="event-container">
-                </div> 
-            {/* <div className="pursuit-board-container">
+                </div>
+                {/* <div className="pursuit-board-container">
                 {pursuitHolderArray.map((pursuit) => pursuit)}
             </div> */}
             </div>

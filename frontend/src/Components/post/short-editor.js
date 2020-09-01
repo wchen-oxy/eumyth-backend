@@ -1,6 +1,5 @@
-import React, { useRef, createRef } from 'react';
+import React from 'react';
 import { withFirebase } from '../../Firebase';
-import AxiosHelper from '../../Axios/axios';
 import ImageSlider from '../image-carousel';
 import TextareaAutosize from 'react-textarea-autosize';
 

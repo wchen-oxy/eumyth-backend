@@ -3,9 +3,6 @@ import Axios from "../../Axios/axios";
 import "./index.scss";
 import LongEditor from "./long-editor";
 import ShortEditor from "./short-editor";
-
-import { Container, Row, Col } from "react-bootstrap";
-import debounce from "lodash/debounce";
 import { withFirebase } from "../../Firebase";
 
 
@@ -13,6 +10,10 @@ class NewEntry extends React.Component {
     _isMounted = false;
     constructor(props) {
         super(props);
+        this.progressRef = React.createRef();
+        this.uploadRef = React.createRef();
+        this.uploadModalRef = React.createRef();
+        this.modalRef = React.createRef();
         this.state = {
             isMilestone: false,
             username: this.props.firebase.returnUsername(),
@@ -23,21 +24,13 @@ class NewEntry extends React.Component {
             imageArray: [],
 
         };
-        this.progressRef = React.createRef();
-        this.uploadRef = React.createRef();
-        this.uploadModalRef = React.createRef();
-        this.modalRef = React.createRef();
-        
-        // this.modalImageRef = React.createRef();
         this.closeModal = this.closeModal.bind(this);
         this.handleTypeToggle = this.handleTypeToggle.bind(this);
         this.handleClick = this.handleClick.bind(this);
         this.handleDisablePost = this.handleDisablePost.bind(this);
         this.setImageArray = this.setImageArray.bind(this);
         this.handleChange = this.handleChange.bind(this);
-        this.closeUploadModal = this.closeUploadModal.bind(this);
         this.openSubmitLongPostModal = this.openSubmitLongPostModal.bind(this);
-
         this.handleSubmitPost = this.handleSubmitPost.bind(this);
 
 
@@ -52,7 +45,6 @@ class NewEntry extends React.Component {
                     console.log(
                         "Error: " + error
                     );
-                   
                 })
         };
     }
@@ -77,25 +69,16 @@ class NewEntry extends React.Component {
         this.setState({ windowType: value, postDisabled: true })
     }
 
-    handleWindowSelection(e) {
-
-    }
-
     setImageArray(imageArray) {
-        // if (!!imageArray)
-        console.log(imageArray);
         this.setState({ imageArray: imageArray });
     }
 
     openSubmitLongPostModal(){
-      
         this.modalRef.current.style.display = "block";
-        
     }
 
     closeModal(){
         this.modalRef.current.style.display = "none";
-        // this.modalImageRef.current.style.backgroundImage = "none";
     }
 
     handleSubmitPost(e) {
@@ -111,50 +94,8 @@ class NewEntry extends React.Component {
                 });
         }
         if (this.state.windowType === "long"){
-            this.openSubmitLongPostModal();
-            //open modal
-            
-           
+            this.openSubmitLongPostModal();            
         }
-        // .then(
-
-        //     () =>
-        //         document
-        //             .getElementById("img")
-        //             .setAttribute("src", `http://localhost:5000/entry/image/${file[0].name}`)
-        // )
-
-        // console.log(file[0]);
-
-        // const uploadFiles = async () => {
-        //     uploadModalRef.current.style.display = "block";
-        //     uploadRef.current.innerHTML = "File(s) Uploading...";
-        //     for (let i = 0; i < validFiles.length; i++) {
-        //         const formData = new FormData();
-        //         formData.append("image", validFiles[i]);
-        //         formData.append("key", "638938ef024e80a8c24baa6d42cae8ee");
-        // axios.post("https://api.imgbb.com/1/upload", formData, {
-        //     onUploadProgress: (progressEvent) => {
-        //         const uploadPercentage = Math.floor((progressEvent.loaded / progressEvent.total) * 100);
-        //         progressRef.current.innerHTML = `${uploadPercentage}%`;
-        //         progressRef.current.style.width = `${uploadPercentage}%`;
-
-        //         if (uploadPercentage === 100) {
-        //             uploadRef.current.innerHTML = "File(s) Uploaded";
-        //             validFiles.length = 0;
-        //             setValidFiles([...validFiles]);
-        //             setSelectedFiles([...validFiles]);
-        //             setUnsupportedFiles([...validFiles]);
-        //         }
-        //     },
-        // })
-        // .catch(() => {
-        //     uploadRef.current.innerHTML = `<span class="error">Error Uploading File(s)</span>`;
-        //     progressRef.current.style.backgroundColor = "red";
-        // })
-        // }
-        // }
-
     }
 
     handleDisablePost(disabled) {
@@ -219,24 +160,14 @@ class NewEntry extends React.Component {
                 editorType = (
                     <>
                         <ShortEditor
-                            // selectedFiles={this.state.selectedFiles}
-                            // validFiles={this.state.validFiles}
-                            // unsupportedFiles={this.state.unsupportedFiles}
-                            // errorMessage={this.state.errorMessage}
                             username={this.state.username}
                             disablePost={this.handleDisablePost}
                             setImageArray={this.setImageArray}
                             handleChange={this.handleChange}
-
-                        // setSelectedFiles = {this.setSelectedfiles}
-                        // setValidFiles = {this.setValidFiles}
-                        // setUnsupportedFiles = {this.setUnsupportedFiles}
-                        // setErrorMessage = {this.setErrorMessage}
                         />
 
                         <div className="upload-modal" ref={this.uploadModalRef}>
                             <div className="overlay"></div>
-                            {/* <div className="close" onClick={(() => this.closeUploadModal())}>X</div> */}
                             <div className="progress-container">
                                 <span ref={this.uploadRef}></span>
                                 <div className="progress">
@@ -262,7 +193,6 @@ class NewEntry extends React.Component {
                 }
             }
         }
-
 
         return (
 

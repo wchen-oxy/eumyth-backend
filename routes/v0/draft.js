@@ -39,13 +39,12 @@ const fs = require('fs');
 
 router.route('/').get((req, res) => {
     const username = req.query.username;
-    console.log(username);
     IndexUser.Model.findOne({ username: username })
         .then((user) => {
             if (user.draft === undefined) {
-                return res.sendStatus(200);
+                return res.status(204);
             }
-            res.send(user.draft.text_data);
+            res.status(200).send(user.draft.text_data);
         })
         .catch(err => console.log('ERROR' + err));
 })
@@ -63,7 +62,6 @@ router.route('/').post((req, res) => {
         indexUser => {
             const authorId = indexUser.user_profile_ref;
             const postModel = new Post.Model({
-                // previewTitle: req.headers.previewTitle ? req.headers.previewTitle : indexUser.draft.previewTitle,
                 author_id: authorId,
                 text_data: req.body.editor_content,
                 post_format: 'long'

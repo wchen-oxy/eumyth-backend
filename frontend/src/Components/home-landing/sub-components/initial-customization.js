@@ -1,8 +1,7 @@
 import React from 'react';
 import './initial-customization.scss';
 import CustomMultiSelect from "../../custom-clickables/createable-single";
-import Firebase, { withFirebase } from '../../../Firebase';
-import axios from 'axios';
+import { withFirebase } from '../../../Firebase';
 import AxiosHelper from '../../../Axios/axios';
 
 const INITIAL_STATE = {

@@ -9,17 +9,17 @@
     justify-content: space-between;
 }
 
-.navbar-item{
+.navbar-item {
     font-size: $primary-medium-font-size;
     padding-left: 1vh;
     padding-right: 1vh;
 }
 
-#settings-link{
+#settings-link {
     padding-right: 1vh;
 }
 
-#new-entry{
+#new-entry {
     padding-left: 1vh;
 }
 
@@ -33,29 +33,26 @@
 //                                     supported by Chrome, Edge, Opera and Firefox */
 //   }
 
-
-@import "../../main.scss";
-
-.modal{
+.modal {
     z-index: 10;
     display: none;
     overflow: hidden;
 }
 
-.modal .overlay{
+.modal .overlay {
     width: 100%;
     height: 100vh;
-    background: rgba(0,0,0,.66);
+    background: rgba(0, 0, 0, 0.66);
     position: fixed;
     top: 0;
     left: 0;
 }
 
-.modal .new-post-container .short-post-container{
+.modal .new-post-container .short-post-container {
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%,-50%);
+    transform: translate(-50%, -50%);
     overflow: scroll;
     object-fit: cover;
     width: 100%;
@@ -66,6 +63,14 @@
 }
 
 .close {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+
     position: fixed;
     top: 15px;
     right: 35px;
@@ -75,10 +80,3 @@
     transition: 0.3s;
     z-index: 21;
 }
-
-
-
-
-
-
-

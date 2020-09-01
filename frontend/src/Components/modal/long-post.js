@@ -10,7 +10,6 @@ const LongPost = (props) => {
   const [window, setWindow] = useState("initial");
   const [hasContent, setHasContent] = useState(props.content !== null);
   const [previewTitle, setPreviewTitle] = useState(props.previewTitle);
-
   if (window === "initial")
     return (
       <div className="long-post-container" id="post-modal">
@@ -43,9 +42,9 @@ const LongPost = (props) => {
         postType="long" 
         setWindow={setWindow} 
         username={props.username}
-        preferredPostType= {this.props.preferredPostType }
-        pursuits = {this.props.pursuits}
-        handlePreferredPostTypeChange = {this.props.handlePreferredPostTypeChange}
+        preferredPostType= {props.preferredPostType}
+        pursuits = {props.pursuits}
+        handlePreferredPostTypeChange = {props.handlePreferredPostTypeChange}
 
       />
     )

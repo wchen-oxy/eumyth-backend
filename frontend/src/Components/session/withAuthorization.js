@@ -12,7 +12,6 @@ const withAuthorization = condition => Component => {
       this.listener = this.props.firebase.auth.onAuthStateChanged(
        
         authUser => {
-          console.log("Authorization Changed");
           if (!condition(authUser)) {
             this.props.history.push('');
           }

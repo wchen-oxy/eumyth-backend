@@ -115,7 +115,6 @@ export default class WelcomePage extends React.Component {
   }
 
   render() {
-    console.log(this.state.isLoginMode);
     let LoginRegisterHome;
     if (this.state.showRegisterSuccess) {
       return (

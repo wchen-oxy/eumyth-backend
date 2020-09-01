@@ -28,7 +28,6 @@ class UserHomePage extends React.Component {
     }
 
     render() {
-        console.log(this.state.newUser ? "is true" : " is false");
         if (this.state.newUser === null) return( <div>Grabbing User Info</div>);
         return (this.state.newUser ? <InitialCustomizationPage /> : <ReturningUserPage />);
     }

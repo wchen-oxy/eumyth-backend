@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import AxiosHelper from '../../Axios/axios';
 import './short-post.scss';
 
@@ -8,12 +8,7 @@ const ReviewPost = (props) => {
     const [milestone, setMilestone] = useState(false);
     const [previewTitle, setPreviewTitle] = useState(props.previewTitle);
     const [postPrivacyType, setPostPrivacyType] = useState("public-feed")
-    const [coverPhoto, setCover] = useState();
-
-    useEffect(() => (
-        console.log("Effect ran")
-        // AxiosHelper.setDraftPreviewTitle()
-    ));
+    const [coverPhoto, setCover] = useState(null);
     
     const handlePostSubmit = (e, postType) => {
         e.preventDefault();
@@ -30,7 +25,6 @@ const ReviewPost = (props) => {
             previewTitle,
             postPrivacyType
         );
-
     }
 
     const setPostPrivacyTypes = (type) => {
@@ -47,7 +41,9 @@ const ReviewPost = (props) => {
             <label>Preview Title</label>
             <input type="text" onChange={(e) => handlePreviewTitleChange(e.target.value)}></input>
             <label>Cover</label>
-            <input type="file" onChange={(e) => setCover(e.target.value)}></input>
+            <input type="file" onChange={(e) => {
+                setCover(e.target.files[0]);
+                }}></input>
             <label>Date</label>
             <input type="date" onChange={(e) => setDate(e.target.value)}></input>
             <label>Total Minutes</label>
@@ -60,7 +56,7 @@ const ReviewPost = (props) => {
         <div className="vertical-grouping">
             <select name="cars" id="cars" value={props.preferredPostType ? props.preferredPostType : "public-feed"} onChange={(e) => setPostPrivacyTypes(e.target.value)}>
                 <option value="private">make post private on your page</option>
-                <option value="personal-page" selected>make post public on your page:</option>
+                <option value="personal-page" defaultValue>make post public on your page:</option>
                 <option value="public-feed">Post to your feed and page</option>
             </select>
         </div>);

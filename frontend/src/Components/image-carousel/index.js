@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React from "react";
 import Slider from "react-slick";
 import './index.scss';
 import "slick-carousel/slick/slick.css";
@@ -78,7 +78,7 @@ class ImageSlider extends React.Component {
           newArray.map(item =>
             item = (
               // <div className="photo-container">
-              <img className="photo" key={count++} src={item} alt='image not loaded' />
+              <img alt="" className="photo" key={count++} src={item} />
               // </div>
             ))
       ).then(result => {

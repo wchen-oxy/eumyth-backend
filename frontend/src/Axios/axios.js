@@ -24,13 +24,13 @@ export default class AxiosHelper {
         return axios.post(DRAFT_URL, { previewTitle: previewTitle });
     }
 
-    // static returnPursuitNames(username) {
-    //     return axios.get(UserEndpoint.INDEX_INFO_URL, {
-    //         params: {
-    //             username: username
-    //         }
-    //     });
-    // }
+    static returnPursuitNames(username) {
+        return axios.get(IndexUserEndpoint.INDEX_USER_PURSUITS_URL, {
+            params: {
+                username: username
+            }
+        });
+    }
 
     static returnIndexUser(username) {
         return axios.get(IndexUserEndpoint.INDEX_USER_URL, {
@@ -51,8 +51,9 @@ export default class AxiosHelper {
     // }
 
     static createPost(username, postType, textData, imageArray, coverPhoto, date, min, milestone, title, postPrivacyType, pursuitCategory) {
-        console.log(imageArray);
         let formData = new FormData();
+        console.log(imageArray);
+        console.log(coverPhoto);
         formData.append("postType", postType);
         formData.append("username", username);
         console.log(min);
@@ -65,13 +66,11 @@ export default class AxiosHelper {
         if (textData) formData.append("textData", textData);
         if (coverPhoto) formData.append("coverPhoto", coverPhoto);
         if (imageArray && imageArray.length > 0) {
-            console.log("HERE");
             for (const image of imageArray) {
                 formData.append("images", image);
             }
             return axios.post(PostEndpoint.POST_URL, formData);
         }
-        console.log("This hut");
         return axios.post(PostEndpoint.POST_URL, formData);
     }
     //FIXME 

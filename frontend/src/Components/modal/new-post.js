@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './new-post.scss';
 import AxiosHelper from "../../Axios/axios";
 import ShortPost from "../modal/short-post";
 import LongPost from "../modal/long-post";
-import ReviewPost from "../modal/review-post";
 import { withFirebase } from "../../Firebase";
 
 
@@ -13,6 +12,7 @@ class NewPost extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      username: this.props.username,
       previousLongDraft: null,
       windowType: "main",
       currentPostType: 'main',
@@ -52,23 +52,23 @@ class NewPost extends React.Component {
           for (const pursuit of result.data.pursuits) {
             pursuitArray.push(pursuit.name);
           }
+        
           this.setState({
             pursuitArray: pursuitArray,
-            preferredPostType: result.data.preferredPostType
-          })
+            indexUserData: result.data
+          });
         });
   }
 
   retrieveDraft() {
     AxiosHelper.retrieveDraft(this.state.username).then(
       (previousDraft) => {
-        console.log(previousDraft);
         console.log(previousDraft.data);
         this.saveDraft(previousDraft.data);
       })
       .catch(error => {
         console.log(
-          "Error: " + error
+           error
         );
 
       })
@@ -92,7 +92,6 @@ class NewPost extends React.Component {
   }
 
   render() {
-    console.log(this.state.pursuits);
     let windowType = '';
     switch (this.state.windowType) {
       case ("main"):
@@ -116,7 +115,6 @@ class NewPost extends React.Component {
           </h4>
               <div className="single-button-container">
                 <button value="newLong" onClick={e => {
-                  console.log(this.state.previousLongDraft);
                   !!this.state.previousLongDraft ?
                     window.confirm("Starting a new Long Post will erase your saved draft. Continue anyway?") &&
                     this.handleClick(e, e.target.value) : this.handleClick(e, e.target.value);
@@ -149,30 +147,29 @@ class NewPost extends React.Component {
         );
         break;
       case ("newLong"):
-        windowType = <LongPost
-          handleClick={this.handleClick}
-          disablePost={this.handleDisablePost}
-          username={this.state.indexUserData.username}
-          pursuits={this.state.pursuits}
-          preferredPostType={this.state.indexUserData.preferredPostType}
-          handlePreferredPostTypeChange={this.onPreferredPostTypeChange}
-          previewTitle=""
+        windowType =
+          (<LongPost
+            handleClick={this.handleClick}
+            disablePost={this.handleDisablePost}
+            username={this.state.indexUserData.username}
+            pursuits={this.state.pursuits}
+            preferredPostType={this.state.indexUserData.preferredPostType}
+            handlePreferredPostTypeChange={this.onPreferredPostTypeChange}
+            previewTitle=""
 
-
-        />;
+          />);
         break;
       case ("oldLong"):
-        windowType = <LongPost
+        const previewTitle = this.state.indexUserData.draft ? this.state.indexUserData.draft.previewTitle : "";
+        windowType = (<LongPost
           content={this.state.previousLongDraft}
           handleClick={this.handleClick}
           disablePost={this.handleDisablePost}
           username={this.state.indexUserData.username}
           preferredPostType={this.state.indexUserData.preferredPostType}
           handlePreferredPostTypeChange={this.onPreferredPostTypeChange}
-          previewTitle={this.state.indexUserData.draft.previewTitle}
-
-
-        />;
+          previewTitle={previewTitle}
+        />);
         break;
       // case ("review"):
       //   windowType = <ReviewPost

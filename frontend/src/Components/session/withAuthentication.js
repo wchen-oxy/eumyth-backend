@@ -16,8 +16,6 @@ const withAuthentication = Component => {
       this.setState({isLoading : true});
       this.listener = this.props.firebase.auth.onAuthStateChanged(
         authUser => {
-          console.log("Authentication Changed");
-          
           authUser
             ? this.setState({ authUser, isLoading: false })
             : this.setState({ authUser: null, isLoading: false });

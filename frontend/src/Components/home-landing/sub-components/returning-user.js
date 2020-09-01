@@ -5,7 +5,7 @@ import AxiosHelper from '../../../Axios/axios';
 import './returning-user.scss';
 import RecentWorkObject from "./recent-work-object";
 import FeedObject from "./feed-object";
-import Axios from 'axios';
+
 class ReturningUserPage extends React.Component {
     _isMounted = false;
     constructor(props) {
@@ -23,10 +23,14 @@ class ReturningUserPage extends React.Component {
 
     componentDidMount() {
         this._isMounted = true;
-
-        if (this._isMounted) this.props.firebase.returnName().then((result) => { if (result) this.setState({ firstName: result.firstName, lastName: result.lastName }) });
+        if (this._isMounted) this.props.firebase.returnName().then((result) => {
+            if (result) this.setState({ firstName: result.firstName, lastName: result.lastName });
+        });
         if (this._isMounted && this.state.username) {
-            AxiosHelper.returnIndexUser(this.state.username).then((result) => this.setState({ indexUserData: result.data }));
+            AxiosHelper.returnIndexUser(this.state.username)
+                .then(
+                    (result) => this.setState({ indexUserData: result.data })
+                );
         }
     }
 
@@ -46,22 +50,18 @@ class ReturningUserPage extends React.Component {
     }
 
     render() {
-        console.log("return user");
-
         let pursuitInfoArray = [];
         let totalMin = 0;
         if (this.state.indexUserData) {
-
-            console.log(this.state.indexUserData);
             for (const pursuit of this.state.indexUserData.pursuits) {
                 totalMin += pursuit.total_min;
                 const hobbyTableData = (
-                    <tr>
-                        <th>{pursuit.name}</th>
-                        <td>{pursuit.experience_level}</td>
-                        <td>{pursuit.total_min}</td>
-                        <td>{pursuit.num_posts}</td>
-                        <td>{pursuit.num_milestones}</td>
+                    <tr key={pursuit.name}>
+                        <th key={pursuit.name + " name"}>{pursuit.name}</th>
+                        <td key={pursuit.name + " experience"}>{pursuit.experience_level}</td>
+                        <td key={pursuit.total_min + "minutes"}>{pursuit.total_min}</td>
+                        <td key={pursuit.num_posts + "posts"}>{pursuit.num_posts}</td>
+                        <td key={pursuit.num_milestones + " milestones"}>{pursuit.num_milestones}</td>
                     </tr>);
                 pursuitInfoArray.push(hobbyTableData);
             }
@@ -72,7 +72,7 @@ class ReturningUserPage extends React.Component {
                 <div className="home-row-container" id="home-profile-row">
                     <div className="home-profile-column-container">
 
-                        <img className="home-profile-photo" src="https://i.redd.it/73j1cgr028u21.jpg"></img>
+                        <img alt="" className="home-profile-photo" src="https://i.redd.it/73j1cgr028u21.jpg"></img>
 
                         <div className="home-profile-text">
                             <p>{this.state.username}</p>
@@ -91,15 +91,16 @@ class ReturningUserPage extends React.Component {
                     </div>
                     <div className="home-profile-column-container">
                         <table id="profile-info-table">
-                            <tr>
-                                <th></th>
-                                <th>Level</th>
-                                <th>Hours Spent</th>
-                                <th>Posts</th>
-                                <th>Milestones</th>
-                            </tr>
-                            {pursuitInfoArray}
-
+                            <tbody>
+                                <tr>
+                                    <th></th>
+                                    <th>Level</th>
+                                    <th>Hours Spent</th>
+                                    <th>Posts</th>
+                                    <th>Milestones</th>
+                                </tr>
+                                {pursuitInfoArray}
+                            </tbody>
                         </table>
                     </div>
 

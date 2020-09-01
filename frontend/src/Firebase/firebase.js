@@ -1,6 +1,4 @@
 import firebase from 'firebase';
-import axios from 'axios';
-
 
 const firebaseConfig = {
   apiKey: "AIzaSyC9sBHK-evjecmuWQsQHoE-iSJmHUcIBcE",
@@ -60,7 +58,7 @@ class Firebase {
       .catch((error) => {
         var errorCode = error.code;
         var errorMessage = error.message;
-        if (errorMessage) alert(errorMessage);
+        if (errorMessage) alert(errorCode + " " + errorMessage);
       }
       );
   }

@@ -4,13 +4,6 @@ import { AuthUserContext } from "../../Components/session/"
 import { withFirebase } from "../../Firebase";
 import { Link } from "react-router-dom";
 import NewPost from "../modal/new-post";
-import ShortPost from "../modal/short-post";
-import LongPost from "../modal/long-post";
-import ReviewPost from "../modal/review-post";
-import Axios from "../../Axios/axios";
-
-// import NewPost from "../modal/new-post";
-
 const Navigation = () => (
 
   <AuthUserContext.Consumer>
@@ -43,31 +36,8 @@ class NavigationAuth extends React.Component {
     this.modalRef = React.createRef();
     this.closeModal = this.closeModal.bind(this);
     this.openModal = this.openModal.bind(this);
-    // this.handleDisablePost = this.handleDisablePost.bind(this);
-    // this.handleChange = this.handleChange.bind(this);
-    // this.handleSubmitPost = this.handleSubmitPost.bind(this);
-    // this.handleClick = this.handleClick.bind(this);
-
 
   }
-  // componentDidMount() {
-  //   this._isMounted = true;
-  //   if (this._isMounted && this.state.username) {
-  //     Axios.retrieveDraft(this.state.username).then((previousDraft) => {
-  //       this.setState({ previousLongDraft: previousDraft.data });
-  //     })
-  //       .catch(error => {
-  //         console.log(
-  //           "Error: " + error
-  //         );
-
-  //       })
-  //   };
-  // }
-  // componentWillUnmount() {
-  //   this._isMounted = false;
-  // }
-
   openModal() {
     this.modalRef.current.style.display = "block";
     document.body.style.overflow = "hidden";
@@ -79,53 +49,7 @@ class NavigationAuth extends React.Component {
     this.setState({ window: 'main' });
   }
 
-
-
-  // handleClick(e, value, disableBoolean) {
-  //   e.preventDefault();
-  //   if (value === 'short' || value === 'long') this.setState({currentPostType : value});
-  //   this.setState({ window: value, postDisabled: disableBoolean });
-  // }
-
-
-  // handleSubmitPost(e) {
-  //   alert("PRESSED SUBMIT");
-  // }
-  // handleDisablePost(disabled) {
-  //   this.setState({ postDisabled: disabled });
-  // }
   render() {
-    // let window = '';
-    // switch (this.state.window) {
-    //   case ("main"):
-    //     window = (<NewPost setWindow={this.handleClick} />);
-    //     break;
-    //   case ("short"):
-    //     window = (<ShortPost
-    //       username={this.state.username}
-    //       disablePost={this.handleDisablePost}
-    //       setImageArray={this.setImageArray}
-    //       // handleChange={this.handleChange}
-    //       handleClick={this.handleClick}
-    //     />);
-    //     break;
-    //   case ("long"):
-    //     window = <LongPost
-    //       content={this.state.previousLongDraft}
-    //       disablePost={this.handleDisablePost}
-    //     />;
-    //     break;
-    // case ("review"):
-    //   window = <ReviewPost
-    //     content={this.state.previousLongDraft}
-    //     disablePost={this.handleDisablePost}
-    //     handleClick={this.handleClick}
-    //     currentPostType={this.state.currentPostType}
-    //   />
-    // break;
-    // default:
-    //   throw Error("No window options matched :(");
-    // }
     return (
       <>
         <nav className="welcome-navbar-container">
@@ -142,7 +66,7 @@ class NavigationAuth extends React.Component {
         <div className="modal" ref={this.modalRef}>
           <div className="overlay"></div>
           <span className="close" onClick={(() => this.closeModal())}>X</span>
-          <NewPost />
+          <NewPost username={this.state.username} />
         </div>
       </>
     );

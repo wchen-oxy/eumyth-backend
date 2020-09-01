@@ -21,6 +21,16 @@ router.get('/', (req, res) => {
       res.status(400).json(err))
 })
 
+router.get('/pursuits', (req, res) => {
+  const username = req.query.username;
+  IndexUser.Model.findOne({ username: username }).then(
+    result =>
+      res.status(200).json(result.pursuits)
+  )
+    .catch(err =>
+      res.status(400).json(err))
+})
+
 // router.post('/available', (req, res) => {
 //   const username = req.body.username;
 //   console.log(req.body);

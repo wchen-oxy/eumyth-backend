@@ -1,10 +1,7 @@
 import React from 'react';
 import DanteEditor from 'Dante2';
-import { convertToHTML } from 'draft-convert';
 import { ImageBlockConfig } from "Dante2/package/es/components/blocks/image.js";
-import { VideoBlockConfig } from "Dante2/package/es/components/blocks/video";
 import { PlaceholderBlockConfig } from "Dante2/package/es/components/blocks/placeholder";
-import { EmbedBlockConfig } from "Dante2/package/es/components/blocks/embed";
 import { withFirebase } from '../../Firebase';
 import './long-editor.scss';
 import { IMAGE_URL, DRAFT_URL } from "../constants/index";
@@ -16,6 +13,9 @@ class LongEditor extends React.Component {
         this.state = {
             username: this.props.username,
         }
+    }
+    componentDidMount() {
+        console.log("Mounted now");
     }
 
     render() {
@@ -57,9 +57,7 @@ class LongEditor extends React.Component {
                                 },
                             },
                         }),
-                        // VideoBlockConfig(),
                         PlaceholderBlockConfig(),
-                        // EmbedBlockConfig(),
 
                     ]}
                     data_storage={{
