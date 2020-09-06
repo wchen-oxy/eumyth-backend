@@ -1,18 +1,22 @@
 import React, { useState } from 'react';
 import AxiosHelper from '../../Axios/axios';
+import TextareaAutosize from 'react-textarea-autosize';
 import './short-post.scss';
 
 const ReviewPost = (props) => {
     const [date, setDate] = useState();
-    const [min, setMin] = useState();
+    const [minDuration, setMinDuration] = useState();
     const [milestone, setMilestone] = useState(false);
     const [previewTitle, setPreviewTitle] = useState(props.previewTitle);
     const [postPrivacyType, setPostPrivacyType] = useState("public-feed")
+    const [postPursuitType, setPursuitType] = useState(null)
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(false);
     const [coverPhoto, setCover] = useState(null);
-    
+
     const handlePostSubmit = (e, postType) => {
         e.preventDefault();
-        console.log(props.imageArray);
+        setLoading(true);
         AxiosHelper.createPost(
             props.username,
             postType === "short" ? "short" : "long",
@@ -20,11 +24,32 @@ const ReviewPost = (props) => {
             props.imageArray,
             coverPhoto,
             date,
-            min,
+            minDuration,
             milestone,
             previewTitle,
-            postPrivacyType
+            postPrivacyType,
+            postPursuitType
+        ).then(
+            (result) =>
+            {
+                 //FIXME add in the listener and response for the new post
+                result.status === 201 ? handleSuccess() : handleError();
+            }
         );
+    }
+
+    const handleSuccess = () => {
+        props.closeModal();
+    }
+
+    const handleError = () => {
+        setLoading(false);
+        setError(true);
+
+    }
+
+    const setPursuitTypes = (type) => {
+        setPursuitType(type);
     }
 
     const setPostPrivacyTypes = (type) => {
@@ -33,21 +58,38 @@ const ReviewPost = (props) => {
     }
 
     const handlePreviewTitleChange = (previewTitle) => {
-        setPreviewTitle(previewTitle);        
+        setPreviewTitle(previewTitle);
     }
+
+
+    let pursuitSelects = [];
+    pursuitSelects.push(
+        <option value={null}></option>
+    )
+    for (const pursuit of props.pursuits) {
+        pursuitSelects.push(
+            <option key={pursuit} value={pursuit}>{pursuit}</option>
+        );
+    }
+
 
     const metaData = (
         <div className="vertical-grouping">
             <label>Preview Title</label>
-            <input type="text" onChange={(e) => handlePreviewTitleChange(e.target.value)}></input>
+            <TextareaAutosize name="title" id='review-post-text' placeholder='Create an Optional Preview Title Text' maxRows={2} onChange={(e) => handlePreviewTitleChange(e.target.value)} maxLength={140} />
+            {/* <input type="text" value={props.previewTitle} onChange={(e) => handlePreviewTitleChange(e.target.value)}></input> */}
             <label>Cover</label>
             <input type="file" onChange={(e) => {
                 setCover(e.target.files[0]);
-                }}></input>
+            }}></input>
             <label>Date</label>
             <input type="date" onChange={(e) => setDate(e.target.value)}></input>
+            <label>Pursuit</label>
+            <select name="cars" id="cars" onChange={(e) => setPursuitTypes(e.target.value)}>
+                {pursuitSelects}
+            </select>
             <label>Total Minutes</label>
-            <input type="number" onChange={(e) => setMin(e.target.value)}></input>
+            <input type="number" onChange={(e) => setMinDuration(e.target.value)}></input>
             <label>Is Milestone</label>
             <input type="checkbox" onClick={() => setMilestone(!milestone)}></input>
         </div>
@@ -56,13 +98,15 @@ const ReviewPost = (props) => {
         <div className="vertical-grouping">
             <select name="cars" id="cars" value={props.preferredPostType ? props.preferredPostType : "public-feed"} onChange={(e) => setPostPrivacyTypes(e.target.value)}>
                 <option value="private">make post private on your page</option>
-                <option value="personal-page" defaultValue>make post public on your page:</option>
-                <option value="public-feed">Post to your feed and page</option>
+                <option value="personal-page" >make post public on your page:</option>
+                <option value="public-feed" >Post to your feed and page</option>
             </select>
         </div>);
-   
+
     const returnToShortButton = (<button id="toggle-button" value="initial" onClick={e => props.onClick(e, e.target.value)}>Return</button>);
     const returnToLongButton = (<button id="toggle-button" value="initial" onClick={e => props.setWindow(e.target.value)}>Return</button>);
+
+    
     return (
         <div className="short-post-container" id="short-post-container">
             <div>
@@ -79,6 +123,17 @@ const ReviewPost = (props) => {
                 {postData}
                 <button onClick={(e) => handlePostSubmit(e, props.postType)}>Post!</button>
             </div>
+
+            {
+                error ? 
+                <p>An Error Occured. Please try again. </p>: <></>
+            }
+            
+            {loading ? 
+            <div className="short-post-container" id="modal-overlay">
+                <p> Loading...</p>
+            </div> : 
+            <></>}
         </div>
     );
 }

@@ -14,7 +14,7 @@ class ShortPost extends React.Component {
       postDescription: '',
       postDisabled: true,
       window: 'initial',
-      previewTitle: ''
+      // previewTitle: ''
     };
 
     this.setSelectedFiles = this.setSelectedFiles.bind(this);
@@ -55,14 +55,14 @@ class ShortPost extends React.Component {
     const text = e.target.value;
     if (e.target.name === "title") {
       console.log(text);
-      return this.setState({title : text});}
-
-    console.log(text.length);
-    this.setState((state) => ({ 
-      postDescription: text,
-      postDisabled: (text.length === 0) && (state.validFiles.length === 0 || state.unsupportedFiles.length > 0 )
-     })
-     )
+      this.setState({previewTitle : text});}
+      else {
+        this.setState((state) => ({ 
+          postDescription: text,
+          postDisabled: (text.length === 0) && (state.validFiles.length === 0 || state.unsupportedFiles.length > 0 )
+         }));
+      }   
+     
   }
 
   handleUnsupportedFileChange(file) {
@@ -121,7 +121,7 @@ class ShortPost extends React.Component {
             validFiles={this.state.validFiles}
             unsupportedFiles={this.state.unsupportedFiles}
             setImageArray={this.setImageArray}
-            title={this.state.title}
+            // title={this.state.title}
             text={this.state.postDescription}
             onTextChange={this.handleTextChange}
             onSelectedFileChange={this.handleSelectedFileChange}
@@ -135,10 +135,10 @@ class ShortPost extends React.Component {
       );
     }
     else{
-
       return (
        <ReviewPost 
        previewTitle = {this.state.previewTitle}
+       closeModal={this.props.closeModal}
        postType={"short"} 
        onClick={this.handleClick} 
        imageArray={this.state.imageArray} 

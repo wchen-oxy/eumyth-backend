@@ -1,18 +1,30 @@
 @import "../../main.scss";
 
-.welcome-navbar-container {
+nav {
     background-color: $primary-color;
-    // min-width: 100%;
     display: flex;
-    padding-left: 1vh;
-    padding-right: 1vh;
     justify-content: space-between;
+    align-items: center;
+    height: 50px;
+
+    button,
+    a {
+        font-size: $primary-medium-font-size;
+        padding: 0.5vh;
+    }
+
+    button {
+        border: none;
+        background-color: transparent;
+        cursor: pointer;
+    }
+    a {
+        text-decoration: none;
+    }
 }
 
-.navbar-item {
-    font-size: $primary-medium-font-size;
-    padding-left: 1vh;
-    padding-right: 1vh;
+#hero-logo-link{
+    font-size: $primary-large-font-size;
 }
 
 #settings-link {

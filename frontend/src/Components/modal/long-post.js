@@ -9,7 +9,7 @@ import ReviewPost from "./review-post";
 const LongPost = (props) => {
   const [window, setWindow] = useState("initial");
   const [hasContent, setHasContent] = useState(props.content !== null);
-  const [previewTitle, setPreviewTitle] = useState(props.previewTitle);
+  // const [previewTitle, setPreviewTitle] = useState(props.previewTitle);
   if (window === "initial")
     return (
       <div className="long-post-container" id="post-modal">
@@ -30,7 +30,7 @@ const LongPost = (props) => {
           content={props.content}
           hasContent={hasContent}
           setHasContent={setHasContent}
-          handlePreviewTitleChange={setPreviewTitle}
+          // handlePreviewTitleChange={setPreviewTitle}
         />
 
       </div>
@@ -38,7 +38,8 @@ const LongPost = (props) => {
   else {
     return (
       <ReviewPost 
-        previewTitle={previewTitle}
+        // previewTitle={previewTitle}
+        closeModal={props.closeModal}
         postType="long" 
         setWindow={setWindow} 
         username={props.username}

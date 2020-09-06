@@ -36,7 +36,7 @@ class InitialCustomizationPage extends React.Component {
                     (response) => {
                         console.log(response);
                         console.log(response.data);
-                        response.data.status === 200 ? this.setState({ isTaken: true }) : this.setState({ isTaken: false });
+                        response.status === 200 ? this.setState({ isTaken: true }) : this.setState({ isTaken: false });
                     }
                 );
 
@@ -59,10 +59,10 @@ class InitialCustomizationPage extends React.Component {
                     <label>{pursuit.value}</label>
                     <select name={pursuit.value} id="experience" onChange={this.handlePursuitExperienceChange}>
                         <option value=""></option>
-                        <option value="beginner">Beginner</option>
-                        <option value="familiar">Familiar</option>
-                        <option value="experienced">Experienced</option>
-                        <option value="expert">Expert</option>
+                        <option value="Beginner">Beginner</option>
+                        <option value="Familiar">Familiar</option>
+                        <option value="Experienced">Experienced</option>
+                        <option value="Expert">Expert</option>
                     </select>
                 </span>
             );
@@ -106,7 +106,7 @@ class InitialCustomizationPage extends React.Component {
     }
 
     render() {
-        console.log(this.state.username);
+        console.log(this.state.isTaken);
         const available = this.state.username !== '' && !this.state.isTaken ? "Available" : "Taken";
         const { username, firstName, lastName, pursuits } = this.state;
         let isInvalid =

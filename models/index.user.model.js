@@ -21,13 +21,13 @@ const indexUserSchema = new Schema(
             trim: true
         },
 
-        preferredPostType: {
+        preferred_post_type: {
             type: String,
-            required: true,
+            required: false,
         },
         draft: Post.Schema,
         pursuits: [IndexPursuit.Schema],
-        latestPosts: [Post.Schema]
+        recent_posts: [Post.Schema]
     }
 );
 

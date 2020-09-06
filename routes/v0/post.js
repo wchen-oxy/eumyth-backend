@@ -14,6 +14,16 @@ const AWS = require('aws-sdk');
 const AwsConstants = require('../../constants/aws');
 const multerS3 = require('multer-s3');
 
+const setPusuitAttributes = (isMilestone, pursuit, minDuration) => {
+  if (isMilestone) { pursuit.num_milestones = Number(pursuit.num_milestones ) + 1;}
+  console.log(pursuit.total_min);
+  pursuit.total_min = Number(pursuit.total_min) + minDuration;
+  console.log(pursuit.total_min);
+  pursuit.num_posts = Number(pursuit.num_posts) + 1;
+  return pursuit;
+}
+
+
 
 const s3 = new AWS.S3({
   accessKeyId: AwsConstants.ID,
@@ -27,7 +37,7 @@ var upload = multer({
     bucket: AwsConstants.BUCKET_NAME,
     contentType: multerS3.AUTO_CONTENT_TYPE,
     metadata: function (req, file, cb) {
-      cb(null, {fieldName: file.fieldname});
+      cb(null, { fieldName: file.fieldname });
     },
     key: function (req, file, cb) {
       cb(null, "images" + "/" + Date.now().toString() + Math.floor(Math.random() * Math.floor(2000)))
@@ -99,83 +109,98 @@ var upload = multer({
 
 const getImageUrls = (array) => {
   let imageArray = [];
-  for (const imageFile of array){
+  for (const imageFile of array) {
+    console.log(imageFile.location)
     imageArray.push(imageFile.location);
   }
   return imageArray;
 }
 
-router.route('/').post(upload.fields([{name: "images"}, {name: "coverPhoto", maxCount: 1}]), (req, res) => {
- 
-  console.log(req.files);
-  console.log(req.file);
-  console.log(req.body);
-  const username = req.body.username;
-  const title = !!req.body.title ? req.body.title : null;
-  const private = !!req.body.private ? req.body.private : null;
-  const coverPhotoURL = !!req.file ? req.file.cover.location : null;
-  const pursuitCategory = !!req.body.pursuitCategory ? req.body.pursuitCategory  : null;
-  const minDuration = !!req.body.minDuration ? req.body.minDuration : null;
+
+router.route('/').post(upload.fields([{ name: "images" }, { name: "coverPhoto", maxCount: 1 }]), (req, res) => {
+
   const postType = !!req.body.postType ? req.body.postType : null;
+  const username = req.body.username;
+  const title = !!req.body.previewTitle ? req.body.previewTitle : null;
+  const postPrivacyType = !!req.body.postPrivacyType ? req.body.postPrivacyType : null;
+  const pursuitCategory = !!req.body.pursuitCategory ? req.body.pursuitCategory : null;
+  const date = !!req.body.date ? req.body.date : null;
+  const textData = !!req.body.textData ? req.body.textData : null;
+  const minDuration = !!req.body.minDuration ? parseInt(req.body.minDuration) : null;
   const isMilestone = !!req.body.isMilestone ? req.body.isMilestone : null;
-  const imageData = !!req.files ? getImageUrls(req.files.images) : [];
+  const coverPhotoURL = req.files.coverPhoto ? req.files.coverPhoto[0].location : null;
+  const imageData = req.files.images ? getImageUrls(req.files.images) : [];
 
   let post = null;
-  let resolveAuthorId = IndexUser.Model.findOne({ username: username }).then(
-    indexUser => {
-      return indexUser.user_profile_ref;}
+  let indexUser = null;
+  const resolveIndexUser = IndexUser.Model.findOne({ username: username }).then(
+    indexUserResult => {
+      indexUser = indexUserResult;
+      return indexUserResult;
+    }
   ).catch(
     err => {
       console.log(err);
       res.status(500).send(err);
     }
   );
-  console.log("Here");
 
-  let resolveNewPost = resolveAuthorId.then( resolvedAuthorID => {
-  switch (postType) {
-    case ("short"):
-      post = new Post.Model({
-        title: title,
-        private: private,
-        author_id: resolvedAuthorID,
-        pursuit_category: pursuitCategory,
-        cover_photo_url: coverPhotoURL,
-        post_format: postType,
-        is_milestone: isMilestone,
-        text_data: req.body.textData,
-        image_data: imageData,
-        min_duration: minDuration
-      });
-      break;
-    case ("long"):
-      post = new Post.Model({
-        title: title,
-        private: private,
-        author_id: resolvedAuthorID,
-        pursuit_category: pursuitCategory,
-        cover_photo_url: coverPhotoURL,
-        post_format: postType,
-        is_milestone: isMilestone,
-        text_data: req.body.textData,
-        min_duration: minDuration
-      });
-      break;
-    default:
-      res.status(500).send();
+  let resolveNewPost = resolveIndexUser.then(resolvedIndexUser => {
+    switch (postType) {
+      case ("short"):
+        post = new Post.Model({
+          preview_title: title,
+          private: postPrivacyType,
+          date: date,
+          author_id: resolvedIndexUser.user_profile_ref,
+          pursuit_category: pursuitCategory,
+          cover_photo_url: coverPhotoURL,
+          post_format: postType,
+          is_milestone: isMilestone,
+          text_data: textData,
+          image_data: imageData,
+          min_duration: minDuration
+        });
+        break;
+      case ("long"):
+        post = new Post.Model({
+          preview_title: title,
+          private: postPrivacyType,
+          author_id: resolvedIndexUser.user_profile_ref,
+          pursuit_category: pursuitCategory,
+          cover_photo_url: coverPhotoURL,
+          post_format: postType,
+          is_milestone: isMilestone,
+          text_data: req.body.textData,
+          min_duration: minDuration
+        });
+        break;
+      default:
+        res.status(500).send();
+    }
+
+    indexUser.recent_posts.push(post);
+    if (indexUser.preferred_post_type !== postPrivacyType) {
+      indexUser.preferred_post_type = postPrivacyType;
+    }
+    if (minDuration) {
+      for (const pursuit of indexUser.pursuits) {
+        if (pursuit.name === pursuitCategory) {
+          setPusuitAttributes(isMilestone, pursuit, minDuration);
+          break;
+        }
+      }
+    }
+
+    return resolvedIndexUser.user_profile_ref;
   }
-
-  return resolvedAuthorID;
-}
-);
-
+  );
 
   //save new post
   let resolveUser = resolveNewPost.then(
-    (result) => 
-     {
-       console.log(result);
-      return User.Model.findById(result);}
+    (result) => {
+      return User.Model.findById(result);
+    }
   );
   resolveUser.then(
     resolvedUser => {
@@ -186,9 +211,7 @@ router.route('/').post(upload.fields([{name: "images"}, {name: "coverPhoto", max
       if (minDuration) {
         for (const pursuit of user.pursuits) {
           if (pursuit.name === pursuitCategory) {
-            if (isMilestone) pursuit.num_milestones += 1;
-            pursuit.total_min += minDuration;
-            pursuit.num_posts += 1;
+            setPusuitAttributes(isMilestone, pursuit, minDuration);
             break;
           }
         }
@@ -196,22 +219,47 @@ router.route('/').post(upload.fields([{name: "images"}, {name: "coverPhoto", max
       return user;
     }
   ).
-  then( user => 
-    {
+
+
+    // resolveIndexUser.then(
+    //   (resolvedIndexUser) => {
+    //     const indexUser = resolvedIndexUser;
+    //     indexUser.recent_posts.push(post);
+    //     if (indexUser.preferred_post_type !== postPrivacyType){
+    //       indexUser.preferred_post_type = postPrivacyType;
+    //     }
+    //     if (minDuration) {
+    //       for (const pursuit of indexUser.pursuits) {
+    //         console.log(pursuit);
+    //         if (pursuit.name === pursuitCategory) {
+    //           if (isMilestone) pursuit.num_milestones += 1;
+    //           pursuit.total_min += minDuration;
+    //           pursuit.num_posts += 1;
+    //           break;
+    //         }
+    //       }
+    //     }
+    //     return resolvedIndexUser;
+    //   }
+    // )
+
+
+    then(user => {
+      indexUser.save().catch(err => res.status(500).json('Error: ' + err));
       user.save().catch(err => res.status(500).json('Error: ' + err));
       post.save().catch(err => res.status(500).json('Error: ' + err));
     }
-    
+
     )
-  .then(
-    () =>  res.status(201).send()
-  ).
-  catch(
-    (err) => {
-      console.log(err);
-      res.status(500).json(err);
-    }
-  )
+    .then(
+      () => res.status(201).send()
+    ).
+    catch(
+      (err) => {
+        console.log(err);
+        res.status(500).json(err);
+      }
+    )
 
 })
 

@@ -11,6 +11,7 @@ export default class AxiosHelper {
     static testString() {
         console.log("TEST SUCCESS");
     }
+
     static checkUsernameAvailable(username) {
         console.log(IndexUserEndpoint.CHECK_USERNAME_URL);
         return axios.get(IndexUserEndpoint.CHECK_USERNAME_URL, { params: { username: username } });
@@ -40,6 +41,10 @@ export default class AxiosHelper {
         })
     }
 
+    static returnUser(username) {
+        return axios.get(UserEndpoint.USER_URL, { params: { username: username } });
+    }
+
     // static returnIndexUsername(uid) {
     //     return axios.post(UserEndpoint.USERNAME_URL, {
     //         uid: uid
@@ -50,19 +55,19 @@ export default class AxiosHelper {
     //     return axios.post(PostEndpoint.IMAGE_POST, formData);
     // }
 
-    static createPost(username, postType, textData, imageArray, coverPhoto, date, min, milestone, title, postPrivacyType, pursuitCategory) {
+    static createPost(username, postType, textData, imageArray, coverPhoto, date, minDuration, isMilestone, title, postPrivacyType, pursuitCategory) {
         let formData = new FormData();
         console.log(imageArray);
         console.log(coverPhoto);
         formData.append("postType", postType);
         formData.append("username", username);
-        console.log(min);
-        if (title) formData.append("title", title);
+        console.log(minDuration);
+        if (title) formData.append("previewTitle", title);
         if (postPrivacyType) formData.append("postPrivacyType", postPrivacyType);
         if (pursuitCategory) formData.append("pursuitCategory", pursuitCategory)
         if (date) formData.append("date", date);
-        if (min) formData.append("min", min);
-        if (milestone) formData.append("milestone", milestone);
+        if (minDuration) formData.append("minDuration", minDuration);
+        if (isMilestone) formData.append("isMilestone", isMilestone);
         if (textData) formData.append("textData", textData);
         if (coverPhoto) formData.append("coverPhoto", coverPhoto);
         if (imageArray && imageArray.length > 0) {

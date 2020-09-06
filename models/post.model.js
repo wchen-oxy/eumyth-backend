@@ -3,15 +3,19 @@ const Comment = require("./comment.model");
 const Schema = mongoose.Schema;
 
 const postSchema = new Schema({
-  previewTitle: {
+  preview_title: {
     type: String,
     required: false,
     trim: true
   },
 
-  private: {
+  post_privacy_type: {
     type: Boolean,
     required: false,
+  },
+
+  date: {
+    type: Date
   },
 
   author_id: {

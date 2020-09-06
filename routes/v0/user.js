@@ -8,6 +8,23 @@ var firebase = require('firebase');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+router.get('/', (req, res) => {
+  const username = req.query.username;
+  User.Model.findOne({ username: username }).then(
+    user => {
+      if (user) res.status(200).json(user);
+      else {
+        res.status(204);
+      }
+    }
+  ).catch(
+    err => {
+      console.log(err);
+      res.status(500).json(err);
+    }
+  )
+}
+)
 
 //create user and indexUser
 router.post('/', (req, res) => {
@@ -56,13 +73,12 @@ router.post('/', (req, res) => {
     pursuits: indexPursuitsHolder
   });
 
-    const resovlvedUser = newUser.save();
-    const resolvedIndexUser = resovlvedUser.then(() => newIndexUser.save());
-    resolvedIndexUser.then(() => res.status(201).json("Success!")).catch(err => 
-      {
-        console.log(err);
-      res.status(500).json(err);
-    });
+  const resovlvedUser = newUser.save();
+  const resolvedIndexUser = resovlvedUser.then(() => newIndexUser.save());
+  resolvedIndexUser.then(() => res.status(201).json("Success!")).catch(err => {
+    console.log(err);
+    res.status(500).json(err);
+  });
   // newUser.save().then(() => console.log("Saved 1")).catch(err => res.status(500).json(err));
   // console.log("123123");
   // newIndexUser.save().then(() => console.log("Saved 2")).catch(err => res.status(500).json(err));

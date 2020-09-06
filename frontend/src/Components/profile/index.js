@@ -6,18 +6,19 @@ import AxiosHelper from '../../Axios/axios';
 import NoMatch from '../no-match';
 
 
-class PursuitProfile extends React.Component {
+class ProfilePage extends React.Component {
     _isMounted = false;
-
     constructor(props) {
         super(props);
         this.state = {
             username: this.props.match.params.username,
             private: false,
+            user: null,
             pursuits: [],
             fail: false
         }
     }
+
     //fixme add catch for no found anything
     componentDidMount() {
         this._isMounted = true;
@@ -33,7 +34,19 @@ class PursuitProfile extends React.Component {
                     }
                 }
             );
-
+        AxiosHelper.returnUser(this.state.username)
+        .then(
+            result => {
+                console.log("User DAta");
+                console.log(result);
+                if (!result.data) this.setState({ fail: true });
+                else if (this._isMounted) {
+                    this.setState({
+                        user: result.data
+                    })
+                }
+            }
+        );
     }
 
     componentWillUnmount() {
@@ -62,10 +75,12 @@ class PursuitProfile extends React.Component {
                 <div id="personal-profile-header">
                     <div id="temp-cover">
                     </div>
-                    <div id="personal-profile-photo">
-                    </div>
+                   
                 </div>
                 <div id="personal-profile-intro-container">
+                    <div id="personal-profile-photo">
+                        <img></img>
+                    </div>
                     <div id="personal-profile-name-container">
                         <h4 id="personal-profile-name">William Chen</h4>
                     </div>
@@ -74,11 +89,11 @@ class PursuitProfile extends React.Component {
                     </div>
 
                 </div>
-                <div id="pursuit-selection-container">
+                {/* <div id="pursuit-selection-container">
                     {pursuitHolderArray}
                 </div>
                 <div id="event-container">
-                </div>
+                </div> */}
                 {/* <div className="pursuit-board-container">
                 {pursuitHolderArray.map((pursuit) => pursuit)}
             </div> */}
@@ -88,4 +103,4 @@ class PursuitProfile extends React.Component {
     }
 }
 
-export default withFirebase(PursuitProfile); 
+export default withFirebase(ProfilePage); 

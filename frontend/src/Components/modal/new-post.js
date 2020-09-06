@@ -48,27 +48,36 @@ class NewPost extends React.Component {
     AxiosHelper.returnIndexUser(this.state.username)
       .then(
         (result) => {
-          let pursuitArray = [];
-          for (const pursuit of result.data.pursuits) {
-            pursuitArray.push(pursuit.name);
+          console.log("ANY FUCKING RESPONSE?");
+          if (result.status === 200) {
+            let pursuitArray = [];
+            console.log(this.state.indexUserData);
+            for (const pursuit of result.data.pursuits) {
+              pursuitArray.push(pursuit.name);
+            }
+            this.setState({
+              pursuits: pursuitArray,
+              indexUserData: result.data
+            });
           }
-        
-          this.setState({
-            pursuitArray: pursuitArray,
-            indexUserData: result.data
-          });
-        });
+          else {
+            throw Error("didnt make it");
+          }
+        }).catch(
+          (result) => { console.log(result) }
+        );
   }
 
   retrieveDraft() {
     AxiosHelper.retrieveDraft(this.state.username).then(
       (previousDraft) => {
-        console.log(previousDraft.data);
-        this.saveDraft(previousDraft.data);
+        if (previousDraft) {
+          this.saveDraft(previousDraft.data);
+        }
       })
       .catch(error => {
         console.log(
-           error
+          error
         );
 
       })
@@ -135,7 +144,9 @@ class NewPost extends React.Component {
         windowType = (
           <>
             <ShortPost
-              username={this.state.indexUserData.username}
+              username={this.state.username}
+              closeModal={this.props.closeModal}
+              pursuits={this.state.pursuits}
               disablePost={this.handleDisablePost}
               setImageArray={this.setImageArray}
               handleClick={this.handleClick}
@@ -150,8 +161,9 @@ class NewPost extends React.Component {
         windowType =
           (<LongPost
             handleClick={this.handleClick}
+            closeModal={this.props.closeModal}
             disablePost={this.handleDisablePost}
-            username={this.state.indexUserData.username}
+            username={this.state.username}
             pursuits={this.state.pursuits}
             preferredPostType={this.state.indexUserData.preferredPostType}
             handlePreferredPostTypeChange={this.onPreferredPostTypeChange}
@@ -161,15 +173,18 @@ class NewPost extends React.Component {
         break;
       case ("oldLong"):
         const previewTitle = this.state.indexUserData.draft ? this.state.indexUserData.draft.previewTitle : "";
-        windowType = (<LongPost
-          content={this.state.previousLongDraft}
-          handleClick={this.handleClick}
-          disablePost={this.handleDisablePost}
-          username={this.state.indexUserData.username}
-          preferredPostType={this.state.indexUserData.preferredPostType}
-          handlePreferredPostTypeChange={this.onPreferredPostTypeChange}
-          previewTitle={previewTitle}
-        />);
+        windowType = (
+          <LongPost
+            content={this.state.previousLongDraft}
+            closeModal={this.props.closeModal}
+            pursuits={this.state.pursuits}
+            handleClick={this.handleClick}
+            disablePost={this.handleDisablePost}
+            username={this.state.username}
+            preferredPostType={this.state.indexUserData.preferredPostType}
+            handlePreferredPostTypeChange={this.onPreferredPostTypeChange}
+            previewTitle={previewTitle}
+          />);
         break;
       // case ("review"):
       //   windowType = <ReviewPost

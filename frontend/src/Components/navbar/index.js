@@ -15,22 +15,23 @@ const Navigation = () => (
 );
 
 const NavigationNonAuth = () => (
-  <div className="welcome-navbar-container">
+  <nav className="welcome-navbar-container">
     <div className="navbar-item-group">
       <Link to={"/"} className="navbar-item">interestHub</Link>
     </div>
-  </div>
+  </nav>
 );
 
 class NavigationAuth extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-
       username: this.props.firebase.returnUsername(),
       previousLongDraft: null,
       window: "main",
-      currentPostType: 'main'
+      currentPostType: 'main',
+      isInitialUser: true,
+      loading: true,
     };
 
     this.modalRef = React.createRef();
@@ -38,6 +39,17 @@ class NavigationAuth extends React.Component {
     this.openModal = this.openModal.bind(this);
 
   }
+  componentDidMount() {
+    this.props.firebase.checkIsExistingUser().then(
+      (result) => {
+        console.log(result);
+        if (result) {
+          this.setState({ loading: false })
+        }
+      }
+    )
+  }
+
   openModal() {
     this.modalRef.current.style.display = "block";
     document.body.style.overflow = "hidden";
@@ -49,25 +61,31 @@ class NavigationAuth extends React.Component {
     this.setState({ window: 'main' });
   }
 
+
   render() {
     return (
       <>
         <nav className="welcome-navbar-container">
-          <div className="navbar-item-group">
-            <Link to={"/"} className="navbar-item">interestHub</Link>
-            <Link to={"/new"} className="navbar-item">New Entry</Link>
-            <button onClick={this.openModal}>New Entry</button>
-          </div>
+          {this.state.loading ?
+            (<></>) :
+            (<div className="navbar-item-group">
+              <Link to={"/"} id="hero-logo-link" className="navbar-item">interestHub</Link>
+              <button className="navbar-item" onClick={this.openModal}>New Entry</button>
+            </div>)
+
+          }
           <div className="navbar-item-group no-select">
             <Link to={"/account"} className="navbar-item" id="settins-link">Settings</Link>
             <button onClick={this.props.firebase.doSignOut} className="navbar-item">SignOut</button>
           </div>
         </nav>
-        <div className="modal" ref={this.modalRef}>
-          <div className="overlay"></div>
-          <span className="close" onClick={(() => this.closeModal())}>X</span>
-          <NewPost username={this.state.username} />
-        </div>
+        {this.state.loading ?
+          (<></>) :
+          (<div className="modal" ref={this.modalRef}>
+            <div className="overlay"></div>
+            <span className="close" onClick={(() => this.closeModal())}>X</span>
+            <NewPost username={this.state.username} closeModal={this.closeModal} />
+          </div>)}
       </>
     );
   }

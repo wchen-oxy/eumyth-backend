@@ -2,9 +2,9 @@ import React from 'react';
 import { withAuthorization } from '../../session';
 import { withFirebase } from '../../../Firebase';
 import AxiosHelper from '../../../Axios/axios';
-import './returning-user.scss';
 import RecentWorkObject from "./recent-work-object";
 import FeedObject from "./feed-object";
+import './returning-user.scss';
 
 class ReturningUserPage extends React.Component {
     _isMounted = false;
@@ -66,6 +66,8 @@ class ReturningUserPage extends React.Component {
                 pursuitInfoArray.push(hobbyTableData);
             }
         }
+
+        //TEST 
         const recentWork = (<RecentWorkObject value="test" onRecentWorkClick={this.handleRecentWorkClick} />);
         return (
             <div id="home-page-container">
@@ -95,7 +97,7 @@ class ReturningUserPage extends React.Component {
                                 <tr>
                                     <th></th>
                                     <th>Level</th>
-                                    <th>Hours Spent</th>
+                                    <th>Minutes Spent</th>
                                     <th>Posts</th>
                                     <th>Milestones</th>
                                 </tr>
@@ -105,7 +107,7 @@ class ReturningUserPage extends React.Component {
                     </div>
 
                 </div>
-                <div className="home-row-container home-works-column-container">
+                <div className="home-works-column-container">
                     <div className="home-works-column-container">
                         <div className="home-works-row-container">
                             <h4>Recent Work</h4>

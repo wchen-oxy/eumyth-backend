@@ -1,0 +1,82 @@
+
+@import  '../../main.scss';
+
+#personal-profile-container{ 
+    display: flex;
+    min-height: 100vh;
+    width: 70vw;
+    flex-direction: column;
+    margin: auto;
+}
+
+#personal-profile-header{
+    height: 345px;
+    background-color: red;
+}
+
+#temp-cover{
+    height: 100%;
+    width: 100%;
+    background-color: blue;
+}
+
+#personal-profile-photo{
+    position: absolute;
+    background-color: grey;
+    margin-left: 70px;
+    margin-top: -170px;
+    width: 170px;
+    height: 170px;
+}
+
+#personal-profile-intro-container{
+        width: 100%;
+        height: 50px;
+        background-color: #1E51BC;
+        // z-index: -1;
+    }
+
+// .pursuit-board-container{
+// display: flex;
+// justify-content: center;
+// margin: 10% -5px;
+
+// }
+
+// #personal-profile-name-container{
+//     display: block;
+//     padding-left: 40vh;
+//     width: 130vh;
+//     background-color: brown;
+// }
+
+// #personal-profile-name{
+    
+//     font-size: $primary-medium-font-size;
+// }
+
+// #personal-profile-intro-container{
+//     display: relative;
+//     width: 130vh;
+//     height: 100px;
+//     background-color: #1E51BC;
+//     z-index: -1;
+// }
+
+// #personal-profile-description{
+//     display: block;
+// }
+
+// #pursuit-selection-container{
+//     width: 130vh;
+//     background-color: #2061E9;
+//     display: flex;
+//     flex-direction: row;
+//     justify-content: center;
+//     padding: 2vh;
+// }
+
+// #new-pursuit-container{
+//     background-color: grey;
+    
+// }
