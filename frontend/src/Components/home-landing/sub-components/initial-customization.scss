@@ -1,14 +1,35 @@
 
-
 .basic-info-container{
     display: flex;
     justify-content: center;
+    margin-bottom: 10vh;
+    input, label, span {
+        margin-bottom: 1vh;
+    }
+    span {
+        margin-top: 1vh;
+    }
 }
-
 
 .basic-info-form-container{
     display: flex;
     flex-direction: column;
     justify-content: center;
     width: 55%;
+}
+
+.info-container{
+    padding: 2vh;
+    display: flex;
+    flex-direction: column;
+}
+
+#temp-profile-photo-container{
+    height: 250px;
+    width: 250px;
+}
+
+#experience-select{
+    display: flex;
+ 
 }

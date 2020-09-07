@@ -17,8 +17,8 @@ export default class AxiosHelper {
         return axios.get(IndexUserEndpoint.CHECK_USERNAME_URL, { params: { username: username } });
     }
 
-    static createUserProfile(username, pursuits) {
-        return axios.post(UserEndpoint.USER_URL, { username: username, pursuits: pursuits });
+    static createUserProfile(username, pursuits, fullImage, croppedImage) {
+        return axios.post(UserEndpoint.USER_URL, { username: username, pursuits: pursuits, fullImage: fullImage, croppedImage: croppedImage });
     }
 
     static setDraftPreviewTitle(previewTitle) {

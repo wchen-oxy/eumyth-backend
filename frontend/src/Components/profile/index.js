@@ -5,6 +5,8 @@ import './index.scss';
 import AxiosHelper from '../../Axios/axios';
 import NoMatch from '../no-match';
 
+//set each necessary state
+
 
 class ProfilePage extends React.Component {
     _isMounted = false;
@@ -13,7 +15,9 @@ class ProfilePage extends React.Component {
         this.state = {
             username: this.props.match.params.username,
             private: false,
-            user: null,
+            displayPhoto: "",
+            coverPhoto: "",
+            bio: "",
             pursuits: [],
             fail: false
         }
@@ -73,13 +77,14 @@ class ProfilePage extends React.Component {
         return (
             <div id="personal-profile-container">
                 <div id="personal-profile-header">
-                    <div id="temp-cover">
-                    </div>
-                   
+                    {
+                    this.state.user ?
+                    (<img href={this.state.user.cover_photo}></img>) : (<div id="temp-cover"></div>)
+                   }
                 </div>
                 <div id="personal-profile-intro-container">
                     <div id="personal-profile-photo">
-                        <img></img>
+                    {this.state.user ?  <img href={this.state.user.display_photo}></img> : <></>}
                     </div>
                     <div id="personal-profile-name-container">
                         <h4 id="personal-profile-name">William Chen</h4>
