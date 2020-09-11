@@ -6,28 +6,29 @@ import { withRouter } from 'react-router-dom';
 class PursuitHolder extends React.Component {
     constructor(props) {
         super(props)
-        this.handleBoardChange = this.handleBoardChange.bind(this);
+        // this.handleBoardChange = this.handleBoardChange.bind(this);
         this.state = {
-            pursuitName: this.props.pursuitData.name
+            name: this.props.pursuitData.name,
+            events: this.props.pursuitData.num_posts
         }
     }
 
-    handleBoardChange(e, pursuitName) {
-        e.preventDefault();
-        const currentPath = this.props.history.location.pathname;
-        this.props.history.push( currentPath + '/pursuit/' + pursuitName);
-    };
+    // handleBoardChange(e, name) {
+    //     e.preventDefault();
+    //     const currentPath = this.props.history.location.pathname;
+    //     this.props.history.push( currentPath + '/pursuit/' + name);
+    // };
    
     render() {
 
-        const pursuitName = this.state.pursuitName;
+        const name = this.state.name;
         return (
-            <div className="pursuit-container" key={pursuitName} value={pursuitName} onClick={(e) => this.handleBoardChange(e, pursuitName)}>
+            <div className="pursuit-container no-select" key={name} value={name}>
                 <h4>
-                    {this.props.pursuitData.name}
+                    {this.state.name}
                 </h4>
                 <p>
-                    Events: {this.props.pursuitData.numEvent}
+                    Events: {this.state.events}
                 </p>
             </div>
         );

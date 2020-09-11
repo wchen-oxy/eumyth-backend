@@ -4,6 +4,7 @@ import CustomMultiSelect from "../../custom-clickables/createable-single";
 import AvatarEditor from 'react-avatar-editor';
 import Dropzone from 'react-dropzone';
 import { withFirebase } from '../../../Firebase';
+import imageCompression from 'browser-image-compression';
 import AxiosHelper from '../../../Axios/axios';
 
 const INITIAL_STATE = {
@@ -27,7 +28,6 @@ class InitialCustomizationPage extends React.Component {
         this.handlePursuitExperienceChange = this.handlePursuitExperienceChange.bind(this);
         this.handleProfilePhotoChange = this.handleProfilePhotoChange.bind(this);
         this.handleImageDrop = this.handleImageDrop.bind(this);
-        this.preview = this.preview.bind(this);
         this.state = {
             ...INITIAL_STATE
         }
@@ -59,20 +59,22 @@ class InitialCustomizationPage extends React.Component {
 
         let pursuitArray = [];
         let experienceSelects = [];
-        for (const pursuit of newValue) {
-            pursuitArray.push({ name: pursuit.value, experience: "" });
-            experienceSelects.push(
-                <span key={pursuit.value}>
-                    <label>{pursuit.value}</label>
-                    <select name={pursuit.value} id="experience-select" onChange={this.handlePursuitExperienceChange}>
-                        <option value=""></option>
-                        <option value="Beginner">Beginner</option>
-                        <option value="Familiar">Familiar</option>
-                        <option value="Experienced">Experienced</option>
-                        <option value="Expert">Expert</option>
-                    </select>
-                </span>
-            );
+        if (newValue) {
+            for (const pursuit of newValue) {
+                pursuitArray.push({ name: pursuit.value, experience: "" });
+                experienceSelects.push(
+                    <span key={pursuit.value}>
+                        <label>{pursuit.value}</label>
+                        <select name={pursuit.value} id="experience-select" onChange={this.handlePursuitExperienceChange}>
+                            <option value=""></option>
+                            <option value="Beginner">Beginner</option>
+                            <option value="Familiar">Familiar</option>
+                            <option value="Experienced">Experienced</option>
+                            <option value="Expert">Expert</option>
+                        </select>
+                    </span>
+                );
+            }
         }
         console.log(pursuitArray);
         this.setState({ pursuits: pursuitArray, experienceSelects: experienceSelects });
@@ -83,29 +85,74 @@ class InitialCustomizationPage extends React.Component {
         if (this.editor) {
             // This returns a HTMLCanvasElement, it can be made into a data URL or a blob,
             // drawn on another canvas, or added to the DOM.
-            const canvas = this.editor.getImage().toDataURL();
+            // const canvas = this.editor.getImage();
             // If you want the image resized to the canvas size (also a HTMLCanvasElement)
-            const canvasScaled = this.editor.getImageScaledToCanvas().toDataURL();
+            const canvasScaled = this.editor.getImageScaledToCanvas();
             // this.setState({ croppedImage: canvasScaled.toDataURL(), fullImage: canvas.toDataURL() });
 
+            //make several async calls, wait untill firebase is done, compress image 1 and compress image 2 are done
 
-            this.props.firebase.writeBasicUserData(
-                this.state.username,
-                this.state.firstName,
-                this.state.lastName
+            //update firebase
+            Promise.all(
+                [this.props.firebase.writeBasicUserData(
+                    this.state.username,
+                    this.state.firstName,
+                    this.state.lastName
+                ),
+                this.props.firebase.doUsernameUpdate(this.state.username),
+                imageCompression.canvasToFile(canvasScaled),
+                ]
             )
                 .then(
-                    () => this.props.firebase.doUsernameUpdate(this.state.username)
-                )
-                .then(
-                    () => AxiosHelper.createUserProfile(this.state.username, this.state.pursuits, canvas, canvasScaled)
-                )
-                .then(
-                    (success) => {
-                        console.log(success);
-                        if (success) window.location.reload();
+                    results => {
+                        console.log(results);
+                        return Promise.all([
+                            imageCompression(results[2], { maxSizeMB: 1, fileType: "image/jpeg" }),
+                            imageCompression(results[2], { maxWidthOrHeight: 80, maxSizeMB: 1, fileType: "image/jpeg" }),
+                            imageCompression(results[2], { maxWidthOrHeight: 40, maxSizeMB: 1, fileType: "image/jpeg" }),
+                        ]);
                     }
-                );
+                )
+                .then(
+                    (results) => {
+                        console.log(results);
+                        const titles = ["normal", "small", "tiny"];
+                        let imageArray = [];
+                        for (let i = 0; i < 3; i++) {
+                            imageArray.push(new File([results[i]], titles[i], { type: "image/jpeg" }));
+                        }
+                        return imageArray;
+                    }
+                )
+                .then(
+                    (results) => {
+                        console.log(results);
+                        return AxiosHelper.createUserProfile(
+                            this.state.username,
+                            this.state.pursuits,
+                            results[0],
+                            results[1],
+                            results[2])
+                    }
+                )
+                .then(
+                    (result) => {
+                        console.log(result);
+                        if (result.status === 201) window.location.reload();
+                    }
+                )
+                .catch((error) => console.log(error));
+
+            // imageCompression.
+            //     .then(
+            //     () => AxiosHelper.createUserProfile(this.state.username, this.state.pursuits, canvas.toDataURL(), canvasScaled.toDataURL())
+            // )
+            //     .then(
+            //         (success) => {
+            //             console.log(success);
+            //             if (success) window.location.reload();
+            //         }
+            //     );
         }
     }
 
@@ -131,10 +178,6 @@ class InitialCustomizationPage extends React.Component {
     }
     setEditorRef = (editor) => this.editor = editor;
 
-    preview() {
-        console.log("inner");
-
-    }
     render() {
         console.log(this.state.isTaken);
         const available = this.state.username !== '' && !this.state.isTaken ? "Available" : "Taken";

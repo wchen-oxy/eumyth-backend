@@ -102,7 +102,9 @@ class Firebase {
 
   //yes
   doUsernameUpdate(username) {
-    return this.auth.currentUser.updateProfile({displayName: username});
+    return this.auth.currentUser.updateProfile({displayName: username})
+    .then(() => 200)
+    ;
   }
 
   //yes
@@ -143,8 +145,7 @@ class Firebase {
         firstName: firstName,
         lastName: lastName
       })
-      .then(() => uid)
-      .catch(err => 'Error: ' + err);
+      .then(() => 200)
   }
 }
 

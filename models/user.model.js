@@ -10,6 +10,25 @@ const userSchema = new Schema({
     trim: true,
   },
 
+  cropped_display_photo: {
+    type: String,
+    required: false
+  },
+
+  small_cropped_display_photo: {
+    type: String,
+    required: false
+  },
+
+  tiny_cropped_display_photo: {
+    type: String,
+    required: false
+  },
+
+  cover_photo: {
+    type: String,
+  },
+
   bio: {
     type: String,
     trim: true
@@ -19,10 +38,10 @@ const userSchema = new Schema({
     required: true,
   },
   pinned: [Post.Schema],
-  pursuits:[Pursuits.Schema],
+  pursuits: [Pursuits.Schema],
   posts: [mongoose.Types.ObjectId],
   recent_posts: [Post.Schema],
-  
+
 
 }, {
   timestamps: true,
@@ -31,6 +50,6 @@ const userSchema = new Schema({
 const userModel = mongoose.model('user', userSchema);
 
 module.exports = {
-  Schema : userSchema,
-  Model : userModel
+  Schema: userSchema,
+  Model: userModel
 };

@@ -17,6 +17,7 @@ const ReviewPost = (props) => {
     const handlePostSubmit = (e, postType) => {
         e.preventDefault();
         setLoading(true);
+        console.log(props.imageArray);
         AxiosHelper.createPost(
             props.username,
             postType === "short" ? "short" : "long",

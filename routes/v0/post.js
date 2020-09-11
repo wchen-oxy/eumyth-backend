@@ -13,6 +13,8 @@ const crypto = require('crypto');
 const AWS = require('aws-sdk');
 const AwsConstants = require('../../constants/aws');
 const multerS3 = require('multer-s3');
+const uuid = require('uuid');
+
 
 const setPusuitAttributes = (isMilestone, pursuit, minDuration) => {
   if (isMilestone) { pursuit.num_milestones = Number(pursuit.num_milestones ) + 1;}
@@ -22,8 +24,6 @@ const setPusuitAttributes = (isMilestone, pursuit, minDuration) => {
   pursuit.num_posts = Number(pursuit.num_posts) + 1;
   return pursuit;
 }
-
-
 
 const s3 = new AWS.S3({
   accessKeyId: AwsConstants.ID,
@@ -40,7 +40,7 @@ var upload = multer({
       cb(null, { fieldName: file.fieldname });
     },
     key: function (req, file, cb) {
-      cb(null, "images" + "/" + Date.now().toString() + Math.floor(Math.random() * Math.floor(2000)))
+      cb(null, "images/content/" + uuid.v1())
     }
   })
 });

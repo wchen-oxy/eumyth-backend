@@ -13,6 +13,20 @@ const indexUserSchema = new Schema(
             trim: true
 
         },
+        cropped_display_photo: {
+            type: String,
+            required: false
+        },
+
+        small_cropped_display_photo: {
+            type: String,
+            required: false
+        },
+
+        tiny_cropped_display_photo: {
+            type: String,
+            required: false
+        },
 
         user_profile_ref: {
             type: mongoose.Types.ObjectId,

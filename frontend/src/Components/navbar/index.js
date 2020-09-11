@@ -28,8 +28,6 @@ class NavigationAuth extends React.Component {
     this.state = {
       username: this.props.firebase.returnUsername(),
       previousLongDraft: null,
-      window: "main",
-      currentPostType: 'main',
       isInitialUser: true,
       loading: true,
     };
@@ -58,7 +56,6 @@ class NavigationAuth extends React.Component {
   closeModal() {
     this.modalRef.current.style.display = "none";
     document.body.style.overflow = "visible";
-    this.setState({ window: 'main' });
   }
 
 
@@ -66,14 +63,13 @@ class NavigationAuth extends React.Component {
     return (
       <>
         <nav className="welcome-navbar-container">
-          {this.state.loading ?
-            (<></>) :
-            (<div className="navbar-item-group">
-              <Link to={"/"} id="hero-logo-link" className="navbar-item">interestHub</Link>
-              <button className="navbar-item" onClick={this.openModal}>New Entry</button>
-            </div>)
-
-          }
+          <div className="navbar-item-group">
+            <Link to={"/"} id="hero-logo-link" className="navbar-item">interestHub</Link>
+            {this.state.loading ?
+              (<></>) :
+              (<button className="navbar-item" onClick={this.openModal}>New Entry</button>)   }
+            </div>
+       
           <div className="navbar-item-group no-select">
             <Link to={"/account"} className="navbar-item" id="settins-link">Settings</Link>
             <button onClick={this.props.firebase.doSignOut} className="navbar-item">SignOut</button>
@@ -85,7 +81,8 @@ class NavigationAuth extends React.Component {
             <div className="overlay"></div>
             <span className="close" onClick={(() => this.closeModal())}>X</span>
             <NewPost username={this.state.username} closeModal={this.closeModal} />
-          </div>)}
+          </div>)
+       }
       </>
     );
   }

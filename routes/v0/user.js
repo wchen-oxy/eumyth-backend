@@ -6,32 +6,69 @@ let Pursuit = require('../../models/pursuit.model');
 let IndexPursuit = require('../../models/index.pursuit.model');
 var firebase = require('firebase');
 const mongoose = require('mongoose');
+const multer = require('multer');
+const multerStorage = multer.memoryStorage();
 const Schema = mongoose.Schema;
+const uuid = require('uuid');
+const AWS = require('aws-sdk');
+const AwsConstants = require('../../constants/aws');
+const multerS3 = require('multer-s3');
 
-router.get('/', (req, res) => {
-  const username = req.query.username;
-  User.Model.findOne({ username: username }).then(
-    user => {
-      if (user) res.status(200).json(user);
-      else {
-        res.status(204);
-      }
+const s3 = new AWS.S3({
+  accessKeyId: AwsConstants.ID,
+  secretAccessKey: AwsConstants.SECRET
+});
+
+var upload = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: AwsConstants.BUCKET_NAME,
+    contentType: multerS3.AUTO_CONTENT_TYPE,
+    metadata: function (req, file, cb) {
+      cb(null, { fieldName: file.fieldname });
+    },
+    key: function (req, file, cb) {
+      cb(null, "images/profile/" + uuid.v1())
     }
-  ).catch(
-    err => {
-      console.log(err);
-      res.status(500).json(err);
-    }
-  )
-}
-)
+  })
+});
 
 //create user and indexUser
-router.post('/', (req, res) => {
+router.route('/')
+.get((req, res) => {
+    const username = req.query.username;
+    console.log("FUCKERS");
+    User.Model.findOne({ username: username }).then(
+      user => {
+        if (user) res.status(200).json(user);
+        else {
+          res.status(204);
+        }
+      }
+    ).catch(
+      err => {
+        console.log(err);
+        res.status(500).json(err);
+      }
+    )
+  }
+)
+.post(upload.fields([{ name: "croppedImage"}, { name: "smallCroppedImage"}, { name: "tinyCroppedImage"}]),
+ (req, res) => {
+  // sharp(req.files)
+  console.log(req.files);
+  console.log(req.body);
+  // res.send(200);
+  
   const username = req.body.username;
-  const pursuitsArray = req.body.pursuits;
+  const pursuitsArray = JSON.parse(req.body.pursuits);
+  const croppedImage = req.files.croppedImage[0].location;
+  const smallCroppedImage = req.files.smallCroppedImage[0].location;
+  const tinyCroppedImage = req.files.tinyCroppedImage[0].location;
+
   let mainPursuitsHolder = [];
   let indexPursuitsHolder = [];
+  console.log("HOMO");
   console.log(pursuitsArray);
   for (const pursuit of pursuitsArray) {
     console.log(pursuit);
@@ -61,6 +98,9 @@ router.post('/', (req, res) => {
 
   const newUser = new User.Model({
     username: username,
+    cropped_display_photo: croppedImage,
+    small_cropped_display_photo : smallCroppedImage,
+    tiny_cropped_display_photo: tinyCroppedImage,
     pursuits: mainPursuitsHolder,
     private: false
   });
@@ -69,6 +109,9 @@ router.post('/', (req, res) => {
     username: username,
     user_profile_ref: newUser._id,
     preferredPostType: "public-feed",
+    cropped_display_photo: croppedImage,
+    small_cropped_display_photo : smallCroppedImage,
+    tiny_cropped_display_photo: tinyCroppedImage,
     private: false,
     pursuits: indexPursuitsHolder
   });
@@ -79,6 +122,14 @@ router.post('/', (req, res) => {
     console.log(err);
     res.status(500).json(err);
   });
+
+
+
+
+
+
+
+
   // newUser.save().then(() => console.log("Saved 1")).catch(err => res.status(500).json(err));
   // console.log("123123");
   // newIndexUser.save().then(() => console.log("Saved 2")).catch(err => res.status(500).json(err));

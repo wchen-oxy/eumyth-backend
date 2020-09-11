@@ -101,7 +101,7 @@ var upload = multer({
       cb(null, {fieldName: file.fieldname});
     },
     key: function (req, file, cb) {
-      cb(null, "images" + "/" + Date.now().toString() + Math.floor(Math.random() * Math.floor(2000)))
+      cb(null, "images/content/" + Date.now().toString() + Math.floor(Math.random() * Math.floor(2000)))
     }
   })
 });

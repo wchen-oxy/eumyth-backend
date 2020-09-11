@@ -8,6 +8,7 @@
   "dependencies": {
     "aws-sdk": "^2.731.0",
     "body-parser": "^1.19.0",
+    "browser-image-compression": "^1.0.12",
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
     "debug": "~2.6.9",
@@ -24,6 +25,8 @@
     "multer-gridfs-storage": "^4.2.0",
     "multer-s3": "^2.9.0",
     "react": "^16.13.1",
-    "react-router-dom": "^5.1.2"
+    "react-router-dom": "^5.1.2",
+    "sharp": "^0.26.0",
+    "uuid": "^8.3.0"
   }
 }
