@@ -115,7 +115,11 @@ export default class AxiosHelper {
     // static saveDraft(username, editorState) {
     //     return axios.post(DRAFT_UPLOAD_URL, { username: username, editorState: editorState });
     // }
-
+    static saveDraft(username, draft) {
+        return axios.put(DRAFT_URL,
+            { params: { username: username, draft: draft } }
+        )
+    }
     static retrieveDraft(username) {
         return axios.get(DRAFT_URL,
             { params: { username: username } }

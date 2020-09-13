@@ -1,7 +1,7 @@
 import React from 'react';
-import ShortEditor from "../post/short-editor";
+import ShortEditor from "../editors/short-editor";
 import ReviewPost from "./review-post";
-import './short-post.scss';
+import ModalNav from "./sub-components/modal-nav";
 
 class ShortPost extends React.Component {
   constructor(props) {
@@ -55,14 +55,15 @@ class ShortPost extends React.Component {
     const text = e.target.value;
     if (e.target.name === "title") {
       console.log(text);
-      this.setState({previewTitle : text});}
-      else {
-        this.setState((state) => ({ 
-          postDescription: text,
-          postDisabled: (text.length === 0) && (state.validFiles.length === 0 || state.unsupportedFiles.length > 0 )
-         }));
-      }   
-     
+      this.setState({ previewTitle: text });
+    }
+    else {
+      this.setState((state) => ({
+        postDescription: text,
+        postDisabled: (text.length === 0) && (state.validFiles.length === 0 || state.unsupportedFiles.length > 0)
+      }));
+    }
+
   }
 
   handleUnsupportedFileChange(file) {
@@ -81,10 +82,10 @@ class ShortPost extends React.Component {
 
   handleClick(e, value) {
     e.preventDefault();
-    this.setState({ window: value});
+    this.setState({ window: value });
   }
-  
-  
+
+
   generateValidFiles() {
     let selectedFiles = this.state.selectedFiles;
     let filteredArr = selectedFiles.reduce((acc, current) => {
@@ -102,53 +103,43 @@ class ShortPost extends React.Component {
   render() {
     if (this.state.window === "initial") {
       return (
-        <div className="short-post-container" id="short-post-container">
-          <div>
-            <h2>Placeholder for short</h2>
-            <div id="button-container">
-              <span id="toggle-button-span">
-                <button id="toggle-button" value="main" onClick={e => this.props.handleClick(e, e.target.value, true)}>Return</button>
-              </span>
-              <span id="post-button-span">
-                <button id="post-button" value="review" disabled={this.state.postDisabled} onClick={e => this.handleClick(e, e.target.value)}>Review Post</button>
-              </span>
-            </div>
-          </div>
-       
-          <ShortEditor
-            username={this.props.username}
-            selectedFiles={this.state.selectedFiles}
-            validFiles={this.state.validFiles}
-            unsupportedFiles={this.state.unsupportedFiles}
-            setImageArray={this.setImageArray}
-            // title={this.state.title}
-            text={this.state.postDescription}
-            onTextChange={this.handleTextChange}
-            onSelectedFileChange={this.handleSelectedFileChange}
-            onUnsupportedFileChange={this.handleUnsupportedFileChange}
-            onDisablePost={this.handleDisablePost}
-            setValidFiles={this.setValidFiles}
-            setSelectedFiles={this.setSelectedFiles}
-            setUnsupportedFiles={this.setUnsupportedFiles}
-          />
+        <div className="small-post-window">
+          <div className="inner-small-post-container post-button-container">
+            <ModalNav disabled={this.state.postDisabled} onReturnClick={this.props.handleClick} onReviewClick={this.handleClick}/>
+            <ShortEditor
+              username={this.props.username}
+              selectedFiles={this.state.selectedFiles}
+              validFiles={this.state.validFiles}
+              unsupportedFiles={this.state.unsupportedFiles}
+              setImageArray={this.setImageArray}
+              // title={this.state.title}
+              text={this.state.postDescription}
+              onTextChange={this.handleTextChange}
+              onSelectedFileChange={this.handleSelectedFileChange}
+              onUnsupportedFileChange={this.handleUnsupportedFileChange}
+              onDisablePost={this.handleDisablePost}
+              setValidFiles={this.setValidFiles}
+              setSelectedFiles={this.setSelectedFiles}
+              setUnsupportedFiles={this.setUnsupportedFiles}
+            />         
+             </div>
         </div>
       );
     }
-    else{
+    else {
       return (
-       <ReviewPost 
-       previewTitle = {this.state.previewTitle}
-       closeModal={this.props.closeModal}
-       postType={"short"} 
-       onClick={this.handleClick} 
-       imageArray={this.state.imageArray} 
-       postText={this.state.postDescription}
-       username={this.props.username}
-       preferredPostType= {this.props.preferredPostType }
-       pursuits = {this.props.pursuits}
-       handlePreferredPostTypeChange = {this.props.handlePreferredPostTypeChange}
-       />
-       
+          <ReviewPost
+            previewTitle={this.state.previewTitle}
+            closeModal={this.props.closeModal}
+            postType={"short"}
+            onClick={this.handleClick}
+            imageArray={this.state.imageArray}
+            postText={this.state.postDescription}
+            username={this.props.username}
+            preferredPostType={this.props.preferredPostType}
+            pursuits={this.props.pursuits}
+            handlePreferredPostTypeChange={this.props.handlePreferredPostTypeChange}
+          />
       );
     }
   }

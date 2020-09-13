@@ -3,7 +3,7 @@ import "./index.scss";
 import { AuthUserContext } from "../../Components/session/"
 import { withFirebase } from "../../Firebase";
 import { Link } from "react-router-dom";
-import NewPost from "../modal/new-post";
+import PostController from "../modal/index";
 const Navigation = () => (
 
   <AuthUserContext.Consumer>
@@ -80,7 +80,7 @@ class NavigationAuth extends React.Component {
           (<div className="modal" ref={this.modalRef}>
             <div className="overlay"></div>
             <span className="close" onClick={(() => this.closeModal())}>X</span>
-            <NewPost username={this.state.username} closeModal={this.closeModal} />
+            <PostController username={this.state.username} closeModal={this.closeModal} />
           </div>)
        }
       </>

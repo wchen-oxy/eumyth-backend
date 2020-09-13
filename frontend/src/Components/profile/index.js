@@ -1,10 +1,12 @@
 import React from 'react';
 import { withFirebase } from '../../Firebase';
-import PursuitHolder from './pursuit-holder';
-import Timeline from "./sub-components/timeline";
+import PursuitHolder from './sub-components/pursuit-holder';
+import Timeline from "./timeline";
 import './index.scss';
 import AxiosHelper from '../../Axios/axios';
 import NoMatch from '../no-match';
+import EventModal from "./sub-components/event-modal";
+
 
 //set each necessary state
 
@@ -21,8 +23,14 @@ class ProfilePage extends React.Component {
             bio: "",
             pursuits: null,
             recentPosts: null,
-            fail: false
+            allPosts: null,
+            fail: false,
+            selectedEvent: null,
         }
+        this.modalRef = React.createRef();
+        this.handleEventClick = this.handleEventClick.bind(this);
+        this.closeModal = this.closeModal.bind(this);
+        this.openModal = this.openModal.bind(this);
     }
 
     //fixme add catch for no found anything
@@ -40,21 +48,21 @@ class ProfilePage extends React.Component {
         //             }
         //         }
         //     );
-        if (this._isMounted) AxiosHelper.returnUser(this.state.username)
+        AxiosHelper.returnUser(this.state.username)
             .then(
                 response => {
-                    if (!response) this.setState({ fail: true });              
+                    if (!response) this.setState({ fail: true });
                     else {
                         const result = response.data;
-                        this.setState({
+                        console.log(result.recent_posts);
+                        if (this._isMounted) this.setState({
                             coverPhoto: result.cover_photo,
                             displayPhoto: result.cropped_display_photo,
                             bio: result.bio,
                             pinned: result.pinned,
-                            pursuits: result.pursuits,   
+                            pursuits: result.pursuits,
                             allPosts: result.posts,
                             recentPosts: result.recent_posts,
-                         
                         })
                     }
                 }
@@ -65,9 +73,29 @@ class ProfilePage extends React.Component {
         this._isMounted = false;
 
     }
+
+
+    openModal() {
+        this.modalRef.current.style.display = "block";
+        document.body.style.overflow = "hidden";
+    }
+
+    closeModal() {
+        this.modalRef.current.style.display = "none";
+        document.body.style.overflow = "visible";
+    }
+
+    handleEventClick(index) {
+        console.log(index);
+        const selectedEvent = index < this.state.recentPosts.length ? this.state.recentPosts[index] : this.state.allPosts[index];
+        this.setState({selectedEvent : selectedEvent}, 
+            this.openModal()
+            );
+       
+    }
+
     render() {
         var pursuitHolderArray = [];
-        console.log(this.props.match.params);
         if (this.state.fail) return NoMatch;
 
         if (this.state.pursuits) {
@@ -77,9 +105,11 @@ class ProfilePage extends React.Component {
                 );
             }
         }
-        
+        console.log(this.state.recentPosts);
+
         return (
-            <div id="personal-profile-container">
+            <div>
+                <div id="personal-profile-container">
                 <div id="personal-profile-header">
                     {
                         this.state.user ?
@@ -94,18 +124,27 @@ class ProfilePage extends React.Component {
                         <h4 id="personal-profile-name">William Chen</h4>
                     </div>
                     <div id="personal-profile-description">
-                    {this.state.bio ? <p>{this.state.bio}</p> : <p></p> }
+                        {this.state.bio ? <p>{this.state.bio}</p> : <p></p>}
                     </div>
                     <div id="pursuit-selection-container">
-                    {pursuitHolderArray}
-                   </div>
+                        {pursuitHolderArray}
+                    </div>
 
                 </div>
-                <Timeline recentPosts={this.state.recentPosts}/>
-                    
+                </div>
+                <div id="personal-profile-timeline-container">
+                <Timeline recentPosts={this.state.recentPosts} onEventClick={this.handleEventClick} />
+
+                </div>
+
                 {/* <div className="pursuit-board-container">
                 {pursuitHolderArray.map((pursuit) => pursuit)}
             </div> */}
+                <div className="modal" ref={this.modalRef}>
+                    <div className="overlay"></div>
+                    <span className="close" onClick={(() => this.closeModal())}>X</span>
+                    <EventModal closeModal={this.closeModal} eventData={this.state.selectedEvent}/>
+                </div>
             </div>
         );
 

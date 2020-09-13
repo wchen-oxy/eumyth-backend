@@ -27,21 +27,6 @@ class ShortEditor extends React.Component {
         this.setState({ value });
     }
 
-    // handleImagePost(e) {
-    //     e.preventDefault();
-    //     const file = document.getElementById('inputGroupFile01').files;
-    //     const formData = new FormData();
-    //     formData.append('file', file[0]);
-    //     if (file[0]) AxiosHelper.postImage(formData)
-    //         .then(result => {
-    //         }).then(
-    //             () =>
-    //                 document
-    //                     .getElementById('img')
-    //                     .setAttribute('src', `http://localhost:5000/entry/image/${file[0].name}`)
-    //         );
-    // }
-
     preventDefault = (e) => {
         e.preventDefault();
     }
@@ -281,7 +266,7 @@ class ShortEditor extends React.Component {
         else {
             return (
                 <>
-                    <div className="editor-component-container vertical-grouping">
+                    <div className="editor-component-container">
                         <div className="post-preview-container" id="after-image-container">
                             <div className="photo-upload-container">
                                 {this.props.unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
@@ -291,7 +276,7 @@ class ShortEditor extends React.Component {
                         </div>
                     </div>
                     <div className="editor-component-container">
-                        <div className="uploaded-file-container vertical-grouping">
+                        <div className="uploaded-file-container post-button-container">
                         {miniDropContainer}
                         {fileDisplayContainer}
                         </div>

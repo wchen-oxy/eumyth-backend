@@ -1,32 +1,30 @@
 .editor-component-container {
-    background-color: white;
     height: 60vh;
     display: flex;
-    width: auto;
+    width: 100%;
     padding: 1vh;
     justify-content: center;
     flex-direction: column;
 }
 
-.description-container{
+.description-container {
     height: 100%;
     width: 100%;
     display: flex;
     flex-direction: column;
 }
 
-.uploaded-file-container{
+.uploaded-file-container {
     display: flex;
 }
-#short-post-text{
-height: 100%;
-width: 100%;
-box-sizing: border-box;
-overflow: hidden;
-
+#short-post-text {
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
-#description-input-container{
+#description-input-container {
     height: 100%;
 }
 
@@ -39,21 +37,19 @@ overflow: hidden;
     display: flex;
 }
 
-#before-image-container{
+#before-image-container {
     flex-direction: column;
 }
 
-#after-image-container{
+#after-image-container {
     flex-direction: row;
     max-height: 473.39px;
-    
 }
 #text-container {
     min-width: 300px;
     background-color: grey;
     padding: 1vh;
     display: flex;
-    
 }
 
 // .modal {
@@ -90,7 +86,7 @@ overflow: hidden;
     height: 100%;
     max-height: 473.39px;
     min-height: 0;
-	min-width: 0;
+    min-width: 0;
     width: 100%;
     align-self: center;
     flex: 1;
@@ -105,7 +101,6 @@ overflow: hidden;
     align-items: center;
     min-width: 75%;
     justify-content: center;
-    height: calc(50% - 8px);
     border: 4px dashed #4aa1f3;
 }
 
@@ -117,11 +112,11 @@ overflow: hidden;
     border: 4px dashed #4aa1f3;
 }
 
-#drop-image-container-before{
+#drop-image-container-before {
     height: 150px;
 }
 
-#drop-image-container-after{
+#drop-image-container-after {
     height: calc(100% - 8px);
 }
 
@@ -225,7 +220,7 @@ overflow: hidden;
 
 .file-input {
     display: none;
-} 
+}
 
 .file-upload-btn {
     color: white;

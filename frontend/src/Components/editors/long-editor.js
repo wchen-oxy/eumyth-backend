@@ -3,9 +3,8 @@ import DanteEditor from 'Dante2';
 import { ImageBlockConfig } from "Dante2/package/es/components/blocks/image.js";
 import { PlaceholderBlockConfig } from "Dante2/package/es/components/blocks/placeholder";
 import { withFirebase } from '../../Firebase';
-import './long-editor.scss';
 import { IMAGE_URL, DRAFT_URL } from "../constants/index";
-
+import './long-editor.scss';
 
 class LongEditor extends React.Component {
     constructor(props) {
@@ -13,9 +12,6 @@ class LongEditor extends React.Component {
         this.state = {
             username: this.props.username,
         }
-    }
-    componentDidMount() {
-        console.log("Mounted now");
     }
 
     render() {
@@ -25,14 +21,17 @@ class LongEditor extends React.Component {
                 < DanteEditor
                     onChange={
                         (editor) => {
-                            const editorState = editor.emitSerializedOutput().blocks;
+                            const editorState = editor.emitSerializedOutput();
                             if (this.props.hasContent === false) {
-                                for (let block of editorState) {
+                                for (let block of editorState.blocks) {
                                     if (block.text !== '') {
                                         this.props.setHasContent(true);
                                         break;
                                     }
                                 }
+                            }
+                            else{
+                                this.props.onSaveDraft(editorState);
                             }
                         }}
                     content={this.props.content}
@@ -65,7 +64,7 @@ class LongEditor extends React.Component {
                         failure_handler: function () { console.log("fail") },
                         url: DRAFT_URL,
                         method: "POST",
-                        interval: 1000, //original is 4000 sec
+                        interval: 4000, //original is 4000 sec
                         withCredentials: false,
                         crossDomain: true,
                         headers: {
