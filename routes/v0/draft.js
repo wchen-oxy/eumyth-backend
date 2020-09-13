@@ -47,9 +47,7 @@ router.route('/').get((req, res) => {
             res.status(200).send(user.draft.text_data);
         })
         .catch(err => console.log('ERROR' + err));
-})
-
-router.route('/').post((req, res) => {
+}).post((req, res) => {
     const username = req.headers.username;
     IndexUser.Model.findOne({ username: username },
         (err, indexUserProfile) => {
@@ -74,11 +72,9 @@ router.route('/').post((req, res) => {
                     res.status(500).json(err);
                 }
             });
-            }).then(() => res.sendStatus(201)).catch(err => console.log(err));
-        }
-    );
-
-router.route('/').delete((req, res) => {
+        }).then(() => res.sendStatus(201)).catch(err => console.log(err));
+}
+).delete((req, res) => {
     const username = req.headers.username;
 
     IndexUser.Model.findOne({ username: username },
@@ -100,7 +96,7 @@ router.route('/').delete((req, res) => {
             });
         }
     )
-    .then(() => res.sendStatus(201)).catch(err => console.log(err));
+        .then(() => res.sendStatus(201)).catch(err => console.log(err));
 
 
 
@@ -121,20 +117,19 @@ router.route('/').delete((req, res) => {
 
 })
 
-router.route('/title').post((req, res) =>
-    {
-        const username = req.headers.username;
-        IndexUser.Model.findOne({ username: username },
-            (err, indexUserProfile) => {
-                if (err) {
-                    console.log(err);
-                    res.status(500).json("Error: " + err)
-                }
+router.route('/title').post((req, res) => {
+    const username = req.headers.username;
+    IndexUser.Model.findOne({ username: username },
+        (err, indexUserProfile) => {
+            if (err) {
+                console.log(err);
+                res.status(500).json("Error: " + err)
             }
-        )
+        }
+    )
         .then(
-            (indexUser) =>{
-        
+            (indexUser) => {
+
                 indexUser.draft.previewTitle = req.body.previewTitle;
                 return indexUser.save((err) => {
                     if (err) {
@@ -142,11 +137,11 @@ router.route('/title').post((req, res) =>
                         res.status(500).json(err);
                     }
                 });
-                
+
             }
         ).then(() => res.sendStatus(201)).catch(err => console.log(err));
-        
-    }
+
+}
 )
 
 module.exports = router;

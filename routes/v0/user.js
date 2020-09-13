@@ -123,13 +123,6 @@ router.route('/')
     res.status(500).json(err);
   });
 
-
-
-
-
-
-
-
   // newUser.save().then(() => console.log("Saved 1")).catch(err => res.status(500).json(err));
   // console.log("123123");
   // newIndexUser.save().then(() => console.log("Saved 2")).catch(err => res.status(500).json(err));

@@ -205,7 +205,7 @@ router.route('/').post(upload.fields([{ name: "images" }, { name: "coverPhoto", 
   resolveUser.then(
     resolvedUser => {
       const user = resolvedUser;
-      user.posts.push(post._id);
+      user.all_posts.push(post._id);
       user.recent_posts.push(post);
       //check if pursuits exists already
       if (minDuration) {
