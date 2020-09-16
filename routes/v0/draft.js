@@ -49,6 +49,7 @@ router.route('/').get((req, res) => {
         .catch(err => console.log('ERROR' + err));
 }).post((req, res) => {
     const username = req.headers.username;
+    console.log( typeof(req.body.editor_content));
     IndexUser.Model.findOne({ username: username },
         (err, indexUserProfile) => {
             if (err) {
@@ -73,49 +74,74 @@ router.route('/').get((req, res) => {
                 }
             });
         }).then(() => res.sendStatus(201)).catch(err => console.log(err));
-}
-).delete((req, res) => {
-    const username = req.headers.username;
-
-    IndexUser.Model.findOne({ username: username },
-        (err, indexUserProfile) => {
-            if (err) {
-                // console.log("Error");
-                console.log(err);
-                res.status(500).json("Error: " + err)
-            }
-        }
-    ).then(
-        indexUser => {
-            indexUser.draft = '';
-            user.save((err) => {
-                if (err) {
-                    console.error('ERROR: ' + err);
-                    res.status(500).json(err);
-                }
-            });
-        }
-    )
-        .then(() => res.sendStatus(201)).catch(err => console.log(err));
-
-
-
-    // User.Model.findById(authorId, (err, user) => {
-    //     if (err) {
-    //         console.log(err);
-    //         return res.status(500).json(err);}
-    //     if (user && user.draft === postModel) return res.sendStatus(200);
-    //     user.draft = postModel;
-    //     user.save((err) => {
-    //         if (err) {
-    //             console.error('ERROR: ' + err);
-    //             res.status(500).json(err);
-    //         }
-    //     });
-    // })
-    // .then(() => res.sendStatus(201)).catch(err => console.log(err));
-
 })
+    .put((req, res) => {
+        const username = req.body.username;
+        const draft = req.body.draft;
+     
+        console.log(typeof(draft));
+        IndexUser.Model.findOne({ username: username },
+            (err, indexUserProfile) => {
+                if (err) {
+                    console.log(err);
+                    res.status(500).json("Error: " + err)
+                }
+            }
+        ).then(
+            indexUser => {
+                indexUser.draft.text_data = draft;
+                indexUser.save((err) => {
+                    if (err) {
+                        console.error('ERROR: ' + err);
+                        res.status(500).json(err);
+                    }
+                });
+            }
+        )
+            .then(() => res.sendStatus(200)).catch(err => console.log(err));
+    })
+    .delete((req, res) => {
+        const username = req.headers.username;
+
+        IndexUser.Model.findOne({ username: username },
+            (err, indexUserProfile) => {
+                if (err) {
+                    // console.log("Error");
+                    console.log(err);
+                    res.status(500).json("Error: " + err)
+                }
+            }
+        ).then(
+            indexUser => {
+                indexUser.draft = '';
+                indexuser.save((err) => {
+                    if (err) {
+                        console.error('ERROR: ' + err);
+                        res.status(500).json(err);
+                    }
+                });
+            }
+        )
+            .then(() => res.sendStatus(201)).catch(err => console.log(err));
+
+
+
+        // User.Model.findById(authorId, (err, user) => {
+        //     if (err) {
+        //         console.log(err);
+        //         return res.status(500).json(err);}
+        //     if (user && user.draft === postModel) return res.sendStatus(200);
+        //     user.draft = postModel;
+        //     user.save((err) => {
+        //         if (err) {
+        //             console.error('ERROR: ' + err);
+        //             res.status(500).json(err);
+        //         }
+        //     });
+        // })
+        // .then(() => res.sendStatus(201)).catch(err => console.log(err));
+
+    })
 
 router.route('/title').post((req, res) => {
     const username = req.headers.username;

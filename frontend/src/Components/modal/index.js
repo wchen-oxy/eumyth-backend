@@ -13,20 +13,22 @@ class PostController extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: this.props.username,
-      previousLongDraft: null,
-      saveInProgress: false,
-      windowType: "main",
-      currentPostType: 'main',
+      onlineDraftRetrieved: false,
+      onlineDraft: null,
+    
+      updatingOnlineDraft: false,
+      postType: "none",
       pursuits: null,
       indexUserData: null,
-      errorSaving : false
+      errorSaving: false
     };
 
     this.handleDisablePost = this.handleDisablePost.bind(this);
     this.handleSubmitPost = this.handleSubmitPost.bind(this);
-    this.handleClick = this.handleClick.bind(this);
-    this.handleSaveDraft = this.handleSaveDraft.bind(this);
+    this.handleLocalSync = this.handleLocalSync.bind(this);
+    this.handleLocalOnlineSync = this.handleLocalOnlineSync.bind(this);
+    this.handlePostTypeSet = this.handlePostTypeSet.bind(this);
+    // this.handleLocalDraftChange = this.handleLocalDraftChange.bind(this);
     this.retrieveDraft = this.retrieveDraft.bind(this);
     this.setIndexUserData = this.setIndexUserData.bind(this);
     this.onPreferredPostTypeChange = this.onPreferredPostTypeChange.bind(this);
@@ -34,12 +36,10 @@ class PostController extends React.Component {
 
   componentDidMount() {
     this._isMounted = true;
-    if (this._isMounted && this.state.username) {
+    if (this._isMounted && this.props.username) {
       this.setIndexUserData();
-      this.setState({ saveInProgress: true },
-        this.retrieveDraft());
-
-    };
+      this.retrieveDraft(true);
+    }
   }
   componentWillUnmount() {
     this._isMounted = false;
@@ -49,14 +49,50 @@ class PostController extends React.Component {
     this.setState({ preferredPostType: type });
   }
 
+  // handleLocalDraftChange(text) {
+  //   this.setState({ localDraft: text });
+  // }
+
+  handleInitialPageLaunch(e, postType, clearLongDraft) {
+    e.preventDefault();
+    if (clearLongDraft) {
+      this.setState({ onlineDraft: null });
+    }
+    this.setState({ postType: postType })
+  }
+
+  handleLocalSync(draft) {
+    this.setState({ onlineDraft: draft });
+  }
+
+  handleLocalOnlineSync(localDraft) {
+    if (localDraft !== this.state.onlineDraft) {
+      this.setState({ updatingOnlineDraft: true });
+      return AxiosHelper.saveDraft(this.props.username, JSON.stringify(localDraft)).then(
+        (result) => {
+          if (result.status !== 200) {
+            console.log("Error");
+            this.setState({ errorSaving: true });
+          }
+          this.setState({ onlineDraft: localDraft, updatingOnlineDraft: false });
+          return true;
+        }
+      )
+        .catch(
+          (err) => {
+            console.log(err);
+            this.setState({ updatingOnlineDraft: false });
+          }
+        );
+    }
+  }
+
   setIndexUserData() {
-    AxiosHelper.returnIndexUser(this.state.username)
+    AxiosHelper.returnIndexUser(this.props.username)
       .then(
         (result) => {
-          console.log("ANY FUCKING RESPONSE?");
           if (result.status === 200) {
             let pursuitArray = [];
-            console.log(this.state.indexUserData);
             for (const pursuit of result.data.pursuits) {
               pursuitArray.push(pursuit.name);
             }
@@ -73,11 +109,14 @@ class PostController extends React.Component {
         );
   }
 
-  retrieveDraft() {
-    AxiosHelper.retrieveDraft(this.state.username).then(
-      (previousDraft) => {
-        if (previousDraft) {
-          this.setState({ longDraft: previousDraft.draft, saveInProgress: false });
+  retrieveDraft(isInitial) {
+    this.setState({ updatingOnlineDraft: true });
+    AxiosHelper.retrieveDraft(this.props.username).then(
+      (response) => {
+        if (response.status === 200) {
+          if (isInitial) this.setState({ onlineDraftRetrieved: true });
+          console.log(response.status);
+          this.setState({ onlineDraft: response.data, updatingOnlineDraft: false });
         }
       })
       .catch(error => {
@@ -88,26 +127,6 @@ class PostController extends React.Component {
       })
   }
 
-  handleSaveDraft(draft) {
-    console.log("SAVING");
-    this.setState({ longDraft: draft, saveInProgress: true },
-      AxiosHelper.saveDraft(this.state.username, draft)      
-    ).then((result) => {
-      if (result.status !== 200){
-        console.log("Error");
-        this.setState({errorSaving : true});}
-      this.setState({saveInProgress : false})
-    }
-    ).catch(
-      (err) => console.log(err)
-    )
-  }
-
-  handleClick(e, value) {
-    e.preventDefault();
-    this.setState({ windowType: value });
-  }
-
   handleSubmitPost(e) {
     alert("PRESSED SUBMIT");
   }
@@ -115,74 +134,81 @@ class PostController extends React.Component {
     this.setState({ postDisabled: disabled });
   }
 
+  handlePostTypeSet(postType, localDraft) {
+    switch (postType) {
+      case ("none"):
+        if (localDraft) {
+          console.log(localDraft);
+          this.setState({ postType: postType, onlineDraft: localDraft});
+        }
+        else{
+          this.setState({ postType : postType})
+        }
+        break;
+      case ("short"):
+        this.setState({ postType: postType });
+        break;
+      case ("new-long"):
+        this.setState({ postType: "long", onlineDraft: null });
+        break;
+      case ("old-long"):
+        this.setState({ postType: "long" });
+        break;
+      default:
+        throw Error("No postType options matched :(");
+    }
+  }
+
   render() {
-    let windowType = '';
-    switch (this.state.windowType) {
-      case ("main"):
-        windowType = (
-          <NewPost longDraft={this.state.longDraft} onClick={this.handleClick} />
+    let postType = '';
+    if (!this.state.indexUserData) return (<>updatingOnlineDraft...</>)
+    switch (this.state.postType) {
+      case ("none"):
+        postType = (
+          <NewPost onlineDraft={this.state.onlineDraft} onPostTypeSet={this.handlePostTypeSet} />
         );
         break;
       case ("short"):
-        windowType = (
+        postType = (
           <ShortPost
-            username={this.state.username}
+            username={this.props.username}
             closeModal={this.props.closeModal}
             pursuits={this.state.pursuits}
             disablePost={this.handleDisablePost}
             setImageArray={this.setImageArray}
-            handleClick={this.handleClick}
+            onPostTypeSet={this.handlePostTypeSet}
             preferredPostType={this.state.indexUserData.preferredPostType}
             handlePreferredPostTypeChange={this.onPreferredPostTypeChange}
           />
         );
         break;
-      case ("newLong"):
-        windowType =
-          (<LongPost
-            handleClick={this.handleClick}
-            closeModal={this.props.closeModal}
-            disablePost={this.handleDisablePost}
-            username={this.state.username}
-            pursuits={this.state.pursuits}
-            preferredPostType={this.state.indexUserData.preferredPostType}
-            handlePreferredPostTypeChange={this.onPreferredPostTypeChange}
-            onSaveDraft={this.handleSaveDraft}
-            previewTitle=""
-
-          />);
-        break;
-      case ("oldLong"):
-        const previewTitle = this.state.indexUserData.draft ? this.state.indexUserData.draft.previewTitle : "";
-        windowType = (
+      case ("long"):
+        // const previewTitle = this.state.indexUserData ? this.state.indexUserData.draft.previewTitle : "";
+        postType = (
           <LongPost
-            longDraft={this.state.longDraft}
-            closeModal={this.props.closeModal}
+            username={this.props.username}
+            onlineDraft={this.state.onlineDraft}
             pursuits={this.state.pursuits}
-            handleClick={this.handleClick}
-            disablePost={this.handleDisablePost}
-            username={this.state.username}
+            onlineDraftRetrieved={this.state.onlineDraftRetrieved}
             preferredPostType={this.state.indexUserData.preferredPostType}
+            previewTitle={this.state.indexUserData.draft.previewTitle}
+            updatingOnlineDraft={this.state.updatingOnlineDraft}
+            onLocalDraftChange={this.handleLocalDraftChange}
+            onLocalOnlineSync={this.handleLocalOnlineSync}
+            onLocalSync={this.handleLocalSync}
+            onPostTypeSet={this.handlePostTypeSet}
+            disablePost={this.handleDisablePost}
             handlePreferredPostTypeChange={this.onPreferredPostTypeChange}
-            onSaveDraft={this.handleSaveDraft}
-            previewTitle={previewTitle}
+            closeModal={this.props.closeModal}
           />);
         break;
-      // case ("review"):
-      //   windowType = <ReviewPost
-      //     content={this.state.previousLongDraft}
-      //     disablePost={this.handleDisablePost}
-      //     handleClick={this.handleClick}
-      //     currentPostType={this.state.currentPostType}
-      //   />
-      //   break;
       default:
-        throw Error("No windowType options matched :(");
+        throw Error("No postType options matched :(");
     }
-
     return (
       <>
-        {windowType}
+        <span className="close" onClick={(() => this.props.closeModal())}>X</span>
+        {postType}
       </>
     );
   }

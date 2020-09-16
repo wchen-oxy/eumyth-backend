@@ -29,9 +29,8 @@ class NavigationAuth extends React.Component {
       username: this.props.firebase.returnUsername(),
       previousLongDraft: null,
       isInitialUser: true,
-      loading: true,
+      existingUserLoading: true,
     };
-
     this.modalRef = React.createRef();
     this.closeModal = this.closeModal.bind(this);
     this.openModal = this.openModal.bind(this);
@@ -40,12 +39,11 @@ class NavigationAuth extends React.Component {
   componentDidMount() {
     this.props.firebase.checkIsExistingUser().then(
       (result) => {
-        console.log(result);
         if (result) {
-          this.setState({ loading: false })
+          this.setState({ existingUserLoading: false })
         }
       }
-    )
+    );
   }
 
   openModal() {
@@ -65,7 +63,7 @@ class NavigationAuth extends React.Component {
         <nav className="welcome-navbar-container">
           <div className="navbar-item-group">
             <Link to={"/"} id="hero-logo-link" className="navbar-item">interestHub</Link>
-            {this.state.loading ?
+            {this.state.existingUserLoading ?
               (<></>) :
               (<button className="navbar-item" onClick={this.openModal}>New Entry</button>)   }
             </div>
@@ -75,11 +73,11 @@ class NavigationAuth extends React.Component {
             <button onClick={this.props.firebase.doSignOut} className="navbar-item">SignOut</button>
           </div>
         </nav>
-        {this.state.loading ?
+        {this.state.existingUserLoading ?
           (<></>) :
           (<div className="modal" ref={this.modalRef}>
             <div className="overlay"></div>
-            <span className="close" onClick={(() => this.closeModal())}>X</span>
+           
             <PostController username={this.state.username} closeModal={this.closeModal} />
           </div>)
        }

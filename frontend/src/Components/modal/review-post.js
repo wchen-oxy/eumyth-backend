@@ -71,8 +71,8 @@ const ReviewPost = (props) => {
         );
     }
 
-    const returnToShortButton = (<button id="toggle-button" value="initial" onClick={e => props.onClick(e, e.target.value)}>Return</button>);
-    const returnToLongButton = (<button id="toggle-button" value="initial" onClick={e => props.setWindow(e.target.value)}>Return</button>);
+    const returnToShortButton = (<button id="toggle-button" value="initial" onClick={e => props.onClick(e.target.value)}>Return</button>);
+    const returnToLongButton = (<button id="toggle-button" value="initial" onClick={e => props.setPostStage(e.target.value, false)}>Return</button>);
 
 
     return (
