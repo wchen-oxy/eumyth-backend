@@ -16,14 +16,6 @@ router.route('/').get((req, res) => {
     .then(users => res.json(users))
     .catch(err => res.status(400).json('Error: ' + err));
 
-    // const matchingUsers = User.find()
-    // .then(users => res.json(users))
-    // .catch(err => res.status(400).json('Error: ' + err));
-  
-    // if (matchingUsers) {
-    //   console.log(matchingUsers);
-    // }
-  
   })
   
   module.exports = router;

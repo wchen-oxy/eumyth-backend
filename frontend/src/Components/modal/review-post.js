@@ -7,27 +7,23 @@ const ReviewPost = (props) => {
     const [date, setDate] = useState(null);
     const [minDuration, setMinDuration] = useState(null);
     const [milestone, setMilestone] = useState(false);
-    const [title, setTitle] = useState(props.title);
+    const [title, setTitle] = useState('');
     const [subtitle, setSubtitle] = useState('');
-
     const [postPrivacyType, setPostPrivacyType] = useState("public-feed");
-    // const [description, setDescription] = useState(props.description);
     const [pursuitCategory, setPursuitCategory] = useState(null)
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
     const [coverPhoto, setCover] = useState(null);
 
-
     const handlePostSubmit = () => {
         setLoading(true);
         console.log(props.imageArray);
-
         let formData = new FormData();
         formData.append("postType", props.postType);
         formData.append("username", props.username);
         console.log(minDuration);
-        if (title) formData.append("title", title);
-        if (subtitle) formData.append("subtitle", subtitle);
+        if (title) formData.append("title", _.trim(title));
+        if (subtitle) formData.append("subtitle", _.trim(subtitle));
         if (postPrivacyType) formData.append("postPrivacyType", postPrivacyType);
         if (pursuitCategory) formData.append("pursuitCategory", pursuitCategory)
         if (date) formData.append("date", date);
@@ -39,38 +35,14 @@ const ReviewPost = (props) => {
             for (const image of props.imageArray) {
                 formData.append("images", image);
             }
-            
         }
-        AxiosHelper.createPost(
-           formData
-        )
+
+        AxiosHelper.createPost(formData)
             .then(
-                //     (response) => {
-                //         if (response.status === 201) {
-                //             // AxiosHelper.de
-                //         }
-                //     }
-                // )
                 (result) => {
-                    //FIXME add in the listener and response for the new post
                     result.status === 201 ? handleSuccess() : handleError();
                 }
             );
-    }
-
-    const handleMetaDataSave = (setDataFunc, value) => {
-        // setDataFunc(value);
-        // _.debounce(AxiosHelper.saveDraftMetaInfo(
-        //     new FormData()
-        //     .append(props.username)
-        //     .append( title)
-        //     .append(description)
-        //     .append(date)
-        //     .append(coverPhoto)
-        //     .append(pursuitCategory)
-        //     .append(milestone)
-        //     .append(minDuration)
-        //    ), 4000)
     }
 
     const handleSuccess = () => {
@@ -81,42 +53,6 @@ const ReviewPost = (props) => {
     const handleError = () => {
         setLoading(false);
         setError(true);
-
-    }
-    const handleMilestoneChange = (milestone) => {
-        setMilestone(milestone);
-        handleMetaDataSave();
-    }
-    const handleDateChange = (date) => {
-        setDate(date);
-        handleMetaDataSave();
-    }
-
-    const handlePursuitChange = (type) => {
-        setPursuitCategory(type);
-        handleMetaDataSave();
-    }
-
-    const setPostPrivacyTypes = (type) => {
-        setPostPrivacyType(type);
-        props.handlePreferredPostTypeChange(type);
-
-    }
-
-    const handleTitleChange = (title) => {
-        setTitle(title);
-        handleMetaDataSave();
-
-    }
-
-    const handleDescriptionChange = (description) => {
-        setSubtitle(description);
-        handleMetaDataSave();
-    }
-
-    const handleMinDurationChange = (minDuration) => {
-        setMinDuration(minDuration);
-        handleMetaDataSave();
     }
 
     let pursuitSelects = [];
@@ -132,7 +68,6 @@ const ReviewPost = (props) => {
     const returnToShortButton = (<button id="toggle-button" value="initial" onClick={e => props.onClick(e.target.value)}>Return</button>);
     const returnToLongButton = (<button id="toggle-button" value="initial" onClick={e => props.setPostStage(e.target.value, false)}>Return</button>);
 
-
     return (
         <div className="small-post-window">
             <div className="inner-small-post-container post-button-container">
@@ -146,29 +81,27 @@ const ReviewPost = (props) => {
                 </div>
                 <div className="post-button-container">
                     <label>Preview Title</label>
-                    <TextareaAutosize name="title" id='review-post-text' placeholder='Create an Optional Preview Title Text' maxRows={2} onChange={(e) => handleTitleChange(e.target.value)} maxLength={100} />
-                    <TextareaAutosize name="description" id='review-post-text' placeholder='Create an Optional Description' maxRows={2} onChange={(e) => handleDescriptionChange(e.target.value)} maxLength={140} />
-
-                    {/* <input type="text" value={props.previewTitle} onChange={(e) => handleTitleChange(e.target.value)}></input> */}
+                    <TextareaAutosize name="title" id='review-post-text' placeholder='Create an Optional Preview Title Text' onChange={(e) => setTitle(e.target.value)} maxLength={100} />
+                    <TextareaAutosize name="subtitle" id='review-post-text' placeholder='Create an Optional Description' onChange={(e) => setSubtitle(e.target.value)} maxLength={140} />
                     <label>Cover</label>
                     <input type="file" onChange={(e) => {
                         setCover(e.target.files[0]);
                     }}></input>
                     <label>Date</label>
-                    <input type="date" onChange={(e) => handleDateChange(e.target.value)}></input>
+                    <input type="date" onChange={(e) => setDate(e.target.value)}></input>
                     <label>Pursuit</label>
-                    <select name="pursuit-category" onChange={(e) => handlePursuitChange(e.target.value)}>
+                    <select name="pursuit-category" onChange={(e) => setPursuitCategory(e.target.value)}>
                         {pursuitSelects}
                     </select>
                     <label>Total Minutes</label>
-                    <input type="number" onChange={(e) => handleMinDurationChange(e.target.value)}></input>
+                    <input type="number" onChange={(e) => setMinDuration(e.target.value)}></input>
                     <label>Is Milestone</label>
-                    <input type="checkbox" onClick={() => handleMilestoneChange(!milestone)}></input>
+                    <input type="checkbox" onClick={() => setMilestone(!milestone)}></input>
                 </div>
                 <div className="post-button-container">
                     <p>Post to:</p>
                     <div className="post-button-container">
-                        <select name="cars" id="cars" value={props.preferredPostType ? props.preferredPostType : "public-feed"} onChange={(e) => setPostPrivacyTypes(e.target.value)}>
+                        <select name="cars" id="cars" value={props.preferredPostType ? props.preferredPostType : "public-feed"} onChange={(e) => setPostPrivacyType(e.target.value)}>
                             <option value="private">make post private on your page</option>
                             <option value="personal-page" >make post public on your page:</option>
                             <option value="public-feed" >Post to your feed and page</option>
@@ -176,12 +109,7 @@ const ReviewPost = (props) => {
                     </div>
                     <button onClick={(e) => handlePostSubmit()}>Post!</button>
                 </div>
-
-                {
-                    error ?
-                        <p>An Error Occured. Please try again. </p> : <></>
-                }
-
+                {error ? <p>An Error Occured. Please try again. </p> : <></>}
                 {loading ?
                     <div className="short-post-container" id="modal-overlay">
                         <p> Loading...</p>

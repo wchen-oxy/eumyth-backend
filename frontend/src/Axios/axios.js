@@ -17,13 +17,7 @@ export default class AxiosHelper {
         return axios.get(IndexUserEndpoint.CHECK_USERNAME_URL, { params: { username: username } });
     }
 
-    static createUserProfile(username, pursuits, croppedImage, smallCroppedImage, tinyCroppedImage) {
-        let formData = new FormData();
-        formData.append("username", username);
-        formData.append("croppedImage", croppedImage);
-        formData.append("smallCroppedImage", smallCroppedImage);
-        formData.append("tinyCroppedImage", tinyCroppedImage);
-        formData.append("pursuits", JSON.stringify(pursuits));
+    static createUserProfile(formData) {
         return axios.post(UserEndpoint.USER_URL, formData);
     }
 

@@ -127,12 +127,14 @@ class InitialCustomizationPage extends React.Component {
                 .then(
                     (results) => {
                         console.log(results);
-                        return AxiosHelper.createUserProfile(
-                            this.state.username,
-                            this.state.pursuits,
-                            results[0],
-                            results[1],
-                            results[2])
+                        let formData = new FormData();
+                        formData.append("username", this.state.username);
+                        formData.append("pursuits", JSON.stringify( this.state.pursuits));
+                        formData.append("croppedImage", results[0]);
+                        formData.append("smallCroppedImage",results[1]);
+                        formData.append("tinyCroppedImage", results[2]);
+                     
+                        return AxiosHelper.createUserProfile(formData)
                     }
                 )
                 .then(
