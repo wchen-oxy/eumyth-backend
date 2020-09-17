@@ -44,42 +44,41 @@ router.route('/').get((req, res) => {
             if (user.draft === undefined) {
                 return res.status(204);
             }
-            res.status(200).send(user.draft.text_data);
+            res.status(200).send(user.draft);
         })
         .catch(err => console.log('ERROR' + err));
-}).post((req, res) => {
-    const username = req.headers.username;
-    console.log( typeof(req.body.editor_content));
-    IndexUser.Model.findOne({ username: username },
-        (err, indexUserProfile) => {
-            if (err) {
-                console.log(err);
-                res.status(500).json("Error: " + err)
-            }
-        }
-    ).then(
-        indexUser => {
-            const authorId = indexUser.user_profile_ref;
-            const postModel = new Post.Model({
-                author_id: authorId,
-                text_data: req.body.editor_content,
-                post_format: 'long'
-            });
-            if (indexUser && indexUser.draft === postModel) return;
-            indexUser.draft = postModel;
-            return indexUser.save((err) => {
-                if (err) {
-                    console.error('ERROR: ' + err);
-                    res.status(500).json(err);
-                }
-            });
-        }).then(() => res.sendStatus(201)).catch(err => console.log(err));
 })
+// .post((req, res) => {
+//     const username = req.headers.username;
+//     console.log( typeof(req.body.editor_content));
+//     IndexUser.Model.findOne({ username: username },
+//         (err, indexUserProfile) => {
+//             if (err) {
+//                 console.log(err);
+//                 res.status(500).json("Error: " + err)
+//             }
+//         }
+//     ).then(
+//         indexUser => {
+//             const authorId = indexUser.user_profile_ref;
+//             const postModel = new Post.Model({
+//                 author_id: authorId,
+//                 text_data: req.body.editor_content,
+//                 post_format: 'long'
+//             });
+//             if (indexUser && indexUser.draft === postModel) return;
+//             indexUser.draft = postModel;
+//             return indexUser.save((err) => {
+//                 if (err) {
+//                     console.error('ERROR: ' + err);
+//                     res.status(500).json(err);
+//                 }
+//             });
+//         }).then(() => res.sendStatus(201)).catch(err => console.log(err));
+// })
     .put((req, res) => {
         const username = req.body.username;
         const draft = req.body.draft;
-     
-        console.log(typeof(draft));
         IndexUser.Model.findOne({ username: username },
             (err, indexUserProfile) => {
                 if (err) {
@@ -89,7 +88,7 @@ router.route('/').get((req, res) => {
             }
         ).then(
             indexUser => {
-                indexUser.draft.text_data = draft;
+                indexUser.draft = draft;
                 indexUser.save((err) => {
                     if (err) {
                         console.error('ERROR: ' + err);
@@ -102,7 +101,6 @@ router.route('/').get((req, res) => {
     })
     .delete((req, res) => {
         const username = req.headers.username;
-
         IndexUser.Model.findOne({ username: username },
             (err, indexUserProfile) => {
                 if (err) {
@@ -113,7 +111,7 @@ router.route('/').get((req, res) => {
             }
         ).then(
             indexUser => {
-                indexUser.draft = '';
+                indexUser.draft = null;
                 indexuser.save((err) => {
                     if (err) {
                         console.error('ERROR: ' + err);
@@ -143,8 +141,9 @@ router.route('/').get((req, res) => {
 
     })
 
-router.route('/title').post((req, res) => {
-    const username = req.headers.username;
+router.route('/title').put((req, res) => {
+    const username = req.body.username;
+    const title = req.body.title;
     IndexUser.Model.findOne({ username: username },
         (err, indexUserProfile) => {
             if (err) {
@@ -155,8 +154,34 @@ router.route('/title').post((req, res) => {
     )
         .then(
             (indexUser) => {
+                indexUser.draft.title = req.body.title;
+                return indexUser.save((err) => {
+                    if (err) {
+                        console.error('ERROR: ' + err);
+                        res.status(500).json(err);
+                    }
+                });
 
-                indexUser.draft.previewTitle = req.body.previewTitle;
+            }
+        ).then(() => res.sendStatus(201)).catch(err => console.log(err));
+
+}
+)
+
+router.route('/desc').put((req, res) => {
+    const username = req.body.username;
+    const title = req.body.title;
+    IndexUser.Model.findOne({ username: username },
+        (err, indexUserProfile) => {
+            if (err) {
+                console.log(err);
+                res.status(500).json("Error: " + err)
+            }
+        }
+    )
+        .then(
+            (indexUser) => {
+                indexUser.draft.title = req.body.title;
                 return indexUser.save((err) => {
                     if (err) {
                         console.error('ERROR: ' + err);

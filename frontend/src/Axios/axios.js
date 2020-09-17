@@ -61,29 +61,10 @@ export default class AxiosHelper {
     //     return axios.post(PostEndpoint.IMAGE_POST, formData);
     // }
 
-    static createPost(username, postType, textData, imageArray, coverPhoto, date, minDuration, isMilestone, title, postPrivacyType, pursuitCategory) {
-        let formData = new FormData();
-        console.log(imageArray);
-        console.log(coverPhoto);
-        formData.append("postType", postType);
-        formData.append("username", username);
-        console.log(minDuration);
-        if (title) formData.append("previewTitle", title);
-        if (postPrivacyType) formData.append("postPrivacyType", postPrivacyType);
-        if (pursuitCategory) formData.append("pursuitCategory", pursuitCategory)
-        if (date) formData.append("date", date);
-        if (minDuration) formData.append("minDuration", minDuration);
-        if (isMilestone) formData.append("isMilestone", isMilestone);
-        if (textData) formData.append("textData", textData);
-        if (coverPhoto) formData.append("coverPhoto", coverPhoto);
-        if (imageArray && imageArray.length > 0) {
-            for (const image of imageArray) {
-                formData.append("images", image);
-            }
-            return axios.post(PostEndpoint.POST_URL, formData);
-        }
-        return axios.post(PostEndpoint.POST_URL, formData);
+    static createPost(postInfoForm) {
+        return axios.post(PostEndpoint.POST_URL, postInfoForm);
     }
+    
     //FIXME 
     //STEAL THE UPLOAD THING FROM HERE
     // static postShortPost(formData, progressRef, uploadRef, textOnly){
@@ -115,6 +96,11 @@ export default class AxiosHelper {
     // static saveDraft(username, editorState) {
     //     return axios.post(DRAFT_UPLOAD_URL, { username: username, editorState: editorState });
     // }
+
+    static saveDraftMetaInfo(metaInfoForm){
+        return axios.put(DRAFT_URL, metaInfoForm)
+    }
+
     static saveDraft(username, draft) {
         return axios.put(DRAFT_URL,
           {username: username, draft: draft}

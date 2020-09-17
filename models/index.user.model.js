@@ -39,7 +39,12 @@ const indexUserSchema = new Schema(
             type: String,
             required: false,
         },
-        draft: Post.Schema,
+
+        draft: {
+            type: String,
+            required: false,
+        },
+        
         pursuits: [IndexPursuit.Schema],
         recent_posts: [Post.Schema]
     }

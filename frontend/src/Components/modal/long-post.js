@@ -7,7 +7,6 @@ const LongPost = (props) => {
   const [windowState, setWindowState] = useState("initial");
   const [hasContent, setHasContent] = useState(props.onlineDraft !== null);
   const [isSavePending, setSavePending] = useState(false);
-  const [synced, setSynced] = useState(false);
   const [localDraft, setLocalDraft] = useState(props.onlineDraft);
 
   const handleSavePending = (currentlySaving) => {
@@ -15,14 +14,12 @@ const LongPost = (props) => {
   }
 
   const syncChanges = () => {
-   
     console.log(props.onSyncMerge);
     props.onLocalOnlineSync(localDraft)
       .then((result) => {
         if (result) {
           console.log("SAVING SIDE WAY");
           setSavePending(false);
-          setSynced(true);
         }
         else {
           alert("Save unsucessful");
@@ -31,21 +28,21 @@ const LongPost = (props) => {
       );
   }
 
-  const handlePageClick = (postType, isSavePending) => {
-    if (isSavePending) {
-      //if not saved online, save locally and online
-      if (!window.confirm("Do you want to leave while changes are being saved?")) {
-        syncChanges();
-      }
-      else {
-        props.onPostTypeSet(postType, null);
-      }
-    }
-    else {
-      props.onPostTypeSet(postType, localDraft);
-      syncChanges();
-    }
-  }
+  // const handlePageClick = (postType, isSavePending) => {
+  //   if (isSavePending) {
+  //     //if not saved online, save locally and online
+  //     if (!window.confirm("Do you want to leave while changes are being saved?")) {
+  //       syncChanges();
+  //     }
+  //     else {
+  //       props.onPostTypeSet(postType, null);
+  //     }
+  //   }
+  //   else {
+  //     props.onPostTypeSet(postType, localDraft);
+  //     syncChanges();
+  //   }
+  // }
 
   const setPostStage = (windowType, isSavePending) => {
     if (isSavePending) {
@@ -73,11 +70,11 @@ const LongPost = (props) => {
         setWindowState(windowType);
       }
       //already saved, just set the local state
-      else if (windowType === "review"){
+      else if (windowType === "review") {
         setWindowState(windowType);
         props.onLocalSync(localDraft);
       }
-      else{
+      else {
         setWindowState(windowType);
 
       }
@@ -101,9 +98,8 @@ const LongPost = (props) => {
         {props.onlineDraftRetrieved && !props.loading ?
           (<LongEditor
             username={props.username}
-            setSynced={setSynced}
             isSavePending={isSavePending}
-            synced={synced}
+          
             hasContent={hasContent}
             setHasContent={setHasContent}
             onSavePending={handleSavePending}

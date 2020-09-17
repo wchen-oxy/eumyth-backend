@@ -15,12 +15,13 @@ class PostController extends React.Component {
     this.state = {
       onlineDraftRetrieved: false,
       onlineDraft: null,
-    
+
       updatingOnlineDraft: false,
       postType: "none",
       pursuits: null,
       indexUserData: null,
-      errorSaving: false
+      errorRetrievingDraft: false,
+      errorSaving: false,
     };
 
     this.handleDisablePost = this.handleDisablePost.bind(this);
@@ -118,6 +119,14 @@ class PostController extends React.Component {
           console.log(response.status);
           this.setState({ onlineDraft: response.data, updatingOnlineDraft: false });
         }
+        else {
+          this.setState({ onlineDraftRetrieved: true, updatingOnlineDraft: false, errorRetrievingDraft: true });
+          alert(
+            `Something went wrong retrieving your long post draft. 
+            Please do not edit your old draft or you will your saved data. 
+            Refresh your page or contact support for more help.`
+          )
+        }
       })
       .catch(error => {
         console.log(
@@ -139,10 +148,10 @@ class PostController extends React.Component {
       case ("none"):
         if (localDraft) {
           console.log(localDraft);
-          this.setState({ postType: postType, onlineDraft: localDraft});
+          this.setState({ postType: postType, onlineDraft: localDraft });
         }
-        else{
-          this.setState({ postType : postType})
+        else {
+          this.setState({ postType: postType })
         }
         break;
       case ("short"):
@@ -191,7 +200,6 @@ class PostController extends React.Component {
             pursuits={this.state.pursuits}
             onlineDraftRetrieved={this.state.onlineDraftRetrieved}
             preferredPostType={this.state.indexUserData.preferredPostType}
-            previewTitle={this.state.indexUserData.draft.previewTitle}
             updatingOnlineDraft={this.state.updatingOnlineDraft}
             onLocalDraftChange={this.handleLocalDraftChange}
             onLocalOnlineSync={this.handleLocalOnlineSync}

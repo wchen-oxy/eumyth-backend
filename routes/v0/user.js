@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 let User = require('../../models/user.model');
+let Post = require('../../models/draft.model');
 let IndexUser = require('../../models/index.user.model');
 let Pursuit = require('../../models/pursuit.model');
 let IndexPursuit = require('../../models/index.pursuit.model');
@@ -37,7 +38,6 @@ var upload = multer({
 router.route('/')
 .get((req, res) => {
     const username = req.query.username;
-    console.log("FUCKERS");
     User.Model.findOne({ username: username }).then(
       user => {
         if (user) res.status(200).json(user);
@@ -68,8 +68,6 @@ router.route('/')
 
   let mainPursuitsHolder = [];
   let indexPursuitsHolder = [];
-  console.log("HOMO");
-  console.log(pursuitsArray);
   for (const pursuit of pursuitsArray) {
     console.log(pursuit);
     console.log(pursuit.name);
@@ -113,6 +111,7 @@ router.route('/')
     small_cropped_display_photo : smallCroppedImage,
     tiny_cropped_display_photo: tinyCroppedImage,
     private: false,
+    draft: '',
     pursuits: indexPursuitsHolder
   });
 

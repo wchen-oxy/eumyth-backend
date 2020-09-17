@@ -121,7 +121,8 @@ router.route('/').post(upload.fields([{ name: "images" }, { name: "coverPhoto", 
 
   const postType = !!req.body.postType ? req.body.postType : null;
   const username = req.body.username;
-  const title = !!req.body.previewTitle ? req.body.previewTitle : null;
+  const title = !!req.body.title ? req.body.title : null;
+  const description = !!req.body.description ? req.body.description : null;
   const postPrivacyType = !!req.body.postPrivacyType ? req.body.postPrivacyType : null;
   const pursuitCategory = !!req.body.pursuitCategory ? req.body.pursuitCategory : null;
   const date = !!req.body.date ? req.body.date : null;
@@ -149,7 +150,7 @@ router.route('/').post(upload.fields([{ name: "images" }, { name: "coverPhoto", 
     switch (postType) {
       case ("short"):
         post = new Post.Model({
-          preview_title: title,
+          title: title,
           private: postPrivacyType,
           date: date,
           author_id: resolvedIndexUser.user_profile_ref,
@@ -164,7 +165,8 @@ router.route('/').post(upload.fields([{ name: "images" }, { name: "coverPhoto", 
         break;
       case ("long"):
         post = new Post.Model({
-          preview_title: title,
+          title: title,
+          description: description, 
           private: postPrivacyType,
           author_id: resolvedIndexUser.user_profile_ref,
           pursuit_category: pursuitCategory,

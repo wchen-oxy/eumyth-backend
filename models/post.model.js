@@ -3,7 +3,13 @@ const Comment = require("./comment.model");
 const Schema = mongoose.Schema;
 
 const postSchema = new Schema({
-  preview_title: {
+  title: {
+    type: String,
+    required: false,
+    trim: true
+  },
+
+  description: {
     type: String,
     required: false,
     trim: true

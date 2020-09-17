@@ -11,7 +11,7 @@ class ShortPost extends React.Component {
       validFiles: [],
       unsupportedFiles: [],
       imageArray: [],
-      postDescription: '',
+      postText: '',
       postDisabled: true,
       window: 'initial',
       // previewTitle: ''
@@ -59,7 +59,7 @@ class ShortPost extends React.Component {
     }
     else {
       this.setState((state) => ({
-        postDescription: text,
+        postText: text,
         postDisabled: (text.length === 0) && (state.validFiles.length === 0 || state.unsupportedFiles.length > 0)
       }));
     }
@@ -120,7 +120,7 @@ class ShortPost extends React.Component {
               unsupportedFiles={this.state.unsupportedFiles}
               setImageArray={this.setImageArray}
               // title={this.state.title}
-              text={this.state.postDescription}
+              text={this.state.postText}
               onTextChange={this.handleTextChange}
               onSelectedFileChange={this.handleSelectedFileChange}
               onUnsupportedFileChange={this.handleUnsupportedFileChange}
@@ -141,7 +141,7 @@ class ShortPost extends React.Component {
           postType={"short"}
           onClick={this.handleClick}
           imageArray={this.state.imageArray}
-          postText={this.state.postDescription}
+          postText={this.state.postText}
           username={this.props.username}
           preferredPostType={this.props.preferredPostType}
           pursuits={this.props.pursuits}

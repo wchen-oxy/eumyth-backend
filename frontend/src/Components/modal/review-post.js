@@ -1,43 +1,80 @@
 import React, { useState } from 'react';
 import AxiosHelper from '../../Axios/axios';
+import _ from 'lodash';
 import TextareaAutosize from 'react-textarea-autosize';
 
 const ReviewPost = (props) => {
-    const [date, setDate] = useState();
-    const [minDuration, setMinDuration] = useState();
+    const [date, setDate] = useState(null);
+    const [minDuration, setMinDuration] = useState(null);
     const [milestone, setMilestone] = useState(false);
-    const [previewTitle, setPreviewTitle] = useState(props.previewTitle);
-    const [postPrivacyType, setPostPrivacyType] = useState("public-feed")
-    const [postPursuitType, setPursuitType] = useState(null)
+    const [title, setTitle] = useState(props.title);
+    const [subtitle, setSubtitle] = useState('');
+
+    const [postPrivacyType, setPostPrivacyType] = useState("public-feed");
+    // const [description, setDescription] = useState(props.description);
+    const [pursuitCategory, setPursuitCategory] = useState(null)
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
     const [coverPhoto, setCover] = useState(null);
 
-    const handlePostSubmit = (e, postType) => {
-        e.preventDefault();
+
+    const handlePostSubmit = () => {
         setLoading(true);
         console.log(props.imageArray);
-        AxiosHelper.createPost(
-            props.username,
-            postType === "short" ? "short" : "long",
-            props.postText,
-            props.imageArray,
-            coverPhoto,
-            date,
-            minDuration,
-            milestone,
-            previewTitle,
-            postPrivacyType,
-            postPursuitType
-        ).then(
-            (result) => {
-                //FIXME add in the listener and response for the new post
-                result.status === 201 ? handleSuccess() : handleError();
+
+        let formData = new FormData();
+        formData.append("postType", props.postType);
+        formData.append("username", props.username);
+        console.log(minDuration);
+        if (title) formData.append("title", title);
+        if (subtitle) formData.append("subtitle", subtitle);
+        if (postPrivacyType) formData.append("postPrivacyType", postPrivacyType);
+        if (pursuitCategory) formData.append("pursuitCategory", pursuitCategory)
+        if (date) formData.append("date", date);
+        if (minDuration) formData.append("minDuration", minDuration);
+        if (milestone) formData.append("isMilestone", milestone);
+        if (props.postText) formData.append("textData", props.postText);
+        if (coverPhoto) formData.append("coverPhoto", coverPhoto);
+        if (props.imageArray && props.imageArray.length > 0) {
+            for (const image of props.imageArray) {
+                formData.append("images", image);
             }
-        );
+            
+        }
+        AxiosHelper.createPost(
+           formData
+        )
+            .then(
+                //     (response) => {
+                //         if (response.status === 201) {
+                //             // AxiosHelper.de
+                //         }
+                //     }
+                // )
+                (result) => {
+                    //FIXME add in the listener and response for the new post
+                    result.status === 201 ? handleSuccess() : handleError();
+                }
+            );
+    }
+
+    const handleMetaDataSave = (setDataFunc, value) => {
+        // setDataFunc(value);
+        // _.debounce(AxiosHelper.saveDraftMetaInfo(
+        //     new FormData()
+        //     .append(props.username)
+        //     .append( title)
+        //     .append(description)
+        //     .append(date)
+        //     .append(coverPhoto)
+        //     .append(pursuitCategory)
+        //     .append(milestone)
+        //     .append(minDuration)
+        //    ), 4000)
     }
 
     const handleSuccess = () => {
+        alert("Post Successful! You will see your post soon.");
         props.closeModal();
     }
 
@@ -46,20 +83,41 @@ const ReviewPost = (props) => {
         setError(true);
 
     }
+    const handleMilestoneChange = (milestone) => {
+        setMilestone(milestone);
+        handleMetaDataSave();
+    }
+    const handleDateChange = (date) => {
+        setDate(date);
+        handleMetaDataSave();
+    }
 
-    const setPursuitTypes = (type) => {
-        setPursuitType(type);
+    const handlePursuitChange = (type) => {
+        setPursuitCategory(type);
+        handleMetaDataSave();
     }
 
     const setPostPrivacyTypes = (type) => {
         setPostPrivacyType(type);
         props.handlePreferredPostTypeChange(type);
+
     }
 
-    const handlePreviewTitleChange = (previewTitle) => {
-        setPreviewTitle(previewTitle);
+    const handleTitleChange = (title) => {
+        setTitle(title);
+        handleMetaDataSave();
+
     }
 
+    const handleDescriptionChange = (description) => {
+        setSubtitle(description);
+        handleMetaDataSave();
+    }
+
+    const handleMinDurationChange = (minDuration) => {
+        setMinDuration(minDuration);
+        handleMetaDataSave();
+    }
 
     let pursuitSelects = [];
     pursuitSelects.push(
@@ -88,22 +146,24 @@ const ReviewPost = (props) => {
                 </div>
                 <div className="post-button-container">
                     <label>Preview Title</label>
-                    <TextareaAutosize name="title" id='review-post-text' placeholder='Create an Optional Preview Title Text' maxRows={2} onChange={(e) => handlePreviewTitleChange(e.target.value)} maxLength={140} />
-                    {/* <input type="text" value={props.previewTitle} onChange={(e) => handlePreviewTitleChange(e.target.value)}></input> */}
+                    <TextareaAutosize name="title" id='review-post-text' placeholder='Create an Optional Preview Title Text' maxRows={2} onChange={(e) => handleTitleChange(e.target.value)} maxLength={100} />
+                    <TextareaAutosize name="description" id='review-post-text' placeholder='Create an Optional Description' maxRows={2} onChange={(e) => handleDescriptionChange(e.target.value)} maxLength={140} />
+
+                    {/* <input type="text" value={props.previewTitle} onChange={(e) => handleTitleChange(e.target.value)}></input> */}
                     <label>Cover</label>
                     <input type="file" onChange={(e) => {
                         setCover(e.target.files[0]);
                     }}></input>
                     <label>Date</label>
-                    <input type="date" onChange={(e) => setDate(e.target.value)}></input>
+                    <input type="date" onChange={(e) => handleDateChange(e.target.value)}></input>
                     <label>Pursuit</label>
-                    <select name="cars" id="cars" onChange={(e) => setPursuitTypes(e.target.value)}>
+                    <select name="pursuit-category" onChange={(e) => handlePursuitChange(e.target.value)}>
                         {pursuitSelects}
                     </select>
                     <label>Total Minutes</label>
-                    <input type="number" onChange={(e) => setMinDuration(e.target.value)}></input>
+                    <input type="number" onChange={(e) => handleMinDurationChange(e.target.value)}></input>
                     <label>Is Milestone</label>
-                    <input type="checkbox" onClick={() => setMilestone(!milestone)}></input>
+                    <input type="checkbox" onClick={() => handleMilestoneChange(!milestone)}></input>
                 </div>
                 <div className="post-button-container">
                     <p>Post to:</p>
@@ -114,7 +174,7 @@ const ReviewPost = (props) => {
                             <option value="public-feed" >Post to your feed and page</option>
                         </select>
                     </div>
-                    <button onClick={(e) => handlePostSubmit(e, props.postType)}>Post!</button>
+                    <button onClick={(e) => handlePostSubmit()}>Post!</button>
                 </div>
 
                 {
