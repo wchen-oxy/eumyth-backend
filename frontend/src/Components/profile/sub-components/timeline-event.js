@@ -1,5 +1,5 @@
 import React from 'react';
-import './event.scss';
+import './timeline-event.scss';
 
 const Event = (props) => {
     const post = props.eventData;

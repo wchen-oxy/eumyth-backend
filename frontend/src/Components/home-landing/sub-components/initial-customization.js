@@ -207,8 +207,8 @@ class InitialCustomizationPage extends React.Component {
                             <AvatarEditor
                                 ref={this.setEditorRef}
                                 image={this.state.profilePhoto}
-                                width={200}
-                                height={200}
+                                width={170}
+                                height={170}
                                 borderRadius={200}
                                 border={50}
                                 color={[215, 215, 215, 0.8]} // RGBA

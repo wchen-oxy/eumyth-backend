@@ -1,5 +1,5 @@
 import React from 'react';
-import Event from './sub-components/event';
+import Event from './sub-components/timeline-event';
 import './timeline.scss';
 
 class Timeline extends React.Component {
@@ -17,9 +17,7 @@ class Timeline extends React.Component {
                 array.push(
                     <Event key={i} eventIndex={i} eventData={event} onEventClick={this.props.onEventClick} />
                 )
-            }
-         console.log(this.props.recentPosts);
-          
+            }          
         return (
             <>
                 <div id="timeline-container">

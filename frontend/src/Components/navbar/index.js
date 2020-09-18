@@ -3,7 +3,7 @@ import "./index.scss";
 import { AuthUserContext } from "../../Components/session/"
 import { withFirebase } from "../../Firebase";
 import { Link } from "react-router-dom";
-import PostController from "../modal/index";
+import PostController from "../modal-editor/index";
 const Navigation = () => (
 
   <AuthUserContext.Consumer>

@@ -7,10 +7,6 @@ import AxiosHelper from '../../Axios/axios';
 import NoMatch from '../no-match';
 import EventModal from "./sub-components/event-modal";
 
-
-//set each necessary state
-
-
 class ProfilePage extends React.Component {
     _isMounted = false;
     constructor(props) {
@@ -54,7 +50,7 @@ class ProfilePage extends React.Component {
                     if (!response) this.setState({ fail: true });
                     else {
                         const result = response.data;
-                        console.log(result.recent_posts);
+                        console.log(result.cropped_display_photo);
                         if (this._isMounted) this.setState({
                             coverPhoto: result.cover_photo,
                             displayPhoto: result.cropped_display_photo,
@@ -71,7 +67,6 @@ class ProfilePage extends React.Component {
 
     componentWillUnmount() {
         this._isMounted = false;
-
     }
 
 
@@ -88,16 +83,12 @@ class ProfilePage extends React.Component {
     handleEventClick(index) {
         console.log(index);
         const selectedEvent = index < this.state.recentPosts.length ? this.state.recentPosts[index] : this.state.allPosts[index];
-        this.setState({selectedEvent : selectedEvent}, 
-            this.openModal()
-            );
-       
+        this.setState({selectedEvent : selectedEvent}, this.openModal());
     }
 
     render() {
         var pursuitHolderArray = [];
         if (this.state.fail) return NoMatch;
-
         if (this.state.pursuits) {
             for (const pursuit of this.state.pursuits) {
                 pursuitHolderArray.push(
@@ -105,24 +96,25 @@ class ProfilePage extends React.Component {
                 );
             }
         }
-        console.log(this.state.recentPosts);
+        console.log(this.state.displayPhoto);
 
         return (
             <div>
                 <div id="personal-profile-container">
                 <div id="personal-profile-header">
                     {
-                        this.state.user ?
-                            (<img href={this.state.user.cover_photo}></img>) : (<div id="temp-cover"></div>)
+                        this.state.coverPhoto ?
+                            (<img src={this.state.coverPhoto}></img>) : (<div id="temp-cover"></div>)
                     }
                 </div>
                 <div id="personal-profile-intro-container">
                     <div id="personal-profile-photo">
-                        {this.state.user ? <img href={this.state.user.display_photo}></img> : <></>}
-                    </div>
-                    <div id="personal-profile-name-container">
+                        {this.state.displayPhoto ? <img src={this.state.displayPhoto}></img> : <></>}
+                        <div id="personal-profile-name-container">
                         <h4 id="personal-profile-name">William Chen</h4>
+                        </div>
                     </div>
+                   
                     <div id="personal-profile-description">
                         {this.state.bio ? <p>{this.state.bio}</p> : <p></p>}
                     </div>
