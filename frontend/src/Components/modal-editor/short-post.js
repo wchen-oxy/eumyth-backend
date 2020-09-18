@@ -12,6 +12,7 @@ class ShortPost extends React.Component {
       unsupportedFiles: [],
       imageArray: [],
       postText: '',
+      isPaginated: false,
       postDisabled: true,
       window: 'initial',
       // previewTitle: ''
@@ -27,7 +28,26 @@ class ShortPost extends React.Component {
     this.handleDisablePost = this.handleDisablePost.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.generateValidFiles = this.generateValidFiles.bind(this);
+    this.handleCaptionStyleChange = this.handleCaptionStyleChange.bind(this);
 
+  }
+
+  handleCaptionStyleChange(){
+      if (this.state.isPaginated === false){
+        let postArray = [];
+        const imageCount = this.state.validFiles.length ;
+        postArray.append(this.state.postText);
+        for (let i = 1; i < imageCount; i++ ){
+          postArray.append([]);
+        }
+        this.setState({postText : postArray, isPaginated : true});
+      }
+      else{
+        if (window.confirm("Switching back will remove all your captions except for the first one. Keep going?")){
+          const postText = this.state.postText[0];
+          this.setState({postText : postText, isPaginated: false});
+        }
+      }
   }
 
   // handleTitleChange(e)
@@ -119,6 +139,7 @@ class ShortPost extends React.Component {
               validFiles={this.state.validFiles}
               unsupportedFiles={this.state.unsupportedFiles}
               setImageArray={this.setImageArray}
+              onCaptionStyleChange={this.handleCaptionStyleChange}
               // title={this.state.title}
               text={this.state.postText}
               onTextChange={this.handleTextChange}

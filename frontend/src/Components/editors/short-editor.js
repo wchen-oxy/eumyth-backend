@@ -17,11 +17,11 @@ class ShortEditor extends React.Component {
         this.state = {
             errorMessage: ''
         }
-        // this.handleImagePost = this.handleImagePost.bind(this);
         this.setErrorMessage = this.setErrorMessage.bind(this);
         this.validateFile = this.validateFile.bind(this);
    
     }
+
 
     setErrorMessage(value) {
         this.setState({ value });
@@ -193,6 +193,7 @@ class ShortEditor extends React.Component {
             <div id="text-container">
                 <div className="description-container">
                     <h4>{this.props.username}</h4>
+                    {this.props.validFiles > 0 ? <button onChange={this.props.onCaptionStyleChange}>Caption Photos Individually</button>: <></>}
                    
                     {/* <input name="title" type="text" maxlength="140" placeholder="Optional Title" onChange={(e) => this.props.onTextChange(e)}></input> */}
                     {/* <TextareaAutosize name="title" id='short-post-text' placeholder='Write something here.' maxRows={2} onChange={this.props.onTextChange}  value={this.props.title} maxLength={140}/> */}
