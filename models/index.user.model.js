@@ -3,15 +3,6 @@ const Schema = mongoose.Schema;
 const Post = require("./post.model");
 const IndexPursuit = require("./index.pursuit.model");
 
-const friendSchema = new Schema({
-    friend_profile_id: {
-        type: mongoose.Types.ObjectId
-    },
-    status: {
-        type: String
-    }
-});
-
 const indexUserSchema = new Schema(
     {
         username: {
