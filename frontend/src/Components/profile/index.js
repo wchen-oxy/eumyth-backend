@@ -14,7 +14,8 @@ class ProfilePage extends React.Component {
         this.state = {
             username: this.props.match.params.username,
             private: false,
-            displayPhoto: "",
+            croppedDisplayPhoto: null,
+            tinyCroppedcroppedDisplayPhoto: null,
             coverPhoto: "",
             bio: "",
             pursuits: null,
@@ -53,7 +54,8 @@ class ProfilePage extends React.Component {
                         console.log(result.cropped_display_photo);
                         if (this._isMounted) this.setState({
                             coverPhoto: result.cover_photo,
-                            displayPhoto: result.cropped_display_photo,
+                            croppedDisplayPhoto: result.cropped_display_photo,
+                            tinyCroppedDisplayPhoto: result.tiny_cropped_display_photo,
                             bio: result.bio,
                             pinned: result.pinned,
                             pursuits: result.pursuits,
@@ -83,7 +85,7 @@ class ProfilePage extends React.Component {
     handleEventClick(index) {
         console.log(index);
         const selectedEvent = index < this.state.recentPosts.length ? this.state.recentPosts[index] : this.state.allPosts[index];
-        this.setState({selectedEvent : selectedEvent}, this.openModal());
+        this.setState({ selectedEvent: selectedEvent }, this.openModal());
     }
 
     render() {
@@ -96,36 +98,36 @@ class ProfilePage extends React.Component {
                 );
             }
         }
-        console.log(this.state.displayPhoto);
+        console.log(this.state.croppedDisplayPhoto);
 
         return (
             <div>
                 <div id="personal-profile-container">
-                <div id="personal-profile-header">
-                    {
-                        this.state.coverPhoto ?
-                            (<img src={this.state.coverPhoto}></img>) : (<div id="temp-cover"></div>)
-                    }
-                </div>
-                <div id="personal-profile-intro-container">
-                    <div id="personal-profile-photo">
-                        {this.state.displayPhoto ? <img src={this.state.displayPhoto}></img> : <></>}
-                        <div id="personal-profile-name-container">
-                        <h4 id="personal-profile-name">William Chen</h4>
+                    <div id="personal-profile-header">
+                        {
+                            this.state.coverPhoto ?
+                                (<img src={this.state.coverPhoto}></img>) : (<div id="temp-cover"></div>)
+                        }
+                    </div>
+                    <div id="personal-profile-intro-container">
+                        <div id="personal-profile-photo">
+                            {this.state.croppedDisplayPhoto ? <img src={this.state.croppedDisplayPhoto}></img> : <></>}
+                            <div id="personal-profile-name-container">
+                                <h4 id="personal-profile-name">{this.state.username}</h4>
+                            </div>
                         </div>
-                    </div>
-                   
-                    <div id="personal-profile-description">
-                        {this.state.bio ? <p>{this.state.bio}</p> : <p></p>}
-                    </div>
-                    <div id="pursuit-selection-container">
-                        {pursuitHolderArray}
-                    </div>
 
-                </div>
+                        <div id="personal-profile-description">
+                            {this.state.bio ? <p>{this.state.bio}</p> : <p></p>}
+                        </div>
+                        <div id="pursuit-selection-container">
+                            {pursuitHolderArray}
+                        </div>
+
+                    </div>
                 </div>
                 <div id="personal-profile-timeline-container">
-                <Timeline recentPosts={this.state.recentPosts} onEventClick={this.handleEventClick} />
+                    <Timeline recentPosts={this.state.recentPosts} onEventClick={this.handleEventClick} />
 
                 </div>
 
@@ -135,7 +137,11 @@ class ProfilePage extends React.Component {
                 <div className="modal" ref={this.modalRef}>
                     <div className="overlay"></div>
                     <span className="close" onClick={(() => this.closeModal())}>X</span>
-                    <EventModal closeModal={this.closeModal} eventData={this.state.selectedEvent}/>
+                    <EventModal
+                        tinyProfilePhoto={this.state.tinyCroppedDisplayPhoto}
+                        username={this.state.username}
+                        eventData={this.state.selectedEvent} 
+                        closeModal={this.closeModal}/>
                 </div>
             </div>
         );

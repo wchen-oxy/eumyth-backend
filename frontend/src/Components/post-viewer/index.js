@@ -8,7 +8,10 @@ class PostWindowController extends React.Component {
         this.state = {
             window: 'main'
         }
+        this.handleWindowChange = this.handleWindowChange.bind(this);
+
     }
+
 
     render() {
         if (this.state.window === "main") {

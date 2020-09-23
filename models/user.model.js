@@ -41,8 +41,6 @@ const userSchema = new Schema({
   pursuits: [Pursuits.Schema],
   all_posts: [mongoose.Types.ObjectId],
   recent_posts: [Post.Schema],
-
-
 }, {
   timestamps: true,
 });

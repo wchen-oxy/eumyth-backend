@@ -19,9 +19,8 @@ class ShortEditor extends React.Component {
         }
         this.setErrorMessage = this.setErrorMessage.bind(this);
         this.validateFile = this.validateFile.bind(this);
-   
-    }
 
+    }
 
     setErrorMessage(value) {
         this.setState({ value });
@@ -121,7 +120,7 @@ class ShortEditor extends React.Component {
             this.props.setUnsupportedFiles(unsupportedFiles);
         }
 
-        if (validFiles.length > 0 && unsupportedFiles.length === 0 ) {
+        if (validFiles.length > 0 && unsupportedFiles.length === 0) {
             this.updateDisabilityState(false);
         }
         else {
@@ -188,17 +187,17 @@ class ShortEditor extends React.Component {
                 }
             </div>
         );
-     
+
         const textContainer = (
             <div id="text-container">
                 <div className="description-container">
                     <h4>{this.props.username}</h4>
-                    {this.props.validFiles > 0 ? <button onChange={this.props.onCaptionStyleChange}>Caption Photos Individually</button>: <></>}
-                   
+                    {this.props.validFiles > 0 ? <button onChange={this.props.onCaptionStyleChange}>Caption Photos Individually</button> : <></>}
+
                     {/* <input name="title" type="text" maxlength="140" placeholder="Optional Title" onChange={(e) => this.props.onTextChange(e)}></input> */}
                     {/* <TextareaAutosize name="title" id='short-post-text' placeholder='Write something here.' maxRows={2} onChange={this.props.onTextChange}  value={this.props.title} maxLength={140}/> */}
                     <div id="description-input-container" >
-                        <TextareaAutosize id='short-post-text' placeholder='Write something here.' onChange={this.props.onTextChange} minRows={5} value={this.props.text}/>
+                        <TextareaAutosize id='short-post-text' placeholder='Write something here.' onChange={this.props.onTextChange} minRows={5} value={this.props.text} />
                         {/* <form>
                             <input id='short-post-text' type='text' placeholder='Write something here.'>
                             </input>
@@ -217,33 +216,33 @@ class ShortEditor extends React.Component {
             return (
                 <div className="short-editor-container">
                     <div className="post-preview-container" id="before-image-container">
-                        {textContainer} 
+                        {textContainer}
                     </div>
 
                     <div className="photo-upload-container">
-                            {/* {unsupportedFiles.length === 0 && validFiles.length ? <button className="file-upload-btn" onClick={() => uploadFiles()}>Upload Files</button> : ''} */}
-                            {this.props.unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
-                            <div className="drop-image-container" id="drop-image-container-before"
-                                onDragOver={this.dragOver}
-                                onDragEnter={this.dragEnter}
-                                onDragLeave={this.dragLeave}
-                                onDrop={this.fileDrop}
-                                onClick={this.fileInputClicked}
-                            >
-                                <div className="drop-message">
-                                    <div className="upload-icon"></div>
+                        {/* {unsupportedFiles.length === 0 && validFiles.length ? <button className="file-upload-btn" onClick={() => uploadFiles()}>Upload Files</button> : ''} */}
+                        {this.props.unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
+                        <div className="drop-image-container" id="drop-image-container-before"
+                            onDragOver={this.dragOver}
+                            onDragEnter={this.dragEnter}
+                            onDragLeave={this.dragLeave}
+                            onDrop={this.fileDrop}
+                            onClick={this.fileInputClicked}
+                        >
+                            <div className="drop-message">
+                                <div className="upload-icon"></div>
                             Drag and Drop files here or click to select file(s)
                                 </div>
-                                <input
-                                    ref={this.fileInputRef}
-                                    className="file-input"
-                                    type="file"
-                                    multiple
-                                    onChange={this.filesSelected}
-                                />
-                            </div>
-                            {/* {fileDisplayContainer} */}
+                            <input
+                                ref={this.fileInputRef}
+                                className="file-input"
+                                type="file"
+                                multiple
+                                onChange={this.filesSelected}
+                            />
                         </div>
+                        {/* {fileDisplayContainer} */}
+                    </div>
                     {/* <div className="box__input">
                             <form className="box" method="post" action="" enctype="multipart/form-data">
                                     <input
@@ -278,8 +277,8 @@ class ShortEditor extends React.Component {
                     </div>
                     <div className="editor-component-container">
                         <div className="uploaded-file-container post-button-container">
-                        {miniDropContainer}
-                        {fileDisplayContainer}
+                            {miniDropContainer}
+                            {fileDisplayContainer}
                         </div>
                     </div>
                 </>

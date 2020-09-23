@@ -49,7 +49,7 @@ router.route('/')
     )
   }
   )
-  .post(upload.fields([{ name: "croppedImage" }, { name: "smallCroppedImage" }, { name: "tinyCroppedImage" }]),
+  .put(upload.fields([{ name: "croppedImage" }, { name: "smallCroppedImage" }, { name: "tinyCroppedImage" }]),
     (req, res) => {
       console.log(req.files);
       console.log(req.body);

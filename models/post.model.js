@@ -1,12 +1,22 @@
 const mongoose = require('mongoose');
-const Comment = require("./comment.model");
+const PostFeedback = require("./post.feedback");
 const Schema = mongoose.Schema;
 
 const postSchema = new Schema({
+
   title: {
     type: String,
     required: false,
     trim: true
+  },
+
+  author_id: {
+    type: mongoose.Types.ObjectId,
+    required: true
+  },
+
+  date: {
+    type: Date
   },
 
   description: {
@@ -20,13 +30,14 @@ const postSchema = new Schema({
     required: false,
   },
 
-  date: {
-    type: Date
+  username: {
+    type: String,
+    required: false,
   },
 
-  author_id: {
-    type: mongoose.Types.ObjectId,
-    required: true
+  display_photo_url: {
+    type: String,
+    required: false,
   },
 
   cover_photo_url: {
@@ -54,6 +65,10 @@ const postSchema = new Schema({
     type: String,
     required: false
   },
+  paginated_text_data: {
+    type: [String],
+    required: false
+  },
 
   image_data: {
     array: [String],
@@ -65,13 +80,8 @@ const postSchema = new Schema({
     required: false
   },
 
-  likes: {
-    array: [String],
-    required:  false,
-  },
-  recent_comments: [Comment.Schema],
-  all_comments: {
-    type: mongoose.Types.ObjectId,
+  feedback: {
+    type: PostFeedback.Schema
   }
 
 }, {

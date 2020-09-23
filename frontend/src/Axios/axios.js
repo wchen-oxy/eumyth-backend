@@ -18,7 +18,7 @@ export default class AxiosHelper {
     }
 
     static createUserProfile(formData) {
-        return axios.post(UserEndpoint.USER_URL, formData);
+        return axios.put(UserEndpoint.USER_URL, formData);
     }
 
     static setDraftPreviewTitle(previewTitle) {

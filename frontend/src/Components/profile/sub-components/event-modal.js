@@ -1,40 +1,39 @@
-import React, { useEffect } from 'react';
+import React from 'react';
+import ShortPostViewer from "../../post-viewer/short-post";
+import LongPostViewer from "../../post-viewer/long-post";
 import "./event-modal.scss";
 
-const EventModal = (props) => {
-    useEffect(() => {
-        console.log("Is Mounted")
-    },
-        []);
-    const post = props.eventData;
-    if (!post) return (
-        <div id="event-modal">
-        </div>
-    );
-    return (
-        <div className="small-post-window">
-            {post.post_format ?
-                (
-                    <div className="inner-small-post-container">
-                        {post.image_data ?
-                            (<div id="event-inner-window-image">
-                                <div>
-                                    
-                                </div>
-                            </div>)
-                            :
-                            (<div id="event-inner-window-no-image">
-                            </div>)
-                        }
-                    </div>
-                )
-                : (
-                    <div className="inner-small-post-container">
+class EventModal extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            window: 'main'
+        }
+        this.handleWindowChange = this.handleWindowChange.bind(this);
 
-                    </div>
-                )}
-        </div>
-    )
+    }
+    render() {
+        if (this.state.window === "main") {
+            if (this.props.eventData.postType === "short")
+                return (
+                    <ShortPostViewer
+                        profilePhoto={this.props.profilePhoto}
+                        username={this.props.username}
+                        images={this.props.eventData.image_data}
+                        text={this.props.eventData.text_data}
+                    />);
+            else {
+                return (<LongPostViewer />)
+            }
+        }
+        else {
+            return (
+                <div>
+
+                </div>
+            )
+        }
+    }
 }
 
 export default EventModal;

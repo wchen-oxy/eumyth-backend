@@ -3,6 +3,15 @@ const Schema = mongoose.Schema;
 const Post = require("./post.model");
 const IndexPursuit = require("./index.pursuit.model");
 
+const friendSchema = new Schema({
+    friend_profile_id: {
+        type: mongoose.Types.ObjectId
+    },
+    status: {
+        type: String
+    }
+});
+
 const indexUserSchema = new Schema(
     {
         username: {
@@ -13,6 +22,15 @@ const indexUserSchema = new Schema(
             trim: true
 
         },
+
+        followers: {
+            type: Number
+        },
+
+        following: {
+            type: Number
+        },
+
         cropped_display_photo: {
             type: String,
             required: false
@@ -28,7 +46,7 @@ const indexUserSchema = new Schema(
             required: false
         },
 
-        user_profile_ref: {
+        user_profile_id: {
             type: mongoose.Types.ObjectId,
             required: true,
             unique: true,
@@ -44,9 +62,11 @@ const indexUserSchema = new Schema(
             type: String,
             required: false,
         },
-        
+        friend_list: {
+            type: mongoose.Types.ObjectId,
+        },
         pursuits: [IndexPursuit.Schema],
-        recent_posts: [Post.Schema]
+        activity_feed: [Post.Schema]
     }
 );
 

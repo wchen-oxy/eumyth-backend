@@ -84,7 +84,7 @@ router.route('/').post(upload.fields([{ name: "images" }, { name: "coverPhoto", 
           title: title,
           private: postPrivacyType,
           date: date,
-          author_id: resolvedIndexUser.user_profile_ref,
+          author_id: resolvedIndexUser.user_profile_id,
           pursuit_category: pursuitCategory,
           cover_photo_url: coverPhotoURL,
           post_format: postType,
@@ -99,7 +99,7 @@ router.route('/').post(upload.fields([{ name: "images" }, { name: "coverPhoto", 
           title: title,
           subtitle: subtitle,
           private: postPrivacyType,
-          author_id: resolvedIndexUser.user_profile_ref,
+          author_id: resolvedIndexUser.user_profile_id,
           pursuit_category: pursuitCategory,
           cover_photo_url: coverPhotoURL,
           post_format: postType,
@@ -125,7 +125,7 @@ router.route('/').post(upload.fields([{ name: "images" }, { name: "coverPhoto", 
       }
     }
 
-    return resolvedIndexUser.user_profile_ref;
+    return resolvedIndexUser.user_profile_id;
   }
   );
 
