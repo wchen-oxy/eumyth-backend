@@ -1,16 +1,17 @@
-var express = require('express');
-var router = express.Router();
-let User = require('../../models/user.model');
-let IndexUser = require('../../models/index.user.model');
-let Post = require("../../models/post.model");
+const express = require('express');
+const router = express.Router();
+const User = require('../../models/user.model');
+const IndexUser = require('../../models/index.user.model');
+const Post = require("../../models/post.model");
 const multer = require('multer');
 const AWS = require('aws-sdk');
 const AwsConstants = require('../../constants/aws');
 const multerS3 = require('multer-s3');
 const uuid = require('uuid');
+const userRelationModel = require('../../models/user.relation.model');
 
 
-const setPusuitAttributes = (isMilestone, pursuit, minDuration) => {
+const setPursuitAttributes = (isMilestone, pursuit, minDuration) => {
   if (isMilestone) { pursuit.num_milestones = Number(pursuit.num_milestones) + 1; }
   console.log(pursuit.total_min);
   pursuit.total_min = Number(pursuit.total_min) + minDuration;
@@ -48,7 +49,7 @@ const getImageUrls = (array) => {
   return imageArray;
 }
 
-router.route('/').post(upload.fields([{ name: "images" }, { name: "coverPhoto", maxCount: 1 }]), (req, res) => {
+router.route('/').put(upload.fields([{ name: "images" }, { name: "coverPhoto", maxCount: 1 }]), (req, res) => {
 
   const postType = !!req.body.postType ? req.body.postType : null;
   const username = req.body.username;
@@ -65,6 +66,7 @@ router.route('/').post(upload.fields([{ name: "images" }, { name: "coverPhoto", 
 
   let post = null;
   let indexUser = null;
+  let followerArrayID = null;
   const resolveIndexUser = IndexUser.Model.findOne({ username: username }).then(
     indexUserResult => {
       indexUser = indexUserResult;
@@ -111,15 +113,18 @@ router.route('/').post(upload.fields([{ name: "images" }, { name: "coverPhoto", 
       default:
         res.status(500).send();
     }
+    //save followerArray for query
+    followerArrayID = indexUser.user_relation_id;
+    //modify new post array for indexUser
 
-    indexUser.recent_posts.push(post);
+    // indexUser.following_feed.push(post);
     if (indexUser.preferred_post_type !== postPrivacyType) {
       indexUser.preferred_post_type = postPrivacyType;
     }
     if (minDuration) {
       for (const pursuit of indexUser.pursuits) {
         if (pursuit.name === pursuitCategory) {
-          setPusuitAttributes(isMilestone, pursuit, minDuration);
+          setPursuitAttributes(isMilestone, pursuit, minDuration);
           break;
         }
       }
@@ -129,7 +134,7 @@ router.route('/').post(upload.fields([{ name: "images" }, { name: "coverPhoto", 
   }
   );
 
-  //save new post
+  //modify new post array for User
   let resolveUser = resolveNewPost.then(
     (result) => {
       return User.Model.findById(result);
@@ -144,7 +149,7 @@ router.route('/').post(upload.fields([{ name: "images" }, { name: "coverPhoto", 
       if (minDuration) {
         for (const pursuit of user.pursuits) {
           if (pursuit.name === pursuitCategory) {
-            setPusuitAttributes(isMilestone, pursuit, minDuration);
+            setPursuitAttributes(isMilestone, pursuit, minDuration);
             break;
           }
         }
@@ -155,12 +160,44 @@ router.route('/').post(upload.fields([{ name: "images" }, { name: "coverPhoto", 
     then(user => {
       indexUser.save().catch(err => res.status(500).json('Error: ' + err));
       user.save().catch(err => res.status(500).json('Error: ' + err));
-      post.save().catch(err => res.status(500).json('Error: ' + err));
+      post.save(
+        () => {
+          userRelationModel.findById(followerArrayID)
+            .then(
+              (userRelation) => {
+                //INSERT CODE TO PUSH TO FRIENDS
+                //ADD THE PROMISE INTO THE INDEXUSER.FINDBYID
+                const promisedFollowers = userRelation.followers.map(
+                  id => new Promise((resolve) => {
+                    IndexUser.findById(id).then(user => resolve(user));
+                  }));
+                const foundFollowersResolved = Promise.all(promisedFollowers);
+                foundFollowersResolved.then(
+                  (userArray) => {
+                    //resolved users
+                    const promisedUpdatedFollowerArray = userArray.map(
+                      indexUser => new Promise((resolve) => {
+                        indexUser.following_feed.push(post);
+                        indexUser.save().then(() => resolve());
+                      })
+                    );
+                    Promise.all(promisedUpdatedFollowerArray).then((result) => {
+                      console.log("Finished!");
+                      console.log(result);
+                    });
+                    // Promise.all()
+                  }
+                )
+              }
+            )
+        }
+
+      ).catch(err => res.status(500).json('Error: ' + err));
     }
 
     )
     .then(
-      () => res.status(201).send()
+      () => res.status(201).send("Feel Free to continue browsing as we push updates")
     ).
     catch(
       (err) => {
@@ -170,7 +207,5 @@ router.route('/').post(upload.fields([{ name: "images" }, { name: "coverPhoto", 
     )
 
 })
-
-
 
 module.exports = router;

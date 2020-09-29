@@ -1,11 +1,5 @@
 import axios from 'axios';
-import { DRAFT_URL } from "../Components/constants/index";
-import * as IndexUserEndpoint from "../Components/constants/index-user";
-import * as UserEndpoint from "../Components/constants/user";
-import * as PostEndpoint from "../Components/constants/post";
-
-
-
+import urls from "../Components/constants/urls";
 
 export default class AxiosHelper {
     static testString() {
@@ -13,20 +7,31 @@ export default class AxiosHelper {
     }
 
     static checkUsernameAvailable(username) {
-        console.log(IndexUserEndpoint.CHECK_USERNAME_URL);
-        return axios.get(IndexUserEndpoint.CHECK_USERNAME_URL, { params: { username: username } });
+        console.log(urls.CHECK_USERNAME_URL);
+        return axios.get(urls.CHECK_USERNAME_URL, { params: { username: username } });
     }
 
     static createUserProfile(formData) {
-        return axios.put(UserEndpoint.USER_URL, formData);
+        return axios.put(urls.USER_BASE_URL, formData);
+    }
+
+    // static setFriendStatus(formData){
+    //     return axios.put(urls.RELATION_STATUS_URL, formData);
+    // }
+    static setFriendStatus(visitorUsername, targetUserRelationId, action) {
+        return axios.put(urls.RELATION_STATUS_URL, {
+            visitorUsername: visitorUsername,
+            targetUserRelationId: targetUserRelationId,
+            action: action
+        });
     }
 
     static setDraftPreviewTitle(previewTitle) {
-        return axios.post(DRAFT_URL, { previewTitle: previewTitle });
+        return axios.post(urls.DRAFT_BASE_URL, { previewTitle: previewTitle });
     }
 
     static returnPursuitNames(username) {
-        return axios.get(IndexUserEndpoint.INDEX_USER_PURSUITS_URL, {
+        return axios.get(urls.INDEX_USER_PURSUITS_URL, {
             params: {
                 username: username
             }
@@ -34,7 +39,7 @@ export default class AxiosHelper {
     }
 
     static returnIndexUser(username) {
-        return axios.get(IndexUserEndpoint.INDEX_USER_URL, {
+        return axios.get(urls.INDEX_BASE_URL, {
             params: {
                 username: username
             }
@@ -42,7 +47,16 @@ export default class AxiosHelper {
     }
 
     static returnUser(username) {
-        return axios.get(UserEndpoint.USER_URL, { params: { username: username } });
+        return axios.get(urls.USER_BASE_URL, { params: { username: username } });
+    }
+
+    static returnFollowerStatus(userId, userRelationArrayId) {
+        return axios.get(urls.RELATION_BASE_URL, {
+            params: {
+                userRelationArrayId: userRelationArrayId,
+                userId: userId
+            }
+        })
     }
 
     // static returnIndexUsername(uid) {
@@ -56,9 +70,9 @@ export default class AxiosHelper {
     // }
 
     static createPost(postInfoForm) {
-        return axios.post(PostEndpoint.POST_URL, postInfoForm);
+        return axios.put(urls.POST_BASE_URL, postInfoForm);
     }
-    
+
     //FIXME 
     //STEAL THE UPLOAD THING FROM HERE
     // static postShortPost(formData, progressRef, uploadRef, textOnly){
@@ -91,17 +105,17 @@ export default class AxiosHelper {
     //     return axios.post(DRAFT_UPLOAD_URL, { username: username, editorState: editorState });
     // }
 
-    static saveDraftMetaInfo(metaInfoForm){
-        return axios.put(DRAFT_URL, metaInfoForm)
+    static saveDraftMetaInfo(metaInfoForm) {
+        return axios.put(urls.DRAFT_BASE_URL, metaInfoForm)
     }
 
     static saveDraft(username, draft) {
-        return axios.put(DRAFT_URL,
-          {username: username, draft: draft}
+        return axios.put(urls.DRAFT_BASE_URL,
+            { username: username, draft: draft }
         )
     }
     static retrieveDraft(username) {
-        return axios.get(DRAFT_URL,
+        return axios.get(urls.DRAFT_BASE_URL,
             { params: { username: username } }
         )
     }

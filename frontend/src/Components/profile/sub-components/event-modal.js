@@ -9,10 +9,10 @@ class EventModal extends React.Component {
         this.state = {
             window: 'main'
         }
-        this.handleWindowChange = this.handleWindowChange.bind(this);
 
     }
     render() {
+        if (!this.props.eventData) return (<></>);
         if (this.state.window === "main") {
             if (this.props.eventData.postType === "short")
                 return (

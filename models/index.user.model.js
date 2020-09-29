@@ -11,8 +11,12 @@ const indexUserSchema = new Schema(
             required: true,
             unique: true,
             trim: true
-
         },
+        
+        private: {
+            type: Boolean,
+            required: true,
+          },
 
         followers: {
             type: Number
@@ -53,15 +57,17 @@ const indexUserSchema = new Schema(
             type: String,
             required: false,
         },
-        friend_list: {
+
+        user_relation_id: {
             type: mongoose.Types.ObjectId,
-        },
+          },
+
         pursuits: [IndexPursuit.Schema],
-        activity_feed: [Post.Schema]
+        following_feed: [Post.Schema]
     }
 );
 
-const indexUserModel = mongoose.model('indexUser', indexUserSchema);
+const indexUserModel = mongoose.model('index_user', indexUserSchema);
 
 module.exports = {
     Schema: indexUserSchema,

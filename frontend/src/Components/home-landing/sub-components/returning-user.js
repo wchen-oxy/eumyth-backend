@@ -14,6 +14,10 @@ class ReturningUserPage extends React.Component {
             username: this.props.firebase.returnUsername(),
             firstName: null,
             lastName: null,
+
+            pursuits: null,
+            displayPhoto: "https://i.redd.it/73j1cgr028u21.jpg",
+
             indexUserData: null
         }
         this.handlePursuitClick = this.handlePursuitClick.bind(this);
@@ -29,7 +33,11 @@ class ReturningUserPage extends React.Component {
         if (this._isMounted && this.state.username) {
             AxiosHelper.returnIndexUser(this.state.username)
                 .then(
-                    (result) => this.setState({ indexUserData: result.data })
+                    (result) => this.setState({ 
+                        indexUserData : result.data,
+                        displayPhoto : result.data.small_cropped_display_photo, 
+                        pursuits :  result.data.pursuits
+                    })
                 );
         }
     }
@@ -52,8 +60,8 @@ class ReturningUserPage extends React.Component {
     render() {
         let pursuitInfoArray = [];
         let totalMin = 0;
-        if (this.state.indexUserData) {
-            for (const pursuit of this.state.indexUserData.pursuits) {
+        if (this.state.pursuits) {
+            for (const pursuit of this.state.pursuits) {
                 totalMin += pursuit.total_min;
                 const hobbyTableData = (
                     <tr key={pursuit.name}>
@@ -74,7 +82,7 @@ class ReturningUserPage extends React.Component {
                 <div className="home-row-container" id="home-profile-row">
                     <div className="home-profile-column-container">
 
-                        <img alt="" className="home-profile-photo" src="https://i.redd.it/73j1cgr028u21.jpg"></img>
+                        <img alt="" className="home-profile-photo" src={this.state.displayPhoto}></img>
 
                         <div className="home-profile-text">
                             <p>{this.state.username}</p>

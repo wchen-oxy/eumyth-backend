@@ -37,7 +37,7 @@ const postFeedbackSchema = new Schema({
     { timestamps: true }
 );
 
-const postFeedbackModel = mongoose.model('postFeedback', postFeedbackSchema);
+const postFeedbackModel = mongoose.model('post_feedback', postFeedbackSchema);
 
 
 module.exports = {

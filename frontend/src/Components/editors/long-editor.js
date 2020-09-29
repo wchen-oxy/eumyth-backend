@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { ImageBlockConfig } from "Dante2/package/es/components/blocks/image.js";
 import { PlaceholderBlockConfig } from "Dante2/package/es/components/blocks/placeholder";
 import { withFirebase } from '../../Firebase';
-import { IMAGE_URL, DRAFT_URL } from "../constants/index";
+import { IMAGE_BASE_URL, DRAFT_BASE_URL } from "../constants/urls";
 import './long-editor.scss';
 import AxiosHelper from '../../Axios/axios';
 
@@ -96,7 +96,7 @@ class LongEditor extends React.Component {
                     widgets={[
                         ImageBlockConfig({
                             options: {
-                                upload_url: IMAGE_URL,
+                                upload_url: IMAGE_BASE_URL,
                                 upload_callback: (ctx, img) => {
                                     console.log(ctx);
                                     console.log(img);

@@ -1,7 +1,6 @@
 import React from 'react';
 import ShortEditor from "../editors/short-editor";
 import ReviewPost from "./review-post";
-// import ModalNav from "./sub-components/modal-nav";
 
 class ShortPost extends React.Component {
   constructor(props) {
@@ -11,13 +10,14 @@ class ShortPost extends React.Component {
       validFiles: [],
       unsupportedFiles: [],
       imageArray: [],
+      imageIndex : 0,
       postText: '',
       isPaginated: false,
       postDisabled: true,
       window: 'initial',
-      // previewTitle: ''
     };
 
+    this.handleArrowClick = this.handleArrowClick.bind(this);
     this.setSelectedFiles = this.setSelectedFiles.bind(this);
     this.setValidFiles = this.setValidFiles.bind(this);
     this.setUnsupportedFiles = this.setUnsupportedFiles.bind(this);
@@ -31,23 +31,34 @@ class ShortPost extends React.Component {
     this.handleCaptionStyleChange = this.handleCaptionStyleChange.bind(this);
 
   }
+  handleArrowClick(value) {
+    let newIndex = value + this.state.imageIndex;
+    if (newIndex === -1) newIndex = this.state.validFiles.length -1;
+    if (newIndex === this.state.validFiles.length) newIndex = 0;
+    this.setState({imageIndex : newIndex});
+    console.log(newIndex);
+}
 
-  handleCaptionStyleChange(){
-      if (this.state.isPaginated === false){
-        let postArray = [];
-        const imageCount = this.state.validFiles.length ;
-        postArray.append(this.state.postText);
-        for (let i = 1; i < imageCount; i++ ){
-          postArray.append([]);
-        }
-        this.setState({postText : postArray, isPaginated : true});
+  // handlePaginatedToggle() {
+  //   this.setState((state) => ({ isPaginated: !state.isPaginated }))
+  // }
+
+  handleCaptionStyleChange() {
+    if (this.state.isPaginated === false) {
+      let postArray = [];
+      const imageCount = this.state.validFiles.length;
+      postArray.push(this.state.postText);
+      for (let i = 1; i < imageCount; i++) {
+        postArray.push([]);
       }
-      else{
-        if (window.confirm("Switching back will remove all your captions except for the first one. Keep going?")){
-          const postText = this.state.postText[0];
-          this.setState({postText : postText, isPaginated: false});
-        }
+      this.setState({ postText: postArray, isPaginated: true });
+    }
+    else {
+      if (window.confirm("Switching back will remove all your captions except for the first one. Keep going?")) {
+        const postText = this.state.postText[0];
+        this.setState({ postText: postText, isPaginated: false });
       }
+    }
   }
 
   // handleTitleChange(e)
@@ -78,8 +89,17 @@ class ShortPost extends React.Component {
       this.setState({ previewTitle: text });
     }
     else {
+      let newState;
+      if (this.state.isPaginated) {
+        let updatedArray = this.state.postText;
+        updatedArray[this.state.imageIndex] = text;
+        newState = updatedArray;
+      }
+      else{
+        newState = text;
+      }
       this.setState((state) => ({
-        postText: text,
+        postText: newState,
         postDisabled: (text.length === 0) && (state.validFiles.length === 0 || state.unsupportedFiles.length > 0)
       }));
     }
@@ -138,10 +158,12 @@ class ShortPost extends React.Component {
               selectedFiles={this.state.selectedFiles}
               validFiles={this.state.validFiles}
               unsupportedFiles={this.state.unsupportedFiles}
+              isPaginated={this.state.isPaginated}
+              textPageText={this.state.postText}
+              textPageIndex={this.state.imageIndex}
               setImageArray={this.setImageArray}
               onCaptionStyleChange={this.handleCaptionStyleChange}
-              // title={this.state.title}
-              text={this.state.postText}
+              onArrowClick={this.handleArrowClick}
               onTextChange={this.handleTextChange}
               onSelectedFileChange={this.handleSelectedFileChange}
               onUnsupportedFileChange={this.handleUnsupportedFileChange}

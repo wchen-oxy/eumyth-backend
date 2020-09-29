@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const PostFeedback = require("./post.feedback");
+const PostFeedback = require("./post.feedback.model");
 const Schema = mongoose.Schema;
 
 const postSchema = new Schema({
@@ -60,11 +60,17 @@ const postSchema = new Schema({
     type: Boolean,
     required: false,
   },
+
+  is_paginated: {
+    type: Boolean,
+    required: false
+  },
   
   text_data: {
     type: String,
     required: false
   },
+
   paginated_text_data: {
     type: [String],
     required: false

@@ -12,7 +12,10 @@ function PrevArrow(props) {
     <div
       className={className}
       style={{ ...style, display: "block", transform: `translate(${50}px, ${-50}%)`, zIndex: 2, top: "50%" }}
-      onClick={onClick}
+      onClick={() => {
+        props.onArrowClick(1);
+        return onClick();
+      }}
     />
   );
 }
@@ -23,19 +26,14 @@ function NextArrow(props) {
     <div
       className={className}
       style={{ ...style, display: "block", transform: `translate(${-50}px, ${-50}%)`, zIndex: 2, top: "50%" }}
-      onClick={onClick}
+      onClick={() => {
+        props.onArrowClick(-1);
+        return onClick();
+      }}
     />
   );
 }
-const settings = {
-  nextArrow: <NextArrow />,
-  prevArrow: <PrevArrow />,
-  speed: 500,
-  slidesToShow: 1,
-  slidesToScroll: 1,
-  centerPadding: 0,
-  className: 'photo-container'
-};
+
 class ImageSlider extends React.Component {
   _isMounted = false;
   constructor(props) {
@@ -99,6 +97,16 @@ class ImageSlider extends React.Component {
     });
   }
   render() {
+    const settings = {
+      nextArrow: <NextArrow onArrowClick={this.props.onArrowClick}/>,
+      prevArrow: <PrevArrow onArrowClick={this.props.onArrowClick}/>,
+      speed: 500,
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      centerPadding: 0,
+      className: 'photo-container'
+    };
+    
     const container =
       (!!this.state.transformedImageArray ? this.state.transformedImageArray : <p>IMAGE IS STILL LOADING</p>);
       console.log(this.state.transformedImageArray);

@@ -8,7 +8,6 @@ import {withAuthentication} from './Components/session';
 import Navbar from './Components/navbar/index';
 import ProfilePage from './Components/profile';
 // import DetailedPursuit from './Components/profile/detailed-pursuit';
-import NewPost from './Components/editors/index';
 
 
 const App = () => (

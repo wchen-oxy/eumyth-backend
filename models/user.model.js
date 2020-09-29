@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Pursuits = require('./pursuit.model');
 const Post = require('./post.model');
+const userPreview = require('./user.preview.model');
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
@@ -33,10 +34,17 @@ const userSchema = new Schema({
     type: String,
     trim: true
   },
+  
   private: {
     type: Boolean,
     required: true,
   },
+
+  user_relation_array_id: {
+    type: mongoose.Types.ObjectId,
+  },
+  
+  requests : [userPreview.Schema],
   pinned: [Post.Schema],
   pursuits: [Pursuits.Schema],
   all_posts: [mongoose.Types.ObjectId],

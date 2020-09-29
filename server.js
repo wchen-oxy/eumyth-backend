@@ -22,6 +22,7 @@ var pursuitsRouter = require('./routes/v0/pursuit');
 var postRouter = require('./routes/v0/post');
 var imageRouter = require('./routes/v0/image.js');
 var draftRouter = require('./routes/v0/draft.js');
+var relationRouter = require('./routes/v0/relation.js');
 var app = express();
 
 // view engine setup
@@ -76,6 +77,7 @@ app.use('/index', indexUserRouter);
 app.use('/user', usersRouter);
 app.use('/test', testRouter);
 app.use('/post', postRouter);
+app.use('/relation', relationRouter);
 
 // console.log that your server is up and running
 app.listen(port, () => console.log(`Listening on port ${port}`));

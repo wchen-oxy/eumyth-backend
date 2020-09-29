@@ -15,12 +15,14 @@ class ShortEditor extends React.Component {
         super(props);
         this.fileInputRef = React.createRef();
         this.state = {
-            errorMessage: ''
+            errorMessage: '',
+
         }
         this.setErrorMessage = this.setErrorMessage.bind(this);
         this.validateFile = this.validateFile.bind(this);
 
     }
+
 
     setErrorMessage(value) {
         this.setState({ value });
@@ -187,21 +189,28 @@ class ShortEditor extends React.Component {
                 }
             </div>
         );
-
+        console.log(this.props.validFiles);
         const textContainer = (
             <div id="text-container">
                 <div className="description-container">
                     <h4>{this.props.username}</h4>
-                    {this.props.validFiles > 0 ? <button onChange={this.props.onCaptionStyleChange}>Caption Photos Individually</button> : <></>}
+                    {this.props.validFiles.length > 0 && !this.props.isPaginated ? <button onClick={this.props.onCaptionStyleChange}>Caption Photos Individually</button> : <></>}
+                    {this.props.validFiles.length > 0 && this.props.isPaginated ? <button onClick={this.props.onCaptionStyleChange}>Return to Single Caption</button> : <></>}
 
                     {/* <input name="title" type="text" maxlength="140" placeholder="Optional Title" onChange={(e) => this.props.onTextChange(e)}></input> */}
                     {/* <TextareaAutosize name="title" id='short-post-text' placeholder='Write something here.' maxRows={2} onChange={this.props.onTextChange}  value={this.props.title} maxLength={140}/> */}
                     <div id="description-input-container" >
-                        <TextareaAutosize id='short-post-text' placeholder='Write something here.' onChange={this.props.onTextChange} minRows={5} value={this.props.text} />
-                        {/* <form>
-                            <input id='short-post-text' type='text' placeholder='Write something here.'>
-                            </input>
-                        </form> */}
+                        <TextareaAutosize
+                            id='short-post-text'
+                            placeholder='Write something here.'
+                            onChange={this.props.onTextChange}
+                            minRows={5}
+                            value={
+                                this.props.isPaginated ?
+                                    this.props.textPageText[this.props.textPageIndex] :
+                                    this.props.textPageText
+                            }
+                        />
                     </div>
                 </div>
             </div>
@@ -270,7 +279,7 @@ class ShortEditor extends React.Component {
                         <div className="post-preview-container" id="after-image-container">
                             <div className="photo-upload-container">
                                 {this.props.unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
-                                <ImageSlider fileArray={this.props.validFiles} setImageArray={this.props.setImageArray} />
+                                <ImageSlider onArrowClick={this.props.onArrowClick} fileArray={this.props.validFiles} setImageArray={this.props.setImageArray} />
                             </div>
                             {textContainer}
                         </div>

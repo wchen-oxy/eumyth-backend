@@ -26,7 +26,7 @@ const indexPursuitSchema = new Schema({
       }
 }); 
 
-const indexPursuitModel = mongoose.model('indexPursuit', indexPursuitSchema);
+const indexPursuitModel = mongoose.model('index_pursuit', indexPursuitSchema);
 
 module.exports = {
     Schema: indexPursuitSchema,

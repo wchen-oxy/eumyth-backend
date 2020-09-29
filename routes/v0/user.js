@@ -1,14 +1,11 @@
 var express = require('express');
+const mongoose = require('mongoose');
 var router = express.Router();
 let User = require('../../models/user.model');
 let IndexUser = require('../../models/index.user.model');
 let Pursuit = require('../../models/pursuit.model');
 let IndexPursuit = require('../../models/index.pursuit.model');
-const multer = require('multer');
-const uuid = require('uuid');
-const AWS = require('aws-sdk');
-const AwsConstants = require('../../constants/aws');
-const multerS3 = require('multer-s3');
+const UserRelation = require('../../models/user.relation.model');
 const upload = require('../../constants/multer').profileImageUpload;
 
 // const s3 = new AWS.S3({
@@ -30,7 +27,6 @@ const upload = require('../../constants/multer').profileImageUpload;
 //   })
 // });
 
-//create user and indexUser
 router.route('/')
   .get((req, res) => {
     const username = req.query.username;
@@ -38,7 +34,7 @@ router.route('/')
       user => {
         if (user) res.status(200).json(user);
         else {
-          res.status(204);
+          res.status(204).send();
         }
       }
     ).catch(
@@ -98,19 +94,25 @@ router.route('/')
 
       const newIndexUser = new IndexUser.Model({
         username: username,
-        user_profile_ref: newUser._id,
+        user_profile_id: newUser._id,
         preferredPostType: "public-feed",
         cropped_display_photo: croppedImage,
         small_cropped_display_photo: smallCroppedImage,
         tiny_cropped_display_photo: tinyCroppedImage,
         private: false,
-        draft: '',
+        draft: null,
         pursuits: indexPursuitsHolder
       });
 
+      const newUserRelation = new UserRelation.Model({
+        parent_user_id: newUser._id,
+      });
+
+      newUser.user_relation_array_id = newUserRelation._id;
       const resovlvedUser = newUser.save();
       const resolvedIndexUser = resovlvedUser.then(() => newIndexUser.save());
-      resolvedIndexUser.then(() => res.status(201).json("Success!")).catch(err => {
+      const resolvedUserRelation = resolvedIndexUser.then(() => newUserRelation.save());
+      resolvedUserRelation.then(() => res.status(201).json("Success!")).catch(err => {
         console.log(err);
         res.status(500).json(err);
       });
