@@ -94,10 +94,8 @@ class Firebase {
   }
 
   //yes
-  returnUsername() {
-    if (this.auth.currentUser) {
+ returnUsername() {
       return this.auth.currentUser.displayName;
-    }
   } 
 
   //yes

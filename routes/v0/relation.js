@@ -6,26 +6,27 @@ const IndexUser = require('../../models/index.user.model');
 const UserRelation = require('../../models/user.relation.model');
 
 router.route('/').get((req, res) => {
-  const targetUserId = req.query.userId;
+  const visitorUsername = req.query.visitorUsername;
   const followerArrayId = req.query.userRelationArrayId;
-  console.log(targetUserId);
+  console.log(visitorUsername);
   console.log(followerArrayId);
-  UserRelation.Model.findById(followerArrayId)
-    .then(
+
+  const resolvedUserRelation = UserRelation.Model.findById(followerArrayId);
+  resolvedUserRelation.then(
       (userRelationInfo) => {
-        console.log(userRelationInfo);
-        if (!userRelationInfo) return res.status(204);
+        if (!userRelationInfo) return res.status(204).send();
         else {
           if (userRelationInfo.followers.length !== 0) {
             for (const user of userRelationInfo.followers) {
               console.log(user.id);
-              console.log(typeof (user.id));
-              if (targetUserId === user.id.toString()) {
-                return res.status(200).json({ success: user.type });
+              if (visitorUsername === user.username) {
+                console.log("FAS");
+                return res.status(200).json({ success: user.status });
               }
             }
           }
-          res.status(200).json({ error: "User Not in Follower List" });
+          console.log("outer");
+          return res.status(200).json({ error: "USER_NOT_FOUND" });
         }
       }
     )
@@ -33,7 +34,7 @@ router.route('/').get((req, res) => {
       console.log(err);
       res.status(500);
     });
-
+    console.log("123123123");
 });
 
 router.route('/status').put((req, res) => {
@@ -57,7 +58,7 @@ router.route('/status').put((req, res) => {
           case ("FOLLOW"):
             for (const follower of followerArray) {
               if (follower.id.toString() === indexUser.user_profile_id.toString()) {
-                console.log("UES");
+            
                 return ("EXISTS");
               }
             }
@@ -95,7 +96,7 @@ router.route('/status').put((req, res) => {
     );
 
   resolvedUpdate.then((result) => {
-    console.log(result);
+   
     if (result === "SAVED") {
       res.status(200);
     }

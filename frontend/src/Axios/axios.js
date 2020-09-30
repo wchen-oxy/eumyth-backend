@@ -50,11 +50,11 @@ export default class AxiosHelper {
         return axios.get(urls.USER_BASE_URL, { params: { username: username } });
     }
 
-    static returnFollowerStatus(userId, userRelationArrayId) {
+    static returnFollowerStatus(visitorUsername, userRelationArrayId) {
         return axios.get(urls.RELATION_BASE_URL, {
             params: {
+                visitorUsername: visitorUsername,
                 userRelationArrayId: userRelationArrayId,
-                userId: userId
             }
         })
     }
