@@ -1,8 +1,16 @@
-.short-viewer-hero-container{
-
-
+#short-post-viewer-container{
+   display: flex;
+   flex-direction: row; 
 }
 
+.short-viewer-hero-container{
+    width: 65%;
+}
 .short-viewer-side-container{
-    
+    width: 35%;
+}
+
+.short-viewer-hero-container{
+    margin: auto;
+    text-align: center;
 }

@@ -14,14 +14,17 @@ class EventModal extends React.Component {
     render() {
         if (!this.props.eventData) return (<></>);
         if (this.state.window === "main") {
-            if (this.props.eventData.postType === "short")
+            if (this.props.eventData.post_format === "short") {
+                console.log(this.props.eventData.image_data.length);
+
                 return (
                     <ShortPostViewer
-                        profilePhoto={this.props.profilePhoto}
+                        profilePhoto={this.props.smallProfilePhoto}
                         username={this.props.username}
                         images={this.props.eventData.image_data}
                         text={this.props.eventData.text_data}
                     />);
+            }
             else {
                 return (<LongPostViewer />)
             }

@@ -4,7 +4,7 @@ const LongPostViewer = (props) => {
 
    
         return(
-            <div>
+            <div className="long-post-window">
 
             </div>
         );

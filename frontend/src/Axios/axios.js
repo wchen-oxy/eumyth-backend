@@ -15,10 +15,8 @@ export default class AxiosHelper {
         return axios.put(urls.USER_BASE_URL, formData);
     }
 
-    // static setFriendStatus(formData){
-    //     return axios.put(urls.RELATION_STATUS_URL, formData);
-    // }
-    static setFriendStatus(visitorUsername, targetUserRelationId, action) {
+    
+    static setFollowerStatus(visitorUsername, targetUserRelationId, action) {
         return axios.put(urls.RELATION_STATUS_URL, {
             visitorUsername: visitorUsername,
             targetUserRelationId: targetUserRelationId,

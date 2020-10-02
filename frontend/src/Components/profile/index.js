@@ -7,7 +7,7 @@ import AxiosHelper from '../../Axios/axios';
 import NoMatch from '../no-match';
 import EventModal from "./sub-components/event-modal";
 import FollowButton from "./sub-components/follow-buttons";
-import { NOT_A_FOLLOWER_STATE, FOLLOW_ACTION, FOLLOW_REQUESTED_STATE } from "../constants/flags";
+import { NOT_A_FOLLOWER_STATE, FOLLOW_ACTION, UNFOLLOWED_STATE, FOLLOW_REQUESTED_STATE, FOLLOWED_STATE } from "../constants/flags";
 
 class ProfilePage extends React.Component {
     _isMounted = false;
@@ -28,7 +28,7 @@ class ProfilePage extends React.Component {
             allPosts: null,
             fail: false,
             selectedEvent: null,
-            userRelationArrayId: null,
+            userRelationId: null,
             followerStatus: null
         }
         this.modalRef = React.createRef();
@@ -36,63 +36,112 @@ class ProfilePage extends React.Component {
         this.closeModal = this.closeModal.bind(this);
         this.openModal = this.openModal.bind(this);
         this.handleFollowClick = this.handleFollowClick.bind(this);
-        this.callUser = this.callUser.bind(this);
-        this.callFollowerStatus = this.callFollowerStatus.bind(this);
+        this.handleFollowerStatusChange = this.handleFollowerStatusChange.bind(this);
+        // this.retrieveTargetUserInfo = this.retrieveTargetUserInfo.bind(this);
+        // this.retrieveFollowerStatus = this.retrieveFollowerStatus.bind(this);
     }
 
-    callUser(user) {
-        return AxiosHelper.returnUser(this.state.targetUsername)
-            .then(
-                response => {
-                    if (!response) this.setState({ fail: true });
-                    else {
-                        const result = response.data;
-                        const userRelationId = result.user_relation_array_id ? result.user_relation_array_id : null;
-                        this.setState({
-                            visitorUsername: user.displayName,
-                            targetProfileId: result._id,
-                            coverPhoto: result.cover_photo,
-                            croppedDisplayPhoto: result.cropped_display_photo,
-                            tinyCroppedDisplayPhoto: result.tiny_cropped_display_photo,
-                            bio: result.bio,
-                            pinned: result.pinned,
-                            pursuits: result.pursuits,
-                            allPosts: result.posts,
-                            recentPosts: result.recent_posts,
-                            userRelationArrayId: userRelationId
-                        });
+    // retrieveTargetUserInfo(user) {
+    //     return AxiosHelper.returnUser(this.state.targetUsername)
+    //         .then(
+    //             response => {
+    //                 if (!response) this.setState({ fail: true });
+    //                 else {
+    //                     const result = response.data;
+    //                     console.log(result.user_relation_id);
 
-                        return [ user.displayName, userRelationId];
-                    }
+    //                     const userRelationId = result.user_relation_id ? result.user_relation_id : null;
+    //                     this.setState({
+    //                         visitorUsername: user.displayName,
+    //                         targetProfileId: result._id,
+    //                         coverPhoto: result.cover_photo,
+    //                         croppedDisplayPhoto: result.cropped_display_photo,
+    //                         smallCroppedDisplayPhoto : result.small_cropped_display_photo,
+    //                         tinyCroppedDisplayPhoto: result.tiny_cropped_display_photo,
+    //                         bio: result.bio,
+    //                         pinned: result.pinned,
+    //                         pursuits: result.pursuits,
+    //                         allPosts: result.posts,
+    //                         recentPosts: result.recent_posts,
+    //                         userRelationId: userRelationId
+    //                     });
+
+    //                     return [user.displayName, userRelationId];
+    //                 }
+    //             }
+    //         )
+    // }
+
+    handleFollowerStatusResponse(followerStatusResponse) {
+        if (followerStatusResponse.status === 200) {
+            if (followerStatusResponse.data.success) {
+                if (followerStatusResponse.data.success === FOLLOWED_STATE) {
+                    return FOLLOWED_STATE;
                 }
-            )
-    }
-    callFollowerStatus(userInfo) {
-        const visitorUsername = userInfo[0];
-        console.log(visitorUsername);
 
-        const userRelationId = userInfo[1];
-        if (userRelationId && visitorUsername !== this.state.targetUsername) {
-            console.log(visitorUsername);
-            AxiosHelper.returnFollowerStatus(visitorUsername, userRelationId)
-                .then(
-                    (result) => {
-                        
-                        if (result.status === 200) {
-                            console.log(result);
-                            if (result.data.success) this.setState({ followerStatus: result.data.success });
-                            else if (result.data.error) {
-                                this.setState({ followerStatus: NOT_A_FOLLOWER_STATE })
-                                console.log(result.data.error);
-                            }
-                        }
-                        console.log("Finished Checking Friend Status");
-                    })
-                .catch(
-                    err => console.log(err)
-                );
+                else if (followerStatusResponse.data.success === FOLLOW_REQUESTED_STATE) {
+                    return FOLLOW_REQUESTED_STATE;
+                }
+
+                else {
+                    throw Error;
+                }
+            }
+            else if (followerStatusResponse.data.error) {
+                console.log(followerStatusResponse.data.error);
+                return followerStatusResponse.data.error === NOT_A_FOLLOWER_STATE || followerStatusResponse.data.error === UNFOLLOWED_STATE?
+                    NOT_A_FOLLOWER_STATE :
+                    FOLLOW_REQUESTED_STATE;
+            }
         }
     }
+
+    handleResponseData(user, targetUserInfo, followerStatusResponse) {
+        const followerStatus = followerStatusResponse ? this.handleFollowerStatusResponse(followerStatusResponse) : null;
+        //set visitor user info and targetUserinfo
+        this.setState({
+            visitorUsername: user ? user.displayName : null,
+            targetProfileId: targetUserInfo._id,
+            coverPhoto: targetUserInfo.cover_photo,
+            croppedDisplayPhoto: targetUserInfo.cropped_display_photo,
+            smallCroppedDisplayPhoto: targetUserInfo.small_cropped_display_photo,
+            bio: targetUserInfo.bio,
+            pinned: targetUserInfo.pinned,
+            pursuits: targetUserInfo.pursuits,
+            allPosts: targetUserInfo.posts,
+            recentPosts: targetUserInfo.recent_posts,
+            userRelationId: targetUserInfo.user_relation_id,
+            followerStatus: followerStatus
+        });
+
+        //follower Status Reponse
+        console.log("Finished Checking Friend Status");
+    }
+    // retrieveFollowerStatus(userInfo) {
+    //     const visitorUsername = userInfo[0];
+    //     const userRelationId = userInfo[1];
+    //     if (userRelationId && visitorUsername !== this.state.targetUsername && visitorUsername) {
+    //         console.log(visitorUsername);
+    //         AxiosHelper.returnFollowerStatus(visitorUsername, userRelationId)
+    //             .then(
+    //                 (result) => {
+    //                     console.log(result);
+    //                     if (result.status === 200) {
+    //                         if (result.data.success) this.setState({ followerStatus: result.data.success });
+    //                         else if (result.data.error) {
+    //                             result.data.error === NOT_A_FOLLOWER_STATE ?
+    //                                 this.setState({ followerStatus: NOT_A_FOLLOWER_STATE }) :
+    //                                 this.setState({ followerStatus: FOLLOW_REQUESTED_STATE });
+    //                             console.log(result.data.error);
+    //                         }
+    //                     }
+    //                     console.log("Finished Checking Friend Status");
+    //                 })
+    //             .catch(
+    //                 err => console.log(err)
+    //             );
+    //     }
+    // }
 
     //fixme add catch for no found anything
     componentDidMount() {
@@ -110,15 +159,52 @@ class ProfilePage extends React.Component {
         //         }
         //     );
         if (this._isMounted) {
-            this.props.firebase.auth.onAuthStateChanged((user) =>
-                this.callUser(user)
-                    .then(
-                        userInfo => {
-                            this.callFollowerStatus(userInfo);
-                        }
-                    )
-            );
+            this.props.firebase.auth.onAuthStateChanged(
+                (user) => {
+                    if (user) {
+                        let targetUserInfo = null;
+                        AxiosHelper.returnUser(this.state.targetUsername).then(
+                            response => {
+                                targetUserInfo = response.data;
+                                if (user.displayName !== this.state.targetUsername) {
+                                    return AxiosHelper.returnFollowerStatus(user.displayName, targetUserInfo.user_relation_id)
+                                }
+                                else return null; //if user owns current profile
+                            }
+                        )
+                            .then((response) => {
+                                if (response) { this.handleResponseData(user, targetUserInfo, response); }
+                                else {
+                                    this.handleResponseData(user, targetUserInfo, null);
+                                }
+                            }).catch(
+                                err => console.log(err)
+                            );
+
+
+                    }
+                    else {
+                        AxiosHelper.returnUser(this.state.targetUsername).then(
+                            response =>
+                                (this.handleResponseData(user, response.data, null))
+
+                        ).catch(
+                            err => console.log(err)
+                        );
+
+                    }
+                }
+            )
+            // AxiosHelper.returnUser(this.state.targetUsername)
         }
+        // if (this._isMounted) {
+        //     this.retrieveTargetUserInfo(this.props.firebase.auth.currentUser)
+        //         .then(
+        //             userInfo => {
+        //                 this.retrieveFollowerStatus(userInfo);
+        //             }
+        //         );
+        // }
 
     }
 
@@ -130,6 +216,7 @@ class ProfilePage extends React.Component {
     openModal() {
         this.modalRef.current.style.display = "block";
         document.body.style.overflow = "hidden";
+
     }
 
     closeModal() {
@@ -143,20 +230,27 @@ class ProfilePage extends React.Component {
         this.setState({ selectedEvent: selectedEvent }, this.openModal());
     }
 
-    handleFollowClick() {
-        AxiosHelper.setFriendStatus(this.state.visitorUsername, this.state.userRelationArrayId, FOLLOW_ACTION).then(
+    handleFollowerStatusChange(action) {
+        AxiosHelper.setFollowerStatus(this.state.visitorUsername, this.state.userRelationId, action).then(
             (result) => {
                 console.log(result);
-                if (result.status === 200)
-                    this.setState({ followerStatus: FOLLOW_REQUESTED_STATE });
-
+                if (result.status === 200) {
+                    if (result.data.success) this.setState({ followerStatus: result.data.success });
+                    else {
+                        this.setState({ followerStatus: result.data.error });
+                    }
+                }
             })
             .catch((error) => {
                 console.log(error);
-                alert("You already requested");
-                this.setState({ followerStatus: FOLLOW_REQUESTED_STATE });
-
-            })
+            });
+    }
+    handleFollowClick(action) {
+        console.log(action);
+        if (action === FOLLOW_ACTION) this.handleFollowerStatusChange(action);
+        else {
+            window.confirm("Are you sure you want to unfollow?") && this.handleFollowerStatusChange(action);
+        }
     }
 
     render() {
@@ -215,7 +309,7 @@ class ProfilePage extends React.Component {
                     <div className="overlay"></div>
                     <span className="close" onClick={(() => this.closeModal())}>X</span>
                     <EventModal
-                        tinyProfilePhoto={this.state.tinyCroppedDisplayPhoto}
+                        smallProfilePhoto={this.state.smallCroppedDisplayPhoto}
                         username={this.state.targetUsername}
                         eventData={this.state.selectedEvent}
                         closeModal={this.closeModal} />

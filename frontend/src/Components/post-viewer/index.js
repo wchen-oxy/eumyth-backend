@@ -16,7 +16,7 @@ class PostWindowController extends React.Component {
     render() {
         if (this.state.window === "main") {
             if (this.props.postType === "short")
-            return ( <ShortPostViewer text={this.props.post.text_data} />);
+            return ( <ShortPostViewer eventData={}/>);
             else{
                 return (<LongPostViewer />)
             }

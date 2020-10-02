@@ -40,7 +40,7 @@ const userSchema = new Schema({
     required: true,
   },
 
-  user_relation_array_id: {
+  user_relation_id: {
     type: mongoose.Types.ObjectId,
   },
   

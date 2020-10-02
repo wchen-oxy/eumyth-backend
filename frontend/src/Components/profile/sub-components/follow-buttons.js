@@ -1,25 +1,25 @@
 import React from 'react';
-import { NOT_A_FOLLOWER_STATE, FOLLOWED_STATE, FOLLOW_REQUESTED_STATE } from "../../constants/flags";
-import { FOLLOW_BUTTON_TEXT, REQUESTED_BUTTON_TEXT } from "../../constants/ui-text";
+import { NOT_A_FOLLOWER_STATE, FOLLOWED_STATE, FOLLOW_REQUESTED_STATE, FOLLOW_ACTION, UNFOLLOW_ACTION } from "../../constants/flags";
+import { FOLLOW_BUTTON_TEXT, FOLLOWED_BUTTON_TEXT, REQUESTED_BUTTON_TEXT } from "../../constants/ui-text";
 
 const FollowButtons = (props) => {
 
     if (!props.followerStatus || props.isOwner) return (<></>);
     else {
         let text = "";
-        let isDisabled = true;
+        let isFollowing = true;
 
         // const followState = 
         switch (props.followerStatus) {
             case (NOT_A_FOLLOWER_STATE):
                 text = FOLLOW_BUTTON_TEXT;
-                isDisabled = false;
+                isFollowing = false;
                 break;
             case (FOLLOW_REQUESTED_STATE):
                 text = REQUESTED_BUTTON_TEXT;
                 break;
             case (FOLLOWED_STATE):
-                text = FOLLOWED_STATE;
+                text = FOLLOWED_BUTTON_TEXT;
                 break;
             default:
                 break;
@@ -28,9 +28,14 @@ const FollowButtons = (props) => {
         console.log(props.followerStatus);
 
         // props.followerStatus === NOT_A_FOLLOWER ? FOLLOW_BUTTON_TEXT : REQUESTED_BUTTON_TEXT
+        if (isFollowing) return (
+            <div>
+                <button onClick={() => props.onFollowClick(UNFOLLOW_ACTION)}>{text}</button>
+            </div>
+        )
         return (
             <div>
-                <button onClick={props.onFollowClick} disabled={isDisabled}>{text}</button>
+                <button onClick={() => props.onFollowClick(FOLLOW_ACTION)}>{text}</button>
             </div>
         )
     }

@@ -82,7 +82,7 @@ const LongPost = (props) => {
   }
   if (windowState === "initial")
     return (
-      <div className="long-post-container">
+      <div className="long-post-window">
         <div>
           <h2>Long Entry</h2>
           {isSavePending ? (<p>Saving</p>) : (<p>Saved</p>)}

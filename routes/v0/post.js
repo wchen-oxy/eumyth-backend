@@ -8,7 +8,7 @@ const AWS = require('aws-sdk');
 const AwsConstants = require('../../constants/aws');
 const multerS3 = require('multer-s3');
 const uuid = require('uuid');
-const userRelationModel = require('../../models/user.relation.model');
+const userRelation = require('../../models/user.relation.model');
 
 
 const setPursuitAttributes = (isMilestone, pursuit, minDuration) => {
@@ -162,12 +162,12 @@ router.route('/').put(upload.fields([{ name: "images" }, { name: "coverPhoto", m
       user.save().catch(err => res.status(500).json('Error: ' + err));
       post.save(
         () => {
-          userRelationModel.findById(followerArrayID)
+          userRelation.Model.findById(followerArrayID)
             .then(
-              (userRelation) => {
+              (userRelationResult) => {
                 //INSERT CODE TO PUSH TO FRIENDS
                 //ADD THE PROMISE INTO THE INDEXUSER.FINDBYID
-                const promisedFollowers = userRelation.followers.map(
+                const promisedFollowers = userRelationResult.followers.map(
                   id => new Promise((resolve) => {
                     IndexUser.findById(id).then(user => resolve(user));
                   }));
@@ -191,11 +191,8 @@ router.route('/').put(upload.fields([{ name: "images" }, { name: "coverPhoto", m
               }
             )
         }
-
-      ).catch(err => res.status(500).json('Error: ' + err));
-    }
-
-    )
+      )
+    })
     .then(
       () => res.status(201).send("Feel Free to continue browsing as we push updates")
     ).
