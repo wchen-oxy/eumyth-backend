@@ -63,7 +63,7 @@ router.route('/').put(upload.fields([{ name: "images" }, { name: "coverPhoto", m
   const isMilestone = !!req.body.isMilestone ? req.body.isMilestone : null;
   const coverPhotoURL = req.files.coverPhoto ? req.files.coverPhoto[0].location : null;
   const imageData = req.files.images ? getImageUrls(req.files.images) : [];
-
+ 
   let post = null;
   let indexUser = null;
   let followerArrayID = null;

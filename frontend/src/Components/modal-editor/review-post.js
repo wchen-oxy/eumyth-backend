@@ -21,6 +21,7 @@ const ReviewPost = (props) => {
         let formData = new FormData();
         formData.append("postType", props.postType);
         formData.append("username", props.username);
+        console.log(props.postText);
         console.log(minDuration);
         if (title) formData.append("title", _.trim(title));
         if (subtitle) formData.append("subtitle", _.trim(subtitle));
@@ -29,7 +30,7 @@ const ReviewPost = (props) => {
         if (date) formData.append("date", date);
         if (minDuration) formData.append("minDuration", minDuration);
         if (milestone) formData.append("isMilestone", milestone);
-        if (props.postText) formData.append("textData", props.postText);
+        if (props.postText) formData.append("textData", JSON.stringify(props.postText));
         if (coverPhoto) formData.append("coverPhoto", coverPhoto);
         if (props.imageArray && props.imageArray.length > 0) {
             for (const image of props.imageArray) {

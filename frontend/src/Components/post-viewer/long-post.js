@@ -1,14 +1,20 @@
 import React from 'react';
+import DanteEditor from 'Dante2';
+
 
 const LongPostViewer = (props) => {
 
-   
-        return(
-            <div className="long-post-window">
+    console.log(JSON.parse(props.eventData.text_data));
+    return (
+        <div className="long-post-window">
+            < DanteEditor
+            content={JSON.parse(props.eventData.text_data)}
+            read_only={true}
+            />
 
-            </div>
-        );
-    
+        </div>
+    );
+
 }
 
 export default LongPostViewer;

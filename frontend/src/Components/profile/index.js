@@ -7,6 +7,7 @@ import AxiosHelper from '../../Axios/axios';
 import NoMatch from '../no-match';
 import EventModal from "./sub-components/event-modal";
 import FollowButton from "./sub-components/follow-buttons";
+import UserOptions from "./sub-components/user-options";
 import { NOT_A_FOLLOWER_STATE, FOLLOW_ACTION, UNFOLLOWED_STATE, FOLLOW_REQUESTED_STATE, FOLLOWED_STATE } from "../constants/flags";
 
 class ProfilePage extends React.Component {
@@ -32,11 +33,13 @@ class ProfilePage extends React.Component {
             followerStatus: null
         }
         this.modalRef = React.createRef();
+        this.miniModalRef = React.createRef();
         this.handleEventClick = this.handleEventClick.bind(this);
         this.closeModal = this.closeModal.bind(this);
         this.openModal = this.openModal.bind(this);
         this.handleFollowClick = this.handleFollowClick.bind(this);
         this.handleFollowerStatusChange = this.handleFollowerStatusChange.bind(this);
+        this.handleOptionsClick = this.handleOptionsClick.bind(this);
         // this.retrieveTargetUserInfo = this.retrieveTargetUserInfo.bind(this);
         // this.retrieveFollowerStatus = this.retrieveFollowerStatus.bind(this);
     }
@@ -89,7 +92,7 @@ class ProfilePage extends React.Component {
             }
             else if (followerStatusResponse.data.error) {
                 console.log(followerStatusResponse.data.error);
-                return followerStatusResponse.data.error === NOT_A_FOLLOWER_STATE || followerStatusResponse.data.error === UNFOLLOWED_STATE?
+                return followerStatusResponse.data.error === NOT_A_FOLLOWER_STATE || followerStatusResponse.data.error === UNFOLLOWED_STATE ?
                     NOT_A_FOLLOWER_STATE :
                     FOLLOW_REQUESTED_STATE;
             }
@@ -213,21 +216,22 @@ class ProfilePage extends React.Component {
     }
 
 
-    openModal() {
-        this.modalRef.current.style.display = "block";
+    openModal(modal) {
+        modal.current.style.display = "block";
         document.body.style.overflow = "hidden";
 
     }
 
-    closeModal() {
-        this.modalRef.current.style.display = "none";
+    closeModal(modal) {
+        modal.current.style.display = "none";
         document.body.style.overflow = "visible";
     }
 
     handleEventClick(index) {
         console.log(index);
         const selectedEvent = index < this.state.recentPosts.length ? this.state.recentPosts[index] : this.state.allPosts[index];
-        this.setState({ selectedEvent: selectedEvent }, this.openModal());
+        console.log(selectedEvent);
+        this.setState({ selectedEvent: selectedEvent }, this.openModal(this.modalRef));
     }
 
     handleFollowerStatusChange(action) {
@@ -253,8 +257,12 @@ class ProfilePage extends React.Component {
         }
     }
 
+    handleOptionsClick() {
+        this.openModal(this.miniModalRef);
+    }
+
     render() {
-        console.log(this.state.visitorUsername);
+        console.log(this.state.selectedEvent);
         var pursuitHolderArray = [];
         if (this.state.fail) return NoMatch;
         if (this.state.pursuits) {
@@ -284,6 +292,7 @@ class ProfilePage extends React.Component {
                                     isOwner={this.state.targetUsername === this.state.visitorUsername}
                                     followerStatus={this.state.followerStatus}
                                     onFollowClick={this.handleFollowClick}
+                                    onOptionsClick={this.handleOptionsClick}
                                 />
                             </div>
                         </div>
@@ -299,20 +308,18 @@ class ProfilePage extends React.Component {
                 </div>
                 <div id="personal-profile-timeline-container">
                     <Timeline recentPosts={this.state.recentPosts} onEventClick={this.handleEventClick} />
-
                 </div>
-
-                {/* <div className="pursuit-board-container">
-                {pursuitHolderArray.map((pursuit) => pursuit)}
-            </div> */}
                 <div className="modal" ref={this.modalRef}>
-                    <div className="overlay"></div>
-                    <span className="close" onClick={(() => this.closeModal())}>X</span>
+                    <div className="overlay"  onClick={(() => this.closeModal(this.modalRef))}></div>
+                    <span className="close" onClick={(() => this.closeModal(this.modalRef))}>X</span>
                     <EventModal
                         smallProfilePhoto={this.state.smallCroppedDisplayPhoto}
                         username={this.state.targetUsername}
-                        eventData={this.state.selectedEvent}
-                        closeModal={this.closeModal} />
+                        eventData={this.state.selectedEvent} />
+                </div>
+                <div className="modal" ref={this.miniModalRef}>
+                <div className="overlay" onClick={(() => this.closeModal(this.miniModalRef))}></div>
+                <UserOptions />
                 </div>
             </div>
         );

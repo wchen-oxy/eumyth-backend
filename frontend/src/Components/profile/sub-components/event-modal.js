@@ -21,12 +21,12 @@ class EventModal extends React.Component {
                     <ShortPostViewer
                         profilePhoto={this.props.smallProfilePhoto}
                         username={this.props.username}
-                        images={this.props.eventData.image_data}
-                        text={this.props.eventData.text_data}
+                        eventData={this.props.eventData}
+                       
                     />);
             }
             else {
-                return (<LongPostViewer />)
+                return (<LongPostViewer eventData={this.props.eventData} />)
             }
         }
         else {
