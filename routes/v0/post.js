@@ -40,7 +40,8 @@ var upload = multer({
   })
 });
 
-const getImageUrls = (array) => {
+const getImageUrls = ( array) => {
+  // console.log(mongooseArray);
   let imageArray = [];
   for (const imageFile of array) {
     console.log(imageFile.location)
@@ -63,7 +64,8 @@ router.route('/').put(upload.fields([{ name: "images" }, { name: "coverPhoto", m
   const isMilestone = !!req.body.isMilestone ? req.body.isMilestone : null;
   const coverPhotoURL = req.files.coverPhoto ? req.files.coverPhoto[0].location : null;
   const imageData = req.files.images ? getImageUrls(req.files.images) : [];
- 
+  // console.log(imageData);
+
   let post = null;
   let indexUser = null;
   let followerArrayID = null;
@@ -90,11 +92,13 @@ router.route('/').put(upload.fields([{ name: "images" }, { name: "coverPhoto", m
           pursuit_category: pursuitCategory,
           cover_photo_url: coverPhotoURL,
           post_format: postType,
+          is_paginated: req.body.isPaginated,
           is_milestone: isMilestone,
+          image_data : imageData,
           text_data: textData,
-          image_data: imageData,
           min_duration: minDuration
         });
+        // if (req.files.images) addImageUrls(post.image_data, req.files.images);
         break;
       case ("long"):
         post = new Post.Model({
@@ -167,27 +171,29 @@ router.route('/').put(upload.fields([{ name: "images" }, { name: "coverPhoto", m
               (userRelationResult) => {
                 //INSERT CODE TO PUSH TO FRIENDS
                 //ADD THE PROMISE INTO THE INDEXUSER.FINDBYID
-                const promisedFollowers = userRelationResult.followers.map(
-                  id => new Promise((resolve) => {
-                    IndexUser.findById(id).then(user => resolve(user));
-                  }));
-                const foundFollowersResolved = Promise.all(promisedFollowers);
-                foundFollowersResolved.then(
-                  (userArray) => {
-                    //resolved users
-                    const promisedUpdatedFollowerArray = userArray.map(
-                      indexUser => new Promise((resolve) => {
-                        indexUser.following_feed.push(post);
-                        indexUser.save().then(() => resolve());
-                      })
-                    );
-                    Promise.all(promisedUpdatedFollowerArray).then((result) => {
-                      console.log("Finished!");
-                      console.log(result);
-                    });
-                    // Promise.all()
-                  }
-                )
+                if (userRelationResult) {
+                  const promisedFollowers = userRelationResult.followers.map(
+                    id => new Promise((resolve) => {
+                      IndexUser.findById(id).then(user => resolve(user));
+                    }));
+                  const foundFollowersResolved = Promise.all(promisedFollowers);
+                  foundFollowersResolved.then(
+                    (userArray) => {
+                      //resolved users
+                      const promisedUpdatedFollowerArray = userArray.map(
+                        indexUser => new Promise((resolve) => {
+                          indexUser.following_feed.push(post);
+                          indexUser.save().then(() => resolve());
+                        })
+                      );
+                      Promise.all(promisedUpdatedFollowerArray).then((result) => {
+                        console.log("Finished!");
+                        console.log(result);
+                      });
+                      // Promise.all()
+                    }
+                  )
+                }
               }
             )
         }

@@ -21,6 +21,7 @@ const ReviewPost = (props) => {
         let formData = new FormData();
         formData.append("postType", props.postType);
         formData.append("username", props.username);
+        formData.append("isPaginated", props.isPaginated);
         console.log(props.postText);
         console.log(minDuration);
         if (title) formData.append("title", _.trim(title));
@@ -33,6 +34,7 @@ const ReviewPost = (props) => {
         if (props.postText) formData.append("textData", JSON.stringify(props.postText));
         if (coverPhoto) formData.append("coverPhoto", coverPhoto);
         if (props.imageArray && props.imageArray.length > 0) {
+            console.log(props.imageArray);
             for (const image of props.imageArray) {
                 formData.append("images", image);
             }

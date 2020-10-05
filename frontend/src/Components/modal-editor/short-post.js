@@ -179,6 +179,7 @@ class ShortPost extends React.Component {
     else {
       return (
         <ReviewPost
+          isPaginated={this.state.isPaginated}
           previewTitle={this.state.previewTitle}
           closeModal={this.props.closeModal}
           postType={"short"}

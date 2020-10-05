@@ -71,13 +71,8 @@ const postSchema = new Schema({
     required: false
   },
 
-  paginated_text_data: {
-    type: [String],
-    required: false
-  },
-
   image_data: {
-    array: [String],
+    type: [String],
     required:  false,
   },
   

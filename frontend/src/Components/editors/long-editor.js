@@ -56,7 +56,6 @@ class LongEditor extends React.Component {
     }
 
     render() {
-        console.log(JSON.parse(this.props.onlineDraft));
         return (
             <div id="long-editor-container">
                 < DanteEditor

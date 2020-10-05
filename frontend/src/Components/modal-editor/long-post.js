@@ -99,7 +99,6 @@ const LongPost = (props) => {
           (<LongEditor
             username={props.username}
             isSavePending={isSavePending}
-          
             hasContent={hasContent}
             setHasContent={setHasContent}
             onSavePending={handleSavePending}
@@ -120,6 +119,7 @@ const LongPost = (props) => {
   else {
     return (
       <ReviewPost
+        isPaginated={false}
         postText={props.onlineDraft}
         closeModal={props.closeModal}
         postType="long"

@@ -8,12 +8,12 @@ const Event = (props) => {
             (
                 post.cover_photo_url ?
                     <img src={post.cover_photo_url} /> :
-                    <p className="no-select">{post.text_data.length > 140 ? post.text_data.substring(0, 140) + "..." : post.text_data}</p>
+                    (post.text_data ? <p className="no-select">{post.text_data.length > 140 ? post.text_data.substring(0, 140) + "..." : post.text_data}</p> : <></>)
             ) : (
                 post.cover_photo_url ?
                     <img src={post.cover_photo_url} /> :
-                    <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png"/>
-                    // <p className="no-select">{post.text_data.length > 140 ? post.text_data.substring(0, 140) + "..." : post.text_data}</p>
+                    <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" />
+                // <p className="no-select">{post.text_data.length > 140 ? post.text_data.substring(0, 140) + "..." : post.text_data}</p>
             );
 
 
