@@ -1,26 +1,32 @@
 import React from 'react';
+import ShortEvent from "./timeline-short-event";
+import LongEvent from "./timeline-long-event";
 import './timeline-event.scss';
 
 const Event = (props) => {
     const post = props.eventData;
-    const content =
-        (post.post_format === "short") ?
-            (
-                post.cover_photo_url ?
-                    <img src={post.cover_photo_url} /> :
-                    (post.text_data ? <p className="no-select">{post.text_data.length > 140 ? post.text_data.substring(0, 140) + "..." : post.text_data}</p> : <></>)
-            ) : (
-                post.cover_photo_url ?
-                    <img src={post.cover_photo_url} /> :
-                    <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" />
-                // <p className="no-select">{post.text_data.length > 140 ? post.text_data.substring(0, 140) + "..." : post.text_data}</p>
-            );
-
+    let content = null;
+    switch (post.post_format) {
+        case ("short"):
+            content = <ShortEvent post={props.eventData} />
+            break;
+        case ("long"):
+            content = <LongEvent post={props.eventData} />
+                // post.cover_photo_url ?
+                //     <img src={post.cover_photo_url} /> :
+                //     (<div>
+                //         <img src={post.cover_photo_url}/>
+                //         <p className="no-select">{post.text_data.length > 140 ? post.text_data.substring(0, 140) + "..." : post.text_data}</p>
+                //     </div>);
+            break;
+        default:
+            break;
+    }
 
     return (
         <div className="event-container" onClick={() => props.onEventClick(props.eventIndex)}>
             {content}
-            <h4>{post.preview_title}</h4>
+            {/* <h4>{post.preview_title}</h4> */}
         </div>
     );
 }

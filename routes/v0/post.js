@@ -44,7 +44,6 @@ const getImageUrls = ( array) => {
   // console.log(mongooseArray);
   let imageArray = [];
   for (const imageFile of array) {
-    console.log(imageFile.location)
     imageArray.push(imageFile.location);
   }
   return imageArray;
@@ -81,6 +80,8 @@ router.route('/').put(upload.fields([{ name: "images" }, { name: "coverPhoto", m
     }
   );
 
+  
+
   let resolveNewPost = resolveIndexUser.then(resolvedIndexUser => {
     switch (postType) {
       case ("short"):
@@ -98,7 +99,6 @@ router.route('/').put(upload.fields([{ name: "images" }, { name: "coverPhoto", m
           text_data: textData,
           min_duration: minDuration
         });
-        // if (req.files.images) addImageUrls(post.image_data, req.files.images);
         break;
       case ("long"):
         post = new Post.Model({
@@ -109,6 +109,7 @@ router.route('/').put(upload.fields([{ name: "images" }, { name: "coverPhoto", m
           pursuit_category: pursuitCategory,
           cover_photo_url: coverPhotoURL,
           post_format: postType,
+          is_paginated: req.body.isPaginated,
           is_milestone: isMilestone,
           text_data: req.body.textData,
           min_duration: minDuration
@@ -121,10 +122,10 @@ router.route('/').put(upload.fields([{ name: "images" }, { name: "coverPhoto", m
     followerArrayID = indexUser.user_relation_id;
     //modify new post array for indexUser
 
-    // indexUser.following_feed.push(post);
     if (indexUser.preferred_post_type !== postPrivacyType) {
       indexUser.preferred_post_type = postPrivacyType;
     }
+
     if (minDuration) {
       for (const pursuit of indexUser.pursuits) {
         if (pursuit.name === pursuitCategory) {
@@ -149,6 +150,9 @@ router.route('/').put(upload.fields([{ name: "images" }, { name: "coverPhoto", m
       const user = resolvedUser;
       user.all_posts.push(post._id);
       user.recent_posts.push(post);
+      console.log( user.all_posts);
+      console.log( user.recent_posts);
+
       //check if pursuits exists already
       if (minDuration) {
         for (const pursuit of user.pursuits) {
@@ -162,8 +166,15 @@ router.route('/').put(upload.fields([{ name: "images" }, { name: "coverPhoto", m
     }
   ).
     then(user => {
-      indexUser.save().catch(err => res.status(500).json('Error: ' + err));
-      user.save().catch(err => res.status(500).json('Error: ' + err));
+      console.log(user.all_posts);
+      indexUser.save().catch(err => {
+        console.log(err);
+        res.status(500).json('Error: ' + err);
+      });
+      user.save().catch(err => {
+        console.log(err);
+        res.status(500).json('Error: ' + err);
+      });
       post.save(
         () => {
           userRelation.Model.findById(followerArrayID)

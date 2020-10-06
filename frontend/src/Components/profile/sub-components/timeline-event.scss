@@ -1,13 +1,25 @@
-.event-container{
+.event-container {
     width: 200px;
     margin: 20px;
     word-wrap: break-word;
 
-    img{
-        width: 200px;
-    }
+    // img{
+    //     width: 200px;
+    //     object-fit: cover;
+    //     object-position: center;
+    // }
 
-    p{
+    p {
         margin: 0;
     }
+}
+
+.event-cover-container {
+    height: 120px;
+}
+
+.event-cover-photo {
+    height: 120px;
+    width: 200px;
+    object-fit: cover;
 }

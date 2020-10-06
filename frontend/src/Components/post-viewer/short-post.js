@@ -58,6 +58,7 @@ class ShortPostViewer extends React.Component {
                 return (
                     <div id="short-post-viewer-container" className="small-post-window">
                         <div className="short-viewer-hero-container">
+                            HELLO
 
                         </div>
                         <div className="short-viewer-side-container">
