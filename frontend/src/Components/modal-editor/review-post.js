@@ -22,6 +22,7 @@ const ReviewPost = (props) => {
         formData.append("postType", props.postType);
         formData.append("username", props.username);
         formData.append("isPaginated", props.isPaginated);
+        formData.append("isMilestone", milestone ? milestone : false)
         console.log(props.postText);
         console.log(minDuration);
         if (title) formData.append("title", _.trim(title));
@@ -30,8 +31,7 @@ const ReviewPost = (props) => {
         if (pursuitCategory) formData.append("pursuitCategory", pursuitCategory)
         if (date) formData.append("date", date);
         if (minDuration) formData.append("minDuration", minDuration);
-        if (milestone) formData.append("isMilestone", milestone);
-        if (props.postText) formData.append("textData", JSON.stringify(props.postText));
+        if (props.postText) formData.append("textData", props.postType === "SHORT" ? props.postText : JSON.stringify(props.postText));
         if (coverPhoto) formData.append("coverPhoto", coverPhoto);
         if (props.imageArray && props.imageArray.length > 0) {
             console.log(props.imageArray);
@@ -75,10 +75,10 @@ const ReviewPost = (props) => {
         <div className="small-post-window">
             <div className="inner-small-post-container post-button-container">
                 <div>
-                    {props.postType === "short" ? <h2>Placeholder for short</h2> : <h2>Placeholder for Long</h2>}
+                    {props.postType === "SHORT" ? <h2>Placeholder for short</h2> : <h2>Placeholder for Long</h2>}
                     <div id="button-container">
                         <span id="toggle-button-span">
-                            {props.postType === "short" ? returnToShortButton : returnToLongButton}
+                            {props.postType === "SHORT" ? returnToShortButton : returnToLongButton}
                         </span>
                     </div>
                 </div>

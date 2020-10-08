@@ -109,6 +109,7 @@ router.route('/')
       });
 
       newUser.user_relation_id = newUserRelation._id;
+      newIndexUser.user_relation_id = newUserRelation._id;
       const resovlvedUser = newUser.save();
       const resolvedIndexUser = resovlvedUser.then(() => newIndexUser.save());
       const resolvedUserRelation = resolvedIndexUser.then(() => newUserRelation.save());

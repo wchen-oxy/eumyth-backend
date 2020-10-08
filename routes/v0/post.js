@@ -40,7 +40,7 @@ var upload = multer({
   })
 });
 
-const getImageUrls = ( array) => {
+const getImageUrls = (array) => {
   // console.log(mongooseArray);
   let imageArray = [];
   for (const imageFile of array) {
@@ -80,11 +80,11 @@ router.route('/').put(upload.fields([{ name: "images" }, { name: "coverPhoto", m
     }
   );
 
-  
+
 
   let resolveNewPost = resolveIndexUser.then(resolvedIndexUser => {
     switch (postType) {
-      case ("short"):
+      case ("SHORT"):
         post = new Post.Model({
           title: title,
           private: postPrivacyType,
@@ -95,12 +95,12 @@ router.route('/').put(upload.fields([{ name: "images" }, { name: "coverPhoto", m
           post_format: postType,
           is_paginated: req.body.isPaginated,
           is_milestone: isMilestone,
-          image_data : imageData,
+          image_data: imageData,
           text_data: textData,
           min_duration: minDuration
         });
         break;
-      case ("long"):
+      case ("LONG"):
         post = new Post.Model({
           title: title,
           subtitle: subtitle,
@@ -150,8 +150,6 @@ router.route('/').put(upload.fields([{ name: "images" }, { name: "coverPhoto", m
       const user = resolvedUser;
       user.all_posts.push(post._id);
       user.recent_posts.push(post);
-      console.log( user.all_posts);
-      console.log( user.recent_posts);
 
       //check if pursuits exists already
       if (minDuration) {
@@ -167,46 +165,86 @@ router.route('/').put(upload.fields([{ name: "images" }, { name: "coverPhoto", m
   ).
     then(user => {
       console.log(user.all_posts);
-      indexUser.save().catch(err => {
-        console.log(err);
-        res.status(500).json('Error: ' + err);
+      const savedIndexUser = indexUser.save().catch(err => {
+        if (err) {
+          console.log(err);
+          res.status(500).json('Error: ' + err);
+        }
+        return
       });
-      user.save().catch(err => {
-        console.log(err);
-        res.status(500).json('Error: ' + err);
+      const savedUser = user.save().catch(err => {
+        if (err) {
+          console.log(err);
+          res.status(500).json('Error: ' + err);
+        }
       });
-      post.save(
-        () => {
-          userRelation.Model.findById(followerArrayID)
-            .then(
-              (userRelationResult) => {
-                //INSERT CODE TO PUSH TO FRIENDS
-                //ADD THE PROMISE INTO THE INDEXUSER.FINDBYID
-                if (userRelationResult) {
-                  const promisedFollowers = userRelationResult.followers.map(
-                    id => new Promise((resolve) => {
-                      IndexUser.findById(id).then(user => resolve(user));
-                    }));
-                  const foundFollowersResolved = Promise.all(promisedFollowers);
-                  foundFollowersResolved.then(
-                    (userArray) => {
-                      //resolved users
-                      const promisedUpdatedFollowerArray = userArray.map(
-                        indexUser => new Promise((resolve) => {
-                          indexUser.following_feed.push(post);
-                          indexUser.save().then(() => resolve());
-                        })
-                      );
-                      Promise.all(promisedUpdatedFollowerArray).then((result) => {
-                        console.log("Finished!");
-                        console.log(result);
-                      });
-                      // Promise.all()
-                    }
-                  )
+      const savedPost = post.save().catch(err => {
+        if (err) {
+          console.log(err);
+          res.status(500).json('Error: ' + err);
+        }
+      });
+      return Promise.all([savedIndexUser, savedUser, savedPost]);
+    })
+    .then(
+      (result) => {
+        console.log(result);
+        return userRelation.Model.findById(followerArrayID)
+          .then(
+            (userRelationResult) => {
+              console.log(userRelationResult)
+              //INSERT CODE TO PUSH TO FRIENDS
+              //ADD THE PROMISE INTO THE INDEXUSER.FINDBYID
+              if (userRelationResult) {
+                let followersArray = [];
+                for (const user of userRelationResult.followers) {
+                  console.log(typeof (user.id));
+                  followersArray.push(user.id);
                 }
+                console.log(followersArray);
+                return IndexUser.Model.find({
+                  '_id': { $in: followersArray }, function(err, docs) {
+                    if (err) console.log(err);
+                    else {
+                      console.log(docs);
+                    }
+                  }
+                });
+
+                // const promisedFollowers = userRelationResult.followers.map(
+                //   user => new Promise((resolve, reject) => 
+                //     () => IndexUser.findById(user.id).then(indexUser => {
+                //       console.log("user " + indexUser);
+                //       if (indexUser) resolve(indexUser);
+                //       else{
+                //         reject(new Error('User not found for User in follower list'));
+                //       }
+                //     })
+                //   ));
+                //   console.log("REturning promise in 208");
+                //   console.log(promisedFollowers);
+                // return Promise.all(promisedFollowers).then(result => {console.log(result); return result});            
               }
-            )
+            }
+          )
+      }
+    )
+    .then((foundFollowersResolved) => {
+      console.log("found followers");
+      console.log(foundFollowersResolved);
+      return foundFollowersResolved.then(
+        (userArray) => {
+          //resolved users
+          const promisedUpdatedFollowerArray = userArray.map(
+            indexUser => new Promise((resolve) => {
+              indexUser.following_feed.push(post);
+              indexUser.save().then(() => resolve());
+            })
+          );
+          return Promise.all(promisedUpdatedFollowerArray).then((result) => {
+            console.log("Finished!");
+            console.log(result);
+          });
         }
       )
     })

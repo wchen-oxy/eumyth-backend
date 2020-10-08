@@ -189,7 +189,6 @@ class ShortEditor extends React.Component {
                 }
             </div>
         );
-        console.log(this.props.validFiles);
         const textContainer = (
             <div id="text-container">
                 <div className="description-container">
@@ -279,7 +278,7 @@ class ShortEditor extends React.Component {
                         <div className="post-preview-container" id="after-image-container">
                             <div className="photo-upload-container">
                                 {this.props.unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
-                                <ImageSlider onArrowClick={this.props.onArrowClick} fileArray={this.props.validFiles} setImageArray={this.props.setImageArray} />
+                                <ImageSlider onIndexChange={this.props.onIndexChange} fileArray={this.props.validFiles} setImageArray={this.props.setImageArray} />
                             </div>
                             {textContainer}
                         </div>

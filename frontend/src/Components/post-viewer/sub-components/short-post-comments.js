@@ -13,7 +13,7 @@ const ShortPostComments = (props) => {
                 {props.pursuit ? <p>{props.pursuit}</p> : <></>}
                 {props.min ? <p>{props.min}</p> : <></>}
             </div>
-            <p>Text Area</p>
+            <p>{props.isPaginated ? props.textData[props.index] : props.textData }</p>
         </div>
     )
 }

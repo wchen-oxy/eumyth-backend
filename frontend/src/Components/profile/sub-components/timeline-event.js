@@ -7,10 +7,10 @@ const Event = (props) => {
     const post = props.eventData;
     let content = null;
     switch (post.post_format) {
-        case ("short"):
+        case ("SHORT"):
             content = <ShortEvent post={props.eventData} />
             break;
-        case ("long"):
+        case ("LONG"):
             content = <LongEvent post={props.eventData} />
                 // post.cover_photo_url ?
                 //     <img src={post.cover_photo_url} /> :
@@ -20,7 +20,9 @@ const Event = (props) => {
                 //     </div>);
             break;
         default:
-            break;
+            
+            throw Error("No matching post type: " + post.post_format );
+            
     }
 
     return (

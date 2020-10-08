@@ -6,33 +6,6 @@ import "slick-carousel/slick/slick-theme.css";
 
 // https://css-tricks.com/centering-css-complete-guide/#center-vertically
 //Explains the weird -50% and top 50% thing
-function PrevArrow(props) {
-  const { className, style, onClick } = props;
-  return (
-    <div
-      className={className}
-      style={{ ...style, display: "block", transform: `translate(${50}px, ${-50}%)`, zIndex: 2, top: "50%" }}
-      onClick={() => {
-        props.onArrowClick(1);
-        return onClick();
-      }}
-    />
-  );
-}
-
-function NextArrow(props) {
-  const { className, style, onClick } = props;
-  return (
-    <div
-      className={className}
-      style={{ ...style, display: "block", transform: `translate(${-50}px, ${-50}%)`, zIndex: 2, top: "50%" }}
-      onClick={() => {
-        props.onArrowClick(-1);
-        return onClick();
-      }}
-    />
-  );
-}
 
 class ImageSlider extends React.Component {
   _isMounted = false;
@@ -98,20 +71,18 @@ class ImageSlider extends React.Component {
   }
   render() {
     const settings = {
-      nextArrow: <NextArrow onArrowClick={this.props.onArrowClick}/>,
-      prevArrow: <PrevArrow onArrowClick={this.props.onArrowClick}/>,
       speed: 500,
       slidesToShow: 1,
       slidesToScroll: 1,
       centerPadding: 0,
-      className: 'photo-container'
+      className: 'photo-container',
+    
     };
     
     const container =
       (!!this.state.transformedImageArray ? this.state.transformedImageArray : <p>IMAGE IS STILL LOADING</p>);
-      console.log(this.state.transformedImageArray);
     return (
-      <Slider {...settings}>
+      <Slider afterChange={index => (this.props.onIndexChange(index))} {...settings}>
         {container}
       </Slider>
     );

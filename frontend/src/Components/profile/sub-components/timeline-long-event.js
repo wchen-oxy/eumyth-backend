@@ -3,9 +3,6 @@ import React from 'react';
 const LongEvent = (props) => {
     const post = props.post;
 
-    const getTextExcerpt = () => {
-        console.log(JSON.parse(post.text_data).blocks[0].text);
-    }
     // if (!post.image_data) {
     //     const initialText = JSON.parse(post.text_data).blocks[0].text;
     //     return (
@@ -23,7 +20,6 @@ const LongEvent = (props) => {
     //     </div>);
     // else {
     const initialText = JSON.parse(post.text_data).blocks[0].text;
-    console.log(initialText.length);
     // getTextExcerpt();
     const cover = post.cover_photo_url ? <img className="event-cover-photo" src={post.cover_photo_url} /> :
         (<p className="no-select">{initialText.length > 140 ? initialText.substring(0, 140).trim() + "..." : initialText}</p>)

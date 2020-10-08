@@ -122,7 +122,7 @@ const LongPost = (props) => {
         isPaginated={false}
         postText={props.onlineDraft}
         closeModal={props.closeModal}
-        postType="long"
+        postType="LONG"
         setPostStage={setPostStage}
         username={props.username}
         preferredPostType={props.preferredPostType}

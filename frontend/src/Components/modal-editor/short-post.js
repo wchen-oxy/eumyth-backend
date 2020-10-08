@@ -17,7 +17,7 @@ class ShortPost extends React.Component {
       window: 'initial',
     };
 
-    this.handleArrowClick = this.handleArrowClick.bind(this);
+    this.handleIndexChange = this.handleIndexChange.bind(this);
     this.setSelectedFiles = this.setSelectedFiles.bind(this);
     this.setValidFiles = this.setValidFiles.bind(this);
     this.setUnsupportedFiles = this.setUnsupportedFiles.bind(this);
@@ -31,12 +31,9 @@ class ShortPost extends React.Component {
     this.handleCaptionStyleChange = this.handleCaptionStyleChange.bind(this);
 
   }
-  handleArrowClick(value) {
-    let newIndex = value + this.state.imageIndex;
-    if (newIndex === -1) newIndex = this.state.validFiles.length -1;
-    if (newIndex === this.state.validFiles.length) newIndex = 0;
-    this.setState({imageIndex : newIndex});
-    console.log(newIndex);
+  handleIndexChange(value) {
+    this.setState({imageIndex : value});
+    console.log(value);
 }
 
   // handlePaginatedToggle() {
@@ -163,7 +160,7 @@ class ShortPost extends React.Component {
               textPageIndex={this.state.imageIndex}
               setImageArray={this.setImageArray}
               onCaptionStyleChange={this.handleCaptionStyleChange}
-              onArrowClick={this.handleArrowClick}
+              onIndexChange={this.handleIndexChange}
               onTextChange={this.handleTextChange}
               onSelectedFileChange={this.handleSelectedFileChange}
               onUnsupportedFileChange={this.handleUnsupportedFileChange}
@@ -182,7 +179,7 @@ class ShortPost extends React.Component {
           isPaginated={this.state.isPaginated}
           previewTitle={this.state.previewTitle}
           closeModal={this.props.closeModal}
-          postType={"short"}
+          postType={"SHORT"}
           onClick={this.handleClick}
           imageArray={this.state.imageArray}
           postText={this.state.postText}

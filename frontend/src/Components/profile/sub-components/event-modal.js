@@ -7,13 +7,14 @@ class EventModal extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            window: 'main'
+            window: 'MAIN'
         }
+
     }
     render() {
         if (!this.props.eventData) return (<></>);
-        if (this.state.window === "main") {
-            if (this.props.eventData.post_format === "short") {
+        if (this.state.window === "MAIN") {
+            if (this.props.eventData.post_format === "SHORT") {
                 return (
                     <ShortPostViewer
                         profilePhoto={this.props.smallProfilePhoto}

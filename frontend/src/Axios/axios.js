@@ -16,9 +16,10 @@ export default class AxiosHelper {
     }
 
     
-    static setFollowerStatus(visitorUsername, targetUserRelationId, action) {
+    static setFollowerStatus(visitorUsername, targetUsername, targetUserRelationId, action) {
         return axios.put(urls.RELATION_STATUS_URL, {
             visitorUsername: visitorUsername,
+            targetUsername: targetUsername,
             targetUserRelationId: targetUserRelationId,
             action: action
         });

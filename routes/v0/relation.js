@@ -33,6 +33,7 @@ router.route('/').get((req, res) => {
 
 router.route('/status').put((req, res) => {
   const visitorUsername = req.body.visitorUsername;
+  const targetUsername = req.body.targetUsername;
   const targetUserRelationId = req.body.targetUserRelationId;
   const action = req.body.action;
   let indexUser = null;
@@ -49,46 +50,69 @@ router.route('/status').put((req, res) => {
   const UNFOLLOWED = "UNFOLLOWED";
 
 
+  //FIXME ADD IN THE STUFF TO ADD WHO YOURE FOLLOWING TO YOUR OWN USERRELATION
+
+  // '_id': { $in: followersArray }, function(err, docs) {
+  //   if (err) console.log(err);
+  //   else {
+  //     console.log(docs);
+  //   }
+  // }
+
   const resolvedVisitor = IndexUser.Model.findOne({ username: visitorUsername });
   const resolvedUserRelation = resolvedVisitor.then(
-    (result) => {
+    (result) => {  
       indexUser = result;
-      return UserRelation.Model.findById(targetUserRelationId)
+      //need id of the target user and currentuser
+      const userRelationArray = [targetUserRelationId, indexUser.user_relation_id]
+      return UserRelation.Model.find({
+        '_id': { $in: userRelationArray }, function(err, docs) {
+          if (err) console.log(err);
+          else {
+            console.log(docs);
+          }
+        }
+      })
     }
   );
   const resolvedUpdate = resolvedUserRelation
     .then(
-      (targetUserRelation) => {
-        let followerArray = targetUserRelation.followers;
+      (userRelation) => {
+        let visitorFollowingArray = userRelation[0].following;
+        let targetFollowersArray = userRelation[1].followers;
         let user = null;
         switch (action) {
           case (FOLLOW):
-            for (const follower of followerArray) {
-              if (follower.id.toString() === indexUser.user_profile_id.toString()) {
-                resultStatus = FOLLOWING;
-                break;
+            for (const follower of targetFollowersArray) {
+              if (follower.id.toString() === indexUser._id.toString()) {
+                return Promise.reject("Already Following User");
               }
             }
             if (indexUser.private === true) {
-              followerArray.push(new UserPreview.Model({
+              targetFollowersArray.push(new UserPreview.Model({
                 status: FOLLOW_REQUESTED,
-                id: indexUser.user_profile_id,
+                id: indexUser._id,
                 username: visitorUsername,
               }));
               resultStatus = FOLLOW_REQUESTED;
             }
             else {
-              followerArray.push(new UserPreview.Model({
+              targetFollowersArray.push(new UserPreview.Model({
                 status: FOLLOWING,
-                id: indexUser.user_profile_id,
+                id: indexUser._id,
                 username: visitorUsername,
+              }));
+              visitorFollowingArray.push(new UserPreview.Model({
+                status: FOLLOWING,
+                id: userRelation[0].parent_user_id,
+                username: targetUsername,
               }));
               resultStatus = FOLLOWING;
             }
             break;
           case (ACCEPT_REQUEST):
-            for (const follower of followerArray) {
-              if (follower.id === indexUser.user_profile_id) {
+            for (const follower of targetFollowersArray) {
+              if (follower.id.toString() === indexUser._id.toString()) {
                 user = follower;
                 break;
               }
@@ -98,9 +122,9 @@ router.route('/status').put((req, res) => {
             break;
           case (UNFOLLOW):
             let newFollowers = [];
-            for (const follower of followerArray) {
+            for (const follower of targetFollowersArray) {
               // console.log(follower);
-              if (follower.id.toString() === indexUser.user_profile_id.toString()) {
+              if (follower.id.toString() === indexUser._id.toString()) {
                 console.log("1");
                 user = follower;
                 break;
@@ -109,17 +133,20 @@ router.route('/status').put((req, res) => {
                 newFollowers.push(follower);
               }
             }
-            targetUserRelation.followers = newFollowers;
+            userRelation[0].followers = newFollowers;
             resultStatus = UNFOLLOWED;
             break;
           default:
             break;
         }
 
-        return (targetUserRelation.save())
+        console.log(userRelation[0]);
+        return (userRelation[0].save().then(() => userRelation[1].save()))
       }
     )
+  
   resolvedUpdate.then(() => {
+    console.log("BOth saved");
     //FIXME FIX PROMISES WITH ACTION RESULT
     if (resultStatus === UNFOLLOWED) {
       res.status(200).json({ error: NOT_A_FOLLOWER_STATE });
@@ -131,7 +158,7 @@ router.route('/status').put((req, res) => {
   })
     .catch((error) => {
       console.log(error);
-      res.status(500).send();
+      res.status(500).send(error);
     });
 
 })

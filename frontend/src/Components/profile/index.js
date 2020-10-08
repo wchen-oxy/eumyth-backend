@@ -104,6 +104,7 @@ class ProfilePage extends React.Component {
         //set visitor user info and targetUserinfo
         this.setState({
             visitorUsername: user ? user.displayName : null,
+            targetUsername:  targetUserInfo.username,
             targetProfileId: targetUserInfo._id,
             coverPhoto: targetUserInfo.cover_photo,
             croppedDisplayPhoto: targetUserInfo.cropped_display_photo,
@@ -235,7 +236,7 @@ class ProfilePage extends React.Component {
     }
 
     handleFollowerStatusChange(action) {
-        AxiosHelper.setFollowerStatus(this.state.visitorUsername, this.state.userRelationId, action).then(
+        AxiosHelper.setFollowerStatus(this.state.visitorUsername, this.state.targetUsername, this.state.userRelationId, action).then(
             (result) => {
                 console.log(result);
                 if (result.status === 200) {
