@@ -190,64 +190,64 @@ router.route('/').put(upload.fields([{ name: "images" }, { name: "coverPhoto", m
       (result) => {
         console.log(result);
         return userRelation.Model.findById(followerArrayID)
-          .then(
-            (userRelationResult) => {
-              console.log(userRelationResult)
-              //INSERT CODE TO PUSH TO FRIENDS
-              //ADD THE PROMISE INTO THE INDEXUSER.FINDBYID
-              if (userRelationResult) {
-                let followersArray = [];
-                for (const user of userRelationResult.followers) {
-                  console.log(typeof (user.id));
-                  followersArray.push(user.id);
-                }
-                console.log(followersArray);
-                return IndexUser.Model.find({
-                  '_id': { $in: followersArray }, function(err, docs) {
-                    if (err) console.log(err);
-                    else {
-                      console.log(docs);
-                    }
-                  }
-                });
-
-                // const promisedFollowers = userRelationResult.followers.map(
-                //   user => new Promise((resolve, reject) => 
-                //     () => IndexUser.findById(user.id).then(indexUser => {
-                //       console.log("user " + indexUser);
-                //       if (indexUser) resolve(indexUser);
-                //       else{
-                //         reject(new Error('User not found for User in follower list'));
-                //       }
-                //     })
-                //   ));
-                //   console.log("REturning promise in 208");
-                //   console.log(promisedFollowers);
-                // return Promise.all(promisedFollowers).then(result => {console.log(result); return result});            
-              }
-            }
-          )
+        
       }
     )
-    .then((foundFollowersResolved) => {
-      console.log("found followers");
-      console.log(foundFollowersResolved);
-      return foundFollowersResolved.then(
+    .then(
+      (userRelationResult) => {
+        console.log(userRelationResult)
+        //INSERT CODE TO PUSH TO FRIENDS
+        //ADD THE PROMISE INTO THE INDEXUSER.FINDBYID
+        if (userRelationResult) {
+          let followersArray = [];
+          for (const user of userRelationResult.followers) {
+            console.log(typeof (user.id));
+            followersArray.push(user.id);
+          }
+          console.log(followersArray);
+          return IndexUser.Model.find({
+            '_id': { $in: followersArray }, function(err, docs) {
+              if (err) console.log(err);
+              else {
+                console.log(docs);
+              }
+            }
+          });
+
+          // const promisedFollowers = userRelationResult.followers.map(
+          //   user => new Promise((resolve, reject) => 
+          //     () => IndexUser.findById(user.id).then(indexUser => {
+          //       console.log("user " + indexUser);
+          //       if (indexUser) resolve(indexUser);
+          //       else{
+          //         reject(new Error('User not found for User in follower list'));
+          //       }
+          //     })
+          //   ));
+          //   console.log("REturning promise in 208");
+          //   console.log(promisedFollowers);
+          // return Promise.all(promisedFollowers).then(result => {console.log(result); return result});            
+        }
+        else{
+          Promise.reject("Unable to push new posts to followers because User Relation was not found.");
+        }
+      }
+    )
+    .then(
         (userArray) => {
           //resolved users
           const promisedUpdatedFollowerArray = userArray.map(
             indexUser => new Promise((resolve) => {
               indexUser.following_feed.push(post);
-              indexUser.save().then(() => resolve());
+              indexUser.save().then(() => resolve("saved"));
             })
           );
           return Promise.all(promisedUpdatedFollowerArray).then((result) => {
             console.log("Finished!");
             console.log(result);
           });
-        }
-      )
-    })
+        }    
+    )
     .then(
       () => res.status(201).send("Feel Free to continue browsing as we push updates")
     ).
