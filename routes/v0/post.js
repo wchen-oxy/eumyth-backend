@@ -170,7 +170,6 @@ router.route('/').put(upload.fields([{ name: "images" }, { name: "coverPhoto", m
           console.log(err);
           res.status(500).json('Error: ' + err);
         }
-        return
       });
       const savedUser = user.save().catch(err => {
         if (err) {
@@ -199,14 +198,12 @@ router.route('/').put(upload.fields([{ name: "images" }, { name: "coverPhoto", m
         //INSERT CODE TO PUSH TO FRIENDS
         //ADD THE PROMISE INTO THE INDEXUSER.FINDBYID
         if (userRelationResult) {
-          let followersArray = [];
+          let followersIdArray = [];
           for (const user of userRelationResult.followers) {
-            console.log(typeof (user.id));
-            followersArray.push(user.id);
+            followersIdArray.push(user.id);
           }
-          console.log(followersArray);
           return IndexUser.Model.find({
-            '_id': { $in: followersArray }, function(err, docs) {
+            '_id': { $in: followersIdArray }, function(err, docs) {
               if (err) console.log(err);
               else {
                 console.log(docs);

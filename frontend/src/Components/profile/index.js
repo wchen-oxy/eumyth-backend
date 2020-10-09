@@ -19,7 +19,7 @@ class ProfilePage extends React.Component {
             visitorUsername: null,
             targetProfileId: null,
             targetUsername: this.props.match.params.username,
-            private: false,
+            isPrivate: true,
             croppedDisplayPhoto: null,
             tinyCroppedcroppedDisplayPhoto: null,
             coverPhoto: "",
@@ -76,6 +76,7 @@ class ProfilePage extends React.Component {
     // }
 
     handleFollowerStatusResponse(followerStatusResponse) {
+        console.log(followerStatusResponse);
         if (followerStatusResponse.status === 200) {
             if (followerStatusResponse.data.success) {
                 if (followerStatusResponse.data.success === FOLLOWED_STATE) {
@@ -105,6 +106,7 @@ class ProfilePage extends React.Component {
         this.setState({
             visitorUsername: user ? user.displayName : null,
             targetUsername:  targetUserInfo.username,
+            isPrivate : targetUserInfo.private,
             targetProfileId: targetUserInfo._id,
             coverPhoto: targetUserInfo.cover_photo,
             croppedDisplayPhoto: targetUserInfo.cropped_display_photo,
@@ -121,47 +123,11 @@ class ProfilePage extends React.Component {
         //follower Status Reponse
         console.log("Finished Checking Friend Status");
     }
-    // retrieveFollowerStatus(userInfo) {
-    //     const visitorUsername = userInfo[0];
-    //     const userRelationId = userInfo[1];
-    //     if (userRelationId && visitorUsername !== this.state.targetUsername && visitorUsername) {
-    //         console.log(visitorUsername);
-    //         AxiosHelper.returnFollowerStatus(visitorUsername, userRelationId)
-    //             .then(
-    //                 (result) => {
-    //                     console.log(result);
-    //                     if (result.status === 200) {
-    //                         if (result.data.success) this.setState({ followerStatus: result.data.success });
-    //                         else if (result.data.error) {
-    //                             result.data.error === NOT_A_FOLLOWER_STATE ?
-    //                                 this.setState({ followerStatus: NOT_A_FOLLOWER_STATE }) :
-    //                                 this.setState({ followerStatus: FOLLOW_REQUESTED_STATE });
-    //                             console.log(result.data.error);
-    //                         }
-    //                     }
-    //                     console.log("Finished Checking Friend Status");
-    //                 })
-    //             .catch(
-    //                 err => console.log(err)
-    //             );
-    //     }
-    // }
-
+    
     //fixme add catch for no found anything
     componentDidMount() {
         this._isMounted = true;
-        // AxiosHelper.returnPursuitNames(this.state.targetUsername)
-        //     .then(
-        //         result => {
-        //             console.log(result);
-        //             if (!result.data) this.setState({ fail: true });
-        //             else if (this._isMounted) {
-        //                 this.setState({
-        //                     pursuits: result.data
-        //                 })
-        //             }
-        //         }
-        //     );
+
         if (this._isMounted) {
             this.props.firebase.auth.onAuthStateChanged(
                 (user) => {
@@ -236,7 +202,7 @@ class ProfilePage extends React.Component {
     }
 
     handleFollowerStatusChange(action) {
-        AxiosHelper.setFollowerStatus(this.state.visitorUsername, this.state.targetUsername, this.state.userRelationId, action).then(
+        AxiosHelper.setFollowerStatus(this.state.visitorUsername, this.state.targetUsername, this.state.userRelationId, this.state.isPrivate, action).then(
             (result) => {
                 console.log(result);
                 if (result.status === 200) {

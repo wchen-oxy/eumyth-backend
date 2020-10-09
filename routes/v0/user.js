@@ -105,18 +105,23 @@ router.route('/')
       });
 
       const newUserRelation = new UserRelation.Model({
-        parent_user_id: newUser._id,
+        parent_index_user_id: newIndexUser._id,
       });
 
       newUser.user_relation_id = newUserRelation._id;
       newIndexUser.user_relation_id = newUserRelation._id;
-      const resovlvedUser = newUser.save();
-      const resolvedIndexUser = resovlvedUser.then(() => newIndexUser.save());
-      const resolvedUserRelation = resolvedIndexUser.then(() => newUserRelation.save());
-      resolvedUserRelation.then(() => res.status(201).json("Success!")).catch(err => {
+      newUser.index_user_id = newIndexUser._id;
+      const savedUser = newUser.save();
+      const savedIndexUser = newIndexUser.save();
+      const savedUserRelation = newUserRelation.save();
+      return Promise.all([savedIndexUser, savedUser, savedUserRelation])
+      .then(() => res.status(201).json("Success!"))
+      .catch(err => {
         console.log(err);
         res.status(500).json(err);
       });
     });
+ 
+
 
 module.exports = router;

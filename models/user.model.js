@@ -34,17 +34,21 @@ const userSchema = new Schema({
     type: String,
     trim: true
   },
-  
+
   private: {
     type: Boolean,
     required: true,
+  },
+  
+  index_user_id: {
+    type: mongoose.Types.ObjectId,
   },
 
   user_relation_id: {
     type: mongoose.Types.ObjectId,
   },
-  
-  requests : [userPreview.Schema],
+
+  requests: [userPreview.Schema],
   pinned: [Post.Schema],
   pursuits: [Pursuits.Schema],
   all_posts: [mongoose.Types.ObjectId],

@@ -4,7 +4,7 @@ const userPreview = require("./user.preview.model");
 
 
 const userRelationSchema = new Schema({
-    parent_user_id: {
+    parent_index_user_id: {
         type: mongoose.Types.ObjectId,
         required: true
     },
