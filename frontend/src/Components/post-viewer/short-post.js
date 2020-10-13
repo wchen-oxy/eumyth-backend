@@ -56,7 +56,13 @@ class ShortPostViewer extends React.Component {
                             <ShortHeroText text={this.props.eventData.text_data} />
                         </div>
                         <div className="short-viewer-side-container">
-                            <ProfileHeader username={this.props.username} profilePhoto={this.props.profilePhoto} onEditClick={this.handleWindowChange} />
+                            <ProfileHeader
+                                isOwnProfile={this.props.isOwnProfile}
+                                username={this.props.username}
+                                profilePhoto={this.props.profilePhoto}
+                                onEditClick={this.handleWindowChange}
+                                onDeletePost={this.props.onDeletePost}
+                            />
                             <ShortPostComments
                                 index={this.state.imageIndex}
                                 isPaginated={this.props.eventData.isPaginated}
@@ -83,11 +89,13 @@ class ShortPostViewer extends React.Component {
                         </div>
                         <div className="short-viewer-side-container">
                             <ProfileHeader
+                                isOwnProfile={this.props.isOwnProfile}
                                 username={this.props.username}
                                 profilePhoto={this.props.profilePhoto}
                                 onEditClick={this.handleWindowChange}
+                                onDeletePost={this.props.onDeletePost}
                             />
-                             <ShortPostComments
+                            <ShortPostComments
                                 index={this.state.imageIndex}
                                 isPaginated={this.props.eventData.is_paginated}
                                 isMilestone={this.props.eventData.is_milestone}

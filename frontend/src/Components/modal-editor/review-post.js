@@ -19,6 +19,7 @@ const ReviewPost = (props) => {
         setLoading(true);
         console.log(props.imageArray);
         let formData = new FormData();
+        formData.append("displayPhoto", props.displayPhoto);
         formData.append("postType", props.postType);
         formData.append("username", props.username);
         formData.append("isPaginated", props.isPaginated);
@@ -26,12 +27,14 @@ const ReviewPost = (props) => {
         console.log(props.postText);
         console.log(minDuration);
         if (title) formData.append("title", _.trim(title));
-        if (subtitle) formData.append("subtitle", _.trim(subtitle));
+        if (subtitle) {
+            console.log("VALID");
+            formData.append("subtitle", _.trim(subtitle));}
         if (postPrivacyType) formData.append("postPrivacyType", postPrivacyType);
         if (pursuitCategory) formData.append("pursuitCategory", pursuitCategory)
         if (date) formData.append("date", date);
         if (minDuration) formData.append("minDuration", minDuration);
-        if (props.postText) formData.append("textData", props.postType === "SHORT" ? props.postText : JSON.stringify(props.postText));
+        if (props.postText) formData.append("textData", props.postType === "LONG" || props.isPaginated ? JSON.stringify(props.postText) : props.postText );
         if (coverPhoto) formData.append("coverPhoto", coverPhoto);
         if (props.imageArray && props.imageArray.length > 0) {
             console.log(props.imageArray);
@@ -70,7 +73,7 @@ const ReviewPost = (props) => {
 
     const returnToShortButton = (<button id="toggle-button" value="initial" onClick={e => props.onClick(e.target.value)}>Return</button>);
     const returnToLongButton = (<button id="toggle-button" value="initial" onClick={e => props.setPostStage(e.target.value, false)}>Return</button>);
-
+    console.log(subtitle);
     return (
         <div className="small-post-window">
             <div className="inner-small-post-container post-button-container">
@@ -85,7 +88,7 @@ const ReviewPost = (props) => {
                 <div className="post-button-container">
                     <label>Preview Title</label>
                     <TextareaAutosize name="title" id='review-post-text' placeholder='Create an Optional Preview Title Text' onChange={(e) => setTitle(e.target.value)} maxLength={100} />
-                    <TextareaAutosize name="subtitle" id='review-post-text' placeholder='Create an Optional Description' onChange={(e) => setSubtitle(e.target.value)} maxLength={140} />
+                    {props.postType === "LONG" ? <TextareaAutosize name="subtitle" id='review-post-text' placeholder='Create an Optional Description' onChange={(e) => setSubtitle(e.target.value)} maxLength={140} /> : <></>}
                     <label>Cover</label>
                     <input type="file" onChange={(e) => {
                         setCover(e.target.files[0]);

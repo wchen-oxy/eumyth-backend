@@ -10,7 +10,7 @@ class ShortPost extends React.Component {
       validFiles: [],
       unsupportedFiles: [],
       imageArray: [],
-      imageIndex : 0,
+      imageIndex: 0,
       postText: '',
       isPaginated: false,
       postDisabled: true,
@@ -32,9 +32,9 @@ class ShortPost extends React.Component {
 
   }
   handleIndexChange(value) {
-    this.setState({imageIndex : value});
+    this.setState({ imageIndex: value });
     console.log(value);
-}
+  }
 
   // handlePaginatedToggle() {
   //   this.setState((state) => ({ isPaginated: !state.isPaginated }))
@@ -92,7 +92,7 @@ class ShortPost extends React.Component {
         updatedArray[this.state.imageIndex] = text;
         newState = updatedArray;
       }
-      else{
+      else {
         newState = text;
       }
       this.setState((state) => ({
@@ -176,6 +176,7 @@ class ShortPost extends React.Component {
     else {
       return (
         <ReviewPost
+          displayPhoto={this.props.displayPhoto}
           isPaginated={this.state.isPaginated}
           previewTitle={this.state.previewTitle}
           closeModal={this.props.closeModal}

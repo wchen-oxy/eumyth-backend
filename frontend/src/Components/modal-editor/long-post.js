@@ -119,6 +119,7 @@ const LongPost = (props) => {
   else {
     return (
       <ReviewPost
+        displayPhoto={this.props.displayPhoto}
         isPaginated={false}
         postText={props.onlineDraft}
         closeModal={props.closeModal}

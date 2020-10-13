@@ -10,12 +10,9 @@ const multerS3 = require('multer-s3');
 const uuid = require('uuid');
 const userRelation = require('../../models/user.relation.model');
 
-
 const setPursuitAttributes = (isMilestone, pursuit, minDuration) => {
   if (isMilestone) { pursuit.num_milestones = Number(pursuit.num_milestones) + 1; }
-  console.log(pursuit.total_min);
   pursuit.total_min = Number(pursuit.total_min) + minDuration;
-  console.log(pursuit.total_min);
   pursuit.num_posts = Number(pursuit.num_posts) + 1;
   return pursuit;
 }
@@ -41,7 +38,6 @@ var upload = multer({
 });
 
 const getImageUrls = (array) => {
-  // console.log(mongooseArray);
   let imageArray = [];
   for (const imageFile of array) {
     imageArray.push(imageFile.location);
@@ -49,7 +45,8 @@ const getImageUrls = (array) => {
   return imageArray;
 }
 
-router.route('/').put(upload.fields([{ name: "images" }, { name: "coverPhoto", maxCount: 1 }]), (req, res) => {
+router.route('/'
+).put(upload.fields([{ name: "images" }, { name: "coverPhoto", maxCount: 1 }]), (req, res) => {
 
   const postType = !!req.body.postType ? req.body.postType : null;
   const username = req.body.username;
@@ -63,7 +60,6 @@ router.route('/').put(upload.fields([{ name: "images" }, { name: "coverPhoto", m
   const isMilestone = !!req.body.isMilestone ? req.body.isMilestone : null;
   const coverPhotoURL = req.files.coverPhoto ? req.files.coverPhoto[0].location : null;
   const imageData = req.files.images ? getImageUrls(req.files.images) : [];
-  // console.log(imageData);
 
   let post = null;
   let indexUser = null;
@@ -79,8 +75,6 @@ router.route('/').put(upload.fields([{ name: "images" }, { name: "coverPhoto", m
       res.status(500).send(err);
     }
   );
-
-
 
   let resolveNewPost = resolveIndexUser.then(resolvedIndexUser => {
     switch (postType) {
@@ -111,7 +105,7 @@ router.route('/').put(upload.fields([{ name: "images" }, { name: "coverPhoto", m
           post_format: postType,
           is_paginated: req.body.isPaginated,
           is_milestone: isMilestone,
-          text_data: req.body.textData,
+          text_data: textData,
           min_duration: minDuration
         });
         break;
@@ -135,6 +129,9 @@ router.route('/').put(upload.fields([{ name: "images" }, { name: "coverPhoto", m
       }
     }
 
+    resolvedIndexUser.recent_posts.push(post);
+    if (resolvedIndexUser.recent_posts.length > 6) resolvedIndexUser.shift();
+    
     return resolvedIndexUser.user_profile_id;
   }
   );
@@ -150,7 +147,10 @@ router.route('/').put(upload.fields([{ name: "images" }, { name: "coverPhoto", m
       const user = resolvedUser;
       user.all_posts.push(post._id);
       user.recent_posts.push(post);
-
+      if (user.recent_posts.length > 20) {
+        user.recent_posts.shift();
+        console.log("Removed oldest post.");
+      }
       //check if pursuits exists already
       if (minDuration) {
         for (const pursuit of user.pursuits) {
@@ -164,7 +164,6 @@ router.route('/').put(upload.fields([{ name: "images" }, { name: "coverPhoto", m
     }
   ).
     then(user => {
-      console.log(user.all_posts);
       const savedIndexUser = indexUser.save().catch(err => {
         if (err) {
           console.log(err);
@@ -187,14 +186,12 @@ router.route('/').put(upload.fields([{ name: "images" }, { name: "coverPhoto", m
     })
     .then(
       (result) => {
-        console.log(result);
         return userRelation.Model.findById(followerArrayID)
-        
+
       }
     )
     .then(
       (userRelationResult) => {
-        console.log(userRelationResult)
         //INSERT CODE TO PUSH TO FRIENDS
         //ADD THE PROMISE INTO THE INDEXUSER.FINDBYID
         if (userRelationResult) {
@@ -210,43 +207,31 @@ router.route('/').put(upload.fields([{ name: "images" }, { name: "coverPhoto", m
               }
             }
           });
-
-          // const promisedFollowers = userRelationResult.followers.map(
-          //   user => new Promise((resolve, reject) => 
-          //     () => IndexUser.findById(user.id).then(indexUser => {
-          //       console.log("user " + indexUser);
-          //       if (indexUser) resolve(indexUser);
-          //       else{
-          //         reject(new Error('User not found for User in follower list'));
-          //       }
-          //     })
-          //   ));
-          //   console.log("REturning promise in 208");
-          //   console.log(promisedFollowers);
-          // return Promise.all(promisedFollowers).then(result => {console.log(result); return result});            
         }
-        else{
+        else {
           Promise.reject("Unable to push new posts to followers because User Relation was not found.");
         }
       }
     )
     .then(
-        (userArray) => {
-          //resolved users
-          const promisedUpdatedFollowerArray = userArray.map(
-            indexUser => new Promise((resolve) => {
-              indexUser.following_feed.push(post);
-              indexUser.save().then(() => resolve("saved"));
-            })
-          );
-          return Promise.all(promisedUpdatedFollowerArray).then((result) => {
-            console.log("Finished!");
-            console.log(result);
-          });
-        }    
-    )
-    .then(
-      () => res.status(201).send("Feel Free to continue browsing as we push updates")
+      (userArray) => {
+        //resolved users
+        const promisedUpdatedFollowerArray = userArray.map(
+          indexUser => new Promise((resolve) => {
+            indexUser.following_feed.push(post._id);
+            if (indexUser.following_feed.length > 50) {
+              indexUser.following_feed.shift();
+              console.log("Removed oldest post from a user's following feed");
+            }
+            indexUser.save().then(() => resolve("saved"));
+          })
+        );
+        return Promise.all(promisedUpdatedFollowerArray).then((result) => {
+          console.log("Finished!");
+          console.log(result);
+          res.status(201).send("Feel Free to continue browsing as we push updates")
+        });
+      }
     ).
     catch(
       (err) => {
@@ -254,6 +239,78 @@ router.route('/').put(upload.fields([{ name: "images" }, { name: "coverPhoto", m
         res.status(500).json(err);
       }
     )
+
+})
+  .delete((req, res) => {
+    const userId = req.body.userId;
+    const postId = req.body.postId;
+    let returnedUser = null;
+
+    return User.Model.findById(userId)
+      .then((user) => {
+        returnedUser = user;
+        let updatedAllPosts = [];
+        let updatedRecentPosts = [];
+        for (const post of user.all_posts) {
+          if (post.toString() !== postId) {
+            updatedAllPosts.push(post);
+          }
+        }
+        for (const post of user.recent_posts) {
+          if (post._id.toString() !== postId) {
+            updatedRecentPosts.push(post);
+          }
+        }
+        returnedUser.all_posts = updatedAllPosts;
+        returnedUser.recent_posts = updatedRecentPosts;
+
+        return Post.Model.deleteOne({ _id: postId });
+      })
+      .then(() => {
+        return returnedUser.save();
+      })
+      .then(() => res.status(204).send())
+      .catch((err) => console.log(err));
+  });
+
+router.route('/feed').get((req, res) => {
+  const indexUserId = req.query.indexUserId;
+  const postIdList = req.query.postIdList;
+  console.log("ewr");
+  console.log(postIdList);
+  let updatedPostIdList = [];
+  let posts = null;
+  return Post.Model.find({
+    '_id': { $in: postIdList }, function(err, docs) {
+      if (err) console.log(err);
+      else {
+        console.log(docs);
+      }
+    }
+  }).then(
+    (result) => {
+      console.log(result);
+      posts = result;
+      if (result.length !== postIdList) {
+        for (const post of result) {
+          if (postIdList.includes(post._id.toString())) updatedPostIdList.push(post._id.toString());
+        }
+        return IndexUser.Model.findById(indexUserId).then(
+          (indexUser) => {
+            indexUser.following_feed = updatedPostIdList;
+            return indexUser.save();
+          }
+        );
+      }
+      return;
+    }
+  )
+    .then(() => res.status(200).json({feed: posts}))
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send();
+    })
+
 
 })
 

@@ -14,6 +14,7 @@ const RELATION_STATUS_URL = RELATION_BASE_URL + "/status";
 const POST_BASE_URL = ROOT_URL + "/post";
 const WITH_IMAGE_POST_URL = POST_BASE_URL + "/with-image";
 const NO_IMAGE_POST_URL = POST_BASE_URL + "/no-image";
+const MULTIPLE_POST_URL = POST_BASE_URL + "/feed";
 
 //index
 const INDEX_BASE_URL = ROOT_URL + "/index";
@@ -30,6 +31,7 @@ module.exports = {
     POST_BASE_URL,
     WITH_IMAGE_POST_URL,
     NO_IMAGE_POST_URL,
+    MULTIPLE_POST_URL,
     INDEX_BASE_URL,
     CHECK_USERNAME_URL,
     INDEX_USER_PURSUITS_URL

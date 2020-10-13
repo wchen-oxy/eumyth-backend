@@ -15,13 +15,13 @@ export default class AxiosHelper {
         return axios.put(urls.USER_BASE_URL, formData);
     }
 
-    
+
     static setFollowerStatus(visitorUsername, targetUsername, targetUserRelationId, isPrivate, action) {
         return axios.put(urls.RELATION_STATUS_URL, {
             visitorUsername: visitorUsername,
             targetUsername: targetUsername,
             targetUserRelationId: targetUserRelationId,
-            isPrivate : isPrivate,
+            isPrivate: isPrivate,
             action: action
         });
     }
@@ -69,8 +69,21 @@ export default class AxiosHelper {
     //     return axios.post(PostEndpoint.IMAGE_POST, formData);
     // }
 
+    static returnSocialFeedPosts(indexUserId, postIdList) {
+        return axios.get(urls.MULTIPLE_POST_URL, {
+            params: {
+                indexUserId: indexUserId,
+                postIdList: postIdList
+            }
+        })
+    }
+
     static createPost(postInfoForm) {
         return axios.put(urls.POST_BASE_URL, postInfoForm);
+    }
+
+    static deletePost(userDataId, postId) {
+        return axios.delete(urls.POST_BASE_URL, { data: { userId: userDataId, postId: postId } });
     }
 
     //FIXME 

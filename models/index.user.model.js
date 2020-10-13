@@ -63,7 +63,8 @@ const indexUserSchema = new Schema(
           },
 
         pursuits: [IndexPursuit.Schema],
-        following_feed: [Post.Schema]
+        following_feed: [mongoose.Types.ObjectId],
+        recent_posts: [Post.Schema]
     }
 );
 

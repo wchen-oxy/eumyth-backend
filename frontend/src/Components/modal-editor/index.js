@@ -117,7 +117,11 @@ class PostController extends React.Component {
         if (response.status === 200) {
           if (isInitial) this.setState({ onlineDraftRetrieved: true });
           console.log(response.status);
-          this.setState({ onlineDraft: response.data, updatingOnlineDraft: false });
+          this.setState({
+            smallDisplayPhoto: response.data.smallDisplayPhoto,
+            onlineDraft: response.data.draft,
+            updatingOnlineDraft: false
+          });
         }
         else {
           this.setState({ onlineDraftRetrieved: true, updatingOnlineDraft: false, errorRetrievingDraft: true });
@@ -180,6 +184,7 @@ class PostController extends React.Component {
       case ("short"):
         postType = (
           <ShortPost
+            displayPhoto={this.state.displayPhoto}
             username={this.props.username}
             closeModal={this.props.closeModal}
             pursuits={this.state.pursuits}
@@ -195,6 +200,7 @@ class PostController extends React.Component {
         // const previewTitle = this.state.indexUserData ? this.state.indexUserData.draft.previewTitle : "";
         postType = (
           <LongPost
+            displayPhoto={this.state.displayPhoto}
             username={this.props.username}
             onlineDraft={this.state.onlineDraft}
             pursuits={this.state.pursuits}

@@ -15,7 +15,6 @@ class ProfilePage extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-
             visitorUsername: null,
             targetProfileId: null,
             targetUsername: this.props.match.params.username,
@@ -40,9 +39,17 @@ class ProfilePage extends React.Component {
         this.handleFollowClick = this.handleFollowClick.bind(this);
         this.handleFollowerStatusChange = this.handleFollowerStatusChange.bind(this);
         this.handleOptionsClick = this.handleOptionsClick.bind(this);
+        this.handleDeletePost = this.handleDeletePost.bind(this);
+
         // this.retrieveTargetUserInfo = this.retrieveTargetUserInfo.bind(this);
         // this.retrieveFollowerStatus = this.retrieveFollowerStatus.bind(this);
     }
+
+
+    handleDeletePost(){
+        AxiosHelper.deletePost(this.state.targetProfileId, this.state.selectedEvent._id).then((result) => console.log(result));
+    }
+
 
     // retrieveTargetUserInfo(user) {
     //     return AxiosHelper.returnUser(this.state.targetUsername)
@@ -228,7 +235,9 @@ class ProfilePage extends React.Component {
         this.openModal(this.miniModalRef);
     }
 
+
     render() {
+        console.log(this.visitorUsername === this.targetUsername);
         console.log(this.state.selectedEvent);
         var pursuitHolderArray = [];
         if (this.state.fail) return NoMatch;
@@ -280,9 +289,12 @@ class ProfilePage extends React.Component {
                     <div className="overlay"  onClick={(() => this.closeModal(this.modalRef))}></div>
                     <span className="close" onClick={(() => this.closeModal(this.modalRef))}>X</span>
                     <EventModal
+                        isOwnProfile={this.visitorUsername === this.targetUsername}
                         smallProfilePhoto={this.state.smallCroppedDisplayPhoto}
                         username={this.state.targetUsername}
-                        eventData={this.state.selectedEvent} />
+                        eventData={this.state.selectedEvent} 
+                        onDeletePost={this.handleDeletePost}
+                        />
                 </div>
                 <div className="modal" ref={this.miniModalRef}>
                 <div className="overlay" onClick={(() => this.closeModal(this.miniModalRef))}></div>

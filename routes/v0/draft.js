@@ -9,7 +9,10 @@ router.route('/').get((req, res) => {
             if (user.draft === undefined) {
                 return res.status(204);
             }
-            res.status(200).send(user.draft);
+            return res.status(200).send({
+                smallDisplayPhoto: user.small_cropped_display_photo,
+                draft: user.draft
+            });
         })
         .catch(err => console.log('ERROR' + err));
 })

@@ -19,7 +19,7 @@ const postSchema = new Schema({
     type: Date
   },
 
-  description: {
+  subtitle: {
     type: String,
     required: false,
     trim: true

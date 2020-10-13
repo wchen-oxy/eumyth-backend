@@ -5,6 +5,10 @@ import AxiosHelper from '../../../Axios/axios';
 import RecentWorkObject from "./recent-work-object";
 import FeedObject from "./feed-object";
 import './returning-user.scss';
+import LongPostViewer from '../../post-viewer/long-post';
+import ShortPostViewer from '../../post-viewer/short-post';
+
+const SHORT = "SHORT";
 
 class ReturningUserPage extends React.Component {
     _isMounted = false;
@@ -14,10 +18,9 @@ class ReturningUserPage extends React.Component {
             username: this.props.firebase.returnUsername(),
             firstName: null,
             lastName: null,
-
+            feedData: null,
             pursuits: null,
             displayPhoto: "https://i.redd.it/73j1cgr028u21.jpg",
-
             indexUserData: null
         }
         this.handlePursuitClick = this.handlePursuitClick.bind(this);
@@ -31,13 +34,38 @@ class ReturningUserPage extends React.Component {
             if (result) this.setState({ firstName: result.firstName, lastName: result.lastName });
         });
         if (this._isMounted && this.state.username) {
+            let indexUserData = null;
+            let displayPhoto = "";
+            let pursuits = null;
             AxiosHelper.returnIndexUser(this.state.username)
                 .then(
-                    (result) => this.setState({ 
-                        indexUserData : result.data,
-                        displayPhoto : result.data.small_cropped_display_photo, 
-                        pursuits :  result.data.pursuits
-                    })
+                    (result) => {
+                        indexUserData = result.data;
+                        displayPhoto = result.data.small_cropped_display_photo;
+                        pursuits = result.data.pursuits;
+                        return result.data.following_feed;
+                    }
+                )
+                .then(
+                    (feed) => {
+                        if (!feed || feed.length === 0) return;
+                        else if (feed.length < 20) {
+                            return AxiosHelper.returnSocialFeedPosts(indexUserData._id, feed.slice(0, feed.length));
+                        }
+                        else {
+                            return AxiosHelper.returnSocialFeedPosts(indexUserData._id, feed.slice(0, 20));
+                        }
+                    }
+                )
+                .then(
+                    (results) => {
+                        this.setState({
+                            feedData: results ? results : null,
+                            indexUserData: indexUserData,
+                            displayPhoto: displayPhoto,
+                            pursuits: pursuits,
+                        });
+                    }
                 );
         }
     }
@@ -59,6 +87,7 @@ class ReturningUserPage extends React.Component {
 
     render() {
         let pursuitInfoArray = [];
+        let feed = [];
         let totalMin = 0;
         if (this.state.pursuits) {
             for (const pursuit of this.state.pursuits) {
@@ -73,6 +102,29 @@ class ReturningUserPage extends React.Component {
                     </tr>);
                 pursuitInfoArray.push(hobbyTableData);
             }
+        }
+
+        if (this.state.feed) {
+            for (const feedItem of this.state.feed) {
+                feed.push(
+                    feedItem.post_format === SHORT ?
+                        <ShortPostViewer
+                            isOwnProfile={false}
+                            profilePhoto={this.props.smallProfilePhoto}
+                            username={this.props.username}
+                            eventData={this.props.eventData}
+                            onDeletePost={this.props.onDeletePost}
+                        />
+                        :
+                        <LongPostViewer
+                            username={this.props.username}
+                            isOwnProfile={false}
+                            eventData={this.props.eventData}
+                            onDeletePost={this.props.onDeletePost}
+                        />
+                )
+            }
+
         }
 
         //TEST 
