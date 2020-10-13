@@ -58,7 +58,8 @@ class ShortPostViewer extends React.Component {
                         <div className="short-viewer-side-container">
                             <ProfileHeader
                                 isOwnProfile={this.props.isOwnProfile}
-                                username={this.props.username}
+                                username={this.props.eventData.username}
+                                displayPhoto={this.props.eventData.displayPhoto}
                                 profilePhoto={this.props.profilePhoto}
                                 onEditClick={this.handleWindowChange}
                                 onDeletePost={this.props.onDeletePost}
@@ -90,8 +91,8 @@ class ShortPostViewer extends React.Component {
                         <div className="short-viewer-side-container">
                             <ProfileHeader
                                 isOwnProfile={this.props.isOwnProfile}
-                                username={this.props.username}
-                                profilePhoto={this.props.profilePhoto}
+                                username={this.props.eventData.username}
+                                displayPhoto={this.props.eventData.displayPhoto}
                                 onEditClick={this.handleWindowChange}
                                 onDeletePost={this.props.onDeletePost}
                             />

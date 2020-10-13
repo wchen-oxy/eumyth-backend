@@ -19,15 +19,15 @@ class EventModal extends React.Component {
                 return (
                     <ShortPostViewer
                         isOwnProfile={this.props.isOwnProfile}
-                        profilePhoto={this.props.smallProfilePhoto}
-                        username={this.props.username}
+                        // profilePhoto={this.props.smallProfilePhoto}
+                        // username={this.props.username}
                         eventData={this.props.eventData}
                         onDeletePost={this.props.onDeletePost}
                     />);
             }
             else {
                 return (<LongPostViewer
-                    username={this.props.username}
+                    // username={this.props.username}
                     isOwnProfile={this.props.isOwnProfile}
                     eventData={this.props.eventData}
                     onDeletePost={this.props.onDeletePost}

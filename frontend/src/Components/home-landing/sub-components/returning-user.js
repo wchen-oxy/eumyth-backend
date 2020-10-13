@@ -108,16 +108,13 @@ class ReturningUserPage extends React.Component {
             for (const feedItem of this.state.feed) {
                 feed.push(
                     feedItem.post_format === SHORT ?
-                        <ShortPostViewer
+                        <ShortPostViewer                          
                             isOwnProfile={false}
-                            profilePhoto={this.props.smallProfilePhoto}
-                            username={this.props.username}
                             eventData={this.props.eventData}
                             onDeletePost={this.props.onDeletePost}
                         />
                         :
                         <LongPostViewer
-                            username={this.props.username}
                             isOwnProfile={false}
                             eventData={this.props.eventData}
                             onDeletePost={this.props.onDeletePost}

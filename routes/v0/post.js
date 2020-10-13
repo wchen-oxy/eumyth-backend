@@ -50,6 +50,7 @@ router.route('/'
 
   const postType = !!req.body.postType ? req.body.postType : null;
   const username = req.body.username;
+  const displayPhoto = req.body.displayPhoto;
   const title = !!req.body.title ? req.body.title : null;
   const subtitle = !!req.body.subtitle ? req.body.subtitle : null;
   const postPrivacyType = !!req.body.postPrivacyType ? req.body.postPrivacyType : null;
@@ -60,7 +61,7 @@ router.route('/'
   const isMilestone = !!req.body.isMilestone ? req.body.isMilestone : null;
   const coverPhotoURL = req.files.coverPhoto ? req.files.coverPhoto[0].location : null;
   const imageData = req.files.images ? getImageUrls(req.files.images) : [];
-
+console.log(displayPhoto)
   let post = null;
   let indexUser = null;
   let followerArrayID = null;
@@ -80,11 +81,13 @@ router.route('/'
     switch (postType) {
       case ("SHORT"):
         post = new Post.Model({
+          username: username,
           title: title,
           private: postPrivacyType,
           date: date,
           author_id: resolvedIndexUser.user_profile_id,
           pursuit_category: pursuitCategory,
+          display_photo_url: displayPhoto,
           cover_photo_url: coverPhotoURL,
           post_format: postType,
           is_paginated: req.body.isPaginated,
@@ -96,11 +99,13 @@ router.route('/'
         break;
       case ("LONG"):
         post = new Post.Model({
+          username: username,
           title: title,
           subtitle: subtitle,
           private: postPrivacyType,
           author_id: resolvedIndexUser.user_profile_id,
           pursuit_category: pursuitCategory,
+          display_photo_url: displayPhoto,
           cover_photo_url: coverPhotoURL,
           post_format: postType,
           is_paginated: req.body.isPaginated,

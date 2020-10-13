@@ -15,7 +15,7 @@ class PostController extends React.Component {
     this.state = {
       onlineDraftRetrieved: false,
       onlineDraft: null,
-
+      displayPhoto: null,
       updatingOnlineDraft: false,
       postType: "none",
       pursuits: null,
@@ -116,9 +116,9 @@ class PostController extends React.Component {
       (response) => {
         if (response.status === 200) {
           if (isInitial) this.setState({ onlineDraftRetrieved: true });
-          console.log(response.status);
+          console.log(response.data);
           this.setState({
-            smallDisplayPhoto: response.data.smallDisplayPhoto,
+            displayPhoto: response.data.smallDisplayPhoto,
             onlineDraft: response.data.draft,
             updatingOnlineDraft: false
           });

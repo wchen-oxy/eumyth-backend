@@ -2,12 +2,12 @@ import React from 'react';
 import { withFirebase } from '../../Firebase';
 import PursuitHolder from './sub-components/pursuit-holder';
 import Timeline from "./timeline";
-import './index.scss';
 import AxiosHelper from '../../Axios/axios';
 import NoMatch from '../no-match';
 import EventModal from "./sub-components/event-modal";
 import FollowButton from "./sub-components/follow-buttons";
 import UserOptions from "./sub-components/user-options";
+import './index.scss';
 import { NOT_A_FOLLOWER_STATE, FOLLOW_ACTION, UNFOLLOWED_STATE, FOLLOW_REQUESTED_STATE, FOLLOWED_STATE } from "../constants/flags";
 
 class ProfilePage extends React.Component {
@@ -46,7 +46,7 @@ class ProfilePage extends React.Component {
     }
 
 
-    handleDeletePost(){
+    handleDeletePost() {
         AxiosHelper.deletePost(this.state.targetProfileId, this.state.selectedEvent._id).then((result) => console.log(result));
     }
 
@@ -112,8 +112,8 @@ class ProfilePage extends React.Component {
         //set visitor user info and targetUserinfo
         this.setState({
             visitorUsername: user ? user.displayName : null,
-            targetUsername:  targetUserInfo.username,
-            isPrivate : targetUserInfo.private,
+            targetUsername: targetUserInfo.username,
+            isPrivate: targetUserInfo.private,
             targetProfileId: targetUserInfo._id,
             coverPhoto: targetUserInfo.cover_photo,
             croppedDisplayPhoto: targetUserInfo.cropped_display_photo,
@@ -130,7 +130,7 @@ class ProfilePage extends React.Component {
         //follower Status Reponse
         console.log("Finished Checking Friend Status");
     }
-    
+
     //fixme add catch for no found anything
     componentDidMount() {
         this._isMounted = true;
@@ -286,19 +286,19 @@ class ProfilePage extends React.Component {
                     <Timeline recentPosts={this.state.recentPosts} onEventClick={this.handleEventClick} />
                 </div>
                 <div className="modal" ref={this.modalRef}>
-                    <div className="overlay"  onClick={(() => this.closeModal(this.modalRef))}></div>
+                    <div className="overlay" onClick={(() => this.closeModal(this.modalRef))}></div>
                     <span className="close" onClick={(() => this.closeModal(this.modalRef))}>X</span>
                     <EventModal
                         isOwnProfile={this.visitorUsername === this.targetUsername}
-                        smallProfilePhoto={this.state.smallCroppedDisplayPhoto}
+                        // smallProfilePhoto={this.state.smallCroppedDisplayPhoto}
                         username={this.state.targetUsername}
-                        eventData={this.state.selectedEvent} 
+                        eventData={this.state.selectedEvent}
                         onDeletePost={this.handleDeletePost}
-                        />
+                    />
                 </div>
                 <div className="modal" ref={this.miniModalRef}>
-                <div className="overlay" onClick={(() => this.closeModal(this.miniModalRef))}></div>
-                <UserOptions />
+                    <div className="overlay" onClick={(() => this.closeModal(this.miniModalRef))}></div>
+                    <UserOptions />
                 </div>
             </div>
         );
