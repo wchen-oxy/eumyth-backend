@@ -1,9 +1,10 @@
-import React from "react";
-import "./index.scss";
-import { AuthUserContext } from "../../Components/session/"
-import { withFirebase } from "../../Firebase";
-import { Link } from "react-router-dom";
-import PostController from "../modal-editor/index";
+import React from 'react';
+import PostController from '../post/index';
+import { AuthUserContext } from '../../Components/session/'
+import { withFirebase } from '../../Firebase';
+import { Link } from 'react-router-dom';
+import './index.scss';
+
 const Navigation = () => (
 
   <AuthUserContext.Consumer>

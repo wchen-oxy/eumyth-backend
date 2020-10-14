@@ -1,14 +1,21 @@
 import React from 'react';
 import { withFirebase } from '../../Firebase';
 import PursuitHolder from './sub-components/pursuit-holder';
-import Timeline from "./timeline";
+import Timeline from "./timeline/index";
 import AxiosHelper from '../../Axios/axios';
 import NoMatch from '../no-match';
 import EventModal from "./sub-components/event-modal";
 import FollowButton from "./sub-components/follow-buttons";
 import UserOptions from "./sub-components/user-options";
+import {
+    NOT_A_FOLLOWER_STATE,
+    FOLLOW_ACTION,
+    UNFOLLOWED_STATE,
+    FOLLOW_REQUESTED_STATE,
+    FOLLOWED_STATE
+} from "../constants/flags";
 import './index.scss';
-import { NOT_A_FOLLOWER_STATE, FOLLOW_ACTION, UNFOLLOWED_STATE, FOLLOW_REQUESTED_STATE, FOLLOWED_STATE } from "../constants/flags";
+
 
 class ProfilePage extends React.Component {
     _isMounted = false;
@@ -41,8 +48,7 @@ class ProfilePage extends React.Component {
         this.handleOptionsClick = this.handleOptionsClick.bind(this);
         this.handleDeletePost = this.handleDeletePost.bind(this);
 
-        // this.retrieveTargetUserInfo = this.retrieveTargetUserInfo.bind(this);
-        // this.retrieveFollowerStatus = this.retrieveFollowerStatus.bind(this);
+
     }
 
 
@@ -50,37 +56,6 @@ class ProfilePage extends React.Component {
         AxiosHelper.deletePost(this.state.targetProfileId, this.state.selectedEvent._id).then((result) => console.log(result));
     }
 
-
-    // retrieveTargetUserInfo(user) {
-    //     return AxiosHelper.returnUser(this.state.targetUsername)
-    //         .then(
-    //             response => {
-    //                 if (!response) this.setState({ fail: true });
-    //                 else {
-    //                     const result = response.data;
-    //                     console.log(result.user_relation_id);
-
-    //                     const userRelationId = result.user_relation_id ? result.user_relation_id : null;
-    //                     this.setState({
-    //                         visitorUsername: user.displayName,
-    //                         targetProfileId: result._id,
-    //                         coverPhoto: result.cover_photo,
-    //                         croppedDisplayPhoto: result.cropped_display_photo,
-    //                         smallCroppedDisplayPhoto : result.small_cropped_display_photo,
-    //                         tinyCroppedDisplayPhoto: result.tiny_cropped_display_photo,
-    //                         bio: result.bio,
-    //                         pinned: result.pinned,
-    //                         pursuits: result.pursuits,
-    //                         allPosts: result.posts,
-    //                         recentPosts: result.recent_posts,
-    //                         userRelationId: userRelationId
-    //                     });
-
-    //                     return [user.displayName, userRelationId];
-    //                 }
-    //             }
-    //         )
-    // }
 
     handleFollowerStatusResponse(followerStatusResponse) {
         console.log(followerStatusResponse);

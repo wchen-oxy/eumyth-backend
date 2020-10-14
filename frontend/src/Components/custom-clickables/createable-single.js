@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-
 import CreatableSelect from 'react-select/creatable';
 import {components} from 'react-select';
 import {options as pursuitOptions}  from './options';

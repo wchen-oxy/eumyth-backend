@@ -2,7 +2,7 @@ import React from 'react';
 // import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import './App.scss';
-import HomePage from './Components/home-redirect/index';
+import HomePage from './Components/home/index';
 import AccountPage from  './Components/account';
 import {withAuthentication} from './Components/session';
 import Navbar from './Components/navbar/index';
