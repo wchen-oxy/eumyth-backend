@@ -4,7 +4,7 @@ import './verify.scss';
 const VerifyPage = (props) => {
     const [sentIndicator, setSentIndicator] = useState(<></>);
         return (
-            <div className="login-signup-container">
+            <div className="login-signup-container flex-display">
                 <section>
                     <div className="login-register-container">
                         <p>If you have verified your email, please refresh the page. </p>
@@ -13,7 +13,7 @@ const VerifyPage = (props) => {
                             setSentIndicator(<p>Email has been sent! Once you verify your email, try refreshing the page.</p>)
                             props.onSendEmailVerification(e);
                             }}>Resend Email</button>
-                        <div className="login-register-button-containers">
+                        <div className="flex-display">
                             <button onClick={props.onLoginRegisterToggle}>Register</button>
                             <button onClick={props.onSignOut}>Login as someone else</button>
                         </div>

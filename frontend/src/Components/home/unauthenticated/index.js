@@ -67,12 +67,11 @@ export default class WelcomePage extends React.Component {
     });
   }
 
-  handleVerifiedState(isVerified){
+  handleVerifiedState(isVerified) {
     this.setState({
-      verified : isVerified
+      verified: isVerified
     })
   }
-
 
   toggleLoginRegisterWindow(e) {
     e.preventDefault();
@@ -90,10 +89,10 @@ export default class WelcomePage extends React.Component {
         if (result) {
           console.log(result.user.emailVerified);
           if (result.user.emailVerified) this.props.history.push("/");
-          else{
+          else {
             this.handleVerifiedState(result.user.emailVerified);
           }
-          
+
         }
       });
   }
@@ -120,8 +119,8 @@ export default class WelcomePage extends React.Component {
     if (this.state.showRegisterSuccess) {
       return (
         <main>
-          <section className="overview-login-register-container">
-            <div className="overview-description-container">
+          <section className="overview-login-register-container flex-display">
+            <div className="overview-description-container flex-display flex-direction-column">
               <p>Welcome to interestHub! Login or sign up to get started!</p>
             </div>
             <div>
@@ -162,8 +161,8 @@ export default class WelcomePage extends React.Component {
 
     return (
       <main>
-        <section className="overview-login-register-container">
-          <div className="overview-description-container">
+        <section className="overview-login-register-container flex-display">
+          <div className="overview-description-container flex-display flex-direction-column">
             <p>Welcome to interestHub! Login or sign up to get started!</p>
           </div>
           {LoginRegisterHome}

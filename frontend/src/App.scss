@@ -1,3 +1,12 @@
+// Colors
+$primary-color: #ed4071;
+$primary-text-color: black;
+
+//Sizes
+$primary-calc-medium-font-size: calc(10px + 2vmin);
+$primary-large-font-size: 30px;
+$primary-medium-font-size: 20px;
+
 // set basic Rules
 body {
   //layouts
@@ -17,6 +26,18 @@ body {
   -ms-user-select: none; /* Internet Explorer/Edge */
   user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome, Edge, Opera and Firefox */
+}
+
+.flex-display{
+  display: flex;
+}
+
+.flex-direction-column{
+  flex-direction: column;
+}
+
+.flex-direction-row{
+  flex-direction: row;    
 }
 
 .small-post-window {

@@ -5,7 +5,7 @@ import AxiosHelper from '../../../../Axios/axios';
 import RecentWorkObject from "./recent-work-object";
 import LongPostViewer from '../../../post/viewer/long-post';
 import ShortPostViewer from '../../../post/viewer/short-post';
-import FeedObject from "./feed-object";
+// import FeedObject from "./feed-object";
 import './returning-user.scss';
 
 const SHORT = "SHORT";

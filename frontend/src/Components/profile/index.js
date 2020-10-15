@@ -147,17 +147,7 @@ class ProfilePage extends React.Component {
                     }
                 }
             )
-            // AxiosHelper.returnUser(this.state.targetUsername)
         }
-        // if (this._isMounted) {
-        //     this.retrieveTargetUserInfo(this.props.firebase.auth.currentUser)
-        //         .then(
-        //             userInfo => {
-        //                 this.retrieveFollowerStatus(userInfo);
-        //             }
-        //         );
-        // }
-
     }
 
     componentWillUnmount() {
@@ -225,7 +215,7 @@ class ProfilePage extends React.Component {
         }
         return (
             <div>
-                <div id="personal-profile-container">
+                <div id="personal-profile-container" className="flex-display flex-direction-column">
                     <div id="personal-profile-header">
                         {
                             this.state.coverPhoto ?
@@ -233,7 +223,7 @@ class ProfilePage extends React.Component {
                         }
                     </div>
                     <div id="personal-profile-intro-container">
-                        <div id="personal-profile-photo">
+                        <div id="personal-profile-photo-container">
                             {this.state.croppedDisplayPhoto ? <img src={this.state.croppedDisplayPhoto}></img> : <></>}
                             <div id="personal-profile-name-container">
                                 <h4 id="personal-profile-name">{this.state.targetUsername}</h4>

@@ -1,22 +1,11 @@
-.flex-display{
-    display: flex;
-}
-
-.flex-direction-column{
-    flex-direction: column;
-}
-
-.flex-direction-row{
-    flex-direction: row;    
-}
-
 .home-row-container {
     padding: 2vh;
+
+    .home-profile-column-container {
+        margin: auto;
+    }
 }
 
-.home-profile-column-container {
-    margin: auto;
-}
 
 .home-profile-text {
     text-align: center;
