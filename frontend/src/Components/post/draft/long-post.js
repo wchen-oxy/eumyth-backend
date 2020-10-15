@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import LongEditor from '../editor/long-editor';
 import ReviewPost from './review-post';
 
-
 const LongPost = (props) => {
   const [windowState, setWindowState] = useState("initial");
   const [hasContent, setHasContent] = useState(props.onlineDraft !== null);

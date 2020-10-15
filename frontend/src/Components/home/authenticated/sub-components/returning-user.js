@@ -40,7 +40,7 @@ class ReturningUserPage extends React.Component {
                 .then(
                     (result) => {
                         indexUserData = result.data;
-                        displayPhoto = result.data.small_cropped_display_photo;
+                        displayPhoto = result.data.cropped_display_photo;
                         pursuits = result.data.pursuits;
                         return result.data.following_feed;
                     }
@@ -134,12 +134,10 @@ class ReturningUserPage extends React.Component {
         //TEST 
         const recentWork = (<RecentWorkObject value="test" onRecentWorkClick={this.handleRecentWorkClick} />);
         return (
-            <div id="home-page-container">
-                <div className="home-row-container" id="home-profile-row">
+            <div >
+                <div className="home-row-container flex-display">
                     <div className="home-profile-column-container">
-
-                        <img alt="" className="home-profile-photo" src={this.state.displayPhoto}></img>
-
+                        <img alt="" id="home-profile-photo" src={this.state.displayPhoto}></img>
                         <div className="home-profile-text">
                             <p>{this.state.username}</p>
                             <p>{this.state.firstName}</p>
@@ -171,28 +169,27 @@ class ReturningUserPage extends React.Component {
                     </div>
 
                 </div>
-                <div className="home-works-column-container">
-                    <div className="home-works-column-container">
-                        <div className="home-works-row-container">
+                <div className="flex-display flex-direction-column">
+                    <div className="flex-display">
+                        <div className="flex-display">
                             <h4>Recent Work</h4>
                             <button onClick={this.handlePursuitClick}>Pursuits</button>
                         </div>
                     </div>
-                    <div className="home-works-column-container">
-                        <div className="home-works-row-container">
+                    <div className="flex-display flex-direction-column">
+                        <div className="flex-display">
                             {recentWork}
                             {recentWork}
                         </div>
                     </div>
-
                 </div>
-                <div className="home-row-container home-works-column-container">
-                    <div className="home-works-column-container">
-                        <div className="home-works-row-container">
+                <div className="home-row-container flex-display flex-display">
+                    <div className="flex-display flex-direction-column">
+                        <div className="flex-display">
                             <h4>Your Feed</h4>
                         </div>
                     </div>
-                    <div className="home-works-column-container">
+                    <div className="flex-display flex-direction-column">
                         <div id="placeholder-feed">
                             {/* <FeedObject /> */}
                             {feed}

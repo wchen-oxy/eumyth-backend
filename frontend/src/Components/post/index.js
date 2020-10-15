@@ -6,7 +6,6 @@ import AxiosHelper from '../../Axios/axios';
 import { withFirebase } from '../../Firebase';
 import './index.scss';
 
-
 class PostController extends React.Component {
   _isMounted = false;
   constructor(props) {

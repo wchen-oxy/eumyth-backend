@@ -56,7 +56,7 @@ class LongEditor extends React.Component {
 
     render() {
         return (
-            <div id="long-editor-container">
+            <div className="long-editor-container">
                 < DanteEditor
                     onChange={
                         (editor) => {
