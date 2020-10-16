@@ -61,27 +61,26 @@ class NavigationAuth extends React.Component {
   render() {
     return (
       <>
-        <nav className="welcome-navbar-container">
-          <div className="navbar-item-group">
-            <Link to={"/"} id="hero-logo-link" className="navbar-item">interestHub</Link>
+        <nav>
+          <div>
+            <Link to={"/"} id="hero-logo-link">interestHub</Link>
             {this.state.existingUserLoading ?
               (<></>) :
-              (<button className="navbar-item" onClick={this.openModal}>New Entry</button>)   }
-            </div>
-       
-          <div className="navbar-item-group no-select">
-            <Link to={"/account"} className="navbar-item" id="settins-link">Settings</Link>
-            <button onClick={this.props.firebase.doSignOut} className="navbar-item">SignOut</button>
+              (<button onClick={this.openModal}>New Entry</button>)}
+          </div>
+
+          <div className="no-select">
+            <Link to={"/account"} >Settings</Link>
+            <button onClick={this.props.firebase.doSignOut} >SignOut</button>
           </div>
         </nav>
         {this.state.existingUserLoading ?
           (<></>) :
           (<div className="modal" ref={this.modalRef}>
             <div className="overlay"></div>
-           
             <PostController username={this.state.username} closeModal={this.closeModal} />
           </div>)
-       }
+        }
       </>
     );
   }

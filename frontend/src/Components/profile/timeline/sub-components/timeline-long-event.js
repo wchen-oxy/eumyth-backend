@@ -12,8 +12,7 @@ const LongEvent = (props) => {
 
     const coverImage = <img className="event-cover-photo" src={post.cover_photo_url} />;
     const previewText = initialText.length > 140 ? initialText.substring(0, 140).trim() + "..." : initialText;
-    // console.log(initialText);
-    // console.log(previewText);
+
     return (
         <div>
             <div className="event-cover-container">

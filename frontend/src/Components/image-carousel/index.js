@@ -5,6 +5,23 @@ import "slick-carousel/slick/slick-theme.css";
 import './index.scss';
 
 
+
+const Arrow = (props) => {
+  const { className, style, onClick } = props;
+  return (
+    <div
+      className={className}
+      style=
+      {
+        props.direction === 'left' ?
+          { ...style, display: "block", background: "red", left: '5%', zIndex: '1' } :
+          { ...style, display: "block", background: "red", right: '5%', zIndex: '1' }
+      }
+      onClick={onClick}
+    />
+  );
+}
+
 // https://css-tricks.com/centering-css-complete-guide/#center-vertically
 //Explains the weird -50% and top 50% thing
 
@@ -33,9 +50,7 @@ class ImageSlider extends React.Component {
       this.props.setImageArray(this.props.fileArray);
       this.transformImageProp();
     }
-
   }
-
 
   componentWillUnmount() {
     this._isMounted = false;
@@ -77,9 +92,11 @@ class ImageSlider extends React.Component {
       slidesToScroll: 1,
       centerPadding: 0,
       className: 'photo-container',
-    
+      nextArrow: <Arrow direction="right" />,
+      prevArrow: <Arrow direction="left" />
+
     };
-    
+
     const container =
       (!!this.state.transformedImageArray ? this.state.transformedImageArray : <p>IMAGE IS STILL LOADING</p>);
     return (

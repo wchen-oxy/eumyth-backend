@@ -217,10 +217,7 @@ class ProfilePage extends React.Component {
             <div>
                 <div id="personal-profile-container" className="flex-display flex-direction-column">
                     <div id="personal-profile-header">
-                        {
-                            this.state.coverPhoto ?
-                                (<img src={this.state.coverPhoto}></img>) : (<div id="temp-cover"></div>)
-                        }
+                        {this.state.coverPhoto ? (<img src={this.state.coverPhoto}></img>) : (<div id="temp-cover"></div>)}
                     </div>
                     <div id="personal-profile-intro-container">
                         <div id="personal-profile-photo-container">

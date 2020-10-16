@@ -1,7 +1,6 @@
 import React from 'react';
 import ShortPostViewer from "../../post/viewer/short-post";
 import LongPostViewer from "../../post/viewer/long-post";
-import "./event-modal.scss";
 import AxiosHelper from '../../../Axios/axios';
 
 class EventModal extends React.Component {

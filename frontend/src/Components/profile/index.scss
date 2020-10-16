@@ -24,7 +24,7 @@
             width: 175px;
             height: 175px;
             border-radius: 50%;
-            
+
             img {
                 height: 170px;
                 width: 170px;
@@ -64,35 +64,50 @@
     background-color: blue;
 }
 
-
-
 #personal-profile-timeline-container {
     width: 100%;
     margin: auto;
     max-width: 980px;
 }
 
+// .mini-modal {
+//     z-index: 10;
+//     display: none;
+//     overflow: hidden;
+
+//     width: 100%;
+//     height: 100vh;
+//     background: rgba(0, 0, 0, 0.66);
+//     position: fixed;
+//     top: 0;
+//     left: 0;
+
+//     position: fixed;
+//     top: 50%;
+//     left: 50%;
+//     transform: translate(-50%, -50%);
+//     overflow: scroll;
+//     object-fit: cover;
+//     background-size: contain;
+//     background-repeat: no-repeat;
+//     background-position: center;
+// }
 
 
-.mini-modal {
-    z-index: 10;
-    display: none;
-    overflow: hidden;
+.pursuit-container {
+    justify-content: center;
+    margin: 0 5px;
+    background-color: grey;
+    cursor: pointer;
+}
 
-    width: 100%;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.66);
-    position: fixed;
-    top: 0;
-    left: 0;
-
+#user-option-window{
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    overflow: scroll;
-    object-fit: cover;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
+    z-index: 11;
+    height: 500px;
+    width: 300px;
+    background-color: blue;
 }

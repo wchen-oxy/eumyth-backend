@@ -12,12 +12,6 @@ const Event = (props) => {
             break;
         case ("LONG"):
             content = <LongEvent post={props.eventData} />
-                // post.cover_photo_url ?
-                //     <img src={post.cover_photo_url} /> :
-                //     (<div>
-                //         <img src={post.cover_photo_url}/>
-                //         <p className="no-select">{post.text_data.length > 140 ? post.text_data.substring(0, 140) + "..." : post.text_data}</p>
-                //     </div>);
             break;
         default:
             

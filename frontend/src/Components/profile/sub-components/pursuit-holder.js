@@ -1,5 +1,4 @@
 import React from 'react';
-import './pursuit-holder.scss';
 import { withRouter } from 'react-router-dom';
 
 

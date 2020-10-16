@@ -2,7 +2,11 @@ import React from 'react';
 import { withFirebase } from '../../../Firebase';
 import ImageSlider from '../../image-carousel';
 import TextareaAutosize from 'react-textarea-autosize';
+import ImageDrop from './sub-components/image-drop';
+import FileDisplayContainer from './sub-components/file-display-container';
+import TextContainer from './sub-components/text-container';
 import './short-editor.scss';
+
 
 var isAdvancedUpload = function () {
     var div = document.createElement('div');
@@ -150,54 +154,13 @@ class ShortEditor extends React.Component {
     }
 
     render() {
-        const miniDropContainer = (
-            <div className="mini-drop-image-container"
-                onDragOver={this.dragOver}
-                onDragEnter={this.dragEnter}
-                onDragLeave={this.dragLeave}
-                onDrop={this.fileDrop}
-                onClick={this.fileInputClicked}
-            >
-                <div className="drop-message">
-                    <div className="upload-icon"></div>
-                Drag and Drop files here or click to select file(s)
-            </div>
-                <input
-                    ref={this.fileInputRef}
-                    className="file-input"
-                    type="file"
-                    multiple
-                    onChange={this.filesSelected}
-                />
-            </div>
-        );
 
-        const fileDisplayContainer = (
-            <div className="file-display-container">
-                {
-                    this.props.validFiles.map((data, i) =>
-                        <div className="file-status-bar" key={i}>
-                            <div onClick={!data.invalid ? () => this.openImageModal(data) : () => this.removeFile(data.name)}>
-                                <div className="file-type-logo"></div>
-                                <div className="file-type">{this.fileType(data.name)}</div>
-                                <span className={`file-name ${data.invalid ? 'file-error' : ''}`}>{data.name}</span>
-                                <span className="file-size">({this.fileSize(data.size)})</span> {data.invalid && <span className='file-error-message'>({this.state.errorMessage})</span>}
-                            </div>
-                            <div className="file-remove" onClick={() => this.removeFile(data.name)}>X</div>
-                        </div>
-                    )
-                }
-            </div>
-        );
         const textContainer = (
-            <div id="text-container">
-                <div className="description-container">
+            <div id="text-container flex-display">
+                <div className=" description-container flex-display flex-direction-column">
                     <h4>{this.props.username}</h4>
                     {this.props.validFiles.length > 0 && !this.props.isPaginated ? <button onClick={this.props.onCaptionStyleChange}>Caption Photos Individually</button> : <></>}
                     {this.props.validFiles.length > 0 && this.props.isPaginated ? <button onClick={this.props.onCaptionStyleChange}>Return to Single Caption</button> : <></>}
-
-                    {/* <input name="title" type="text" maxlength="140" placeholder="Optional Title" onChange={(e) => this.props.onTextChange(e)}></input> */}
-                    {/* <TextareaAutosize name="title" id='short-post-text' placeholder='Write something here.' maxRows={2} onChange={this.props.onTextChange}  value={this.props.title} maxLength={140}/> */}
                     <div id="description-input-container" >
                         <TextareaAutosize
                             id='short-post-text'
@@ -217,77 +180,63 @@ class ShortEditor extends React.Component {
 
         if (!isAdvancedUpload) {
             console.log("It's not a modern browser!");
-            //   advBrowserText = (<label for="file"><strong>Choose a file</strong><span className="box__dragndrop"> or drag it here</span>.</label>);
-
         }
         if (this.props.validFiles.length === 0) {
             return (
-                <div className="short-editor-container">
-                    <div className="post-preview-container" id="before-image-container">
+                <>
+                    <div className="post-preview-container flex-display flex-direction-column"  >
                         {textContainer}
                     </div>
+                    {this.props.unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
+                    <ImageDrop
+                        reference={this.fileInputRef}
+                        dragOver={this.dragOver}
+                        dragEnter={this.dragEnter}
+                        dragLeave={this.dragLeave}
+                        fileDrop={this.fileDrop}
+                        fileInputClicked={this.fileInputClicked}
 
-                    <div className="photo-upload-container">
-                        {/* {unsupportedFiles.length === 0 && validFiles.length ? <button className="file-upload-btn" onClick={() => uploadFiles()}>Upload Files</button> : ''} */}
-                        {this.props.unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
-                        <div className="drop-image-container" id="drop-image-container-before"
-                            onDragOver={this.dragOver}
-                            onDragEnter={this.dragEnter}
-                            onDragLeave={this.dragLeave}
-                            onDrop={this.fileDrop}
-                            onClick={this.fileInputClicked}
-                        >
-                            <div className="drop-message">
-                                <div className="upload-icon"></div>
-                            Drag and Drop files here or click to select file(s)
-                                </div>
-                            <input
-                                ref={this.fileInputRef}
-                                className="file-input"
-                                type="file"
-                                multiple
-                                onChange={this.filesSelected}
-                            />
-                        </div>
-                        {/* {fileDisplayContainer} */}
-                    </div>
-                    {/* <div className="box__input">
-                            <form className="box" method="post" action="" enctype="multipart/form-data">
-                                    <input
-                                        name="files[]"
-                                        type="file"
-                                        multiple
-                                        className="custom-file-input box__file"
-                                        id="inputGroupFile01 file"
-                                        aria-describedby="inputGroupFileAddon01"
-                                        data-multiple-caption="{count} files selected"  
-                                        onChange={this.handleImagePost}
-                                    />
-                                    <button className="box__button" type="submit">Upload</button>
-                                </form>
-                            </div> */}
-
-
-                </div>
+                        filesSelected={this.filesSelected}
+                    />
+                </>
             );
         }
         else {
             return (
                 <>
-                    <div className="editor-component-container">
-                        <div className="post-preview-container" id="after-image-container">
-                            <div className="photo-upload-container">
-                                {this.props.unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
-                                <ImageSlider onIndexChange={this.props.onIndexChange} fileArray={this.props.validFiles} setImageArray={this.props.setImageArray} />
-                            </div>
-                            {textContainer}
+                    <div className="post-preview-container flex-display">
+                        <div className="photo-upload-container">
+                            {this.props.unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
+                            <ImageSlider onIndexChange={this.props.onIndexChange} fileArray={this.props.validFiles} setImageArray={this.props.setImageArray} />
                         </div>
+                        <TextContainer
+                            validFilesLength={this.props.validFiles.length}
+                            isPaginated={this.props.isPaginated}
+                            onCaptionStyleChange={this.props.onCaptionStyleChange}
+                            onTextChange={this.props.onTextChange}
+                            textPageText={this.props.textPageText}
+                            textPageIndex={this.props.textPageIndex}
+
+                        />
                     </div>
-                    <div className="editor-component-container">
-                        <div className="uploaded-file-container post-button-container">
-                            {miniDropContainer}
-                            {fileDisplayContainer}
-                        </div>
+                    <div className="flex-display flex-direction-column">
+                        <ImageDrop
+                            reference={this.fileInputRef}
+                            dragOver={this.dragOver}
+                            dragEnter={this.dragEnter}
+                            dragLeave={this.dragLeave}
+                            fileDrop={this.fileDrop}
+                            fileInputClicked={this.fileInputClicked}
+                            filesSelected={this.filesSelected}
+                        />
+                        <FileDisplayContainer
+                            validFiles={this.props.validFiles}
+                            openImageModal={this.openImageModal}
+                            removeFile={this.removeFile}
+                            fileType={this.fileType}
+                            fileSize={this.fileSize}
+                            errorMessage={this.state.errorMessage}
+                        />
                     </div>
                 </>
             );

@@ -19,12 +19,10 @@ class Timeline extends React.Component {
                 )
             }          
         return (
-            <>
                 <div id="timeline-container">
                     {array}
                 </div>
              
-            </>
         );
     }
 }
