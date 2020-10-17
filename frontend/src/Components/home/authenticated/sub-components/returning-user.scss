@@ -18,11 +18,11 @@
     width: 100px;
 }
 
-#placeholder-feed {
-    background-color: red;
-    width: 75%;
-    margin: auto;
-}
+// #placeholder-feed {
+//     background-color: red;
+//     width: 75%;
+//     margin: auto;
+// }
 
 //table
 #profile-info-table {
@@ -34,4 +34,10 @@
 td,
 th {
     padding: 8px;
+}
+
+//
+#feed-container{
+    margin: auto;
+    width: 800px;
 }

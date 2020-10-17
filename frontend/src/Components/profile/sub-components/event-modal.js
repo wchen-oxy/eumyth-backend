@@ -15,23 +15,23 @@ class EventModal extends React.Component {
     render() {
         if (!this.props.eventData) return (<></>);
         if (this.state.window === "MAIN") {
-            if (this.props.eventData.post_format === "SHORT") {
-                return (
+            return (this.props.eventData.post_format === "SHORT" ?
+                <div className="small-post-window">
                     <ShortPostViewer
                         largeViewMode={this.state.largeViewMode}
                         isOwnProfile={this.props.isOwnProfile}
                         eventData={this.props.eventData}
-                        onDeletePost={this.props.onDeletePost}
-                    />);
-            }
-            else {
-                return (<LongPostViewer
-                    // username={this.props.username}
-                    isOwnProfile={this.props.isOwnProfile}
-                    eventData={this.props.eventData}
-                    onDeletePost={this.props.onDeletePost}
-                />)
-            }
+                        onDeletePost={this.props.onDeletePost} />
+                </div> :
+                <div className="long-post-window">
+                    <LongPostViewer
+                        // username={this.props.username}
+                        isOwnProfile={this.props.isOwnProfile}
+                        eventData={this.props.eventData}
+                        onDeletePost={this.props.onDeletePost} />
+                </div>
+            );
+
         }
         else {
             return (

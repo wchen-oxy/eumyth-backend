@@ -13,7 +13,6 @@ const LongPost = (props) => {
   }
 
   const syncChanges = () => {
-    console.log(props.onSyncMerge);
     props.onLocalOnlineSync(localDraft)
       .then((result) => {
         if (result) {
@@ -26,22 +25,6 @@ const LongPost = (props) => {
       }
       );
   }
-
-  // const handlePageClick = (postType, isSavePending) => {
-  //   if (isSavePending) {
-  //     //if not saved online, save locally and online
-  //     if (!window.confirm("Do you want to leave while changes are being saved?")) {
-  //       syncChanges();
-  //     }
-  //     else {
-  //       props.onPostTypeSet(postType, null);
-  //     }
-  //   }
-  //   else {
-  //     props.onPostTypeSet(postType, localDraft);
-  //     syncChanges();
-  //   }
-  // }
 
   const setPostStage = (windowType, isSavePending) => {
     if (isSavePending) {

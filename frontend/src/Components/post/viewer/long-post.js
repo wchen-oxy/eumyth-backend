@@ -7,7 +7,7 @@ const LongPostViewer = (props) => {
 
     console.log(JSON.parse(props.eventData.text_data));
     return (
-        <div className="long-post-window">
+        <div>
             <div className="long-editor-container" id="long-editor-buttons">
                 {props.isOwnProfile ? <button>Edit</button> : <></>}
                 {props.isOwnProfile ? <button onClick={props.onDeletePost}>Remove</button> : <></>}

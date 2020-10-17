@@ -51,7 +51,7 @@ class ShortPostViewer extends React.Component {
                 if (this.props.largeViewMode) {
                     return (
                         <div>
-                            <div id="short-post-viewer-container" >
+                            <div className="flex-display" >
                                 <div className="short-viewer-hero-container">
                                     <ShortHeroText text={this.props.eventData.text_data} />
                                 </div>
@@ -81,7 +81,7 @@ class ShortPostViewer extends React.Component {
                 }
                 else {
                     return (
-                        <div id="short-post-viewer-container"  >
+                        <div className="flex-display"  >
                             <div className="short-viewer-hero-container">
                                 <ShortHeroText text={this.props.eventData.text_data} />
                             </div>
@@ -114,40 +114,38 @@ class ShortPostViewer extends React.Component {
                 const container = this.props.eventData.image_data.map((url, i) => <img key={i} src={url} />);
                 if (this.props.largeViewMode) {
                     return (
-                        <div>
-                            <div id="short-post-viewer-container">
-                                <div className="short-viewer-hero-container">
-                                    <Slider afterChange={index => (this.handleIndexChange(index))} {...settings}>
-                                        {container}
-                                    </Slider>
-                                </div>
-                                <div className="short-viewer-side-container">
-                                    <ProfileHeader
-                                        isOwnProfile={this.props.isOwnProfile}
-                                        username={this.props.eventData.username}
-                                        displayPhoto={this.props.eventData.displayPhoto}
-                                        onEditClick={this.handleWindowChange}
-                                        onDeletePost={this.props.onDeletePost}
-                                    />
-                                    <ShortPostMetaInfo
-                                        index={this.state.imageIndex}
-                                        isPaginated={this.props.eventData.is_paginated}
-                                        isMilestone={this.props.eventData.is_milestone}
-                                        date={this.props.eventData.date}
-                                        pursuit={this.props.eventData.pursuit_category}
-                                        min={this.props.eventData.min_duration}
-                                        textData={this.props.eventData.is_paginated ? JSON.parse(this.props.eventData.text_data) : this.props.eventData.text_data}
-                                    />
-
-                                </div>
+                        <div className="flex-display">
+                            <div className="short-viewer-hero-container">
+                                <Slider afterChange={index => (this.handleIndexChange(index))} {...settings}>
+                                    {container}
+                                </Slider>
                             </div>
+                            <div className="short-viewer-side-container">
+                                <ProfileHeader
+                                    isOwnProfile={this.props.isOwnProfile}
+                                    username={this.props.eventData.username}
+                                    displayPhoto={this.props.eventData.displayPhoto}
+                                    onEditClick={this.handleWindowChange}
+                                    onDeletePost={this.props.onDeletePost}
+                                />
+                                <ShortPostMetaInfo
+                                    index={this.state.imageIndex}
+                                    isPaginated={this.props.eventData.is_paginated}
+                                    isMilestone={this.props.eventData.is_milestone}
+                                    date={this.props.eventData.date}
+                                    pursuit={this.props.eventData.pursuit_category}
+                                    min={this.props.eventData.min_duration}
+                                    textData={this.props.eventData.is_paginated ? JSON.parse(this.props.eventData.text_data) : this.props.eventData.text_data}
+                                />
 
+                            </div>
                         </div>
+
                     )
                 }
                 else {
                     return (
-                        <div id="short-post-viewer-container" >
+                        <div className="flex-display" >
                             <div className="short-viewer-hero-container">
                                 <Slider afterChange={index => (this.handleIndexChange(index))} {...settings}>
                                     {container}

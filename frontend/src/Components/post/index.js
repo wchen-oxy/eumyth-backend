@@ -66,7 +66,7 @@ class PostController extends React.Component {
   handleLocalOnlineSync(localDraft) {
     if (localDraft !== this.state.onlineDraft) {
       this.setState({ updatingOnlineDraft: true });
-      return AxiosHelper.saveDraft(this.props.username, JSON.stringify(localDraft)).then(
+      return AxiosHelper.saveDraft(this.props.username, localDraft).then(
         (result) => {
           if (result.status !== 200) {
             console.log("Error");
@@ -113,10 +113,9 @@ class PostController extends React.Component {
       (response) => {
         if (response.status === 200) {
           if (isInitial) this.setState({ onlineDraftRetrieved: true });
-          console.log(response.data);
           this.setState({
             displayPhoto: response.data.smallDisplayPhoto,
-            onlineDraft: response.data.draft,
+            onlineDraft: JSON.parse(response.data.draft),
             updatingOnlineDraft: false
           });
         }
@@ -130,10 +129,7 @@ class PostController extends React.Component {
         }
       })
       .catch(error => {
-        console.log(
-          error
-        );
-
+        console.log(error);
       })
   }
 

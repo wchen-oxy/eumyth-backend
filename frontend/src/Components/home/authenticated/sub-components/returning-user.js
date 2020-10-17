@@ -109,9 +109,7 @@ class ReturningUserPage extends React.Component {
         }
 
         if (this.state.feedData) {
-            console.log(this.state.feedData);
             for (const feedItem of this.state.feedData) {
-                console.log(feedItem);
                 feed.push(
                     feedItem.post_format === SHORT ?
                         <ShortPostViewer
@@ -183,17 +181,14 @@ class ReturningUserPage extends React.Component {
                         </div>
                     </div>
                 </div>
-                <div className="home-row-container flex-display flex-display">
-                    <div className="flex-display flex-direction-column">
-                        <div className="flex-display">
-                            <h4>Your Feed</h4>
-                        </div>
-                    </div>
-                    <div className="flex-display flex-direction-column">
-                        <div id="placeholder-feed">
-                            {/* <FeedObject /> */}
-                            {feed}
-                        </div>
+                <div className="home-row-container flex-display flex-direction-column">
+
+                    <h4>Your Feed</h4>
+                    <div id="feed-container" className="flex-display flex-direction-column">
+                        {/* <div id="placeholder-feed"> */}
+                        {/* <FeedObject /> */}
+                        {feed}
+                        {/* </div> */}
                     </div>
 
                 </div>

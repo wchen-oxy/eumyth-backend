@@ -24,15 +24,11 @@ class LongEditor extends React.Component {
         //prevent false save
         if (!this.props.isSavePending) {
             console.log("Catch uneccessary save");
-            console.log(content);
-            console.log(this.props.localDraft);
         }
         else {
             console.log("Saving");
-            // console.log(editorContext);
-            console.log(content);
             this.props.onSavePending(true);
-            AxiosHelper.saveDraft(this.props.username, JSON.stringify(content))
+            AxiosHelper.saveDraft(this.props.username, content)
                 .then(
                     (result) => this.handleSaveSuccess(result)
                 )
@@ -80,13 +76,14 @@ class LongEditor extends React.Component {
                                     console.log("After Mount");
                                     const draftsIdentical = _.isEqual(editorState, this.props.localDraft);
                                     if (!draftsIdentical) {
+                                        console.log(editorState);
                                         this.props.onSavePending(true);
                                         this.props.setLocalDraft(editorState);
                                     }
                                 }
                             }
                         }}
-                    content={JSON.parse(this.props.onlineDraft)}
+                    content={this.props.onlineDraft}
                     default_wrappers={[
                         { className: 'my-custom-h1', block: 'header-one' },
                         { className: 'my-custom-h2', block: 'header-two' },

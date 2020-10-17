@@ -124,7 +124,7 @@ export default class AxiosHelper {
 
     static saveDraft(username, draft) {
         return axios.put(urls.DRAFT_BASE_URL,
-            { username: username, draft: draft }
+            { username: username, draft: JSON.stringify(draft) }
         )
     }
     static retrieveDraft(username) {
