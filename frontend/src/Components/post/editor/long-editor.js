@@ -14,7 +14,8 @@ class LongEditor extends React.Component {
         super(props);
         this.state = {
             username: this.props.username,
-            isInitial: true
+            isInitial: true,
+            needOnlineSync: false,
         }
         this.handleSave = this.handleSave.bind(this);
         this.handleSaveSuccess = this.handleSaveSuccess.bind(this);
@@ -57,9 +58,12 @@ class LongEditor extends React.Component {
                     onChange={
                         (editor) => {
                             const editorState = editor.emitSerializedOutput();
+                            console.log("ANY CHANGE???");
                             if (this.props.hasContent === false) {
+                                console.log("inner");
                                 for (let block of editorState.blocks) {
                                     if (block.text !== '') {
+                                        console.log("FASDF");
                                         this.props.setHasContent(true);
                                         break;
                                     }
@@ -73,12 +77,22 @@ class LongEditor extends React.Component {
 
                                 }
                                 else {
+                                    if (this.state.needOnlineSync){
+                                        console.log("Caught inner");
+                                        this.props.onSavePending(true);
+                                        // this.props.setLocalDraft(editorState);
+                                        this.props.syncChanges();
+                                        this.setState({needOnlineSync: false})
+                                    }
                                     console.log("After Mount");
+                                    console.log(editorState);
+                                    console.log(this.props.localDraft);
                                     const draftsIdentical = _.isEqual(editorState, this.props.localDraft);
                                     if (!draftsIdentical) {
                                         console.log(editorState);
                                         this.props.onSavePending(true);
                                         this.props.setLocalDraft(editorState);
+                                       
                                     }
                                 }
                             }
@@ -97,7 +111,8 @@ class LongEditor extends React.Component {
                                     console.log(ctx);
                                     console.log(img);
                                     alert('file uploaded: ' +
-                                        ctx.data.url)
+                                        ctx.data.url);
+                                    this.setState({needOnlineSync: true})
                                 },
                                 upload_error_callback: (ctx,
                                     img) => {

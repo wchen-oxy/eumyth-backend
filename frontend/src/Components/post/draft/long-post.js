@@ -86,6 +86,7 @@ const LongPost = (props) => {
             onSavePending={handleSavePending}
             onlineDraft={props.onlineDraft}
             localDraft={localDraft}
+            syncChanges={syncChanges}
             setLocalDraft={setLocalDraft}
           // handlePreviewTitleChange={setPreviewTitle}
           />)
@@ -101,7 +102,7 @@ const LongPost = (props) => {
   else {
     return (
       <ReviewPost
-        displayPhoto={this.props.displayPhoto}
+        displayPhoto={props.displayPhoto}
         isPaginated={false}
         postText={props.onlineDraft}
         closeModal={props.closeModal}
