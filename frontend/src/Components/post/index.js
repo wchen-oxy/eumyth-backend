@@ -4,7 +4,7 @@ import ShortPost from './draft/short-post';
 import LongPost from './draft/long-post';
 import AxiosHelper from '../../Axios/axios';
 import { withFirebase } from '../../Firebase';
- 
+
 class PostController extends React.Component {
   _isMounted = false;
   constructor(props) {
@@ -26,7 +26,6 @@ class PostController extends React.Component {
     this.handleLocalSync = this.handleLocalSync.bind(this);
     this.handleLocalOnlineSync = this.handleLocalOnlineSync.bind(this);
     this.handlePostTypeSet = this.handlePostTypeSet.bind(this);
-    // this.handleLocalDraftChange = this.handleLocalDraftChange.bind(this);
     this.retrieveDraft = this.retrieveDraft.bind(this);
     this.setIndexUserData = this.setIndexUserData.bind(this);
     this.onPreferredPostTypeChange = this.onPreferredPostTypeChange.bind(this);
@@ -46,10 +45,6 @@ class PostController extends React.Component {
   onPreferredPostTypeChange(type) {
     this.setState({ preferredPostType: type });
   }
-
-  // handleLocalDraftChange(text) {
-  //   this.setState({ localDraft: text });
-  // }
 
   handleInitialPageLaunch(e, postType, clearLongDraft) {
     e.preventDefault();

@@ -59,21 +59,21 @@ export default class AxiosHelper {
         })
     }
 
-    // static returnIndexUsername(uid) {
-    //     return axios.post(UserEndpoint.USERNAME_URL, {
-    //         uid: uid
-    //     })
-    // }
+    static returnMultiplePosts(targetUserDataId, postIdList ) {
+        return axios.get(urls.MULTIPLE_POSTS_URL, {
+            params: {
+                targetUserDataId: targetUserDataId,
+                postIdList: postIdList
+            }
+        })
+    }
 
-    // static postImage(formData) {
-    //     return axios.post(PostEndpoint.IMAGE_POST, formData);
-    // }
-
-    static returnSocialFeedPosts(indexUserId, postIdList) {
-        return axios.get(urls.MULTIPLE_POST_URL, {
+    static returnSocialFeedPosts(indexUserId, postIdList ) {
+        return axios.get(urls.SOCIAL_FEED_POSTS_URL, {
             params: {
                 indexUserId: indexUserId,
                 postIdList: postIdList
+                
             }
         })
     }
@@ -108,14 +108,6 @@ export default class AxiosHelper {
     //         },
     //     });
     //     }
-    // }
-
-    // static savePost(content) {
-    //     return axios.post(PostEndpoint.NEW_POST_URL, content)
-    // }
-
-    // static saveDraft(username, editorState) {
-    //     return axios.post(DRAFT_UPLOAD_URL, { username: username, editorState: editorState });
     // }
 
     static saveDraftMetaInfo(metaInfoForm) {

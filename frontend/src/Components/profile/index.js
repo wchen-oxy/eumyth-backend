@@ -5,6 +5,8 @@ import Timeline from "./timeline/index";
 import AxiosHelper from '../../Axios/axios';
 import NoMatch from '../no-match';
 import EventModal from "./sub-components/event-modal";
+import Event from './timeline/sub-components/timeline-event';
+
 import FollowButton from "./sub-components/follow-buttons";
 import UserOptions from "./sub-components/user-options";
 import {
@@ -36,7 +38,11 @@ class ProfilePage extends React.Component {
             fail: false,
             selectedEvent: null,
             userRelationId: null,
-            followerStatus: null
+            followerStatus: null,
+            feedData: [[]],
+            lastRetrievedPostIndex: 0
+
+
         }
         this.modalRef = React.createRef();
         this.miniModalRef = React.createRef();
@@ -47,9 +53,9 @@ class ProfilePage extends React.Component {
         this.handleFollowerStatusChange = this.handleFollowerStatusChange.bind(this);
         this.handleOptionsClick = this.handleOptionsClick.bind(this);
         this.handleDeletePost = this.handleDeletePost.bind(this);
-
-
+        // this.createTimelineRow = this.createTimelineRow.bind(this);
     }
+
 
 
     handleDeletePost() {
@@ -88,15 +94,15 @@ class ProfilePage extends React.Component {
         this.setState({
             visitorUsername: user ? user.displayName : null,
             targetUsername: targetUserInfo.username,
-            isPrivate: targetUserInfo.private,
             targetProfileId: targetUserInfo._id,
+            isPrivate: targetUserInfo.private,
             coverPhoto: targetUserInfo.cover_photo,
             croppedDisplayPhoto: targetUserInfo.cropped_display_photo,
             smallCroppedDisplayPhoto: targetUserInfo.small_cropped_display_photo,
             bio: targetUserInfo.bio,
             pinned: targetUserInfo.pinned,
             pursuits: targetUserInfo.pursuits,
-            allPosts: targetUserInfo.posts,
+            allPosts: targetUserInfo.all_posts,
             recentPosts: targetUserInfo.recent_posts,
             userRelationId: targetUserInfo.user_relation_id,
             followerStatus: followerStatus
@@ -109,7 +115,6 @@ class ProfilePage extends React.Component {
     //fixme add catch for no found anything
     componentDidMount() {
         this._isMounted = true;
-
         if (this._isMounted) {
             this.props.firebase.auth.onAuthStateChanged(
                 (user) => {
@@ -132,8 +137,6 @@ class ProfilePage extends React.Component {
                             }).catch(
                                 err => console.log(err)
                             );
-
-
                     }
                     else {
                         AxiosHelper.returnUser(this.state.targetUsername).then(
@@ -202,8 +205,7 @@ class ProfilePage extends React.Component {
 
 
     render() {
-        console.log(this.visitorUsername === this.targetUsername);
-        console.log(this.state.selectedEvent);
+        console.log(this.state.recentPosts);
         var pursuitHolderArray = [];
         if (this.state.fail) return NoMatch;
         if (this.state.pursuits) {
@@ -245,7 +247,13 @@ class ProfilePage extends React.Component {
                     </div>
                 </div>
                 <div id="personal-profile-timeline-container">
-                    <Timeline recentPosts={this.state.recentPosts} onEventClick={this.handleEventClick} />
+                    {this.state.recentPosts ?
+                        <Timeline
+                            recentPosts={this.state.recentPosts}
+                            allPosts={this.state.allPosts}
+                            onEventClick={this.handleEventClick}
+                            targetProfileId={this.state.targetProfileId} />
+                        : <></>}
                 </div>
                 <div className="modal" ref={this.modalRef}>
                     <div className="overlay" onClick={(() => this.closeModal(this.modalRef))}></div>

@@ -1,7 +1,7 @@
 import React from 'react';
 import "./post-header.scss";
 
-const ProfileHeader = (props) => {
+const ShortPostHeader = (props) => {
     console.log(props.isTimeline);
     return (
         <div id="post-header-container">
@@ -14,4 +14,4 @@ const ProfileHeader = (props) => {
 
 }
 
-export default ProfileHeader;
+export default ShortPostHeader;

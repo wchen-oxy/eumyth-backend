@@ -1,9 +1,8 @@
 import React from 'react';
 import Slider from 'react-slick';
-import ProfileHeader from './sub-components/post-header';
+import ShortPostHeader from './sub-components/post-header';
 import ShortHeroText from './sub-components/short-text';
 import ShortPostMetaInfo from './sub-components/short-post-comments';
-import Comments from './sub-components/comments';
 import ShortEditor from '../editor/short-editor';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
@@ -56,7 +55,7 @@ class ShortPostViewer extends React.Component {
                                     <ShortHeroText text={this.props.eventData.text_data} />
                                 </div>
                                 <div className="short-viewer-side-container">
-                                    <ProfileHeader
+                                    <ShortPostHeader
                                         isOwnProfile={this.props.isOwnProfile}
                                         username={this.props.eventData.username}
                                         displayPhoto={this.props.eventData.displayPhoto}
@@ -86,7 +85,7 @@ class ShortPostViewer extends React.Component {
                                 <ShortHeroText text={this.props.eventData.text_data} />
                             </div>
                             <div className="short-viewer-side-container">
-                                <ProfileHeader
+                                <ShortPostHeader
                                     isOwnProfile={this.props.isOwnProfile}
                                     username={this.props.eventData.username}
                                     displayPhoto={this.props.eventData.display_photo_url}
@@ -103,7 +102,7 @@ class ShortPostViewer extends React.Component {
                                     textData={this.props.eventData.text_data}
                                 />
                             </div>
-                            <Comments />
+                         
 
                         </div>
                     );
@@ -121,7 +120,7 @@ class ShortPostViewer extends React.Component {
                                 </Slider>
                             </div>
                             <div className="short-viewer-side-container">
-                                <ProfileHeader
+                                <ShortPostHeader
                                     isOwnProfile={this.props.isOwnProfile}
                                     username={this.props.eventData.username}
                                     displayPhoto={this.props.eventData.displayPhoto}
@@ -137,10 +136,8 @@ class ShortPostViewer extends React.Component {
                                     min={this.props.eventData.min_duration}
                                     textData={this.props.eventData.is_paginated ? JSON.parse(this.props.eventData.text_data) : this.props.eventData.text_data}
                                 />
-
                             </div>
                         </div>
-
                     )
                 }
                 else {
@@ -152,7 +149,7 @@ class ShortPostViewer extends React.Component {
                                 </Slider>
                             </div>
                             <div className="short-viewer-side-container">
-                                <ProfileHeader
+                                <ShortPostHeader
                                     isOwnProfile={this.props.isOwnProfile}
                                     username={this.props.eventData.username}
                                     displayPhoto={this.props.eventData.displayPhoto}

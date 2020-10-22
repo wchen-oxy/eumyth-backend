@@ -1,10 +1,10 @@
 import React from 'react';
-import { withAuthorization } from '../../../session';
-import { withFirebase } from '../../../../Firebase';
-import AxiosHelper from '../../../../Axios/axios';
-import RecentWorkObject from "./recent-work-object";
-import LongPostViewer from '../../../post/viewer/long-post';
-import ShortPostViewer from '../../../post/viewer/short-post';
+import { withAuthorization } from '../../session';
+import { withFirebase } from '../../../Firebase';
+import AxiosHelper from '../../../Axios/axios';
+import RecentWorkObject from "./sub-components/recent-work-object";
+import LongPostViewer from '../../post/viewer/long-post';
+import ShortPostViewer from '../../post/viewer/short-post';
 // import FeedObject from "./feed-object";
 import './returning-user.scss';
 
@@ -20,7 +20,9 @@ class ReturningUserPage extends React.Component {
             feedData: null,
             pursuits: null,
             displayPhoto: "https://i.redd.it/73j1cgr028u21.jpg",
-            indexUserData: null
+            indexUserData: null,
+            dataLength : 24,
+            lastRetrievedPostIndex : 0
         }
         this.handlePursuitClick = this.handlePursuitClick.bind(this);
         this.handleRecentWorkClick = this.handleRecentWorkClick.bind(this);
@@ -48,18 +50,19 @@ class ReturningUserPage extends React.Component {
                 .then(
                     (feed) => {
                         if (!feed || feed.length === 0) return;
-                        else if (feed.length < 20) {
+                        else if (feed.length < this.state.dataLength) {
                             return AxiosHelper.returnSocialFeedPosts(indexUserData._id, feed.slice(0, feed.length));
                         }
                         else {
-                            return AxiosHelper.returnSocialFeedPosts(indexUserData._id, feed.slice(0, 20));
+                            return AxiosHelper.returnSocialFeedPosts(indexUserData._id, feed.slice(0, this.state.dataLength));
                         }
                     }
                 )
                 .then(
                     (results) => {
-                        this.setState({
-                            feedData: results.data ? results.data.feed : null,
+                        this.setState(          
+                            {
+                            feedData: results.data ? results.data.feed : [],
                             indexUserData: indexUserData,
                             displayPhoto: displayPhoto,
                             pursuits: pursuits,

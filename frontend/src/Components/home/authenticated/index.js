@@ -1,6 +1,6 @@
 import React from 'react';
-import InitialCustomizationPage from './sub-components/initial-customization'
-import ReturningUserPage from './sub-components/returning-user';
+import InitialCustomizationPage from './initial-customization'
+import ReturningUserPage from './returning-user';
 import { withAuthorization } from '../../session';
 import { withFirebase } from '../../../Firebase';
 

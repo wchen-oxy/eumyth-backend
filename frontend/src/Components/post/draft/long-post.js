@@ -45,7 +45,6 @@ const LongPost = (props) => {
     }
     else {
       if (windowType === "none") {
-        // syncChanges();
         props.onPostTypeSet(windowType, localDraft);
       }
       else if (windowType === "initial") {
@@ -58,7 +57,6 @@ const LongPost = (props) => {
       }
       else {
         setWindowState(windowType);
-
       }
     }
   }
@@ -88,7 +86,6 @@ const LongPost = (props) => {
             localDraft={localDraft}
             syncChanges={syncChanges}
             setLocalDraft={setLocalDraft}
-          // handlePreviewTitleChange={setPreviewTitle}
           />)
           : (
             <div>

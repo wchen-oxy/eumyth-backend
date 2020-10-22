@@ -74,15 +74,14 @@ class LongEditor extends React.Component {
                                     console.log("Mounted");
                                     this.setState({ isInitial: false });
                                     this.props.setLocalDraft(editorState);
-
                                 }
                                 else {
-                                    if (this.state.needOnlineSync){
+                                    if (this.state.needOnlineSync) {
                                         console.log("Caught inner");
                                         this.props.onSavePending(true);
-                                        // this.props.setLocalDraft(editorState);
                                         this.props.syncChanges();
-                                        this.setState({needOnlineSync: false})
+                                        this.setState({ needOnlineSync: false });
+                                        return;
                                     }
                                     console.log("After Mount");
                                     console.log(editorState);
@@ -92,7 +91,6 @@ class LongEditor extends React.Component {
                                         console.log(editorState);
                                         this.props.onSavePending(true);
                                         this.props.setLocalDraft(editorState);
-                                       
                                     }
                                 }
                             }
@@ -112,7 +110,7 @@ class LongEditor extends React.Component {
                                     console.log(img);
                                     alert('file uploaded: ' +
                                         ctx.data.url);
-                                    this.setState({needOnlineSync: true})
+                                    this.setState({ needOnlineSync: true })
                                 },
                                 upload_error_callback: (ctx,
                                     img) => {
@@ -121,31 +119,14 @@ class LongEditor extends React.Component {
                             },
                         }),
                         PlaceholderBlockConfig(),
-
                     ]}
                     data_storage={
                         {
                             save_handler: this.handleSave,
-                            // url: 'null',
                             interval: saveInterval,
                             success_handler: this.handleSaveSuccess,
-                            failure_handler: this.handleSaveError,
-
+                            failure_handler: this.handleSaveError
                         }
-                        //     {
-                        //     success_handler: this.handleSaveSuccess,
-                        //     failure_handler: this.handleSaveError,
-                        //     url: DRAFT_URL,
-                        //     method: "POST",
-                        //     interval: saveInterval, //original is 4000 sec
-                        //     withCredentials: false,
-                        //     crossDomain: true,
-                        //     headers: {
-                        //         'Content-Type': 'application/json',
-                        //         'username': this.state.username,
-                        //     }
-
-                        // }
                     }
                 />
             </div>

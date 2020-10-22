@@ -26,6 +26,11 @@ const upload = require('../../constants/multer').contentImageUpload;
 //   })
 // });
 
+router.route('/').post(upload.single('file'), (req, res, err) => {
+  console.log(req.file);
+  return res.status(200).json({'url' : req.file.location});
+})
+
 router.route('/single').post(upload.single('file'), (req, res, err) => {
   console.log(req.file);
   return res.status(200).json({'imageUrl': req.file.location});

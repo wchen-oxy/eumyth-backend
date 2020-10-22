@@ -4,7 +4,7 @@ let IndexUser = require('../../models/index.user.model');
 
 router.route('/').get((req, res) => {
     const username = req.query.username;
-    IndexUser.Model.findOne({ username: username })
+    return IndexUser.Model.findOne({ username: username })
         .then((user) => {
             if (user.draft === undefined) {
                 return res.status(204);
@@ -19,6 +19,9 @@ router.route('/').get((req, res) => {
     .put((req, res) => {
         const username = req.body.username;
         const draft = req.body.draft;
+        console.log(draft);
+        console.log(typeof (draft));
+
         IndexUser.Model.findOne({ username: username },
             (err, indexUserProfile) => {
                 if (err) {
@@ -111,7 +114,6 @@ router.route('/desc').put((req, res) => {
                         res.status(500).json(err);
                     }
                 });
-
             }
         ).then(() => res.sendStatus(201)).catch(err => console.log(err));
 
