@@ -24,19 +24,8 @@ class Timeline extends React.Component {
         console.log(this.props.recentPosts);
         if (this.props.recentPosts) {
             this.createTimelineRow(this.props.recentPosts);
-            // this.props.createTimelineRow(this.props.recentPosts);
         }
     }
-
-    // componentDidUpdate(){
-    //     if (this.props.recentPosts) {
-    //         console.log("FUCK YOU MORE");
-
-    //         this.createTimelineRow(this.props.recentPosts);
-    //         // this.props.createTimelineRow(this.props.recentPosts);
-    //     }
-
-    // }
 
     createTimelineRow(inputArray) {
         let masterArray = this.state.feedData;
@@ -66,9 +55,7 @@ class Timeline extends React.Component {
             masterArray.push([]);
             index++;
             k = 0;
-            // tempArray = [];
         }
-        // console.log(masterArray);
         this.setState({ feedData: masterArray, lastRetrievedPostIndex: lastRetrievedPostIndex });
         console.log(lastRetrievedPostIndex);
     }
@@ -78,9 +65,7 @@ class Timeline extends React.Component {
         console.log(this.props.allPosts.length);
         if (this.state.lastRetrievedPostIndex + 24 >= this.props.allPosts.length) {
             this.setState({ hasMore: false });
-            console.log("No More after this");
         }
-        console.log("Fetching");
         AxiosHelper.returnMultiplePosts(
             this.props.targetProfileId,
             this.props.allPosts.slice(this.state.lastRetrievedPostIndex, this.state.lastRetrievedPostIndex + 24))
@@ -100,8 +85,6 @@ class Timeline extends React.Component {
     }
 
     render() {
-        console.log(this.props.allPosts);
-
         let timelineRows = this.state.feedData.map((item, index) => {
             return (
                 <div className="flex-display" key={index}>
@@ -109,13 +92,6 @@ class Timeline extends React.Component {
                 </div>)
         }
         );
-
-        // return (
-        //     <div id="timeline-container">
-        //         {timelineRows}
-        //     </div>
-
-        // );
 
         return (
             <div id="timeline-container">

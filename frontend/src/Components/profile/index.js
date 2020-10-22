@@ -169,9 +169,9 @@ class ProfilePage extends React.Component {
         document.body.style.overflow = "visible";
     }
 
-    handleEventClick(index) {
-        console.log(index);
-        const selectedEvent = index < this.state.recentPosts.length ? this.state.recentPosts[index] : this.state.allPosts[index];
+    handleEventClick(selectedEvent) {
+        // console.log(index);
+        // const selectedEvent = index < this.state.recentPosts.length ? this.state.recentPosts[index] : this.state.allPosts[index];
         console.log(selectedEvent);
         this.setState({ selectedEvent: selectedEvent }, this.openModal(this.modalRef));
     }
