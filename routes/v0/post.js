@@ -10,7 +10,7 @@ const multerS3 = require('multer-s3');
 const uuid = require('uuid');
 const userRelation = require('../../models/user.relation.model');
 
-const RECENT_POSTS_LIMIT = 24;
+const RECENT_POSTS_LIMIT = 8;
 
 const setPursuitAttributes = (isMilestone, pursuit, minDuration) => {
   if (isMilestone) { pursuit.num_milestones = Number(pursuit.num_milestones) + 1; }
