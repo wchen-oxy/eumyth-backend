@@ -88,7 +88,7 @@ class InitialCustomizationPage extends React.Component {
             // drawn on another canvas, or added to the DOM.
             // const canvas = this.editor.getImage();
             // If you want the image resized to the canvas size (also a HTMLCanvasElement)
-            const canvasScaled = this.editor.getImageScaledToCanvas();
+            const canvasScaled = this.editor.getImage();
             // this.setState({ croppedImage: canvasScaled.toDataURL(), fullImage: canvas.toDataURL() });
 
             //make several async calls, wait untill firebase is done, compress image 1 and compress image 2 are done
@@ -109,8 +109,8 @@ class InitialCustomizationPage extends React.Component {
                         console.log(results);
                         return Promise.all([
                             imageCompression(results[2], { maxSizeMB: 1, fileType: "image/jpeg" }),
+                            imageCompression(results[2], { maxWidthOrHeight: 300, maxSizeMB: 1, fileType: "image/jpeg" }),
                             imageCompression(results[2], { maxWidthOrHeight: 80, maxSizeMB: 1, fileType: "image/jpeg" }),
-                            imageCompression(results[2], { maxWidthOrHeight: 40, maxSizeMB: 1, fileType: "image/jpeg" }),
                         ]);
                     }
                 )

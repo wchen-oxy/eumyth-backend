@@ -47,6 +47,7 @@ router.route('/')
   )
   .put(upload.fields([{ name: "croppedImage" }, { name: "smallCroppedImage" }, { name: "tinyCroppedImage" }]),
     (req, res) => {
+      console.log("start");
       console.log(req.files);
       console.log(req.body);
       const username = req.body.username;
@@ -57,6 +58,7 @@ router.route('/')
 
       let mainPursuitsHolder = [];
       let indexPursuitsHolder = [];
+      console.log("Inner");
       for (const pursuit of pursuitsArray) {
         console.log(pursuit);
         console.log(pursuit.name);

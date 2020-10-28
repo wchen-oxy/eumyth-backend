@@ -134,7 +134,7 @@ router.route('/')
           }
         }
       }
-      resolvedIndexUser.recent_posts.push(post);
+      resolvedIndexUser.recent_posts.push(post._id);
       if (resolvedIndexUser.recent_posts.length > RECENT_POSTS_LIMIT) resolvedIndexUser.recent_posts.shift();
       return resolvedIndexUser.user_profile_id;
     }

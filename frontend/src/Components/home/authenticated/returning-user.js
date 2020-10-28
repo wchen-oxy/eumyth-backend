@@ -62,7 +62,7 @@ class ReturningUserPage extends React.Component {
                     (results) => {
                         this.setState(          
                             {
-                            feedData: results.data ? results.data.feed : [],
+                            feedData: results ? results.data.feed : [],
                             indexUserData: indexUserData,
                             displayPhoto: displayPhoto,
                             pursuits: pursuits,
