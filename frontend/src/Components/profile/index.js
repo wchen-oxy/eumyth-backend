@@ -103,7 +103,7 @@ class ProfilePage extends React.Component {
             pinned: targetUserInfo.pinned,
             pursuits: targetUserInfo.pursuits,
             allPosts: targetUserInfo.all_posts,
-            recentPosts: targetUserInfo.recent_posts,
+            // recentPosts: targetUserInfo.recent_posts,
             userRelationId: targetUserInfo.user_relation_id,
             followerStatus: followerStatus
         });
@@ -205,7 +205,7 @@ class ProfilePage extends React.Component {
 
 
     render() {
-        console.log(this.state.recentPosts);
+        // console.log(this.state.recentPosts);
         var pursuitHolderArray = [];
         if (this.state.fail) return NoMatch;
         if (this.state.pursuits) {
@@ -247,9 +247,9 @@ class ProfilePage extends React.Component {
                     </div>
                 </div>
                 <div id="personal-profile-timeline-container">
-                    {this.state.recentPosts ?
+                    {this.state.allPosts ?
                         <Timeline
-                            recentPosts={this.state.recentPosts}
+                            // recentPosts={this.state.recentPosts}
                             allPosts={this.state.allPosts}
                             onEventClick={this.handleEventClick}
                             targetProfileId={this.state.targetProfileId} />

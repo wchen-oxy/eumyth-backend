@@ -11,7 +11,7 @@ class Timeline extends React.Component {
             events: null,
             hasMore: true,
             feedData: [[]],
-            fixedDataLoadLength: 24,
+            fixedDataLoadLength: 4,
             lastRetrievedPostIndex: -1
         }
 
@@ -21,25 +21,26 @@ class Timeline extends React.Component {
     }
 
     componentDidMount() {
-        console.log(this.props.recentPosts);
-        if (this.props.recentPosts) {
-            this.createTimelineRow(this.props.recentPosts);
+        console.log(this.props.allPosts);
+        if (this.props.allPosts) {
+            this.fetchNextPosts(this.props.allPosts);
         }
     }
 
     createTimelineRow(inputArray) {
         let masterArray = this.state.feedData;
-        let index = masterArray.length - 1;
+        let index = masterArray.length - 1; //last index element of array
         let lastRetrievedPostIndex = this.state.lastRetrievedPostIndex;
 
         let j = 0;
-        let k = masterArray[index].length //length of last array 
+        let k = masterArray[index].length - 1; //length of last array 
         //while input array is not empty
         while (j < inputArray.length) {
             //while the last sub array is not empty
             while (k < 4) {
-                if (!inputArray[j]) break;
-                console.log(inputArray[j])
+                lastRetrievedPostIndex++;
+                if (!inputArray[j]) break; //if we finish...
+                // console.log(inputArray[j])
                 masterArray[index].push(
                     <Event
                         key={lastRetrievedPostIndex}
@@ -47,7 +48,7 @@ class Timeline extends React.Component {
                         eventData={inputArray[j]}
                         onEventClick={this.props.onEventClick} />
                 );
-                lastRetrievedPostIndex++;
+               
                 k++;
                 j++;
             }
@@ -57,18 +58,21 @@ class Timeline extends React.Component {
             k = 0;
         }
         this.setState({ feedData: masterArray, lastRetrievedPostIndex: lastRetrievedPostIndex });
+        console.log(masterArray);
         console.log(lastRetrievedPostIndex);
     }
 
     fetchNextPosts() {
-        console.log(this.state.lastRetrievedPostIndex);
-        console.log(this.props.allPosts.length);
-        if (this.state.lastRetrievedPostIndex + 24 >= this.props.allPosts.length) {
+        // console.log(this.state.lastRetrievedPostIndex);
+        // console.log(this.props.allPosts.length);
+
+        const lastRetrievedPostIndex = this.state.lastRetrievedPostIndex === -1 ? 0 : this.state.lastRetrievedPostIndex;
+        if (lastRetrievedPostIndex + this.state.fixedDataLoadLength >= this.props.allPosts.length) {
             this.setState({ hasMore: false });
         }
         AxiosHelper.returnMultiplePosts(
             this.props.targetProfileId,
-            this.props.allPosts.slice(this.state.lastRetrievedPostIndex, this.state.lastRetrievedPostIndex + 24))
+            this.props.allPosts.slice(lastRetrievedPostIndex, lastRetrievedPostIndex + this.state.fixedDataLoadLength + 1))
             .then(
                 (result) => {
                     console.log("FUC");
@@ -96,8 +100,8 @@ class Timeline extends React.Component {
         return (
             <div id="timeline-container">
                 <InfiniteScroll
-                    dataLength={24}
-                    fixedDataLoadLength={24} //This is important field to render the next data
+                    dataLength={this.state.fixedDataLoadLength}
+                    fixedDataLoadLength={this.state.fixedDataLoadLength} //This is important field to render the next data
                     next={this.fetchNextPosts}
                     hasMore={this.state.hasMore}
                     loader={<h4>Loading...</h4>}

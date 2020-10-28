@@ -52,7 +52,6 @@ const userSchema = new Schema({
   pinned: [Post.Schema],
   pursuits: [Pursuits.Schema],
   all_posts: [mongoose.Types.ObjectId], //all posts including the most recent posts. ID only
-  recent_posts: [Post.Schema], //recent posts from self
 }, {
   timestamps: true,
 });

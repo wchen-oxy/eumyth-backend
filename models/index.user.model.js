@@ -64,7 +64,7 @@ const indexUserSchema = new Schema(
 
         pursuits: [IndexPursuit.Schema],
         following_feed: [mongoose.Types.ObjectId], //feed from others
-        recent_posts: [Post.Schema] // 4 most recent posts
+        recent_posts: [mongoose.Types.ObjectId] // 4 most recent posts
     }
 );
 

@@ -150,11 +150,11 @@ router.route('/')
       resolvedUser => {
         const user = resolvedUser;
         user.all_posts.push(post._id);
-        user.recent_posts.push(post);
-        if (user.recent_posts.length > RECENT_POSTS_LIMIT) {
-          user.recent_posts.shift();
-          console.log("Removed oldest post.");
-        }
+        // user.recent_posts.push(post);
+        // if (user.recent_posts.length > RECENT_POSTS_LIMIT) {
+        //   user.recent_posts.shift();
+        //   console.log("Removed oldest post.");
+        // }
         //check if pursuits exists already
         if (minDuration) {
           for (const pursuit of user.pursuits) {
