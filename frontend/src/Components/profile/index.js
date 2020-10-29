@@ -57,61 +57,6 @@ class ProfilePage extends React.Component {
     }
 
 
-
-    handleDeletePost() {
-        AxiosHelper.deletePost(this.state.targetProfileId, this.state.selectedEvent._id).then((result) => console.log(result));
-    }
-
-
-    handleFollowerStatusResponse(followerStatusResponse) {
-        console.log(followerStatusResponse);
-        if (followerStatusResponse.status === 200) {
-            if (followerStatusResponse.data.success) {
-                if (followerStatusResponse.data.success === FOLLOWED_STATE) {
-                    return FOLLOWED_STATE;
-                }
-
-                else if (followerStatusResponse.data.success === FOLLOW_REQUESTED_STATE) {
-                    return FOLLOW_REQUESTED_STATE;
-                }
-
-                else {
-                    throw Error;
-                }
-            }
-            else if (followerStatusResponse.data.error) {
-                console.log(followerStatusResponse.data.error);
-                return followerStatusResponse.data.error === NOT_A_FOLLOWER_STATE || followerStatusResponse.data.error === UNFOLLOWED_STATE ?
-                    NOT_A_FOLLOWER_STATE :
-                    FOLLOW_REQUESTED_STATE;
-            }
-        }
-    }
-
-    handleResponseData(user, targetUserInfo, followerStatusResponse) {
-        const followerStatus = followerStatusResponse ? this.handleFollowerStatusResponse(followerStatusResponse) : null;
-        //set visitor user info and targetUserinfo
-        this.setState({
-            visitorUsername: user ? user.displayName : null,
-            targetUsername: targetUserInfo.username,
-            targetProfileId: targetUserInfo._id,
-            isPrivate: targetUserInfo.private,
-            coverPhoto: targetUserInfo.cover_photo,
-            croppedDisplayPhoto: targetUserInfo.cropped_display_photo,
-            smallCroppedDisplayPhoto: targetUserInfo.small_cropped_display_photo,
-            bio: targetUserInfo.bio,
-            pinned: targetUserInfo.pinned,
-            pursuits: targetUserInfo.pursuits,
-            allPosts: targetUserInfo.all_posts,
-            // recentPosts: targetUserInfo.recent_posts,
-            userRelationId: targetUserInfo.user_relation_id,
-            followerStatus: followerStatus
-        });
-
-        //follower Status Reponse
-        console.log("Finished Checking Friend Status");
-    }
-
     //fixme add catch for no found anything
     componentDidMount() {
         this._isMounted = true;
@@ -156,6 +101,62 @@ class ProfilePage extends React.Component {
     componentWillUnmount() {
         this._isMounted = false;
     }
+
+
+
+    handleDeletePost() {
+        AxiosHelper.deletePost(this.state.targetProfileId, this.state.selectedEvent._id).then((result) => console.log(result));
+    }
+
+
+    handleFollowerStatusResponse(followerStatusResponse) {
+        if (followerStatusResponse.status === 200) {
+            if (followerStatusResponse.data.success) {
+                if (followerStatusResponse.data.success === FOLLOWED_STATE) {
+                    return FOLLOWED_STATE;
+                }
+
+                else if (followerStatusResponse.data.success === FOLLOW_REQUESTED_STATE) {
+                    return FOLLOW_REQUESTED_STATE;
+                }
+
+                else {
+                    throw Error;
+                }
+            }
+            else if (followerStatusResponse.data.error) {
+                console.log(followerStatusResponse.data.error);
+                return followerStatusResponse.data.error === NOT_A_FOLLOWER_STATE || followerStatusResponse.data.error === UNFOLLOWED_STATE ?
+                    NOT_A_FOLLOWER_STATE :
+                    FOLLOW_REQUESTED_STATE;
+            }
+        }
+    }
+
+    handleResponseData(user, targetUserInfo, followerStatusResponse) {
+        const followerStatus = followerStatusResponse ? this.handleFollowerStatusResponse(followerStatusResponse) : null;
+        //set visitor user info and targetUserinfo
+        if (this._isMounted) this.setState({
+            visitorUsername: user ? user.displayName : null,
+            targetUsername: targetUserInfo.username,
+            targetProfileId: targetUserInfo._id,
+            isPrivate: targetUserInfo.private,
+            coverPhoto: targetUserInfo.cover_photo,
+            croppedDisplayPhoto: targetUserInfo.cropped_display_photo,
+            smallCroppedDisplayPhoto: targetUserInfo.small_cropped_display_photo,
+            bio: targetUserInfo.bio,
+            pinned: targetUserInfo.pinned,
+            pursuits: targetUserInfo.pursuits,
+            allPosts: targetUserInfo.all_posts,
+            // recentPosts: targetUserInfo.recent_posts,
+            userRelationId: targetUserInfo.user_relation_id,
+            followerStatus: followerStatus
+        });
+
+        //follower Status Reponse
+        console.log("Finished Checking Friend Status");
+    }
+
 
 
     openModal(modal) {

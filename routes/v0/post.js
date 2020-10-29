@@ -288,9 +288,17 @@ router.route('/multiple').get((req, res) => {
       }
     }
   }).then(
-    (result) => {
-      console.log(result);
-      res.status(200).send(result);
+    (results) => {
+      // let coverInfoArray = [];
+      // for (result of result){
+      //   const text = result.text_data && result.post_format === "SHORT" ? : ;
+      //   coverInfoArray.push(
+          
+      //   )
+
+      // }
+      console.log(results);
+      res.status(200).send(results);
     })
 });
 

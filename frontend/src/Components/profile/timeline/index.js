@@ -1,10 +1,11 @@
 import React from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Event from './sub-components/timeline-event';
-import './index.scss';
 import AxiosHelper from '../../../Axios/axios';
+import './index.scss';
 
 class Timeline extends React.Component {
+    _isMounted = false;
     constructor(props) {
         super(props)
         this.state = {
@@ -12,7 +13,7 @@ class Timeline extends React.Component {
             hasMore: true,
             feedData: [[]],
             fixedDataLoadLength: 4,
-            lastRetrievedPostIndex: -1
+            nextOpenPostIndex: 0
         }
 
         this.fetchNextPosts = this.fetchNextPosts.bind(this);
@@ -21,87 +22,103 @@ class Timeline extends React.Component {
     }
 
     componentDidMount() {
-        console.log(this.props.allPosts);
+        this._isMounted = true;
         if (this.props.allPosts) {
+            console.log("Mount now");
+            console.log(this.props.allPosts);
             this.fetchNextPosts(this.props.allPosts);
         }
     }
 
     createTimelineRow(inputArray) {
         let masterArray = this.state.feedData;
-        let index = masterArray.length - 1; //last index element of array
-        let lastRetrievedPostIndex = this.state.lastRetrievedPostIndex;
+        let index = masterArray.length - 1; //index position of array in masterArray
+        let nextOpenPostIndex = this.state.nextOpenPostIndex;
 
         let j = 0;
-        let k = masterArray[index].length - 1; //length of last array 
+        let k = masterArray[index].length ; //length of last array 
+        console.log(k);
         //while input array is not empty
         while (j < inputArray.length) {
             //while the last sub array is not empty
             while (k < 4) {
-                lastRetrievedPostIndex++;
                 if (!inputArray[j]) break; //if we finish...
-                // console.log(inputArray[j])
                 masterArray[index].push(
                     <Event
-                        key={lastRetrievedPostIndex}
-                        eventIndex={lastRetrievedPostIndex}
+                        key={nextOpenPostIndex}
+                        eventIndex={nextOpenPostIndex}
                         eventData={inputArray[j]}
                         onEventClick={this.props.onEventClick} />
                 );
-               
+
+                nextOpenPostIndex++;
                 k++;
                 j++;
             }
+            if (k === 4) masterArray.push([]);
             if (!inputArray[j]) break;
-            masterArray.push([]);
             index++;
             k = 0;
         }
-        this.setState({ feedData: masterArray, lastRetrievedPostIndex: lastRetrievedPostIndex });
+        this.setState({ feedData: masterArray, nextOpenPostIndex: nextOpenPostIndex });
         console.log(masterArray);
-        console.log(lastRetrievedPostIndex);
+        console.log(nextOpenPostIndex);
+
     }
 
     fetchNextPosts() {
-        // console.log(this.state.lastRetrievedPostIndex);
-        // console.log(this.props.allPosts.length);
-
-        const lastRetrievedPostIndex = this.state.lastRetrievedPostIndex === -1 ? 0 : this.state.lastRetrievedPostIndex;
-        if (lastRetrievedPostIndex + this.state.fixedDataLoadLength >= this.props.allPosts.length) {
+        console.log("fetch");
+        if (this.state.nextOpenPostIndex + this.state.fixedDataLoadLength >= this.props.allPosts.length) {
+            console.log("Length of All Posts Exceeded");
             this.setState({ hasMore: false });
         }
-        AxiosHelper.returnMultiplePosts(
+        console.log(this.state.nextOpenPostIndex)
+        console.log( this.state.nextOpenPostIndex + this.state.fixedDataLoadLength);
+        return AxiosHelper.returnMultiplePosts(
             this.props.targetProfileId,
-            this.props.allPosts.slice(lastRetrievedPostIndex, lastRetrievedPostIndex + this.state.fixedDataLoadLength + 1))
+            this.props.allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength))
             .then(
                 (result) => {
-                    console.log("FUC");
                     console.log(result.data);
-                    this.createTimelineRow(result.data);
-                    // this.setState((state) => ({
-                    //     feedData: state.feedData.concat(result.data)
-                    // }));
-                    // console.log(result.data);
+                    if (this._isMounted) this.createTimelineRow(result.data);
                 }
             )
             .catch((error) => console.log(error));
 
     }
 
-    render() {
-        let timelineRows = this.state.feedData.map((item, index) => {
-            return (
-                <div className="flex-display" key={index}>
-                    {item}
-                </div>)
-        }
-        );
+    // fetchNextPosts() {
+    //     const nextOpenPostIndex = this.state.nextOpenPostIndex === -1 ? 0 : this.state.nextOpenPostIndex;
+    //     if (nextOpenPostIndex + this.state.fixedDataLoadLength >= this.props.allPosts.length) {
+    //         this.setState({ hasMore: false });
+    //     }
+    //     AxiosHelper.returnMultiplePosts(
+    //         this.props.targetProfileId,
+    //         this.props.allPosts.slice(nextOpenPostIndex, nextOpenPostIndex + this.state.fixedDataLoadLength + 1))
+    //         .then(
+    //             (result) => {
+    //                 console.log("FUC");
+    //                 console.log(result.data);
+    //                 this.createTimelineRow(result.data);
+    //             }
+    //         )
+    //         .catch((error) => console.log(error));
 
+    // }
+
+    render() {
+        if (!this._isMounted) return (
+            <div id="timeline-container">
+                <p>Loading</p>
+            </div>
+
+        );
+            console.log(this.state.nextOpenPostIndex);
         return (
             <div id="timeline-container">
                 <InfiniteScroll
-                    dataLength={this.state.fixedDataLoadLength}
-                    fixedDataLoadLength={this.state.fixedDataLoadLength} //This is important field to render the next data
+                    dataLength={this.state.nextOpenPostIndex}
+                    // fixedDataLoadLength={this.state.fixedDataLoadLength} //This is important field to render the next data
                     next={this.fetchNextPosts}
                     hasMore={this.state.hasMore}
                     loader={<h4>Loading...</h4>}
@@ -110,18 +127,15 @@ class Timeline extends React.Component {
                             <b>Yay! You have seen it all</b>
                         </p>
                     }
-                // below props only if you need pull down functionality
-                // refreshFunction={this.refresh}
-                // pullDownToRefresh
-                // pullDownToRefreshThreshold={16}
-                // pullDownToRefreshContent={
-                //     <h3 style={{ textAlign: 'center' }}>&#8595; Pull down to refresh</h3>
-                // }
-                // releaseToRefreshContent={
-                //     <h3 style={{ textAlign: 'center' }}>&#8593; Release to refresh</h3>
-                // }
                 >
-                    {timelineRows}
+                    {
+                        this.state.feedData.map((item, index) => (
+                            <div className="flex-display" key={index}>
+                                {item}
+                            </div>)
+
+                        )}
+                    {/* {timelineRows} */}
                 </InfiniteScroll>
             </div>
         )
