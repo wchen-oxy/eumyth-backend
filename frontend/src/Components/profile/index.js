@@ -37,6 +37,7 @@ class ProfilePage extends React.Component {
             allPosts: null,
             fail: false,
             selectedEvent: null,
+            textData: null,
             userRelationId: null,
             followerStatus: null,
             feedData: [[]],
@@ -174,7 +175,17 @@ class ProfilePage extends React.Component {
         // console.log(index);
         // const selectedEvent = index < this.state.recentPosts.length ? this.state.recentPosts[index] : this.state.allPosts[index];
         console.log(selectedEvent);
-        this.setState({ selectedEvent: selectedEvent }, this.openModal(this.modalRef));
+        return AxiosHelper.retrieveTextData(selectedEvent._id)
+            .then(
+                (result) => {
+                    console.log(result.data);
+                    if (this._isMounted) {
+                        this.setState({ selectedEvent: selectedEvent, textData: result.data}, this.openModal(this.modalRef));
+                    }
+                }
+            )
+            .catch(error => console.log(error));
+        // .then(() => this.setState({ selectedEvent: selectedEvent }));
     }
 
     handleFollowerStatusChange(action) {
@@ -264,6 +275,7 @@ class ProfilePage extends React.Component {
                         // smallProfilePhoto={this.state.smallCroppedDisplayPhoto}
                         username={this.state.targetUsername}
                         eventData={this.state.selectedEvent}
+                        textData={this.state.textData}
                         onDeletePost={this.handleDeletePost}
                     />
                 </div>

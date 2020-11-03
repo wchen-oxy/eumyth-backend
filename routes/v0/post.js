@@ -61,11 +61,32 @@ router.route('/')
     const textData = !!req.body.textData ? req.body.textData : null;
     const minDuration = !!req.body.minDuration ? parseInt(req.body.minDuration) : null;
     const isMilestone = !!req.body.isMilestone ? req.body.isMilestone : null;
+    const isPaginated = req.body.isPaginated ? true : false;
     const coverPhotoURL = req.files.coverPhoto ? req.files.coverPhoto[0].location : null;
     const imageData = req.files.images ? getImageUrls(req.files.images) : [];
+
     let post = null;
     let indexUser = null;
     let followerArrayID = null;
+    let textSnippet = null;
+
+    if (textData) {
+      if (postType === "SHORT") {
+        if (textData.isPaginated) {
+          textSnippet = textData[0].length > 140 ? textData[0].substring(0, 140).trim() + "..." : textData[0];
+        }
+        else {
+          textSnippet = textData.length > 140 ? textData.substring(0, 140).trim() + "..." : textData;
+        }
+      }
+      else {
+        const completeText = JSON.parse(textData).blocks[0].text;
+        textSnippet = completeText.length > 140 ? completeText.substring(0, 140).trim() + "..." : completeText.trim();
+      }
+    }
+
+    console.log(textSnippet);
+
     const resolveIndexUser = IndexUser.Model.findOne({ username: username }).then(
       indexUserResult => {
         indexUser = indexUserResult;
@@ -91,9 +112,10 @@ router.route('/')
             display_photo_url: displayPhoto,
             cover_photo_url: coverPhotoURL,
             post_format: postType,
-            is_paginated: req.body.isPaginated,
+            is_paginated: isPaginated,
             is_milestone: isMilestone,
             image_data: imageData,
+            text_snippet: textSnippet,
             text_data: textData,
             min_duration: minDuration
           });
@@ -109,8 +131,9 @@ router.route('/')
             display_photo_url: displayPhoto,
             cover_photo_url: coverPhotoURL,
             post_format: postType,
-            is_paginated: req.body.isPaginated,
+            is_paginated: isPaginated,
             is_milestone: isMilestone,
+            text_snippet: textSnippet,
             text_data: textData,
             min_duration: minDuration
           });
@@ -289,16 +312,17 @@ router.route('/multiple').get((req, res) => {
     }
   }).then(
     (results) => {
-      // let coverInfoArray = [];
-      // for (result of result){
-      //   const text = result.text_data && result.post_format === "SHORT" ? : ;
-      //   coverInfoArray.push(
-          
-      //   )
-
-      // }
-      console.log(results);
-      res.status(200).send(results);
+      let coverInfoArray = results;
+      console.log(coverInfoArray);
+      for (result of coverInfoArray) {
+        // coverInfoArray.push(
+          result.text_data = "";
+          result.feedback = "";
+          console.log(result.text_data);
+        
+      }
+      console.log(coverInfoArray);
+      res.status(200).send(coverInfoArray);
     })
 });
 
@@ -341,6 +365,17 @@ router.route('/feed').get((req, res) => {
     })
 
 
+});
+
+router.route('/single-text').get((req, res) => {
+  return Post.Model.findById(req.query.postId)
+  .then(result => {
+    res.status(200).send(result.text_data);
+  })
+  .catch(err => {
+    console.log(err);
+    res.status(500).send("No Post Found");
+  })
 })
 
 module.exports = router;

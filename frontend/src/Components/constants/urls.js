@@ -18,6 +18,8 @@ const WITH_IMAGE_POST_URL = POST_BASE_URL + "/with-image";
 const NO_IMAGE_POST_URL = POST_BASE_URL + "/no-image";
 const SOCIAL_FEED_POSTS_URL = POST_BASE_URL + "/feed";
 
+const SINGLE_POST_TEXT_DATA_URL = POST_BASE_URL + "/single-text"
+
 //index
 const INDEX_BASE_URL = ROOT_URL + "/index";
 const CHECK_USERNAME_URL = INDEX_BASE_URL + '/username';
@@ -35,6 +37,7 @@ module.exports = {
     WITH_IMAGE_POST_URL,
     NO_IMAGE_POST_URL,
     SOCIAL_FEED_POSTS_URL,
+    SINGLE_POST_TEXT_DATA_URL,
     INDEX_BASE_URL,
     CHECK_USERNAME_URL,
     INDEX_USER_PURSUITS_URL

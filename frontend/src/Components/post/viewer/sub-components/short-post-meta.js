@@ -5,6 +5,8 @@ const ShortPostMetaInfo = (props) => {
         "July", "August", "September", "October", "November", "December"
     ];
     const date = new Date(props.date);
+    console.log(props.isPaginated);
+    console.log(props.textData);
     return (
         <div>
             <div>
@@ -13,7 +15,7 @@ const ShortPostMetaInfo = (props) => {
                 {props.pursuit ? <p>{props.pursuit}</p> : <></>}
                 {props.min ? <p>{props.min}</p> : <></>}
             </div>
-            <p>{props.isPaginated ? props.textData[props.index] : props.textData }</p>
+            <p>{props.isPaginated ? props.textData[props.index] : props.textData}</p>
         </div>
     )
 }

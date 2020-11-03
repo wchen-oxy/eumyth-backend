@@ -4,8 +4,7 @@ import "./long-post.scss";
 
 
 const LongPostViewer = (props) => {
-
-    console.log(JSON.parse(props.eventData.text_data));
+    console.log(props.textData);
     return (
         <div>
             <div className="long-editor-container" id="long-editor-buttons">
@@ -14,10 +13,11 @@ const LongPostViewer = (props) => {
             </div>
             <div className="long-editor-container">
                 < DanteEditor
-                    content={JSON.parse(props.eventData.text_data)}
+                    content={props.textData}
                     read_only={true}
                 />
             </div>
+
 
         </div>
     );

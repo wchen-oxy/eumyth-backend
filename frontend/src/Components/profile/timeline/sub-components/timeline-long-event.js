@@ -4,14 +4,14 @@ import "./timeline-long-event.scss";
 const LongEvent = (props) => {
 
     if (props.post.text_data === undefined) return( <></>);
-    // console.log(props.post);
     const post = props.post;
-
-    const initialText = JSON.parse(post.text_data).blocks[0].text;
-    console.log(initialText);
-
+    console.log(post);
     const coverImage = <img className="event-cover-photo" src={post.cover_photo_url} />;
-    const previewText = initialText.length > 140 ? initialText.substring(0, 140).trim() + "..." : initialText;
+
+    // const initialText = JSON.parse(post.text_data).blocks[0].text;
+    // const previewText = initialText.length > 140 ? initialText.substring(0, 140).trim() + "..." : initialText;
+
+    const previewText = post.text_snippet;
 
     return (
         <div>

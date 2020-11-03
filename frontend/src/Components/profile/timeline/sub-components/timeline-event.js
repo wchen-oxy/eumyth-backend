@@ -22,7 +22,6 @@ const Event = (props) => {
     return (
         <div className="event-container" onClick={() => props.onEventClick(props.eventData)}>
             {content}
-            {/* <h4>{post.preview_title}</h4> */}
         </div>
     );
 }

@@ -36,7 +36,7 @@ class Timeline extends React.Component {
         let nextOpenPostIndex = this.state.nextOpenPostIndex;
 
         let j = 0;
-        let k = masterArray[index].length ; //length of last array 
+        let k = masterArray[index].length; //length of last array 
         console.log(k);
         //while input array is not empty
         while (j < inputArray.length) {
@@ -72,8 +72,7 @@ class Timeline extends React.Component {
             console.log("Length of All Posts Exceeded");
             this.setState({ hasMore: false });
         }
-        console.log(this.state.nextOpenPostIndex)
-        console.log( this.state.nextOpenPostIndex + this.state.fixedDataLoadLength);
+        console.log( this.props.allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength));
         return AxiosHelper.returnMultiplePosts(
             this.props.targetProfileId,
             this.props.allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength))
@@ -87,25 +86,6 @@ class Timeline extends React.Component {
 
     }
 
-    // fetchNextPosts() {
-    //     const nextOpenPostIndex = this.state.nextOpenPostIndex === -1 ? 0 : this.state.nextOpenPostIndex;
-    //     if (nextOpenPostIndex + this.state.fixedDataLoadLength >= this.props.allPosts.length) {
-    //         this.setState({ hasMore: false });
-    //     }
-    //     AxiosHelper.returnMultiplePosts(
-    //         this.props.targetProfileId,
-    //         this.props.allPosts.slice(nextOpenPostIndex, nextOpenPostIndex + this.state.fixedDataLoadLength + 1))
-    //         .then(
-    //             (result) => {
-    //                 console.log("FUC");
-    //                 console.log(result.data);
-    //                 this.createTimelineRow(result.data);
-    //             }
-    //         )
-    //         .catch((error) => console.log(error));
-
-    // }
-
     render() {
         if (!this._isMounted) return (
             <div id="timeline-container">
@@ -113,12 +93,14 @@ class Timeline extends React.Component {
             </div>
 
         );
-            console.log(this.state.nextOpenPostIndex);
+        console.log(this.state.feedData);
+        console.log(this.state.nextOpenPostIndex);
+        console.log(this.state.hasMore);
         return (
             <div id="timeline-container">
                 <InfiniteScroll
                     dataLength={this.state.nextOpenPostIndex}
-                    // fixedDataLoadLength={this.state.fixedDataLoadLength} //This is important field to render the next data
+                    // fixedDataLoadLength={this.state.nextOpenPostIndex} //This is important field to render the next data
                     next={this.fetchNextPosts}
                     hasMore={this.state.hasMore}
                     loader={<h4>Loading...</h4>}
@@ -126,8 +108,7 @@ class Timeline extends React.Component {
                         <p style={{ textAlign: 'center' }}>
                             <b>Yay! You have seen it all</b>
                         </p>
-                    }
-                >
+                    } >
                     {
                         this.state.feedData.map((item, index) => (
                             <div className="flex-display" key={index}>

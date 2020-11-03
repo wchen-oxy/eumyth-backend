@@ -2,14 +2,17 @@ import React from 'react';
 
 
 const ShortEvent = (props) => {
+    console.log(props.post);
     const post = props.post;
     //No Cover Photo
     if (post.image_data.length === 0) {
-        let intitialText = null;
-        if (typeof (post.text_data) === 'string') intitialText = (post.text_data.length > 140 ? post.text_data.substring(0, 140).trim() + "..." : post.text_data);
-        else {
-            intitialText = post.text_data[0].length > 140 ? post.text_data[0].substring(0, 140).trim() + "..." : post.text_data[0]
-        }
+        // let intitialText = null;
+        // if (typeof (post.text_data) === 'string') intitialText = (post.text_data.length > 140 ? post.text_data.substring(0, 140).trim() + "..." : post.text_data);
+        // else {
+        //     intitialText = post.text_data[0].length > 140 ? post.text_data[0].substring(0, 140).trim() + "..." : post.text_data[0]
+        // }
+
+        const intitialText = post.text_snippet;
 
         if (!post.title) {
             const activityType = post.is_milestone ? "MileStone" : "Progress";
@@ -40,7 +43,7 @@ const ShortEvent = (props) => {
     }
     //YES COVER PHOTO
     else {
-        console.log(post.image_data[0]);
+       
         if (!post.title) {
             const activityType = post.is_milestone ? "MileStone" : "Progress";
             return (

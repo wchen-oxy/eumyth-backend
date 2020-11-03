@@ -65,6 +65,11 @@ const postSchema = new Schema({
     type: Boolean,
     required: false
   },
+
+  text_snippet: {
+    type: String,
+    required: false
+  },
   
   text_data: {
     type: String,

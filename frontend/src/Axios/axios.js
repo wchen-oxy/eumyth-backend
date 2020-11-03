@@ -77,6 +77,14 @@ export default class AxiosHelper {
         })
     }
 
+    static retrieveTextData(postId){
+        return axios.get(urls.SINGLE_POST_TEXT_DATA_URL, {
+            params: {
+                postId : postId
+            }
+        })
+    }
+
     static returnSocialFeedPosts(indexUserId, postIdList ) {
         return axios.get(urls.SOCIAL_FEED_POSTS_URL, {
             params: {
