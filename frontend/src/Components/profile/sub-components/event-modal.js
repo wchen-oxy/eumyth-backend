@@ -24,7 +24,6 @@ class EventModal extends React.Component {
     }
 
     render() {
-        console.log(this.props.textData);
         if (!this.props.eventData || !this.props.textData) return (<></>);
         if (this.state.window === "MAIN") {
             return (this.props.eventData.post_format === "SHORT" ?

@@ -7,6 +7,7 @@ import ShortEditor from '../editor/short-editor';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import './short-post.scss';
+import ShortReEditor from '../editor/short-re-editor';
 
 class ShortPostViewer extends React.Component {
 
@@ -28,7 +29,6 @@ class ShortPostViewer extends React.Component {
 
     handleWindowChange(newWindow) {
         this.setState({ window: newWindow });
-        console.log(newWindow);
     }
 
     handleIndexChange(value) {
@@ -37,52 +37,20 @@ class ShortPostViewer extends React.Component {
 
 
     render() {
-        console.log(this.props.textData)
         const settings = {
             speed: 500,
             slidesToShow: 1,
             slidesToScroll: 1,
             centerPadding: 0,
-            className: 'photo-container',
+            // className: 'image-container',
         };
-        // if (this.state.loaded === 'false') {
-        //     return (
-        //         <div className="flex-display" >
-        //             <div className="short-viewer-hero-container">
-        //                 <ShortHeroText  text={this.props.textData} />
-        //             </div>
-        //             <div className="short-viewer-side-container">
-        //                 <ShortPostHeader
-
-        //                     isOwnProfile={this.props.isOwnProfile}
-        //                     username={this.props.eventData.username}
-        //                     displayPhoto={this.props.eventData.displayPhoto}
-        //                     onEditClick={this.handleWindowChange}
-        //                     onDeletePost={this.props.onDeletePost}
-        //                 />
-        //                 <ShortPostMetaInfo
-
-        //                     index={this.state.imageIndex}
-        //                     isPaginated={this.props.eventData.is_paginated}
-        //                     isMilestone={this.props.eventData.is_milestone}
-        //                     date={this.props.eventData.date}
-        //                     pursuit={this.props.eventData.pursuit_category}
-        //                     min={this.props.eventData.min_duration}
-        //                     textData={null}
-        //                 />
-
-        //             </div>
-        //         </div>
-        //     )
-        // }
-
         if (this.state.window === "INITIAL") {
             if (!this.props.eventData.image_data.length) {
 
                 if (this.props.largeViewMode) {
                     console.log(this.props.textData);
                     return (
-                        <div className="flex-display" >
+                        <div className="flex-display short-viewer-main-container" >
                             <div className="short-viewer-hero-container">
                                 <ShortHeroText
                                     text={this.props.textData} />
@@ -92,7 +60,7 @@ class ShortPostViewer extends React.Component {
 
                                     isOwnProfile={this.props.isOwnProfile}
                                     username={this.props.eventData.username}
-                                    displayPhoto={this.props.eventData.displayPhoto}
+                                    displayPhoto={this.props.eventData.display_photo_url}
                                     onEditClick={this.handleWindowChange}
                                     onDeletePost={this.props.onDeletePost}
                                 />
@@ -114,7 +82,7 @@ class ShortPostViewer extends React.Component {
                 }
                 else {
                     return (
-                        <div className="flex-display"  >
+                        <div className="flex-display short-viewer-main-container"  >
                             <div className="short-viewer-hero-container">
 
                                 <ShortHeroText text={this.props.textData} />
@@ -136,7 +104,7 @@ class ShortPostViewer extends React.Component {
                                     date={this.props.eventData.date}
                                     pursuit={this.props.eventData.pursuit_category}
                                     min={this.props.eventData.min_duration}
-                                    // textData={this.props.textData}
+                                // textData={this.props.textData}
                                 />
                             </div>
 
@@ -146,22 +114,33 @@ class ShortPostViewer extends React.Component {
                 }
             }
             //with images
+
+
             else {
-                const container = this.props.eventData.image_data.map((url, i) => <img key={i} src={url} />);
+                const container = this.props.eventData.image_data.map((url, i) =>
+                    <div className="image-container">
+                        <img className="preview-image" key={i} src={url} />
+                     </div>
+                );
+                const imageDisplay =
+                    (
+                        <div className="short-viewer-hero-container">
+                            <Slider afterChange={index => (this.handleIndexChange(index))} {...settings}>
+                                {container}
+                            </Slider>
+                        </div>
+                    );
+
                 if (this.props.largeViewMode) {
                     return (
-                        <div className="flex-display">
-                            <div className="short-viewer-hero-container">
-                                <Slider afterChange={index => (this.handleIndexChange(index))} {...settings}>
-                                    {container}
-                                </Slider>
-                            </div>
+                        <div className="flex-display short-viewer-main-container">
+                            {imageDisplay}
                             <div className="short-viewer-side-container">
                                 <ShortPostHeader
 
                                     isOwnProfile={this.props.isOwnProfile}
                                     username={this.props.eventData.username}
-                                    displayPhoto={this.props.eventData.displayPhoto}
+                                    displayPhoto={this.props.eventData.display_photo_url}
                                     onEditClick={this.handleWindowChange}
                                     onDeletePost={this.props.onDeletePost}
                                 />
@@ -173,7 +152,7 @@ class ShortPostViewer extends React.Component {
                                     date={this.props.eventData.date}
                                     pursuit={this.props.eventData.pursuit_category}
                                     min={this.props.eventData.min_duration}
-                                    textData={this.props.eventData.is_paginated ? JSON.parse(this.props.textData) : this.props.textData}
+                                    textData={this.props.textData}
                                 />
                             </div>
                         </div>
@@ -181,18 +160,13 @@ class ShortPostViewer extends React.Component {
                 }
                 else {
                     return (
-                        <div className="flex-display" >
-                            <div className="short-viewer-hero-container">
-                                <Slider afterChange={index => (this.handleIndexChange(index))} {...settings}>
-                                    {container}
-                                </Slider>
-                            </div>
+                        <div className="flex-display short-viewer-main-container" >
+                            {imageDisplay}
                             <div className="short-viewer-side-container">
                                 <ShortPostHeader
-
                                     isOwnProfile={this.props.isOwnProfile}
                                     username={this.props.eventData.username}
-                                    displayPhoto={this.props.eventData.displayPhoto}
+                                    displayPhoto={this.props.eventData.display_photo_url}
                                     onEditClick={this.handleWindowChange}
                                     onDeletePost={this.props.onDeletePost}
                                 />
@@ -204,8 +178,7 @@ class ShortPostViewer extends React.Component {
                                     date={this.props.eventData.date}
                                     pursuit={this.props.eventData.pursuit_category}
                                     min={this.props.eventData.min_duration}
-                                    textData={this.props.eventData.is_paginated ? JSON.parse(this.props.textData) : this.props.textData}
-                                />
+                                    textData={this.props.textData} />
                             </div>
                         </div>
                     );
@@ -214,10 +187,16 @@ class ShortPostViewer extends React.Component {
         }
         else if (this.state.window === "EDIT") {
             return (
-                <p>Hello</p>
+                <ShortReEditor
+                    onIndexChange={this.handleIndexChange}
+                    imageIndex={this.state.imageIndex}
+                    eventData={this.props.eventData}
+                    textData={this.props.textData}
+                />
+
                 // <ShortEditor
                 //     username={this.props.username}
-                //     selectedFiles={this.props.eventData.}
+                //     selectedFiles={this.state.selectedFiles}
                 //     validFiles={this.state.validFiles}
                 //     unsupportedFiles={this.state.unsupportedFiles}
                 //     isPaginated={this.state.isPaginated}
@@ -235,6 +214,9 @@ class ShortPostViewer extends React.Component {
                 //     setUnsupportedFiles={this.setUnsupportedFiles}
                 // />
             )
+        }
+        else { //REVIEW
+
         }
     }
 

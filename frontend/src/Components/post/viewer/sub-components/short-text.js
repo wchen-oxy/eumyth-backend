@@ -2,7 +2,6 @@ import React from 'react';
 import "./short-text.scss";
 
 const ShortHeroText = (props) => {
-    console.log(props.text);
     if (props.length < 1000) {
         return (
             <div id="tiny-amount-text-container">

@@ -159,8 +159,8 @@ class ShortEditor extends React.Component {
             <div id="text-container flex-display">
                 <div className=" description-container flex-display flex-direction-column">
                     <h4>{this.props.username}</h4>
-                    {this.props.validFiles.length > 0 && !this.props.isPaginated ? <button onClick={this.props.onCaptionStyleChange}>Caption Photos Individually</button> : <></>}
-                    {this.props.validFiles.length > 0 && this.props.isPaginated ? <button onClick={this.props.onCaptionStyleChange}>Return to Single Caption</button> : <></>}
+                    {/* {this.props.validFiles.length > 0 && !this.props.isPaginated ? <button onClick={this.props.onCaptionStyleChange}>Caption Photos Individually</button> : <></>}
+                    {this.props.validFiles.length > 0 && this.props.isPaginated ? <button onClick={this.props.onCaptionStyleChange}>Return to Single Caption</button> : <></>} */}
                     <div id="description-input-container" >
                         <TextareaAutosize
                             id='short-post-text'

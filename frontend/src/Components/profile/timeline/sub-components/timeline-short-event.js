@@ -13,9 +13,9 @@ const ShortEvent = (props) => {
         // }
 
         const intitialText = post.text_snippet;
+        const activityType = post.is_milestone ? "MileStone" : "Progress";
 
-        if (!post.title) {
-            const activityType = post.is_milestone ? "MileStone" : "Progress";
+
             return (
                 <div>
                     <div className="event-cover-container no-cover-photo">
@@ -23,23 +23,11 @@ const ShortEvent = (props) => {
                             {intitialText}
                         </p>
                     </div>
+                    {post.title? <h4>{post.title}</h4> : <></>}
                     {post.pursuit_category ? <h4>{post.pursuit_category} {activityType} </h4> : <></>}
                 </div>
             );
-        }
-        //yes title
-        else {
-            return (
-                <div>
-                    <div className="event-cover-container no-cover-photo">
-                        <p className="no-select">
-                            {intitialText}
-                        </p>
-                    </div>
-                    <h4>{post.title}</h4>
-                </div>
-            );
-        }
+        
     }
     //YES COVER PHOTO
     else {

@@ -180,7 +180,7 @@ class ProfilePage extends React.Component {
                 (result) => {
                     console.log(result.data);
                     if (this._isMounted) {
-                        this.setState({ selectedEvent: selectedEvent, textData: result.data}, this.openModal(this.modalRef));
+                        this.setState({ selectedEvent: selectedEvent, textData: result.data }, this.openModal(this.modalRef));
                     }
                 }
             )
@@ -265,7 +265,8 @@ class ProfilePage extends React.Component {
                             allPosts={this.state.allPosts}
                             onEventClick={this.handleEventClick}
                             targetProfileId={this.state.targetProfileId} />
-                        : <></>}
+                        : <></>
+                    }
                 </div>
                 <div className="modal" ref={this.modalRef}>
                     <div className="overlay" onClick={(() => this.closeModal(this.modalRef))}></div>

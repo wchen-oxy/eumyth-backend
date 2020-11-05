@@ -4,7 +4,6 @@ import "./long-post.scss";
 
 
 const LongPostViewer = (props) => {
-    console.log(props.textData);
     return (
         <div>
             <div className="long-editor-container" id="long-editor-buttons">

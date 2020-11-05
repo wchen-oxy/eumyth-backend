@@ -72,7 +72,7 @@ router.route('/')
 
     if (textData) {
       if (postType === "SHORT") {
-        if (textData.isPaginated) {
+        if (isPaginated) {
           textSnippet = textData[0].length > 140 ? textData[0].substring(0, 140).trim() + "..." : textData[0];
         }
         else {

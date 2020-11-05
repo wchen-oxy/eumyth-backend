@@ -137,6 +137,7 @@ class ShortPost extends React.Component {
 
 
   render() {
+    console.log(this.state.isPaginated);
     if (this.state.window === "initial") {
       return (
         <div className="small-post-window">

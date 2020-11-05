@@ -61,9 +61,6 @@ class Timeline extends React.Component {
             k = 0;
         }
         this.setState({ feedData: masterArray, nextOpenPostIndex: nextOpenPostIndex });
-        console.log(masterArray);
-        console.log(nextOpenPostIndex);
-
     }
 
     fetchNextPosts() {
@@ -87,7 +84,7 @@ class Timeline extends React.Component {
     }
 
     render() {
-        if (!this._isMounted) return (
+        if (!this._isMounted ) return (
             <div id="timeline-container">
                 <p>Loading</p>
             </div>
@@ -100,7 +97,6 @@ class Timeline extends React.Component {
             <div id="timeline-container">
                 <InfiniteScroll
                     dataLength={this.state.nextOpenPostIndex}
-                    // fixedDataLoadLength={this.state.nextOpenPostIndex} //This is important field to render the next data
                     next={this.fetchNextPosts}
                     hasMore={this.state.hasMore}
                     loader={<h4>Loading...</h4>}
@@ -110,12 +106,19 @@ class Timeline extends React.Component {
                         </p>
                     } >
                     {
-                        this.state.feedData.map((item, index) => (
+                        this.state.feedData.map((item, index) => {
+                            console.log(item);
+                            
+                            if (item.length !== 0)
+                            return (
                             <div className="flex-display" key={index}>
                                 {item}
-                            </div>)
+                            </div>
+                            
+                            )}
 
                         )}
+                        <br/>
                     {/* {timelineRows} */}
                 </InfiniteScroll>
             </div>
