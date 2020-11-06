@@ -7,7 +7,6 @@ import FileDisplayContainer from './sub-components/file-display-container';
 import TextContainer from './sub-components/text-container';
 import './short-editor.scss';
 
-
 var isAdvancedUpload = function () {
     var div = document.createElement('div');
     return (('draggable' in div) || ('ondragstart' in div && 'ondrop' in div)) && 'FormData' in window && 'FileReader' in window;
@@ -205,7 +204,7 @@ class ShortEditor extends React.Component {
             return (
                 <>
                     <div className="short-viewer-main-container flex-display">
-                        <div className="short-viewer-hero-container flex-display flex-direction-column" style={{height: `500px`, maxHeight: `500px`}}>
+                        <div className="short-viewer-hero-container flex-display flex-direction-column black-background">
                             {this.props.unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
                             <ImageSlider onIndexChange={this.props.onIndexChange} fileArray={this.props.validFiles} setImageArray={this.props.setImageArray} />
                         </div>

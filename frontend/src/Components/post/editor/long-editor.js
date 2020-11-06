@@ -60,10 +60,8 @@ class LongEditor extends React.Component {
                             const editorState = editor.emitSerializedOutput();
                             console.log("ANY CHANGE???");
                             if (this.props.hasContent === false) {
-                                console.log("inner");
                                 for (let block of editorState.blocks) {
                                     if (block.text !== '') {
-                                        console.log("FASDF");
                                         this.props.setHasContent(true);
                                         break;
                                     }
@@ -71,21 +69,18 @@ class LongEditor extends React.Component {
                             }
                             else {
                                 if (this.state.isInitial) {
-                                    console.log("Mounted");
                                     this.setState({ isInitial: false });
                                     this.props.setLocalDraft(editorState);
                                 }
                                 else {
                                     if (this.state.needOnlineSync) {
-                                        console.log("Caught inner");
                                         this.props.onSavePending(true);
                                         this.props.syncChanges();
                                         this.setState({ needOnlineSync: false });
                                         return;
                                     }
                                     console.log("After Mount");
-                                    console.log(editorState);
-                                    console.log(this.props.localDraft);
+                                  
                                     const draftsIdentical = _.isEqual(editorState, this.props.localDraft);
                                     if (!draftsIdentical) {
                                         console.log(editorState);

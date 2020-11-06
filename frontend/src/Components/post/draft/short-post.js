@@ -2,6 +2,13 @@ import React from 'react';
 import ShortEditor from '../editor/short-editor';
 import ReviewPost from './review-post';
 
+const NONE = "NONE";
+const INITIAL = "INITIAL";
+const EDIT = "EDIT";
+const REVIEW = "REVIEW";
+
+const SHORT = "SHORT";
+
 class ShortPost extends React.Component {
   constructor(props) {
     super(props);
@@ -14,7 +21,7 @@ class ShortPost extends React.Component {
       postText: '',
       isPaginated: false,
       postDisabled: true,
-      window: 'initial',
+      window: INITIAL,
     };
 
     this.handleIndexChange = this.handleIndexChange.bind(this);
@@ -138,17 +145,17 @@ class ShortPost extends React.Component {
 
   render() {
     console.log(this.state.isPaginated);
-    if (this.state.window === "initial") {
+    if (this.state.window === INITIAL) {
       return (
         <div className="small-post-window">
           <div className="post-button-container">
             <h2>Placeholder for short</h2>
             <div id="button-container">
               <span id="toggle-button-span">
-                <button id="toggle-button" value="none" onClick={e => this.props.onPostTypeSet(e.target.value, false)}>Return</button>
+                <button id="toggle-button" value={NONE} onClick={e => this.props.onPostTypeSet(e.target.value, false)}>Return</button>
               </span>
               <span id="post-button-span">
-                <button id="post-button" value="review" disabled={this.state.postDisabled} onClick={e => this.handleClick(e.target.value)}>Review Post</button>
+                <button id="post-button" value={REVIEW} disabled={this.state.postDisabled} onClick={e => this.handleClick(e.target.value)}>Review Post</button>
               </span>
             </div>
             <ShortEditor
@@ -181,7 +188,7 @@ class ShortPost extends React.Component {
           isPaginated={this.state.isPaginated}
           previewTitle={this.state.previewTitle}
           closeModal={this.props.closeModal}
-          postType={"SHORT"}
+          postType={SHORT}
           onClick={this.handleClick}
           imageArray={this.state.imageArray}
           postText={this.state.postText}

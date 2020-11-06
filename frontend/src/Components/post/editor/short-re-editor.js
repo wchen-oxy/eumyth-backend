@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
-import TextContainer from "./sub-components/text-container";
+import Arrow from '../../image-carousel/arrow';
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -11,7 +11,10 @@ const ShortReEditor = (props) => {
         infinite: true,
         speed: 500,
         slidesToShow: 1,
-        slidesToScroll: 1
+        slidesToScroll: 1,
+        nextArrow: <Arrow direction="right" />,
+        prevArrow: <Arrow direction="left" />
+
     };
 
     const [setPostText, postText] = useState(props.textData);
@@ -28,7 +31,7 @@ const ShortReEditor = (props) => {
         setPostText(newText);
     }
 
-   
+
     if (!props.eventData.image_data.length) {
         return (
 

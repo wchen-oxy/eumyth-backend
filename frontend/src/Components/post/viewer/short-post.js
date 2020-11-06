@@ -3,11 +3,14 @@ import Slider from 'react-slick';
 import ShortPostHeader from './sub-components/post-header';
 import ShortHeroText from './sub-components/short-text';
 import ShortPostMetaInfo from './sub-components/short-post-meta';
-import ShortEditor from '../editor/short-editor';
+import Arrow from "../../image-carousel/arrow";
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import './short-post.scss';
 import ShortReEditor from '../editor/short-re-editor';
+
+const INITIAL = "INITIAL";
+const EDIT = "EDIT";
 
 class ShortPostViewer extends React.Component {
 
@@ -21,7 +24,7 @@ class ShortPostViewer extends React.Component {
             postText: '',
             isPaginated: false,
             postDisabled: true,
-            window: 'INITIAL',
+            window: INITIAL,
         };
         this.handleWindowChange = this.handleWindowChange.bind(this);
         this.handleIndexChange = this.handleIndexChange.bind(this);
@@ -43,8 +46,10 @@ class ShortPostViewer extends React.Component {
             slidesToScroll: 1,
             centerPadding: 0,
             className: 'abcdef',
+            nextArrow: <Arrow direction="right" />,
+            prevArrow: <Arrow direction="left" />
         };
-        if (this.state.window === "INITIAL") {
+        if (this.state.window === INITIAL) {
             if (!this.props.eventData.image_data.length) {
 
                 if (this.props.largeViewMode) {
@@ -114,8 +119,6 @@ class ShortPostViewer extends React.Component {
                 }
             }
             //with images
-
-
             else {
                 const container = this.props.eventData.image_data.map((url, i) =>
                     <div className="image-container">
@@ -124,7 +127,7 @@ class ShortPostViewer extends React.Component {
                 );
                 const imageDisplay =
                     (
-                        <div className="short-viewer-hero-container flex-display flex-direction-column">
+                        <div className="short-viewer-hero-container flex-display flex-direction-column black-background">
                             <Slider afterChange={index => (this.handleIndexChange(index))} {...settings}>
                                 {container}
                             </Slider>
@@ -184,7 +187,7 @@ class ShortPostViewer extends React.Component {
                 }
             }
         }
-        else if (this.state.window === "EDIT") {
+        else if (this.state.window === EDIT) {
             return (
                 <ShortReEditor
                     onIndexChange={this.handleIndexChange}
@@ -192,29 +195,9 @@ class ShortPostViewer extends React.Component {
                     eventData={this.props.eventData}
                     textData={this.props.textData}
                 />
-
-                // <ShortEditor
-                //     username={this.props.username}
-                //     selectedFiles={this.state.selectedFiles}
-                //     validFiles={this.state.validFiles}
-                //     unsupportedFiles={this.state.unsupportedFiles}
-                //     isPaginated={this.state.isPaginated}
-                //     textPageText={this.state.postText}
-                //     textPageIndex={this.state.imageIndex}
-                //     setImageArray={this.setImageArray}
-                //     onCaptionStyleChange={this.handleCaptionStyleChange}
-                //     onArrowClick={this.handleArrowClick}
-                //     onTextChange={this.handleTextChange}
-                //     onSelectedFileChange={this.handleSelectedFileChange}
-                //     onUnsupportedFileChange={this.handleUnsupportedFileChange}
-                //     onDisablePost={this.handleDisablePost}
-                //     setValidFiles={this.setValidFiles}
-                //     setSelectedFiles={this.setSelectedFiles}
-                //     setUnsupportedFiles={this.setUnsupportedFiles}
-                // />
             )
         }
-        else { //REVIEW
+        else { 
 
         }
     }
