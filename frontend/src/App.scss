@@ -48,7 +48,7 @@ body {
   top: 50%;
   left: 50%;
   z-index: 22;
-  height: 76vh;
+  height: 74vh;
   width: 76vw;
   object-fit: cover;
   overflow: scroll;
@@ -68,15 +68,21 @@ body {
   overflow: scroll;  
 }
 
-.inner-small-post-container {
- 
-  height: 100%;
-  margin: auto;
-  min-height: 450px;
-  min-width: 600px;
-  max-height: 600px;
-  max-width: 935px;
+.preview-image{
+  max-height: 74vh;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
 }
+
+// .inner-small-post-container {
+//   height: 100%;
+//   margin: auto;
+//   min-height: 450px;
+//   min-width: 600px;
+//   max-height: 600px;
+//   max-width: 935px;
+// }
 
 @media screen and (max-width: 935px) {
   .inner-small-post-container {

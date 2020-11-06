@@ -204,20 +204,22 @@ class ShortEditor extends React.Component {
         else {
             return (
                 <>
-                    <div className="post-preview-container flex-display">
-                        <div className="photo-upload-container">
+                    <div className="short-viewer-main-container flex-display">
+                        <div className="short-viewer-hero-container flex-display flex-direction-column" style={{height: `500px`, maxHeight: `500px`}}>
                             {this.props.unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
                             <ImageSlider onIndexChange={this.props.onIndexChange} fileArray={this.props.validFiles} setImageArray={this.props.setImageArray} />
                         </div>
-                        <TextContainer
-                            validFilesLength={this.props.validFiles.length}
-                            isPaginated={this.props.isPaginated}
-                            onCaptionStyleChange={this.props.onCaptionStyleChange}
-                            onTextChange={this.props.onTextChange}
-                            textPageText={this.props.textPageText}
-                            textPageIndex={this.props.textPageIndex}
+                        <div className="short-viewer-side-container">
+                            <TextContainer
+                                validFilesLength={this.props.validFiles.length}
+                                isPaginated={this.props.isPaginated}
+                                onCaptionStyleChange={this.props.onCaptionStyleChange}
+                                onTextChange={this.props.onTextChange}
+                                textPageText={this.props.textPageText}
+                                textPageIndex={this.props.textPageIndex}
 
-                        />
+                            />
+                        </div>
                     </div>
                     <div className="flex-display flex-direction-column">
                         <ImageDrop

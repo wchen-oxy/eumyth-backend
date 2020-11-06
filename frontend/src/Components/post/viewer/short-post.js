@@ -42,7 +42,7 @@ class ShortPostViewer extends React.Component {
             slidesToShow: 1,
             slidesToScroll: 1,
             centerPadding: 0,
-            // className: 'image-container',
+            className: 'abcdef',
         };
         if (this.state.window === "INITIAL") {
             if (!this.props.eventData.image_data.length) {
@@ -120,16 +120,17 @@ class ShortPostViewer extends React.Component {
                 const container = this.props.eventData.image_data.map((url, i) =>
                     <div className="image-container">
                         <img className="preview-image" key={i} src={url} />
-                     </div>
+                    </div>
                 );
                 const imageDisplay =
                     (
-                        <div className="short-viewer-hero-container">
+                        <div className="short-viewer-hero-container flex-display flex-direction-column">
                             <Slider afterChange={index => (this.handleIndexChange(index))} {...settings}>
                                 {container}
                             </Slider>
                         </div>
                     );
+                console.log(container);
 
                 if (this.props.largeViewMode) {
                     return (
@@ -137,7 +138,6 @@ class ShortPostViewer extends React.Component {
                             {imageDisplay}
                             <div className="short-viewer-side-container">
                                 <ShortPostHeader
-
                                     isOwnProfile={this.props.isOwnProfile}
                                     username={this.props.eventData.username}
                                     displayPhoto={this.props.eventData.display_photo_url}
@@ -145,7 +145,6 @@ class ShortPostViewer extends React.Component {
                                     onDeletePost={this.props.onDeletePost}
                                 />
                                 <ShortPostMetaInfo
-
                                     index={this.state.imageIndex}
                                     isPaginated={this.props.eventData.is_paginated}
                                     isMilestone={this.props.eventData.is_milestone}

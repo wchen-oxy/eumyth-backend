@@ -8,23 +8,20 @@
     width: 65%;
     margin: auto;
     text-align: center;
-    vertical-align: middle;
+    justify-content: center;
 }
 .short-viewer-side-container {
     width: 35%;
 }
 
-.preview-image {
-    height: auto;
-    width: 100%;
-    object-fit: contain;
-}
-
 .image-container {
-    height: 100%;
     width: 100%;
 }
 .slick-track {
     display: flex;
     align-items: center;
+}
+
+.slick-slide{
+    min-height: 0;
 }

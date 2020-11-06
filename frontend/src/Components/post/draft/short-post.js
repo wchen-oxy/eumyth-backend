@@ -141,7 +141,7 @@ class ShortPost extends React.Component {
     if (this.state.window === "initial") {
       return (
         <div className="small-post-window">
-          <div className="inner-small-post-container post-button-container">
+          <div className="post-button-container">
             <h2>Placeholder for short</h2>
             <div id="button-container">
               <span id="toggle-button-span">

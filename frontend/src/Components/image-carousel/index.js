@@ -2,7 +2,6 @@ import React from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import './index.scss';
 
 
 
@@ -64,9 +63,9 @@ class ImageSlider extends React.Component {
         newArray =>
           newArray.map(item =>
             item = (
-              // <div className="photo-container">
-              <img alt="" className="photo" key={count++} src={item} />
-              // </div>
+              <div className="image-container">
+                <img alt="" className="preview-image" key={count++} src={item} />
+              </div>
             ))
       ).then(result => {
         this.setState({ transformedImageArray: result, displayedItemCount: result.length })
@@ -91,7 +90,6 @@ class ImageSlider extends React.Component {
       slidesToShow: 1,
       slidesToScroll: 1,
       centerPadding: 0,
-      className: 'photo-container',
       nextArrow: <Arrow direction="right" />,
       prevArrow: <Arrow direction="left" />
 
