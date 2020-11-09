@@ -3,12 +3,16 @@ import ShortPostViewer from "../../post/viewer/short-post";
 import LongPostViewer from "../../post/viewer/long-post";
 import AxiosHelper from '../../../Axios/axios';
 
+const MAIN = "MAIN";
+const SHORT = "SHORT";
+
+
 class EventModal extends React.Component {
     _isMounted = false;
     constructor(props) {
         super(props);
         this.state = {
-            window: 'MAIN',
+            window: MAIN,
             largeViewMode: false,
             // loaded: false
         }
@@ -25,9 +29,9 @@ class EventModal extends React.Component {
 
     render() {
         if (!this.props.eventData || !this.props.textData) return (<></>);
-        if (this.state.window === "MAIN") {
-            return (this.props.eventData.post_format === "SHORT" ?
-                <div className="small-post-window">
+        if (this.state.window === MAIN) {
+            return (this.props.eventData.post_format === SHORT ?
+
                     <ShortPostViewer
                         // loaded={this.state.loaded}
                         textData={this.props.textData}
@@ -35,7 +39,8 @@ class EventModal extends React.Component {
                         isOwnProfile={this.props.isOwnProfile}
                         eventData={this.props.eventData}
                         onDeletePost={this.props.onDeletePost} />
-                </div> :
+
+                :
                 <div className="long-post-window">
                     <LongPostViewer
                         // username={this.props.username}

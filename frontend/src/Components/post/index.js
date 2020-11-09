@@ -5,6 +5,13 @@ import LongPost from './draft/long-post';
 import AxiosHelper from '../../Axios/axios';
 import { withFirebase } from '../../Firebase';
 
+
+const NONE = "NONE";
+const SHORT = "SHORT";
+const LONG = "LONG";
+const NEW_LONG = "NEW_LONG";
+const OLD_LONG = "OLD_LONG";
+
 class PostController extends React.Component {
   _isMounted = false;
   constructor(props) {
@@ -14,7 +21,7 @@ class PostController extends React.Component {
       onlineDraft: null,
       displayPhoto: null,
       updatingOnlineDraft: false,
-      postType: "none",
+      postType: NONE,
       pursuits: null,
       indexUserData: null,
       errorRetrievingDraft: false,
@@ -146,14 +153,14 @@ class PostController extends React.Component {
           this.setState({ postType: postType })
         }
         break;
-      case ("short"):
+      case (SHORT):
         this.setState({ postType: postType });
         break;
-      case ("new-long"):
-        this.setState({ postType: "long", onlineDraft: null });
+      case (NEW_LONG):
+        this.setState({ postType: LONG, onlineDraft: null });
         break;
-      case ("old-long"):
-        this.setState({ postType: "long" });
+      case (OLD_LONG):
+        this.setState({ postType: LONG });
         break;
       default:
         throw Error("No postType options matched :(");
@@ -164,12 +171,12 @@ class PostController extends React.Component {
     let postType = '';
     if (!this.state.indexUserData) return (<>updatingOnlineDraft...</>)
     switch (this.state.postType) {
-      case ("none"):
+      case (NONE):
         postType = (
           <NewPost onlineDraft={this.state.onlineDraft} onPostTypeSet={this.handlePostTypeSet} />
         );
         break;
-      case ("short"):
+      case (SHORT):
         postType = (
           <ShortPost
             displayPhoto={this.state.displayPhoto}
@@ -184,7 +191,7 @@ class PostController extends React.Component {
           />
         );
         break;
-      case ("long"):
+      case (LONG):
         // const previewTitle = this.state.indexUserData ? this.state.indexUserData.draft.previewTitle : "";
         postType = (
           <LongPost

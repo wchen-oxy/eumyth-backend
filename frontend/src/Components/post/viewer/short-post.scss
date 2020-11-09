@@ -1,7 +1,7 @@
-.short-viewer-main-container {
-    height: 100%;
-    width: 100%;
-}
+// .short-viewer-main-container {
+//     height: 100%;
+//     width: 100%;
+// }
 
 .short-viewer-hero-container {
     height: 100%;
@@ -11,7 +11,8 @@
     justify-content: center;
 }
 .short-viewer-side-container {
-    width: 335px;
+    min-width: 335px;
+    width: 35%;
 }
 
 .image-container {

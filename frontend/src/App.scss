@@ -50,7 +50,6 @@ body {
   z-index: 22;
   height: 74vh;
   width: 76vw;
-  object-fit: cover;
   overflow: scroll;
 
   button, input, select {
@@ -77,6 +76,16 @@ body {
 
 .black-background{
   background-color: black;
+}
+
+.test1{
+  height: 100%;
+  width: auto;
+}
+.test2{
+  height: 100%;
+  width: 335px;
+  background-color: green;
 }
 
 // .inner-small-post-container {

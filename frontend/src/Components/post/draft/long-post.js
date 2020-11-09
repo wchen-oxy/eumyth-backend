@@ -2,8 +2,13 @@ import React, { useState } from 'react';
 import LongEditor from '../editor/long-editor';
 import ReviewPost from './review-post';
 
+const INITIAL = "INITIAL";
+const REVIEW = "REVIEW";
+const NONE = "NONE";
+const LONG = "LONG";
+
 const LongPost = (props) => {
-  const [windowState, setWindowState] = useState("initial");
+  const [windowState, setWindowState] = useState(INITIAL);
   const [hasContent, setHasContent] = useState(props.onlineDraft !== null);
   const [isSavePending, setSavePending] = useState(false);
   const [localDraft, setLocalDraft] = useState(props.onlineDraft);
@@ -33,7 +38,7 @@ const LongPost = (props) => {
       }
       else {
         //don't care, just leave
-        if (windowType === "none") {
+        if (windowType === NONE) {
           props.onPostTypeSet(windowType, null);
         }
         else {
@@ -44,14 +49,14 @@ const LongPost = (props) => {
       }
     }
     else {
-      if (windowType === "none") {
+      if (windowType === NONE) {
         props.onPostTypeSet(windowType, localDraft);
       }
-      else if (windowType === "initial") {
+      else if (windowType === INITIAL) {
         setWindowState(windowType);
       }
       //already saved, just set the local state
-      else if (windowType === "review") {
+      else if (windowType === REVIEW) {
         setWindowState(windowType);
         props.onLocalSync(localDraft);
       }
@@ -60,7 +65,7 @@ const LongPost = (props) => {
       }
     }
   }
-  if (windowState === "initial")
+  if (windowState === INITIAL)
     return (
       <div className="long-post-window">
         <div>
@@ -68,10 +73,10 @@ const LongPost = (props) => {
           {isSavePending ? (<p>Saving</p>) : (<p>Saved</p>)}
           <div id="button-container">
             <span id="toggle-button-span">
-              <button id="toggle-button" value="none" onClick={e => setPostStage(e.target.value, isSavePending)}>Return</button>
+              <button id="toggle-button" value={NONE} onClick={e => setPostStage(e.target.value, isSavePending)}>Return</button>
             </span>
             <span id="post-button-span">
-              <button id="post-button" value="review" disabled={!hasContent} onClick={(e) => setPostStage(e.target.value, isSavePending)}>Review Post</button>
+              <button id="post-button" value={REVIEW} disabled={!hasContent} onClick={(e) => setPostStage(e.target.value, isSavePending)}>Review Post</button>
             </span>
           </div>
         </div>
@@ -103,7 +108,7 @@ const LongPost = (props) => {
         isPaginated={false}
         postText={props.onlineDraft}
         closeModal={props.closeModal}
-        postType="LONG"
+        postType={LONG}
         setPostStage={setPostStage}
         username={props.username}
         preferredPostType={props.preferredPostType}

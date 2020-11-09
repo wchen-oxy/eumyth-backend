@@ -4,10 +4,9 @@ import ReviewPost from './review-post';
 
 const NONE = "NONE";
 const INITIAL = "INITIAL";
-const EDIT = "EDIT";
 const REVIEW = "REVIEW";
-
 const SHORT = "SHORT";
+const TITLE = "TITLE";
 
 class ShortPost extends React.Component {
   constructor(props) {
@@ -88,7 +87,7 @@ class ShortPost extends React.Component {
   handleTextChange(e) {
     // console.log(e.target.value);
     const text = e.target.value;
-    if (e.target.name === "title") {
+    if (e.target.name === TITLE) {
       console.log(text);
       this.setState({ previewTitle: text });
     }

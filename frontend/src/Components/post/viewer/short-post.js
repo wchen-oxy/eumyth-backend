@@ -49,13 +49,14 @@ class ShortPostViewer extends React.Component {
             nextArrow: <Arrow direction="right" />,
             prevArrow: <Arrow direction="left" />
         };
+        
         if (this.state.window === INITIAL) {
             if (!this.props.eventData.image_data.length) {
 
-                if (this.props.largeViewMode) {
+                // if (this.props.largeViewMode) {
                     console.log(this.props.textData);
                     return (
-                        <div className="flex-display short-viewer-main-container" >
+                        <div className="flex-display small-post-window" >
                             <div className="short-viewer-hero-container">
                                 <ShortHeroText
                                     text={this.props.textData} />
@@ -84,39 +85,39 @@ class ShortPostViewer extends React.Component {
                         </div>
 
                     )
-                }
-                else {
-                    return (
-                        <div className="flex-display short-viewer-main-container"  >
-                            <div className="short-viewer-hero-container">
+                // }
+                // else {
+                //     return (
+                //         <div className="flex-display short-viewer-main-container small-post-window"  >
+                //             <div className="short-viewer-hero-container">
 
-                                <ShortHeroText text={this.props.textData} />
-                            </div>
-                            <div className="short-viewer-side-container">
-                                <ShortPostHeader
+                //                 <ShortHeroText text={this.props.textData} />
+                //             </div>
+                //             <div className="short-viewer-side-container">
+                //                 <ShortPostHeader
 
-                                    isOwnProfile={this.props.isOwnProfile}
-                                    username={this.props.eventData.username}
-                                    displayPhoto={this.props.eventData.display_photo_url}
-                                    onEditClick={this.handleWindowChange}
-                                    onDeletePost={this.props.onDeletePost}
-                                />
-                                <ShortPostMetaInfo
+                //                     isOwnProfile={this.props.isOwnProfile}
+                //                     username={this.props.eventData.username}
+                //                     displayPhoto={this.props.eventData.display_photo_url}
+                //                     onEditClick={this.handleWindowChange}
+                //                     onDeletePost={this.props.onDeletePost}
+                //                 />
+                //                 <ShortPostMetaInfo
 
-                                    index={this.state.imageIndex}
-                                    isPaginated={this.props.eventData.isPaginated}
-                                    isMilestone={this.props.eventData.is_milestone}
-                                    date={this.props.eventData.date}
-                                    pursuit={this.props.eventData.pursuit_category}
-                                    min={this.props.eventData.min_duration}
-                                // textData={this.props.textData}
-                                />
-                            </div>
+                //                     index={this.state.imageIndex}
+                //                     isPaginated={this.props.eventData.is_paginated}
+                //                     isMilestone={this.props.eventData.is_milestone}
+                //                     date={this.props.eventData.date}
+                //                     pursuit={this.props.eventData.pursuit_category}
+                //                     min={this.props.eventData.min_duration}
+                //                 // textData={this.props.textData}
+                //                 />
+                //             </div>
 
 
-                        </div>
-                    );
-                }
+                //         </div>
+                //     );
+                // }
             }
             //with images
             else {
@@ -133,11 +134,9 @@ class ShortPostViewer extends React.Component {
                             </Slider>
                         </div>
                     );
-                console.log(container);
-
                 if (this.props.largeViewMode) {
                     return (
-                        <div className="flex-display short-viewer-main-container">
+                        <div className="flex-display small-post-window">
                             {imageDisplay}
                             <div className="short-viewer-side-container">
                                 <ShortPostHeader
@@ -162,7 +161,7 @@ class ShortPostViewer extends React.Component {
                 }
                 else {
                     return (
-                        <div className="flex-display short-viewer-main-container" >
+                        <div className="flex-display small-post-window" >
                             {imageDisplay}
                             <div className="short-viewer-side-container">
                                 <ShortPostHeader
@@ -197,7 +196,7 @@ class ShortPostViewer extends React.Component {
                 />
             )
         }
-        else { 
+        else {
 
         }
     }

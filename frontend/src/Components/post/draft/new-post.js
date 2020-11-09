@@ -1,7 +1,11 @@
 import React from 'react';
 import "./new-post.scss";
-const NewPost = (props) => {
 
+const SHORT = "SHORT";
+const NEW_LONG = "NEW_LONG";
+const OLD_LONG = "OLD_LONG";
+
+const NewPost = (props) => {
     const handleClick = (e) => {
         !!props.onlineDraft ?
             window.confirm("Starting a new Long Post will erase your saved draft. Continue anyway?") &&
@@ -12,10 +16,10 @@ const NewPost = (props) => {
             <div className="post-button-container">
                 <h3>Document Your Progress</h3>
                 <h4>Begin a New Check-In!</h4>
-                <button value="short" onClick={(e) => props.onPostTypeSet(e.target.value, null)}> New Short</button>
+                <button value={SHORT} onClick={(e) => props.onPostTypeSet(e.target.value, null)}> New Short</button>
                 <h4> Begin a New Post! (Will Delete Saved data)</h4>
-                <button value="new-long" onClick={(e) => handleClick(e)}>New Entry </button>
-                <button value="old-long" onClick={(e) => props.onPostTypeSet(e.target.value, null)}>Continue Previous Draft?</button>
+                <button value={NEW_LONG} onClick={(e) => handleClick(e)}>New Entry </button>
+                <button value={OLD_LONG} onClick={(e) => props.onPostTypeSet(e.target.value, null)}>Continue Previous Draft?</button>
             </div>
         </div>
     )
