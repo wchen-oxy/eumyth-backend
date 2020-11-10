@@ -146,7 +146,7 @@ class ShortPost extends React.Component {
     console.log(this.state.isPaginated);
     if (this.state.window === INITIAL) {
       return (
-        <div className="small-post-window">
+        <div className="flex-display small-post-window flex-direction-column">
           <div className="post-button-container">
             <h2>Placeholder for short</h2>
             <div id="button-container">
@@ -157,7 +157,9 @@ class ShortPost extends React.Component {
                 <button id="post-button" value={REVIEW} disabled={this.state.postDisabled} onClick={e => this.handleClick(e.target.value)}>Review Post</button>
               </span>
             </div>
-            <ShortEditor
+           
+          </div>
+          <ShortEditor
               username={this.props.username}
               selectedFiles={this.state.selectedFiles}
               validFiles={this.state.validFiles}
@@ -176,7 +178,6 @@ class ShortPost extends React.Component {
               setSelectedFiles={this.setSelectedFiles}
               setUnsupportedFiles={this.setUnsupportedFiles}
             />
-          </div>
         </div>
       );
     }

@@ -144,7 +144,7 @@ class PostController extends React.Component {
 
   handlePostTypeSet(postType, localDraft) {
     switch (postType) {
-      case ("none"):
+      case (NONE):
         if (localDraft) {
           console.log(localDraft);
           this.setState({ postType: postType, onlineDraft: localDraft });
