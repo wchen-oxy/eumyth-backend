@@ -17,25 +17,25 @@ const ShortReEditor = (props) => {
 
     };
 
-    const [setPostText, postText] = useState(props.textData);
-    const [setPaginated, isPaginated] = useState(props.eventData.is_paginated);
-    const onPaginatedChange = () => (setPaginated(!isPaginated));
-    const onTextChange = (text) => {
-        let newText = postText;
-        if (isPaginated) {
-            newText[props.imageIndex] = text;
-        }
-        else {
-            newText = text;
-        }
-        setPostText(newText);
-    }
+    // const [setPostText, postText] = useState(props.textData);
+    // const [setPaginated, isPaginated] = useState(props.eventData.is_paginated);
 
+    // const onPaginatedChange = () => (setPaginated(!isPaginated));
+    // const onTextChange = (text) => {
+    //     let newText = postText;
+    //     if (isPaginated) {
+    //         newText[props.imageIndex] = text;
+    //     }
+    //     else {
+    //         newText = text;
+    //     }
+    //     setPostText(newText);
+    // }
 
+    console.log(props.textData);
     if (!props.eventData.image_data.length) {
         return (
-
-            <div className="post-preview-container flex-display flex-direction-column"  >
+            <div className="flex-display" >
                 <div id="text-container flex-display">
                     <div className=" description-container flex-display flex-direction-column">
                         <h4>{props.eventData.username}</h4>
@@ -43,9 +43,9 @@ const ShortReEditor = (props) => {
                             <TextareaAutosize
                                 id='short-post-text'
                                 placeholder='Write something here.'
-                                onChange={onTextChange}
+                                onChange={props.onTextChange}
                                 minRows={5}
-                                value={postText}
+                                value={props.textData}
                             />
                         </div>
                     </div>
@@ -54,31 +54,30 @@ const ShortReEditor = (props) => {
         );
     }
     else {
-
         const images = props.eventData.image_data.map((url, index) => <img src={url} />);
         return (
 
-            <div className="post-preview-container flex-display">
-                <div className="photo-upload-container">
+            <div className="flex-display">
+                <div className="short-viewer-hero-container flex-display flex-direction-column black-background">
                     <Slider afterChange={index => (props.onIndexChange(index))} {...settings}>
                         {images}
                     </Slider>
 
                 </div>
-                <div className=" description-container flex-display flex-direction-column">
-                    <h4>{props.username}</h4>
-                    {props.eventData.image_data.length > 0 && !props.eventData.is_paginated ? <button onClick={onPaginatedChange}>Caption Photos Individually</button> : <></>}
-                    {props.eventData.image_data.length > 0 && props.eventData.is_paginated ? <button onClick={onPaginatedChange}>Return to Single Caption</button> : <></>}
+                <div className="short-viewer-side-container">
+                    <h4>{props.eventData.username}</h4>
+                    {props.eventData.image_data.length > 1 && !props.eventData.is_paginated ? <button onClick={props.onPaginatedChange}>Caption Photos Individually</button> : <></>}
+                    {props.eventData.image_data.length > 1 && props.eventData.is_paginated ? <button onClick={props.onPaginatedChange}>Return to Single Caption</button> : <></>}
 
                     <TextareaAutosize
                         id='short-post-text'
                         placeholder='Write something here.'
-                        onChange={onTextChange}
+                        onChange={props.onTextChange}
                         minRows={5}
                         value={
-                            props.eventData.is_paginated ?
-                                postText[props.imageIndex] :
-                                postText
+                            props.isPaginated ?
+                                props.textData[props.imageIndex] :
+                                props.textData
                         }
                     />
                 </div>

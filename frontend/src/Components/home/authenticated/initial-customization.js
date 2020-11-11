@@ -108,9 +108,9 @@ class InitialCustomizationPage extends React.Component {
                     results => {
                         console.log(results);
                         return Promise.all([
-                            imageCompression(results[2], { maxSizeMB: 1, fileType: "image/jpeg" }),
-                            imageCompression(results[2], { maxWidthOrHeight: 300, maxSizeMB: 1, fileType: "image/jpeg" }),
-                            imageCompression(results[2], { maxWidthOrHeight: 80, maxSizeMB: 1, fileType: "image/jpeg" }),
+                            imageCompression(results[2], { maxWidthOrHeight: 250, maxSizeMB: 1, fileType: "image/jpeg" }),
+                            imageCompression(results[2], { maxWidthOrHeight: 125, maxSizeMB: 1, fileType: "image/jpeg" }),
+                            imageCompression(results[2], { maxWidthOrHeight: 62, maxSizeMB: 1, fileType: "image/jpeg" }),
                         ]);
                     }
                 )

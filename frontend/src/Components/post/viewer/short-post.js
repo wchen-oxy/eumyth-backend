@@ -10,6 +10,7 @@ import 'slick-carousel/slick/slick-theme.css';
 
 const INITIAL = "INITIAL";
 const EDIT = "EDIT";
+const REVIEW = "REVIEW";
 
 class ShortPostViewer extends React.Component {
 
@@ -20,8 +21,13 @@ class ShortPostViewer extends React.Component {
             validFiles: [],
             unsupportedFiles: [],
             imageIndex: 0,
-            postText: '',
-            isPaginated: false,
+            // postText: '',
+            textData: this.props.textData,
+            date: this.props.eventData.date,
+            min: this.props.eventData.min_duration,
+            pursuitCategory: this.props.eventData.pursuit_category,
+            isPaginated: this.props.eventData.is_paginated,
+            isMilestone: this.props.eventData.is_milestone,
             postDisabled: true,
             window: INITIAL,
         };
@@ -37,6 +43,21 @@ class ShortPostViewer extends React.Component {
         this.setState({ imageIndex: value });
     }
 
+    handleTextChange(text) {
+        let newText = "";
+        if (this.state.isPaginated) {
+            newText[this.state.imageIndex] = text;
+        }
+        else {
+            newText = text;
+        }
+        this.setState({ textData: newText });
+    }
+
+    handlePaginatedChange() {
+        this.setState((state) => ({ isPaginated: !state.isPaginated }));
+    }
+
 
     render() {
         const settings = {
@@ -48,42 +69,41 @@ class ShortPostViewer extends React.Component {
             nextArrow: <Arrow direction="right" />,
             prevArrow: <Arrow direction="left" />
         };
-        
+
         if (this.state.window === INITIAL) {
             if (!this.props.eventData.image_data.length) {
 
                 // if (this.props.largeViewMode) {
-                    console.log(this.props.textData);
-                    return (
-                        <div className="flex-display small-post-window" >
-                            <div className="short-viewer-hero-container">
-                                <ShortHeroText
-                                    text={this.props.textData} />
-                            </div>
-                            <div className="short-viewer-side-container">
-                                <ShortPostHeader
-
-                                    isOwnProfile={this.props.isOwnProfile}
-                                    username={this.props.eventData.username}
-                                    displayPhoto={this.props.eventData.display_photo_url}
-                                    onEditClick={this.handleWindowChange}
-                                    onDeletePost={this.props.onDeletePost}
-                                />
-                                <ShortPostMetaInfo
-
-                                    index={this.state.imageIndex}
-                                    isPaginated={this.props.eventData.is_paginated}
-                                    isMilestone={this.props.eventData.is_milestone}
-                                    date={this.props.eventData.date}
-                                    pursuit={this.props.eventData.pursuit_category}
-                                    min={this.props.eventData.min_duration}
-                                    textData={null}
-                                />
-
-                            </div>
+                console.log(this.props.textData);
+                return (
+                    <div className="flex-display small-post-window" >
+                        <div className="short-viewer-hero-container">
+                            <ShortHeroText
+                                text={this.props.textData} />
                         </div>
+                        <div className="short-viewer-side-container">
+                            <ShortPostHeader
 
-                    )
+                                isOwnProfile={this.props.isOwnProfile}
+                                username={this.props.eventData.username}
+                                displayPhoto={this.props.eventData.display_photo_url}
+                                onEditClick={this.handleWindowChange}
+                                onDeletePost={this.props.onDeletePost}
+                            />
+                            <ShortPostMetaInfo
+
+                                index={this.state.imageIndex}
+                                isPaginated={this.state.isPaginated}
+                                isMilestone={this.state.isMilestone}
+                                date={this.state.date}
+                                pursuit={this.state.pursuitCategory}
+                                min={this.state.min}
+                                textData={null}
+                            />
+                        </div>
+                    </div>
+
+                )
                 // }
                 // else {
                 //     return (
@@ -147,12 +167,12 @@ class ShortPostViewer extends React.Component {
                                 />
                                 <ShortPostMetaInfo
                                     index={this.state.imageIndex}
-                                    isPaginated={this.props.eventData.is_paginated}
-                                    isMilestone={this.props.eventData.is_milestone}
-                                    date={this.props.eventData.date}
-                                    pursuit={this.props.eventData.pursuit_category}
-                                    min={this.props.eventData.min_duration}
-                                    textData={this.props.textData}
+                                    isPaginated={this.state.isPaginated}
+                                    isMilestone={this.state.isMilestone}
+                                    date={this.state.date}
+                                    pursuit={this.state.pursuitCategory}
+                                    min={this.state.min}
+                                    textData={this.state.textData}
                                 />
                             </div>
                         </div>
@@ -171,14 +191,14 @@ class ShortPostViewer extends React.Component {
                                     onDeletePost={this.props.onDeletePost}
                                 />
                                 <ShortPostMetaInfo
-
                                     index={this.state.imageIndex}
-                                    isPaginated={this.props.eventData.is_paginated}
-                                    isMilestone={this.props.eventData.is_milestone}
-                                    date={this.props.eventData.date}
-                                    pursuit={this.props.eventData.pursuit_category}
-                                    min={this.props.eventData.min_duration}
-                                    textData={this.props.textData} />
+                                    isPaginated={this.state.isPaginated}
+                                    isMilestone={this.state.isMilestone}
+                                    date={this.state.date}
+                                    pursuit={this.state.pursuitCategory}
+                                    min={this.state.min}
+                                    textData={this.state.textData}
+                                />
                             </div>
                         </div>
                     );
@@ -187,12 +207,22 @@ class ShortPostViewer extends React.Component {
         }
         else if (this.state.window === EDIT) {
             return (
-                <ShortReEditor
-                    onIndexChange={this.handleIndexChange}
-                    imageIndex={this.state.imageIndex}
-                    eventData={this.props.eventData}
-                    textData={this.props.textData}
-                />
+                <div className="flex-display flex-direction-column small-post-window" >
+                    <div className="post-button-container">
+                        <button onClick={() => this.handleWindowChange(INITIAL)}>Return</button>
+                        <button onClick={() => this.handleWindowChange(REVIEW)}>Review Post</button>
+
+                    </div>
+                    <ShortReEditor
+                        onIndexChange={this.handleIndexChange}
+                        imageIndex={this.state.imageIndex}
+                        eventData={this.props.eventData}
+                        textData={this.state.textData}
+                        isPaginated={this.state.isPaginated}
+                        onTextChange={this.handleTextChange}
+                        onPaginatedChange={this.handlePaginatedChange}
+                    />
+                </div>
             )
         }
         else {
