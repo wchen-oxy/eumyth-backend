@@ -1,9 +1,11 @@
-
-.basic-info-container{
+.basic-info-container {
     display: flex;
     justify-content: center;
     margin-bottom: 10vh;
-    input, label, span {
+
+    input,
+    label,
+    span {
         margin-bottom: 1vh;
     }
     span {
@@ -11,25 +13,24 @@
     }
 }
 
-.basic-info-form-container{
+.basic-info-form-container {
     display: flex;
     flex-direction: column;
     justify-content: center;
     width: 55%;
 }
 
-.info-container{
+.info-container {
     padding: 2vh;
     display: flex;
     flex-direction: column;
 }
 
-#temp-profile-photo-container{
+#temp-profile-photo-container {
     height: 250px;
     width: 250px;
 }
 
-#experience-select{
+#experience-select {
     display: flex;
- 
 }

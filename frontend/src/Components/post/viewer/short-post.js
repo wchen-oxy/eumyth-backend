@@ -3,11 +3,10 @@ import Slider from 'react-slick';
 import ShortPostHeader from './sub-components/post-header';
 import ShortHeroText from './sub-components/short-text';
 import ShortPostMetaInfo from './sub-components/short-post-meta';
+import ShortReEditor from '../editor/short-re-editor';
 import Arrow from "../../image-carousel/arrow";
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-import './short-post.scss';
-import ShortReEditor from '../editor/short-re-editor';
 
 const INITIAL = "INITIAL";
 const EDIT = "EDIT";

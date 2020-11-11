@@ -1,6 +1,7 @@
 import React from 'react';
 import ShortEditor from '../editor/short-editor';
 import ReviewPost from './review-post';
+import "../index.scss";
 
 const NONE = "NONE";
 const INITIAL = "INITIAL";
@@ -146,7 +147,7 @@ class ShortPost extends React.Component {
     console.log(this.state.isPaginated);
     if (this.state.window === INITIAL) {
       return (
-        <div className="flex-display small-post-window flex-direction-column">
+        <div className="flex-display flex-direction-column small-post-window">
           <div className="post-button-container">
             <h2>Placeholder for short</h2>
             <div id="button-container">
@@ -157,27 +158,26 @@ class ShortPost extends React.Component {
                 <button id="post-button" value={REVIEW} disabled={this.state.postDisabled} onClick={e => this.handleClick(e.target.value)}>Review Post</button>
               </span>
             </div>
-           
           </div>
           <ShortEditor
-              username={this.props.username}
-              selectedFiles={this.state.selectedFiles}
-              validFiles={this.state.validFiles}
-              unsupportedFiles={this.state.unsupportedFiles}
-              isPaginated={this.state.isPaginated}
-              textPageText={this.state.postText}
-              textPageIndex={this.state.imageIndex}
-              setImageArray={this.setImageArray}
-              onCaptionStyleChange={this.handleCaptionStyleChange}
-              onIndexChange={this.handleIndexChange}
-              onTextChange={this.handleTextChange}
-              onSelectedFileChange={this.handleSelectedFileChange}
-              onUnsupportedFileChange={this.handleUnsupportedFileChange}
-              onDisablePost={this.handleDisablePost}
-              setValidFiles={this.setValidFiles}
-              setSelectedFiles={this.setSelectedFiles}
-              setUnsupportedFiles={this.setUnsupportedFiles}
-            />
+            username={this.props.username}
+            selectedFiles={this.state.selectedFiles}
+            validFiles={this.state.validFiles}
+            unsupportedFiles={this.state.unsupportedFiles}
+            isPaginated={this.state.isPaginated}
+            textPageText={this.state.postText}
+            textPageIndex={this.state.imageIndex}
+            setImageArray={this.setImageArray}
+            onCaptionStyleChange={this.handleCaptionStyleChange}
+            onIndexChange={this.handleIndexChange}
+            onTextChange={this.handleTextChange}
+            onSelectedFileChange={this.handleSelectedFileChange}
+            onUnsupportedFileChange={this.handleUnsupportedFileChange}
+            onDisablePost={this.handleDisablePost}
+            setValidFiles={this.setValidFiles}
+            setSelectedFiles={this.setSelectedFiles}
+            setUnsupportedFiles={this.setUnsupportedFiles}
+          />
         </div>
       );
     }

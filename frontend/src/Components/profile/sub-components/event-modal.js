@@ -20,7 +20,7 @@ class EventModal extends React.Component {
 
     componentDidMount() {
         this._isMounted = true;
-    
+
     }
 
     componentWillUnmount() {
@@ -31,25 +31,22 @@ class EventModal extends React.Component {
         if (!this.props.eventData || !this.props.textData) return (<></>);
         if (this.state.window === MAIN) {
             return (this.props.eventData.post_format === SHORT ?
-
-                    <ShortPostViewer
-                        // loaded={this.state.loaded}
-                        textData={this.props.textData}
-                        largeViewMode={this.state.largeViewMode}
-                        isOwnProfile={this.props.isOwnProfile}
-                        eventData={this.props.eventData}
-                        onDeletePost={this.props.onDeletePost} />
+                <ShortPostViewer
+                    // loaded={this.state.loaded}
+                    textData={this.props.textData}
+                    largeViewMode={this.state.largeViewMode}
+                    isOwnProfile={this.props.isOwnProfile}
+                    eventData={this.props.eventData}
+                    onDeletePost={this.props.onDeletePost} />
 
                 :
-                <div className="long-post-window">
-                    <LongPostViewer
-                        // username={this.props.username}
-                        // loaded={this.state.loaded}
-                        textData={this.props.textData}
-                        isOwnProfile={this.props.isOwnProfile}
-                        eventData={this.props.eventData}
-                        onDeletePost={this.props.onDeletePost} />
-                </div>
+                <LongPostViewer
+                    // username={this.props.username}
+                    // loaded={this.state.loaded}
+                    textData={this.props.textData}
+                    isOwnProfile={this.props.isOwnProfile}
+                    eventData={this.props.eventData}
+                    onDeletePost={this.props.onDeletePost} />
             );
 
         }

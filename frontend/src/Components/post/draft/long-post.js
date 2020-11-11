@@ -81,17 +81,21 @@ const LongPost = (props) => {
           </div>
         </div>
         {props.onlineDraftRetrieved && !props.loading ?
-          (<LongEditor
-            username={props.username}
-            isSavePending={isSavePending}
-            hasContent={hasContent}
-            setHasContent={setHasContent}
-            onSavePending={handleSavePending}
-            onlineDraft={props.onlineDraft}
-            localDraft={localDraft}
-            syncChanges={syncChanges}
-            setLocalDraft={setLocalDraft}
-          />)
+          (
+            <div className="long-editor-container">
+              <LongEditor
+                username={props.username}
+                isSavePending={isSavePending}
+                hasContent={hasContent}
+                setHasContent={setHasContent}
+                onSavePending={handleSavePending}
+                onlineDraft={props.onlineDraft}
+                localDraft={localDraft}
+                syncChanges={syncChanges}
+                setLocalDraft={setLocalDraft}
+              />
+            </div>
+          )
           : (
             <div>
               <p> Loading.... </p>

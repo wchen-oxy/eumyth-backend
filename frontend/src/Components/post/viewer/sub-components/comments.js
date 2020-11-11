@@ -11,7 +11,6 @@ class Comments extends React.Component {
         return (
             <div>
                 <p>Comment Section</p>
-
             </div>
         );
     }

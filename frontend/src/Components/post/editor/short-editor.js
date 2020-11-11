@@ -160,7 +160,7 @@ class ShortEditor extends React.Component {
                     <h4>{this.props.username}</h4>
                     {/* {this.props.validFiles.length > 0 && !this.props.isPaginated ? <button onClick={this.props.onCaptionStyleChange}>Caption Photos Individually</button> : <></>}
                     {this.props.validFiles.length > 0 && this.props.isPaginated ? <button onClick={this.props.onCaptionStyleChange}>Return to Single Caption</button> : <></>} */}
-                    <div id="description-input-container" >
+                    <div id="description-input-container">
                         <TextareaAutosize
                             id='short-post-text'
                             placeholder='Write something here.'
@@ -194,7 +194,6 @@ class ShortEditor extends React.Component {
                         dragLeave={this.dragLeave}
                         fileDrop={this.fileDrop}
                         fileInputClicked={this.fileInputClicked}
-
                         filesSelected={this.filesSelected}
                     />
                 </>
