@@ -41,7 +41,9 @@ class ProfilePage extends React.Component {
             userRelationId: null,
             followerStatus: null,
             feedData: [[]],
-            lastRetrievedPostIndex: 0
+            lastRetrievedPostIndex: 0,
+            preferredPostType: null,
+            isModalShowing: true,
 
 
         }
@@ -135,7 +137,11 @@ class ProfilePage extends React.Component {
     }
 
     handleResponseData(user, targetUserInfo, followerStatusResponse) {
+        let array = [];
         const followerStatus = followerStatusResponse ? this.handleFollowerStatusResponse(followerStatusResponse) : null;
+        for (const pursuit of targetUserInfo.pursuits) {
+            array.push(pursuit.name);
+        }
         //set visitor user info and targetUserinfo
         if (this._isMounted) this.setState({
             visitorUsername: user ? user.displayName : null,
@@ -148,6 +154,7 @@ class ProfilePage extends React.Component {
             bio: targetUserInfo.bio,
             pinned: targetUserInfo.pinned,
             pursuits: targetUserInfo.pursuits,
+            pursuitsNames: array, 
             allPosts: targetUserInfo.all_posts,
             // recentPosts: targetUserInfo.recent_posts,
             userRelationId: targetUserInfo.user_relation_id,
@@ -163,12 +170,14 @@ class ProfilePage extends React.Component {
     openModal(modal) {
         modal.current.style.display = "block";
         document.body.style.overflow = "hidden";
+        this.setState({ isModalShowing: true });
 
     }
 
     closeModal(modal) {
         modal.current.style.display = "none";
         document.body.style.overflow = "visible";
+        this.setState({ isModalShowing: false });
     }
 
     handleEventClick(selectedEvent) {
@@ -217,7 +226,7 @@ class ProfilePage extends React.Component {
 
 
     render() {
-        // console.log(this.state.recentPosts);
+        console.log(this.state.pursuits);
         var pursuitHolderArray = [];
         if (this.state.fail) return NoMatch;
         if (this.state.pursuits) {
@@ -271,14 +280,23 @@ class ProfilePage extends React.Component {
                 <div className="modal" ref={this.modalRef}>
                     <div className="overlay" onClick={(() => this.closeModal(this.modalRef))}></div>
                     <span className="close" onClick={(() => this.closeModal(this.modalRef))}>X</span>
-                    <EventModal
-                        isOwnProfile={this.visitorUsername === this.targetUsername}
-                        // smallProfilePhoto={this.state.smallCroppedDisplayPhoto}
-                        username={this.state.targetUsername}
-                        eventData={this.state.selectedEvent}
-                        textData={this.state.textData}
-                        onDeletePost={this.handleDeletePost}
-                    />
+                    {
+                        this.state.isModalShowing ?
+
+                            <EventModal
+                                isOwnProfile={this.visitorUsername === this.targetUsername}
+                                displayPhoto={this.state.smallCroppedDisplayPhoto}
+                                preferredPostType={this.state.preferredPostType}
+                                // smallProfilePhoto={this.state.smallCroppedDisplayPhoto}
+                                pursuits={this.state.pursuitsNames}
+                                username={this.state.targetUsername}
+                                eventData={this.state.selectedEvent}
+                                textData={this.state.textData}
+                                onDeletePost={this.handleDeletePost}
+                            />
+                            :
+                            <></>
+                    }
                 </div>
                 <div className="modal" ref={this.miniModalRef}>
                     <div className="overlay" onClick={(() => this.closeModal(this.miniModalRef))}></div>

@@ -12,6 +12,8 @@ const RELATION_STATUS_URL = RELATION_BASE_URL + "/status";
 
 //post
 const POST_BASE_URL = ROOT_URL + "/post";
+// const UPDATE_POST_URL = POST_BASE_URL + "/update";
+
 const MULTIPLE_POSTS_URL =  POST_BASE_URL + "/multiple";
 
 const WITH_IMAGE_POST_URL = POST_BASE_URL + "/with-image";

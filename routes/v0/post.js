@@ -48,7 +48,7 @@ const getImageUrls = (array) => {
 }
 
 router.route('/')
-  .put(upload.fields([{ name: "images" }, { name: "coverPhoto", maxCount: 1 }]), (req, res) => {
+  .post(upload.fields([{ name: "images" }, { name: "coverPhoto", maxCount: 1 }]), (req, res) => {
 
     const postType = !!req.body.postType ? req.body.postType : null;
     const username = req.body.username;
@@ -267,6 +267,9 @@ router.route('/')
         }
       )
 
+  })
+  .put((req, res) => {
+    
   })
   .delete((req, res) => {
     const userId = req.body.userId;

@@ -32,7 +32,10 @@ class EventModal extends React.Component {
         if (this.state.window === MAIN) {
             return (this.props.eventData.post_format === SHORT ?
                 <ShortPostViewer
-                    // loaded={this.state.loaded}
+                    displayPhoto={this.props.displayPhoto}
+                    username={this.props.username}
+                    pursuits={this.props.pursuits}
+                    preferredPostType={this.props.preferredPostType}
                     textData={this.props.textData}
                     largeViewMode={this.state.largeViewMode}
                     isOwnProfile={this.props.isOwnProfile}
@@ -41,8 +44,10 @@ class EventModal extends React.Component {
 
                 :
                 <LongPostViewer
-                    // username={this.props.username}
-                    // loaded={this.state.loaded}
+                    displayPhoto={this.props.displayPhoto}
+                    username={this.props.username}
+                    pursuits={this.props.pursuits}
+                    preferredPostType={this.props.preferredPostType}
                     textData={this.props.textData}
                     isOwnProfile={this.props.isOwnProfile}
                     eventData={this.props.eventData}

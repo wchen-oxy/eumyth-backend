@@ -5,12 +5,14 @@ import ShortHeroText from './sub-components/short-text';
 import ShortPostMetaInfo from './sub-components/short-post-meta';
 import ShortReEditor from '../editor/short-re-editor';
 import Arrow from "../../image-carousel/arrow";
+import ReviewPost from "../draft/review-post";
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
 const INITIAL = "INITIAL";
 const EDIT = "EDIT";
 const REVIEW = "REVIEW";
+const SHORT = "SHORT";
 
 class ShortPostViewer extends React.Component {
 
@@ -85,7 +87,7 @@ class ShortPostViewer extends React.Component {
                             <ShortPostHeader
 
                                 isOwnProfile={this.props.isOwnProfile}
-                                username={this.props.eventData.username}
+                                username={this.props.username}
                                 displayPhoto={this.props.eventData.display_photo_url}
                                 onEditClick={this.handleWindowChange}
                                 onDeletePost={this.props.onDeletePost}
@@ -160,7 +162,7 @@ class ShortPostViewer extends React.Component {
                             <div className="short-viewer-side-container">
                                 <ShortPostHeader
                                     isOwnProfile={this.props.isOwnProfile}
-                                    username={this.props.eventData.username}
+                                    username={this.props.username}
                                     displayPhoto={this.props.eventData.display_photo_url}
                                     onEditClick={this.handleWindowChange}
                                     onDeletePost={this.props.onDeletePost}
@@ -185,7 +187,7 @@ class ShortPostViewer extends React.Component {
                             <div className="short-viewer-side-container">
                                 <ShortPostHeader
                                     isOwnProfile={this.props.isOwnProfile}
-                                    username={this.props.eventData.username}
+                                    username={this.props.username}
                                     displayPhoto={this.props.eventData.display_photo_url}
                                     onEditClick={this.handleWindowChange}
                                     onDeletePost={this.props.onDeletePost}
@@ -226,6 +228,37 @@ class ShortPostViewer extends React.Component {
             )
         }
         else {
+
+            let rawDate = null;
+            let formattedDate = null;
+            if (this.props.eventData.date) {
+                rawDate = new Date(this.props.eventData.date);
+                formattedDate = rawDate.getFullYear().toString() + "-" + rawDate.getMonth().toString() + "-" + rawDate.getDate().toString();
+            }
+            return (
+                <ReviewPost
+                    isUpdateToPost={true}
+                    postId={this.props.eventData._id}
+                    displayPhoto={this.props.displayPhoto}
+                    isPaginated={this.state.isPaginated}
+                    isMilestone={this.props.eventData.is_milestone}
+                    previewTitle={this.props.eventData.title}
+                    previewSubtitle={this.props.eventData.subtitle}
+                    coverPhoto={this.props.eventData.cover_photo_url}
+                    date={formattedDate}
+                    min={this.props.eventData.min_duration}
+                    selectedPursuit={this.props.eventData.pursuit_category}
+                    pursuits={this.props.pursuits}
+                    // closeModal={this.props.closeModal}
+                    postType={SHORT}
+                    onClick={this.handleWindowChange}
+                    // existingImageArray={this.state.eventData.image_data}
+                    postText={this.state.textData}
+                    username={this.props.username}
+                    preferredPostType={this.props.preferredPostType}
+                    handlePreferredPostTypeChange={this.handlePreferredPostTypeChange}
+                />
+            );
 
         }
     }

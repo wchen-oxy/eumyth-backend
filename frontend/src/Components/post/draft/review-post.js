@@ -3,14 +3,18 @@ import AxiosHelper from '../../../Axios/axios';
 import _ from 'lodash';
 import TextareaAutosize from 'react-textarea-autosize';
 
+const INITIAL = "INITIAL";
+const LONG = "LONG";
+
+
 const ReviewPost = (props) => {
-    const [date, setDate] = useState(null);
+    const [date, setDate] = useState(props.date);
     const [minDuration, setMinDuration] = useState(null);
-    const [milestone, setMilestone] = useState(false);
+    const [milestone, setMilestone] = useState(props.isMilestone);
     const [title, setTitle] = useState('');
     const [subtitle, setSubtitle] = useState('');
     const [postPrivacyType, setPostPrivacyType] = useState("public-feed");
-    const [pursuitCategory, setPursuitCategory] = useState(null)
+    const [pursuitCategory, setPursuitCategory] = useState(props.selectedPursuit ? props.selectedPursuit : null)
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
     const [coverPhoto, setCover] = useState(null);
@@ -29,12 +33,13 @@ const ReviewPost = (props) => {
         if (title) formData.append("title", _.trim(title));
         if (subtitle) {
             console.log("VALID");
-            formData.append("subtitle", _.trim(subtitle));}
+            formData.append("subtitle", _.trim(subtitle));
+        }
         if (postPrivacyType) formData.append("postPrivacyType", postPrivacyType);
         if (pursuitCategory) formData.append("pursuitCategory", pursuitCategory)
         if (date) formData.append("date", date);
         if (minDuration) formData.append("minDuration", minDuration);
-        if (props.postText) formData.append("textData", props.postType === "LONG" || props.isPaginated ? JSON.stringify(props.postText) : props.postText );
+        if (props.postText) formData.append("textData", props.postType === LONG || props.isPaginated ? JSON.stringify(props.postText) : props.postText);
         if (coverPhoto) formData.append("coverPhoto", coverPhoto);
         if (props.imageArray && props.imageArray.length > 0) {
             console.log(props.imageArray);
@@ -43,12 +48,25 @@ const ReviewPost = (props) => {
             }
         }
 
-        AxiosHelper.createPost(formData)
-            .then(
-                (result) => {
-                    result.status === 201 ? handleSuccess() : handleError();
-                }
-            );
+        if (props.isUpdatetoPost) {
+            if (props.postId) formData.append("postId", props.postId);
+            return AxiosHelper.updatePost(formData)
+                .then(
+                    (result) => {
+                        result.status === 201 ? handleSuccess() : handleError();
+                    }
+                );
+        }
+        else {
+            return AxiosHelper.createPost(formData)
+                .then(
+                    (result) => {
+                        result.status === 201 ? handleSuccess() : handleError();
+                    }
+                );
+        }
+
+
     }
 
     const handleSuccess = () => {
@@ -71,8 +89,11 @@ const ReviewPost = (props) => {
         );
     }
 
-    const returnToShortButton = (<button id="toggle-button" value="initial" onClick={e => props.onClick(e.target.value)}>Return</button>);
-    const returnToLongButton = (<button id="toggle-button" value="initial" onClick={e => props.setPostStage(e.target.value, false)}>Return</button>);
+
+
+    console.log(props.selectedPursuit);
+    const returnToShortButton = (<button id="toggle-button" value={INITIAL} onClick={e => props.onClick(e.target.value)}>Return</button>);
+    const returnToLongButton = (<button id="toggle-button" value={INITIAL} onClick={e => props.setPostStage(e.target.value, false)}>Return</button>);
     console.log(subtitle);
     return (
         <div className="small-post-window">
@@ -87,22 +108,22 @@ const ReviewPost = (props) => {
                 </div>
                 <div className="post-button-container">
                     <label>Preview Title</label>
-                    <TextareaAutosize name="title" id='review-post-text' placeholder='Create an Optional Preview Title Text' onChange={(e) => setTitle(e.target.value)} maxLength={100} />
+                    <TextareaAutosize name="title" id='review-post-text' placeholder='Create an Optional Preview Title Text' value={props.previewTitle ? props.previewTitle : null} onChange={(e) => setTitle(e.target.value)} maxLength={100} />
                     {props.postType === "LONG" ? <TextareaAutosize name="subtitle" id='review-post-text' placeholder='Create an Optional Description' onChange={(e) => setSubtitle(e.target.value)} maxLength={140} /> : <></>}
-                    <label>Cover</label>
+                    {props.coverPhoto ? <label>Upload New Cover Photo?</label> : <label>Upload a Cover Photo</label>}
                     <input type="file" onChange={(e) => {
                         setCover(e.target.files[0]);
                     }}></input>
                     <label>Date</label>
-                    <input type="date" onChange={(e) => setDate(e.target.value)}></input>
+                    <input type="date" value={date} onChange={(e) => setDate(e.target.value)}></input>
                     <label>Pursuit</label>
-                    <select name="pursuit-category" onChange={(e) => setPursuitCategory(e.target.value)}>
+                    <select name="pursuit-category" value={pursuitCategory} onChange={(e) => setPursuitCategory(e.target.value)}>
                         {pursuitSelects}
                     </select>
                     <label>Total Minutes</label>
-                    <input type="number" onChange={(e) => setMinDuration(e.target.value)}></input>
+                    <input type="number" value={props.min} onChange={(e) => setMinDuration(e.target.value)}></input>
                     <label>Is Milestone</label>
-                    <input type="checkbox" onClick={() => setMilestone(!milestone)}></input>
+                    <input type="checkbox" value={milestone} onClick={() => setMilestone(!milestone)}></input>
                 </div>
                 <div className="post-button-container">
                     <p>Post to:</p>

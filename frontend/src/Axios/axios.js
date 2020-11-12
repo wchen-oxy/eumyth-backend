@@ -12,7 +12,7 @@ export default class AxiosHelper {
     }
 
     static createUserProfile(formData) {
-        return axios.put(urls.USER_BASE_URL, formData);
+        return axios.post(urls.USER_BASE_URL, formData);
     }
 
 
@@ -96,7 +96,11 @@ export default class AxiosHelper {
     }
 
     static createPost(postInfoForm) {
-        return axios.put(urls.POST_BASE_URL, postInfoForm);
+        return axios.post(urls.POST_BASE_URL, postInfoForm);
+    }
+
+    static updatePost(postInfoForm){
+        return axios.put(urls.UPDATE_POST_URL, postInfoForm);
     }
 
     static deletePost(userDataId, postId) {
