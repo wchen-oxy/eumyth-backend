@@ -1,4 +1,5 @@
 import React from 'react';
+import { DragDropContext } from 'react-beautiful-dnd';
 import { withFirebase } from '../../../Firebase';
 import ImageSlider from '../../image-carousel';
 import TextareaAutosize from 'react-textarea-autosize';
@@ -22,6 +23,7 @@ class ShortEditor extends React.Component {
 
         this.setErrorMessage = this.setErrorMessage.bind(this);
         this.validateFile = this.validateFile.bind(this);
+
     }
 
 
@@ -87,7 +89,7 @@ class ShortEditor extends React.Component {
 
     }
 
-    validateFile = (file) => {
+    validateFile(file) {
         const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/x-icon'];
         if (validTypes.indexOf(file.type) === -1) {
             return false;
@@ -229,14 +231,16 @@ class ShortEditor extends React.Component {
                             fileInputClicked={this.fileInputClicked}
                             filesSelected={this.filesSelected}
                         />
-                        <FileDisplayContainer
-                            validFiles={this.props.validFiles}
-                            openImageModal={this.openImageModal}
-                            removeFile={this.removeFile}
-                            fileType={this.fileType}
-                            fileSize={this.fileSize}
-                            errorMessage={this.state.errorMessage}
-                        />
+                        <DragDropContext onDragEnd={this.props.handleDragEnd}>
+                            <FileDisplayContainer
+                                validFiles={this.props.validFiles}
+                                openImageModal={this.openImageModal}
+                                removeFile={this.removeFile}
+                                fileType={this.fileType}
+                                fileSize={this.fileSize}
+                                errorMessage={this.state.errorMessage}
+                            />
+                        </DragDropContext>
                     </div>
                 </>
             );

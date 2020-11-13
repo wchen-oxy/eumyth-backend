@@ -36,6 +36,8 @@ class ShortPost extends React.Component {
     this.handleClick = this.handleClick.bind(this);
     this.generateValidFiles = this.generateValidFiles.bind(this);
     this.handleCaptionStyleChange = this.handleCaptionStyleChange.bind(this);
+    this.handleDragEnd = this.handleDragEnd.bind(this);
+
 
   }
   handleIndexChange(value) {
@@ -143,6 +145,17 @@ class ShortPost extends React.Component {
   }
 
 
+  handleDragEnd(result) {
+    console.log(result);
+    if (!result.destination) return;
+    const items = Array.from(this.state.validFiles);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+    console.log(items);
+    this.setState({validFiles: items});
+}
+
+
   render() {
     console.log(this.state.isPaginated);
     if (this.state.window === INITIAL) {
@@ -167,6 +180,7 @@ class ShortPost extends React.Component {
             isPaginated={this.state.isPaginated}
             textPageText={this.state.postText}
             textPageIndex={this.state.imageIndex}
+            handleDragEnd={this.handleDragEnd}
             setImageArray={this.setImageArray}
             onCaptionStyleChange={this.handleCaptionStyleChange}
             onIndexChange={this.handleIndexChange}
