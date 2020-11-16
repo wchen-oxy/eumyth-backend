@@ -5,7 +5,7 @@ import AxiosHelper from '../../../Axios/axios';
 
 const MAIN = "MAIN";
 const SHORT = "SHORT";
-
+const LARGE_VIEW_MODE = true;
 
 class EventModal extends React.Component {
     _isMounted = false;
@@ -13,7 +13,6 @@ class EventModal extends React.Component {
         super(props);
         this.state = {
             window: MAIN,
-            largeViewMode: false,
             // loaded: false
         }
     }
@@ -37,7 +36,7 @@ class EventModal extends React.Component {
                     pursuits={this.props.pursuits}
                     preferredPostType={this.props.preferredPostType}
                     textData={this.props.textData}
-                    largeViewMode={this.state.largeViewMode}
+                    largeViewMode={LARGE_VIEW_MODE}
                     isOwnProfile={this.props.isOwnProfile}
                     eventData={this.props.eventData}
                     onDeletePost={this.props.onDeletePost} />

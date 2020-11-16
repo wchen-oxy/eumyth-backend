@@ -18,7 +18,7 @@ class ShortPost extends React.Component {
       unsupportedFiles: [],
       imageArray: [],
       imageIndex: 0,
-      postText: '',
+      textData: '',
       isPaginated: false,
       postDisabled: true,
       window: INITIAL,
@@ -53,16 +53,16 @@ class ShortPost extends React.Component {
     if (this.state.isPaginated === false) {
       let postArray = [];
       const imageCount = this.state.validFiles.length;
-      postArray.push(this.state.postText);
+      postArray.push(this.state.textData);
       for (let i = 1; i < imageCount; i++) {
         postArray.push([]);
       }
-      this.setState({ postText: postArray, isPaginated: true });
+      this.setState({ textData: postArray, isPaginated: true });
     }
     else {
       if (window.confirm("Switching back will remove all your captions except for the first one. Keep going?")) {
-        const postText = this.state.postText[0];
-        this.setState({ postText: postText, isPaginated: false });
+        const textData = this.state.textData[0];
+        this.setState({ textData: textData, isPaginated: false });
       }
     }
   }
@@ -97,7 +97,7 @@ class ShortPost extends React.Component {
     else {
       let newState;
       if (this.state.isPaginated) {
-        let updatedArray = this.state.postText;
+        let updatedArray = this.state.textData;
         updatedArray[this.state.imageIndex] = text;
         newState = updatedArray;
       }
@@ -105,7 +105,7 @@ class ShortPost extends React.Component {
         newState = text;
       }
       this.setState((state) => ({
-        postText: newState,
+        textData: newState,
         postDisabled: (text.length === 0) && (state.validFiles.length === 0 || state.unsupportedFiles.length > 0)
       }));
     }
@@ -178,7 +178,7 @@ class ShortPost extends React.Component {
             validFiles={this.state.validFiles}
             unsupportedFiles={this.state.unsupportedFiles}
             isPaginated={this.state.isPaginated}
-            textPageText={this.state.postText}
+            textPageText={this.state.textData}
             textPageIndex={this.state.imageIndex}
             handleDragEnd={this.handleDragEnd}
             setImageArray={this.setImageArray}
@@ -205,7 +205,7 @@ class ShortPost extends React.Component {
           postType={SHORT}
           onClick={this.handleClick}
           imageArray={this.state.imageArray}
-          postText={this.state.postText}
+          textData={this.state.textData}
           username={this.props.username}
           preferredPostType={this.props.preferredPostType}
           pursuits={this.props.pursuits}

@@ -1,14 +1,16 @@
 import React from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import { withAuthorization } from '../../session';
 import { withFirebase } from '../../../Firebase';
 import AxiosHelper from '../../../Axios/axios';
 import RecentWorkObject from "./sub-components/recent-work-object";
+import FeedObject from "./sub-components/feed-object"
 import LongPostViewer from '../../post/viewer/long-post';
 import ShortPostViewer from '../../post/viewer/short-post';
 // import FeedObject from "./feed-object";
 import './returning-user.scss';
 
-const SHORT = "SHORT";
+
 class ReturningUserPage extends React.Component {
     _isMounted = false;
     constructor(props) {
@@ -17,15 +19,18 @@ class ReturningUserPage extends React.Component {
             username: this.props.firebase.returnUsername(),
             firstName: null,
             lastName: null,
-            feedData: null,
             pursuits: null,
             displayPhoto: "https://i.redd.it/73j1cgr028u21.jpg",
             indexUserData: null,
-            dataLength : 24,
-            lastRetrievedPostIndex : 0
+
+            allPosts: null,
+            hasMore: true,
+            fixedDataLoadLength: 4,
+            nextOpenPostIndex: 0
         }
         this.handlePursuitClick = this.handlePursuitClick.bind(this);
         this.handleRecentWorkClick = this.handleRecentWorkClick.bind(this);
+        this.fetchNextPosts = this.fetchNextPosts.bind(this);
 
     }
 
@@ -60,13 +65,13 @@ class ReturningUserPage extends React.Component {
                 )
                 .then(
                     (results) => {
-                        this.setState(          
+                        this.setState(
                             {
-                            feedData: results ? results.data.feed : [],
-                            indexUserData: indexUserData,
-                            displayPhoto: displayPhoto,
-                            pursuits: pursuits,
-                        });
+                                allPosts: results ? results.data.feed : null,
+                                indexUserData: indexUserData,
+                                displayPhoto: displayPhoto,
+                                pursuits: pursuits,
+                            });
                     }
                 )
                 .catch((err) => {
@@ -92,6 +97,26 @@ class ReturningUserPage extends React.Component {
         alert(value);
     }
 
+    fetchNextPosts() {
+        console.log("fetch");
+        if (this.state.nextOpenPostIndex + this.state.fixedDataLoadLength >= this.state.allPosts.length) {
+            console.log("Length of All Posts Exceeded");
+            this.setState({ hasMore: false });
+        }
+        console.log(this.state.allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength));
+        return AxiosHelper.returnMultiplePosts(
+            this.props.targetProfileId,
+            this.state.allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength))
+            .then(
+                (result) => {
+                    console.log(result.data);
+                    if (this._isMounted) this.createTimelineRow(result.data);
+                }
+            )
+            .catch((error) => console.log(error));
+
+    }
+
     render() {
         let pursuitInfoArray = [];
         let feed = [];
@@ -109,27 +134,6 @@ class ReturningUserPage extends React.Component {
                     </tr>);
                 pursuitInfoArray.push(hobbyTableData);
             }
-        }
-
-        if (this.state.feedData) {
-            for (const feedItem of this.state.feedData) {
-                feed.push(
-                    feedItem.post_format === SHORT ?
-                        <ShortPostViewer
-                            isOwnProfile={false}
-                            eventData={feedItem}
-                            onDeletePost={this.props.onDeletePost}
-                            largeViewMode={true}
-                        />
-                        :
-                        <LongPostViewer
-                            isOwnProfile={false}
-                            eventData={feedItem}
-                            onDeletePost={this.props.onDeletePost}
-                        />
-                );
-            }
-
         }
 
         //TEST 
@@ -151,7 +155,7 @@ class ReturningUserPage extends React.Component {
                             Total Hours Spent: {Math.floor(totalMin / 60)}
                         </div>
                         <div className="home-profile-text">
-                            {}
+                            { }
                         </div>
                     </div>
                     <div className="home-profile-column-container">
@@ -188,10 +192,31 @@ class ReturningUserPage extends React.Component {
 
                     <h4>Your Feed</h4>
                     <div id="feed-container" className="flex-display flex-direction-column">
-                        {/* <div id="placeholder-feed"> */}
-                        {/* <FeedObject /> */}
-                        {feed}
-                        {/* </div> */}
+
+                        {/* {feed} */}
+
+                        {this.state.allPosts ?
+                            <InfiniteScroll
+                                dataLength={this.state.nextOpenPostIndex}
+                                next={this.fetchNextPosts}
+                                hasMore={this.state.hasMore}
+                                loader={<h4>Loading...</h4>}
+                                endMessage={
+                                    <p style={{ textAlign: 'center' }}>
+                                        <b>Yay! You have seen it all</b>
+                                    </p>
+                                }>
+                                {
+                                    this.state.allPosts.map((feedItem, index) =>
+                                        <div className="feed-object-container">
+                                            <FeedObject feedItem={feedItem} key={index} />
+                                        </div>
+
+                                    )
+                                }
+
+                            </InfiniteScroll>
+                            : <></>}
                     </div>
 
                 </div>

@@ -28,7 +28,7 @@ const ReviewPost = (props) => {
         formData.append("username", props.username);
         formData.append("isPaginated", props.isPaginated);
         formData.append("isMilestone", milestone ? milestone : false)
-        console.log(props.postText);
+        console.log(props.textData);
         console.log(minDuration);
         if (title) formData.append("title", _.trim(title));
         if (subtitle) {
@@ -39,7 +39,7 @@ const ReviewPost = (props) => {
         if (pursuitCategory) formData.append("pursuitCategory", pursuitCategory)
         if (date) formData.append("date", date);
         if (minDuration) formData.append("minDuration", minDuration);
-        if (props.postText) formData.append("textData", props.postType === LONG || props.isPaginated ? JSON.stringify(props.postText) : props.postText);
+        if (props.textData) formData.append("textData", props.postType === LONG || props.isPaginated ? JSON.stringify(props.textData) : props.textData);
         if (coverPhoto) formData.append("coverPhoto", coverPhoto);
         if (props.imageArray && props.imageArray.length > 0) {
             console.log(props.imageArray);

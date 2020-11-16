@@ -1,24 +1,39 @@
-// import React from 'react';
-// import './feed-object.scss';
+import React from 'react';
+import LongPostViewer from '../../../post/viewer/long-post';
+import ShortPostViewer from '../../../post/viewer/short-post';
+import './feed-object.scss';
 
-// const FeedObject = (props) => {
+const LARGE_VIEW_MODE = false;
+const IS_OWN_PROFILE = false;
+const SHORT = "SHORT";
+const FeedObject = (props) => {
+    const feedItem = props.feedItem;
+    return (
+        feedItem.post_format === SHORT ?
+        
+            <ShortPostViewer
+                displayPhoto={feedItem.display_photo_url}
+                username={feedItem.username}
+                pursuits={null}
+                preferredPostType={null}
+                textData={feedItem.text_data}
+                largeViewMode={LARGE_VIEW_MODE}
+                isOwnProfile={IS_OWN_PROFILE}
+                eventData={feedItem}
+                onDeletePost={null}
+            />
+            :
+            <LongPostViewer
+                displayPhoto={feedItem.displayPhoto}
+                username={feedItem.username}
+                pursuits={feedItem.pursuits}
+                preferredPostType={feedItem.preferredPostType}
+                textData={feedItem.textData}
+                isOwnProfile={IS_OWN_PROFILE}
+                eventData={feedItem}
+                onDeletePost={null}
+            />
+    );
+}
 
-//     return (
-//         <div className="feed-object-container">
-//             <div className="feed-object-row">
-//                 <div id="home-feed-profile-column-container" className="home-feed-profile-column-container">
-//                     <img alt="" className="home-feed-photo" src="https://i.redd.it/73j1cgr028u21.jpg"></img>
-//                 </div>
-//                 <div id="home-feed-profile-column-container" className="home-feed-profile-column-container">
-//                         <p className="home-feed-no-margin-text">Username</p>
-//                         <h6 className="home-feed-no-margin-text">William Chen</h6>
-//                 </div>
-//             </div>
-//             <div className="feed-object-row">
-                
-//             </div>
-//         </div>
-//     )
-// }
-
-// export default FeedObject;
+export default FeedObject;

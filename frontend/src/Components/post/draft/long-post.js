@@ -110,7 +110,7 @@ const LongPost = (props) => {
       <ReviewPost
         displayPhoto={props.displayPhoto}
         isPaginated={false}
-        postText={props.onlineDraft}
+        textData={props.onlineDraft}
         closeModal={props.closeModal}
         postType={LONG}
         setPostStage={setPostStage}

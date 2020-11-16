@@ -9,7 +9,6 @@ class Timeline extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            events: null,
             hasMore: true,
             feedData: [[]],
             fixedDataLoadLength: 4,
@@ -109,7 +108,7 @@ class Timeline extends React.Component {
                         this.state.feedData.map((item, index) => {
                             console.log(item);
                             
-                            if (item.length !== 0)
+                            // if (item.length !== 0)
                             return (
                             <div className="flex-display" key={index}>
                                 {item}

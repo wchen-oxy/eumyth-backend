@@ -31,6 +31,7 @@ class NavigationAuth extends React.Component {
       previousLongDraft: null,
       isInitialUser: true,
       existingUserLoading: true,
+      isModalShowing: false
     };
     this.modalRef = React.createRef();
     this.closeModal = this.closeModal.bind(this);
@@ -50,11 +51,14 @@ class NavigationAuth extends React.Component {
   openModal() {
     this.modalRef.current.style.display = "block";
     document.body.style.overflow = "hidden";
+    this.setState({ isModalShowing: true });
   }
 
   closeModal() {
     this.modalRef.current.style.display = "none";
     document.body.style.overflow = "visible";
+    this.setState({ isModalShowing: false });
+
   }
 
 
@@ -76,10 +80,20 @@ class NavigationAuth extends React.Component {
         </nav>
         {this.state.existingUserLoading ?
           (<></>) :
-          (<div className="modal" ref={this.modalRef}>
-            <div className="overlay"></div>
-            <PostController username={this.state.username} closeModal={this.closeModal} />
-          </div>)
+          (
+            <div className="modal" ref={this.modalRef}>
+              <div className="overlay"></div>
+              {
+                this.state.isModalShowing ?
+                  <PostController
+                    username={this.state.username}
+                    closeModal={this.closeModal}
+                  />
+                  :
+                  <></>
+              }
+            </div>
+          )
         }
       </>
     );
