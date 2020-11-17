@@ -167,15 +167,15 @@ class ProfilePage extends React.Component {
 
 
 
-    openModal(modal) {
-        modal.current.style.display = "block";
+    openModal( ) {
+        this.modalRef.current.style.display = "block";
         document.body.style.overflow = "hidden";
         this.setState({ isModalShowing: true });
 
     }
 
-    closeModal(modal) {
-        modal.current.style.display = "none";
+    closeModal( ) {
+        this.modalRef.current.style.display = "none";
         document.body.style.overflow = "visible";
         this.setState({ isModalShowing: false });
     }
@@ -189,7 +189,7 @@ class ProfilePage extends React.Component {
                 (result) => {
                     console.log(result.data);
                     if (this._isMounted) {
-                        this.setState({ selectedEvent: selectedEvent, textData: result.data }, this.openModal(this.modalRef));
+                        this.setState({ selectedEvent: selectedEvent, textData: result.data }, this.openModal());
                     }
                 }
             )
@@ -278,8 +278,8 @@ class ProfilePage extends React.Component {
                     }
                 </div>
                 <div className="modal" ref={this.modalRef}>
-                    <div className="overlay" onClick={(() => this.closeModal(this.modalRef))}></div>
-                    <span className="close" onClick={(() => this.closeModal(this.modalRef))}>X</span>
+                    <div className="overlay" onClick={(() => this.closeModal( ))}></div>
+                    <span className="close" onClick={(() => this.closeModal( ))}>X</span>
                     {
                         this.state.isModalShowing ?
 
@@ -287,6 +287,7 @@ class ProfilePage extends React.Component {
                                 isOwnProfile={this.visitorUsername === this.targetUsername}
                                 displayPhoto={this.state.smallCroppedDisplayPhoto}
                                 preferredPostType={this.state.preferredPostType}
+                                closeModal={ this.closeModal}
                                 // smallProfilePhoto={this.state.smallCroppedDisplayPhoto}
                                 pursuits={this.state.pursuitsNames}
                                 username={this.state.targetUsername}
@@ -299,7 +300,7 @@ class ProfilePage extends React.Component {
                     }
                 </div>
                 <div className="modal" ref={this.miniModalRef}>
-                    <div className="overlay" onClick={(() => this.closeModal(this.miniModalRef))}></div>
+                    <div className="overlay" onClick={(() => this.closeModal())}></div>
                     <UserOptions />
                 </div>
             </div>

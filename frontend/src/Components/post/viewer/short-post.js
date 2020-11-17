@@ -248,7 +248,7 @@ class ShortPostViewer extends React.Component {
                     min={this.props.eventData.min_duration}
                     selectedPursuit={this.props.eventData.pursuit_category}
                     pursuits={this.props.pursuits}
-                    // closeModal={this.props.closeModal}
+                    closeModal={this.props.closeModal}
                     postType={SHORT}
                     onClick={this.handleWindowChange}
                     // existingImageArray={this.state.eventData.image_data}

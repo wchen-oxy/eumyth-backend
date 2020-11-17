@@ -173,7 +173,9 @@ class PostController extends React.Component {
     switch (this.state.postType) {
       case (NONE):
         postType = (
-          <NewPost onlineDraft={this.state.onlineDraft} onPostTypeSet={this.handlePostTypeSet} />
+          <NewPost 
+          onlineDraft={this.state.onlineDraft} 
+          onPostTypeSet={this.handlePostTypeSet} />
         );
         break;
       case (SHORT):

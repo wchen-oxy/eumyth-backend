@@ -39,7 +39,10 @@ class EventModal extends React.Component {
                     largeViewMode={LARGE_VIEW_MODE}
                     isOwnProfile={this.props.isOwnProfile}
                     eventData={this.props.eventData}
-                    onDeletePost={this.props.onDeletePost} />
+                    onDeletePost={this.props.onDeletePost}
+                    closeModal={this.props.closeModal}
+
+                />
 
                 :
                 <LongPostViewer
@@ -50,7 +53,10 @@ class EventModal extends React.Component {
                     textData={this.props.textData}
                     isOwnProfile={this.props.isOwnProfile}
                     eventData={this.props.eventData}
-                    onDeletePost={this.props.onDeletePost} />
+                    onDeletePost={this.props.onDeletePost}
+                    closeModal={this.props.closeModal}
+
+                />
             );
 
         }

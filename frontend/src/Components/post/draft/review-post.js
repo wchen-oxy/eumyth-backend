@@ -91,7 +91,7 @@ const ReviewPost = (props) => {
 
 
 
-    console.log(props.selectedPursuit);
+    console.log(props.textData);
     const returnToShortButton = (<button id="toggle-button" value={INITIAL} onClick={e => props.onClick(e.target.value)}>Return</button>);
     const returnToLongButton = (<button id="toggle-button" value={INITIAL} onClick={e => props.setPostStage(e.target.value, false)}>Return</button>);
     console.log(subtitle);

@@ -7,7 +7,7 @@ import { PlaceholderBlockConfig } from 'Dante2/package/es/components/blocks/plac
 import { withFirebase } from '../../../Firebase';
 import { IMAGE_BASE_URL } from '../../constants/urls';
 
-const saveInterval = 4000;
+const SAVE_INTERVAL = 4000;
 class LongEditor extends React.Component {
     constructor(props) {
         super(props);
@@ -116,7 +116,7 @@ class LongEditor extends React.Component {
                 data_storage={
                     {
                         save_handler: this.handleSave,
-                        interval: saveInterval,
+                        interval: SAVE_INTERVAL,
                         success_handler: this.handleSaveSuccess,
                         failure_handler: this.handleSaveError
                     }
