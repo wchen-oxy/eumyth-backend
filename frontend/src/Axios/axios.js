@@ -100,7 +100,7 @@ export default class AxiosHelper {
     }
 
     static updatePost(postInfoForm){
-        return axios.put(urls.UPDATE_POST_URL, postInfoForm);
+        return axios.put(urls.POST_BASE_URL, postInfoForm);
     }
 
     static deletePost(userDataId, postId) {

@@ -43,7 +43,7 @@ class ProfilePage extends React.Component {
             feedData: [[]],
             lastRetrievedPostIndex: 0,
             preferredPostType: null,
-            isModalShowing: true,
+            isModalShowing: false,
 
 
         }
@@ -154,7 +154,7 @@ class ProfilePage extends React.Component {
             bio: targetUserInfo.bio,
             pinned: targetUserInfo.pinned,
             pursuits: targetUserInfo.pursuits,
-            pursuitsNames: array, 
+            pursuitsNames: array,
             allPosts: targetUserInfo.all_posts,
             // recentPosts: targetUserInfo.recent_posts,
             userRelationId: targetUserInfo.user_relation_id,
@@ -167,14 +167,14 @@ class ProfilePage extends React.Component {
 
 
 
-    openModal( ) {
+    openModal() {
         this.modalRef.current.style.display = "block";
         document.body.style.overflow = "hidden";
         this.setState({ isModalShowing: true });
 
     }
 
-    closeModal( ) {
+    closeModal() {
         this.modalRef.current.style.display = "none";
         document.body.style.overflow = "visible";
         this.setState({ isModalShowing: false });
@@ -236,6 +236,7 @@ class ProfilePage extends React.Component {
                 );
             }
         }
+        console.log(this.state.selectedEvent);
         return (
             <div>
                 <div id="personal-profile-container" className="flex-display flex-direction-column">
@@ -278,16 +279,17 @@ class ProfilePage extends React.Component {
                     }
                 </div>
                 <div className="modal" ref={this.modalRef}>
-                    <div className="overlay" onClick={(() => this.closeModal( ))}></div>
-                    <span className="close" onClick={(() => this.closeModal( ))}>X</span>
+                    <div className="overlay" onClick={(() => this.closeModal())}></div>
+                    <span className="close" onClick={(() => this.closeModal())}>X</span>
                     {
-                        this.state.isModalShowing ?
+                        this.state.isModalShowing && this.state.selectedEvent ?
 
                             <EventModal
+                                key={this.state.selectedEvent._id}
                                 isOwnProfile={this.visitorUsername === this.targetUsername}
                                 displayPhoto={this.state.smallCroppedDisplayPhoto}
                                 preferredPostType={this.state.preferredPostType}
-                                closeModal={ this.closeModal}
+                                closeModal={this.closeModal}
                                 // smallProfilePhoto={this.state.smallCroppedDisplayPhoto}
                                 pursuits={this.state.pursuitsNames}
                                 username={this.state.targetUsername}
@@ -296,7 +298,8 @@ class ProfilePage extends React.Component {
                                 onDeletePost={this.handleDeletePost}
                             />
                             :
-                            <></>
+                            <>                            {console.log("Disappear")}
+                            </>
                     }
                 </div>
                 <div className="modal" ref={this.miniModalRef}>

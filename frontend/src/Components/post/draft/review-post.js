@@ -11,7 +11,7 @@ const ReviewPost = (props) => {
     const [date, setDate] = useState(props.date);
     const [minDuration, setMinDuration] = useState(null);
     const [milestone, setMilestone] = useState(props.isMilestone);
-    const [title, setTitle] = useState('');
+    const [title, setTitle] = useState(props.previewTitle);
     const [subtitle, setSubtitle] = useState('');
     const [postPrivacyType, setPostPrivacyType] = useState("public-feed");
     const [pursuitCategory, setPursuitCategory] = useState(props.selectedPursuit ? props.selectedPursuit : null)
@@ -21,15 +21,15 @@ const ReviewPost = (props) => {
 
     const handlePostSubmit = () => {
         setLoading(true);
-        console.log(props.imageArray);
+        // console.log(props.imageArray);
         let formData = new FormData();
         formData.append("displayPhoto", props.displayPhoto);
         formData.append("postType", props.postType);
         formData.append("username", props.username);
         formData.append("isPaginated", props.isPaginated);
         formData.append("isMilestone", milestone ? milestone : false)
-        console.log(props.textData);
-        console.log(minDuration);
+        // console.log(props.textData);
+        // console.log(minDuration);
         if (title) formData.append("title", _.trim(title));
         if (subtitle) {
             console.log("VALID");
@@ -39,21 +39,21 @@ const ReviewPost = (props) => {
         if (pursuitCategory) formData.append("pursuitCategory", pursuitCategory)
         if (date) formData.append("date", date);
         if (minDuration) formData.append("minDuration", minDuration);
-        if (props.textData) formData.append("textData", props.postType === LONG || props.isPaginated ? JSON.stringify(props.textData) : props.textData);
+        if (props.textData) formData.append("textData", JSON.stringify(props.textData) );
         if (coverPhoto) formData.append("coverPhoto", coverPhoto);
         if (props.imageArray && props.imageArray.length > 0) {
-            console.log(props.imageArray);
             for (const image of props.imageArray) {
                 formData.append("images", image);
             }
         }
 
-        if (props.isUpdatetoPost) {
+        if (props.isUpdateToPost) {
+            console.log( JSON.stringify(props.textData));
             if (props.postId) formData.append("postId", props.postId);
             return AxiosHelper.updatePost(formData)
                 .then(
                     (result) => {
-                        result.status === 201 ? handleSuccess() : handleError();
+                        result.status === 200 ? handleSuccess() : handleError();
                     }
                 );
         }
@@ -91,10 +91,10 @@ const ReviewPost = (props) => {
 
 
 
-    console.log(props.textData);
+    // console.log(props.textData);
     const returnToShortButton = (<button id="toggle-button" value={INITIAL} onClick={e => props.onClick(e.target.value)}>Return</button>);
     const returnToLongButton = (<button id="toggle-button" value={INITIAL} onClick={e => props.setPostStage(e.target.value, false)}>Return</button>);
-    console.log(subtitle);
+    // console.log(subtitle);
     return (
         <div className="small-post-window">
             <div className="inner-small-post-container post-button-container">
@@ -108,7 +108,7 @@ const ReviewPost = (props) => {
                 </div>
                 <div className="post-button-container">
                     <label>Preview Title</label>
-                    <TextareaAutosize name="title" id='review-post-text' placeholder='Create an Optional Preview Title Text' value={props.previewTitle ? props.previewTitle : null} onChange={(e) => setTitle(e.target.value)} maxLength={100} />
+                    <TextareaAutosize name="title" id='review-post-text' placeholder='Create an Optional Preview Title Text' value={title ? title : null} onChange={(e) => setTitle(e.target.value)} maxLength={100} />
                     {props.postType === "LONG" ? <TextareaAutosize name="subtitle" id='review-post-text' placeholder='Create an Optional Description' onChange={(e) => setSubtitle(e.target.value)} maxLength={140} /> : <></>}
                     {props.coverPhoto ? <label>Upload New Cover Photo?</label> : <label>Upload a Cover Photo</label>}
                     <input type="file" onChange={(e) => {

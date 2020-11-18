@@ -35,6 +35,8 @@ class ShortPostViewer extends React.Component {
         };
         this.handleWindowChange = this.handleWindowChange.bind(this);
         this.handleIndexChange = this.handleIndexChange.bind(this);
+        this.handleTextChange = this.handleTextChange.bind(this);
+        this.handlePaginatedChange = this.handlePaginatedChange.bind(this); 
     }
 
     handleWindowChange(newWindow) {
@@ -60,6 +62,9 @@ class ShortPostViewer extends React.Component {
         this.setState((state) => ({ isPaginated: !state.isPaginated }));
     }
 
+    componentWillUnmount(){
+        console.log("unmount");
+    }
 
     render() {
         const settings = {
@@ -92,7 +97,6 @@ class ShortPostViewer extends React.Component {
                                     onDeletePost={this.props.onDeletePost}
                                 />
                                 <ShortPostMetaInfo
-
                                     index={this.state.imageIndex}
                                     isPaginated={this.state.isPaginated}
                                     isMilestone={this.state.isMilestone}
@@ -119,9 +123,7 @@ class ShortPostViewer extends React.Component {
                                     text={this.props.textData} />
                             </div>
                             <div className="mini-short-viewer-side-container">
-
                                 <ShortPostMetaInfo
-
                                     index={this.state.imageIndex}
                                     isPaginated={this.state.isPaginated}
                                     isMilestone={this.state.isMilestone}
@@ -137,7 +139,8 @@ class ShortPostViewer extends React.Component {
             }
             //with images
             else {
-                const transformedTextArray = JSON.parse(this.state.textData);
+                console.log(this.state.textData);
+                const transformedTextArray = this.state.textData;
                 const container = this.props.eventData.image_data.map((url, i) =>
                     <div className="image-container">
                         <img className="preview-image" key={i} src={url} />
@@ -174,7 +177,7 @@ class ShortPostViewer extends React.Component {
                                     date={this.state.date}
                                     pursuit={this.state.pursuitCategory}
                                     min={this.state.min}
-                                    textData={transformedTextArray}
+                                    textData={this.state.textData}
                                 />
                             </div>
                         </div>
@@ -198,7 +201,7 @@ class ShortPostViewer extends React.Component {
                                     date={this.state.date}
                                     pursuit={this.state.pursuitCategory}
                                     min={this.state.min}
-                                    textData={transformedTextArray}
+                                    textData={this.state.textData}
                                 />
                             </div>
                         </div>
