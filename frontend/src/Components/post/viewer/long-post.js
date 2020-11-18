@@ -36,11 +36,25 @@ const LongPostViewer = (props) => {
 
 
     if (window === INITIAL) {
+ 
+        const monthNames = ["January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+        const date = props.eventData.date ? new Date(props.eventData.date) : null;
+        console.log(props.eventData.pursuit_category);
+        // console.log(date.getMonth());
         return (
             <div className="long-post-window">
                 <div className="long-editor-container" id="long-editor-buttons">
                     {props.isOwnProfile ? <button onClick={() => windowSwitch(EDIT)}>Edit</button> : <></>}
                     {props.isOwnProfile ? <button onClick={props.onDeletePost}>Remove</button> : <></>}
+                </div>
+                <div id="long-post-stats-container">
+
+                    {props.eventData.is_milestone ? <p>Milestone :)</p> : <></>}
+                    {props.eventData.date ? <p>{monthNames[date.getMonth()]} {date.getDate()}, {date.getFullYear()} </p> : <></>}
+                    {props.eventData.pursuit_category ? <p>{props.pursuit_category }</p> : <></>}
+                    {props.eventData.min_duration ? <p>{props.eventData.min_duration} minutes</p> : <></>}
                 </div>
                 <div className="long-editor-container">
                     < DanteEditor
@@ -54,6 +68,7 @@ const LongPostViewer = (props) => {
     }
 
     else if (window === EDIT) {
+
         return (
             <div className="long-post-window">
                 <div className="long-editor-container" id="long-editor-buttons">
@@ -113,14 +128,14 @@ const LongPostViewer = (props) => {
 
     else {
         let rawDate = null;
-            let formattedDate = null;
-            if (props.eventData.date) {
-                rawDate = new Date(props.eventData.date);
-                formattedDate = rawDate.getFullYear().toString() + "-" + rawDate.getMonth().toString() + "-" + rawDate.getDate().toString();
-            }
+        let formattedDate = null;
+        if (props.eventData.date) {
+            rawDate = new Date(props.eventData.date);
+            formattedDate = rawDate.getFullYear().toString() + "-" + rawDate.getMonth().toString() + "-" + rawDate.getDate().toString();
+        }
         return (
             <ReviewPost
-               
+
                 displayPhoto={props.displayPhoto}
                 isPaginated={false}
                 textData={localDraft}
