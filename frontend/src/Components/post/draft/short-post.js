@@ -42,7 +42,6 @@ class ShortPost extends React.Component {
   }
   handleIndexChange(value) {
     this.setState({ imageIndex: value });
-    console.log(value);
   }
 
   // handlePaginatedToggle() {
@@ -65,7 +64,6 @@ class ShortPost extends React.Component {
         this.setState({ textData: textData, isPaginated: false });
       }
     }
-    console.log(this.state.isPaginated);
   }
 
   // handleTitleChange(e)
@@ -92,7 +90,6 @@ class ShortPost extends React.Component {
     // console.log(e.target.value);
     const text = e.target.value;
     if (e.target.name === TITLE) {
-      console.log(text);
       this.setState({ previewTitle: text });
     }
     else {
@@ -147,18 +144,15 @@ class ShortPost extends React.Component {
 
 
   handleDragEnd(result) {
-    console.log(result);
     if (!result.destination) return;
     const items = Array.from(this.state.validFiles);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
-    console.log(items);
     this.setState({validFiles: items});
 }
 
 
   render() {
-    console.log(this.state.isPaginated);
     if (this.state.window === INITIAL) {
       return (
         <div className="flex-display flex-direction-column small-post-window">

@@ -8,7 +8,6 @@ const IS_OWN_PROFILE = false;
 const SHORT = "SHORT";
 const FeedObject = (props) => {
     const feedItem = props.feedItem;
-    console.log(feedItem);
     return (
         feedItem.post_format === SHORT ?
         

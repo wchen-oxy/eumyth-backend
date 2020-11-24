@@ -77,8 +77,6 @@ class ShortPostViewer extends React.Component {
             prevArrow: <Arrow direction="left" />
         };
 
-        console.log(this.state.textData);
-        console.log(this.state.isPaginated);
         if (this.state.window === INITIAL) {
             if (!this.props.eventData.image_data.length) {
 
@@ -141,7 +139,6 @@ class ShortPostViewer extends React.Component {
             }
             //with images
             else {
-                console.log(this.state.textData);
                 const transformedTextArray = this.state.textData;
                 const container = this.props.eventData.image_data.map((url, i) =>
                     <div className="image-container">

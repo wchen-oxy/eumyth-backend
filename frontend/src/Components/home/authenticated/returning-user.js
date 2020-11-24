@@ -23,7 +23,7 @@ class ReturningUserPage extends React.Component {
             displayPhoto: "https://i.redd.it/73j1cgr028u21.jpg",
             indexUserData: null,
 
-            allPosts: 0,
+            allPosts: [],
             hasMore: true,
             fixedDataLoadLength: 4,
             nextOpenPostIndex: 0,
@@ -59,8 +59,7 @@ class ReturningUserPage extends React.Component {
                 .then(
                     (feed) => {
                         const slicedFeed = allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength);
-                        // console.log(allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength));
-                        if (!feed || feed.length === 0) return;
+                        if (!feed || feed.length === 0) return this.setState({hasMore : false});
                         return AxiosHelper.returnMultiplePosts(
                             this.props.targetProfileId,
                             slicedFeed,
@@ -87,7 +86,7 @@ class ReturningUserPage extends React.Component {
                 )
                 .then(
                     () => {
-                        // console.log(results);
+                        console.log(allPosts);
                         this.setState(
                             {
                                 allPosts: allPosts ? allPosts : null,
@@ -112,25 +111,24 @@ class ReturningUserPage extends React.Component {
     }
 
     fetchNextPosts() {
+      
         const slicedFeed = this.state.allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength);
         console.log("fetch");
-        if (this.state.nextOpenPostIndex + this.state.fixedDataLoadLength >= this.state.allPosts.length) {
+           if (this.state.nextOpenPostIndex + this.state.fixedDataLoadLength >= this.state.allPosts.length) {
             console.log("Length of All Posts Exceeded");
             this.setState({ hasMore: false });
         }
-        console.log(this.state.allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength));
         return AxiosHelper.returnMultiplePosts(
             this.props.targetProfileId,
             slicedFeed,
             true)
             .then(
                 (result) => {
-                    let feedData = [];
-                    console.log(result.data);
+                    let newFeedData = this.state.feedData;
                     for (const item of result.data){
-                        feedData.push(item);
+                        newFeedData.push(item);
                     }
-                    if (this._isMounted) this.setState((state) => ({ feedData: state.feedData.concat(result.data) }));
+                    if (this._isMounted) this.setState(state => ({ feedData: newFeedData, nextOpenPostIndex : state.nextOpenPostIndex + state.fixedDataLoadLength}));
                 }
             )
             .catch((error) => console.log(error));
@@ -151,10 +149,8 @@ class ReturningUserPage extends React.Component {
 
 
     render() {
-        console.log(this.state.feedData);
-        console.log(this.state.allPosts);
+       
         let pursuitInfoArray = [];
-        let feed = [];
         let totalMin = 0;
         if (this.state.pursuits) {
             for (const pursuit of this.state.pursuits) {
@@ -230,7 +226,7 @@ class ReturningUserPage extends React.Component {
 
                         {/* {feed} */}
 
-                        {this.state.allPosts ?
+                        {/* {this.state.feedData.length > 0 ? */}
                             <InfiniteScroll
                                 dataLength={this.state.nextOpenPostIndex}
                                 next={this.fetchNextPosts}
@@ -251,7 +247,7 @@ class ReturningUserPage extends React.Component {
                                 }
 
                             </InfiniteScroll>
-                            : <></>}
+                            {/* : <></>} */}
                     </div>
 
                 </div>

@@ -5,7 +5,6 @@ const ShortPostMetaInfo = (props) => {
         "July", "August", "September", "October", "November", "December"
     ];
     const date = new Date(props.date);
-    console.log(typeof(props.textData));
     return (
         <div>
             <div>
