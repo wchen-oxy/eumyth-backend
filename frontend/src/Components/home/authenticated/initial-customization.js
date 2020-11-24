@@ -15,6 +15,7 @@ const INITIAL_STATE = {
     pursuits: [],
     experienceSelects: [],
     isTaken: false,
+    isUpperCase: false,
     croppedImage: null,
     fullImage: null,
     imageScale: 1,
@@ -39,14 +40,21 @@ class InitialCustomizationPage extends React.Component {
         console.log(e.target.value);
         this.setState({ [e.target.name]: e.target.value });
         if (e.target.name === "username") {
-            AxiosHelper.checkUsernameAvailable(e.target.value)
-                .then(
-                    (response) => {
-                        console.log(response);
-                        console.log(response.data);
-                        response.status === 200 ? this.setState({ isTaken: true }) : this.setState({ isTaken: false });
-                    }
-                );
+            if (e.target.value === e.target.value.toLowerCase()) {
+                AxiosHelper.checkUsernameAvailable(e.target.value)
+                    .then(
+                        (response) => {
+                            console.log(response);
+                            console.log(response.data);
+                            response.status === 200 ? this.setState({ isTaken: true }) : this.setState({ isTaken: false });
+                            this.setState({ isUpperCase: false });
+                        }
+                    );
+            }
+            else {
+                this.setState({ isUpperCase: true });
+
+            }
 
 
         }
@@ -130,11 +138,11 @@ class InitialCustomizationPage extends React.Component {
                         console.log(results);
                         let formData = new FormData();
                         formData.append("username", this.state.username);
-                        formData.append("pursuits", JSON.stringify( this.state.pursuits));
+                        formData.append("pursuits", JSON.stringify(this.state.pursuits));
                         formData.append("croppedImage", results[0]);
-                        formData.append("smallCroppedImage",results[1]);
+                        formData.append("smallCroppedImage", results[1]);
                         formData.append("tinyCroppedImage", results[2]);
-                     
+
                         return AxiosHelper.createUserProfile(formData)
                     }
                 )
@@ -184,6 +192,7 @@ class InitialCustomizationPage extends React.Component {
     render() {
         console.log(this.state.isTaken);
         const available = this.state.username !== '' && !this.state.isTaken ? "Available" : "Taken";
+        const upperCase = this.state.isUpperCase ? "Please Choose Only Lower Case Characters" : ""; 
         const { username, firstName, lastName, pursuits } = this.state;
         let isInvalid =
             username === '' ||
@@ -274,7 +283,7 @@ class InitialCustomizationPage extends React.Component {
                     <div className="info-container">
 
                         <label>
-                            Choose a username! {available}
+                            Choose a username! {available} {upperCase}
                         </label>
                         <input type="text" name="username" placeholder="Username" onChange={this.handleChange} />
                         <label>First Name</label>

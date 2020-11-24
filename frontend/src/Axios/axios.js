@@ -59,7 +59,7 @@ export default class AxiosHelper {
         })
     }
 
-    static returnMultiplePostInfo(targetUserDataId, postIdList ){
+    static returnMultiplePostInfo(targetUserDataId, postIdList) {
         return axios.get(urls.MULTIPLE_POSTS_URL, {
             params: {
                 targetUserDataId: targetUserDataId,
@@ -68,29 +68,30 @@ export default class AxiosHelper {
         })
     }
 
-    static returnMultiplePosts(targetUserDataId, postIdList ) {
+    static returnMultiplePosts(targetUserDataId, postIdList, includePostText) {
         return axios.get(urls.MULTIPLE_POSTS_URL, {
             params: {
                 targetUserDataId: targetUserDataId,
-                postIdList: postIdList
+                postIdList: postIdList,
+                includePostText: includePostText
             }
         })
     }
 
-    static retrieveTextData(postId){
+    static retrieveTextData(postId) {
         return axios.get(urls.SINGLE_POST_TEXT_DATA_URL, {
             params: {
-                postId : postId
+                postId: postId
             }
         })
     }
 
-    static returnSocialFeedPosts(indexUserId, postIdList ) {
+    static returnSocialFeedPosts(indexUserId, postIdList) {
         return axios.get(urls.SOCIAL_FEED_POSTS_URL, {
             params: {
                 indexUserId: indexUserId,
                 postIdList: postIdList
-                
+
             }
         })
     }
@@ -99,12 +100,18 @@ export default class AxiosHelper {
         return axios.post(urls.POST_BASE_URL, postInfoForm);
     }
 
-    static updatePost(postInfoForm){
+    static updatePost(postInfoForm) {
         return axios.put(urls.POST_BASE_URL, postInfoForm);
     }
 
-    static deletePost(userDataId, postId) {
-        return axios.delete(urls.POST_BASE_URL, { data: { userId: userDataId, postId: postId } });
+    static deletePost(userDataId, indexUserId, postId) {
+        return axios.delete(urls.POST_BASE_URL, {
+            data: {
+                userId: userDataId,
+                indexUserId: indexUserId,
+                postId: postId
+            }
+        });
     }
 
     //FIXME 

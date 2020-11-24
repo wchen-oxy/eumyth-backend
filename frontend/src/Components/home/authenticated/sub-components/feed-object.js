@@ -8,6 +8,7 @@ const IS_OWN_PROFILE = false;
 const SHORT = "SHORT";
 const FeedObject = (props) => {
     const feedItem = props.feedItem;
+    console.log(feedItem);
     return (
         feedItem.post_format === SHORT ?
         
@@ -16,7 +17,7 @@ const FeedObject = (props) => {
                 username={feedItem.username}
                 pursuits={null}
                 preferredPostType={null}
-                textData={feedItem.text_data}
+                textData={feedItem.is_paginated ? JSON.parse(feedItem.text_data) : feedItem.text_data}
                 largeViewMode={LARGE_VIEW_MODE}
                 isOwnProfile={IS_OWN_PROFILE}
                 eventData={feedItem}

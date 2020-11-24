@@ -5,8 +5,6 @@ import Timeline from "./timeline/index";
 import AxiosHelper from '../../Axios/axios';
 import NoMatch from '../no-match';
 import EventModal from "./sub-components/event-modal";
-import Event from './timeline/sub-components/timeline-event';
-
 import FollowButton from "./sub-components/follow-buttons";
 import UserOptions from "./sub-components/user-options";
 import {
@@ -56,7 +54,6 @@ class ProfilePage extends React.Component {
         this.handleFollowerStatusChange = this.handleFollowerStatusChange.bind(this);
         this.handleOptionsClick = this.handleOptionsClick.bind(this);
         this.handleDeletePost = this.handleDeletePost.bind(this);
-        // this.createTimelineRow = this.createTimelineRow.bind(this);
     }
 
 
@@ -108,7 +105,8 @@ class ProfilePage extends React.Component {
 
 
     handleDeletePost() {
-        AxiosHelper.deletePost(this.state.targetProfileId, this.state.selectedEvent._id).then((result) => console.log(result));
+        console.log("Deleting");
+        return AxiosHelper.deletePost(this.state.targetProfileId, this.state.targetIndexUserId, this.state.selectedEvent._id).then((result) => console.log(result));
     }
 
 
@@ -147,6 +145,7 @@ class ProfilePage extends React.Component {
             visitorUsername: user ? user.displayName : null,
             targetUsername: targetUserInfo.username,
             targetProfileId: targetUserInfo._id,
+            targetIndexUserId: targetUserInfo.index_user_id,
             isPrivate: targetUserInfo.private,
             coverPhoto: targetUserInfo.cover_photo,
             croppedDisplayPhoto: targetUserInfo.cropped_display_photo,

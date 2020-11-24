@@ -14,7 +14,6 @@ class Timeline extends React.Component {
             fixedDataLoadLength: 4,
             nextOpenPostIndex: 0
         }
-
         this.fetchNextPosts = this.fetchNextPosts.bind(this);
         this.createTimelineRow = this.createTimelineRow.bind(this);
 
@@ -68,10 +67,11 @@ class Timeline extends React.Component {
             console.log("Length of All Posts Exceeded");
             this.setState({ hasMore: false });
         }
-        console.log( this.props.allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength));
+        console.log(this.props.allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength));
         return AxiosHelper.returnMultiplePosts(
             this.props.targetProfileId,
-            this.props.allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength))
+            this.props.allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength),
+            false)
             .then(
                 (result) => {
                     console.log(result.data);
@@ -83,15 +83,11 @@ class Timeline extends React.Component {
     }
 
     render() {
-        if (!this._isMounted ) return (
+        if (!this._isMounted) return (
             <div id="timeline-container">
                 <p>Loading</p>
             </div>
-
         );
-        console.log(this.state.feedData);
-        console.log(this.state.nextOpenPostIndex);
-        console.log(this.state.hasMore);
         return (
             <div id="timeline-container">
                 <InfiniteScroll
@@ -99,25 +95,25 @@ class Timeline extends React.Component {
                     next={this.fetchNextPosts}
                     hasMore={this.state.hasMore}
                     loader={<h4>Loading...</h4>}
-                    endMessage={
+                    endMessage=
+                    {
                         <p style={{ textAlign: 'center' }}>
                             <b>Yay! You have seen it all</b>
                         </p>
-                    } >
+                    }>
                     {
-                        this.state.feedData.map((item, index) => {
-                            console.log(item);
-                            
-                            // if (item.length !== 0)
-                            return (
-                            <div className="flex-display" key={index}>
-                                {item}
-                            </div>
-                            
-                            )}
-
-                        )}
-                        <br/>
+                        this.state.feedData.map(
+                            (item, index) => {
+                                console.log(item);
+                                return (
+                                    <div className="flex-display" key={index}>
+                                        {item}
+                                    </div>
+                                )
+                            }
+                        )
+                    }
+                    <br />
                     {/* {timelineRows} */}
                 </InfiniteScroll>
             </div>

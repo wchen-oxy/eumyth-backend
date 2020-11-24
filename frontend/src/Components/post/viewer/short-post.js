@@ -77,6 +77,8 @@ class ShortPostViewer extends React.Component {
             prevArrow: <Arrow direction="left" />
         };
 
+        console.log(this.state.textData);
+        console.log(this.state.isPaginated);
         if (this.state.window === INITIAL) {
             if (!this.props.eventData.image_data.length) {
 

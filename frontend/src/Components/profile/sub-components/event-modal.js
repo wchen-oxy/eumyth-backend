@@ -13,7 +13,6 @@ class EventModal extends React.Component {
         super(props);
         this.state = {
             window: MAIN,
-            // loaded: false
         }
     }
 
@@ -55,7 +54,6 @@ class EventModal extends React.Component {
                     eventData={this.props.eventData}
                     onDeletePost={this.props.onDeletePost}
                     closeModal={this.props.closeModal}
-
                 />
             );
 

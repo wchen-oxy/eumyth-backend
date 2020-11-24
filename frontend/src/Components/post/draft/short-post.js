@@ -65,6 +65,7 @@ class ShortPost extends React.Component {
         this.setState({ textData: textData, isPaginated: false });
       }
     }
+    console.log(this.state.isPaginated);
   }
 
   // handleTitleChange(e)

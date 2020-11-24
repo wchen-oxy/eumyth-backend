@@ -23,10 +23,11 @@ class ReturningUserPage extends React.Component {
             displayPhoto: "https://i.redd.it/73j1cgr028u21.jpg",
             indexUserData: null,
 
-            allPosts: null,
+            allPosts: 0,
             hasMore: true,
             fixedDataLoadLength: 4,
-            nextOpenPostIndex: 0
+            nextOpenPostIndex: 0,
+            feedData: []
         }
         this.handlePursuitClick = this.handlePursuitClick.bind(this);
         this.handleRecentWorkClick = this.handleRecentWorkClick.bind(this);
@@ -40,12 +41,15 @@ class ReturningUserPage extends React.Component {
             if (result) this.setState({ firstName: result.firstName, lastName: result.lastName });
         });
         if (this._isMounted && this.state.username) {
+            let allPosts = null;
             let indexUserData = null;
             let displayPhoto = "";
             let pursuits = null;
+            let feedData = [];
             AxiosHelper.returnIndexUser(this.state.username)
                 .then(
                     (result) => {
+                        allPosts = result.data.following_feed;
                         indexUserData = result.data;
                         displayPhoto = result.data.cropped_display_photo;
                         pursuits = result.data.pursuits;
@@ -54,20 +58,41 @@ class ReturningUserPage extends React.Component {
                 )
                 .then(
                     (feed) => {
+                        const slicedFeed = allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength);
+                        // console.log(allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength));
                         if (!feed || feed.length === 0) return;
-                        else if (feed.length < this.state.dataLength) {
-                            return AxiosHelper.returnSocialFeedPosts(indexUserData._id, feed.slice(0, feed.length));
-                        }
-                        else {
-                            return AxiosHelper.returnSocialFeedPosts(indexUserData._id, feed.slice(0, this.state.dataLength));
-                        }
+                        return AxiosHelper.returnMultiplePosts(
+                            this.props.targetProfileId,
+                            slicedFeed,
+                            true)
+                            .then(
+                                (result) => {
+                                    console.log(result.data);
+                                    if (this._isMounted) {
+                                        for (const item of result.data){
+                                            feedData.push(item);
+                                        }
+                                    };
+                                   
+                                }
+                            )
+                            .catch((error) => console.log(error));
+                        // else if (feed.length < this.state.dataLength) {
+                        //     return AxiosHelper.returnSocialFeedPosts(indexUserData._id, feed.slice(0, feed.length));
+                        // }
+                        // else {
+                        //     return AxiosHelper.returnSocialFeedPosts(indexUserData._id, feed.slice(0, this.state.dataLength));
+                        // }
                     }
                 )
                 .then(
-                    (results) => {
+                    () => {
+                        // console.log(results);
                         this.setState(
                             {
-                                allPosts: results ? results.data.feed : null,
+                                allPosts: allPosts ? allPosts : null,
+                                feedData: feedData.length > 0 ? feedData : [],
+                                nextOpenPostIndex: this.state.nextOpenPostIndex + this.state.fixedDataLoadLength,
                                 indexUserData: indexUserData,
                                 displayPhoto: displayPhoto,
                                 pursuits: pursuits,
@@ -76,7 +101,7 @@ class ReturningUserPage extends React.Component {
                 )
                 .catch((err) => {
                     console.log(err);
-                    alert("Could Not Load Feed. Error: " + err);
+                    alert("Could Not Load Feed." + err);
                 })
                 ;
         }
@@ -84,6 +109,32 @@ class ReturningUserPage extends React.Component {
 
     componentWillUnmount() {
         this._isMounted = false;
+    }
+
+    fetchNextPosts() {
+        const slicedFeed = this.state.allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength);
+        console.log("fetch");
+        if (this.state.nextOpenPostIndex + this.state.fixedDataLoadLength >= this.state.allPosts.length) {
+            console.log("Length of All Posts Exceeded");
+            this.setState({ hasMore: false });
+        }
+        console.log(this.state.allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength));
+        return AxiosHelper.returnMultiplePosts(
+            this.props.targetProfileId,
+            slicedFeed,
+            true)
+            .then(
+                (result) => {
+                    let feedData = [];
+                    console.log(result.data);
+                    for (const item of result.data){
+                        feedData.push(item);
+                    }
+                    if (this._isMounted) this.setState((state) => ({ feedData: state.feedData.concat(result.data) }));
+                }
+            )
+            .catch((error) => console.log(error));
+
     }
 
     handlePursuitClick(e) {
@@ -97,27 +148,11 @@ class ReturningUserPage extends React.Component {
         alert(value);
     }
 
-    fetchNextPosts() {
-        console.log("fetch");
-        if (this.state.nextOpenPostIndex + this.state.fixedDataLoadLength >= this.state.allPosts.length) {
-            console.log("Length of All Posts Exceeded");
-            this.setState({ hasMore: false });
-        }
-        console.log(this.state.allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength));
-        return AxiosHelper.returnMultiplePosts(
-            this.props.targetProfileId,
-            this.state.allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength))
-            .then(
-                (result) => {
-                    console.log(result.data);
-                    if (this._isMounted) this.createTimelineRow(result.data);
-                }
-            )
-            .catch((error) => console.log(error));
 
-    }
 
     render() {
+        console.log(this.state.feedData);
+        console.log(this.state.allPosts);
         let pursuitInfoArray = [];
         let feed = [];
         let totalMin = 0;
@@ -207,7 +242,7 @@ class ReturningUserPage extends React.Component {
                                     </p>
                                 }>
                                 {
-                                    this.state.allPosts.map((feedItem, index) =>
+                                    this.state.feedData.map((feedItem, index) =>
                                         <div className="feed-object-container">
                                             <FeedObject feedItem={feedItem} key={index} />
                                         </div>
