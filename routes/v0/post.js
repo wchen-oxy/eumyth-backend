@@ -57,19 +57,18 @@ router.route('/')
     const subtitle = !!req.body.subtitle ? req.body.subtitle : null;
     const postPrivacyType = !!req.body.postPrivacyType ? req.body.postPrivacyType : null;
     const pursuitCategory = !!req.body.pursuitCategory ? req.body.pursuitCategory : null;
-    const date = !!req.body.date ? req.body.date : null;
+    const date = !!req.body.date ? new Date(req.body.date) : null;
     const textData = !!req.body.textData ? req.body.textData : null;
     const minDuration = !!req.body.minDuration ? parseInt(req.body.minDuration) : null;
-    const isMilestone = !!req.body.isMilestone ? req.body.isMilestone : null;
-    const isPaginated = req.body.isPaginated ? true : false;
-    const coverPhotoURL = req.files.coverPhoto ? req.files.coverPhoto[0].location : null;
-    const imageData = req.files.images ? getImageUrls(req.files.images) : [];
+    const isMilestone = Boolean.prototype.valueOf(req.body.isMilestone);
+    const isPaginated = Boolean.prototype.valueOf(req.body.isPaginated);
+    const coverPhotoURL = req.files && req.files.coverPhoto ? req.files.coverPhoto[0].location : null;
+    const imageData = req.files && req.files.images ? getImageUrls(req.files.images) : [];
 
     let post = null;
     let indexUser = null;
     let followerArrayID = null;
     let textSnippet = null;
-
     if (textData) {
       if (postType === "SHORT") {
         if (isPaginated) {
@@ -84,8 +83,6 @@ router.route('/')
         textSnippet = completeText.length > 140 ? completeText.substring(0, 140).trim() + "..." : completeText.trim();
       }
     }
-
-    console.log(textSnippet);
 
     const resolveIndexUser = IndexUser.Model.findOne({ username: username }).then(
       indexUserResult => {
@@ -268,15 +265,89 @@ router.route('/')
       )
 
   })
-  .put((req, res) => {
-    
+  .put(upload.single({ name: "coverPhoto", maxCount: 1 }), (req, res) => {
+    console.log("Hit");
+    console.log(req.body);
+    console.log(req.files);
+
+    const postId = !!req.body.postId ? req.body.postId : null;
+
+    const postType = !!req.body.postType ? req.body.postType : null;
+    const username = req.body.username;
+    const displayPhoto = req.body.displayPhoto;
+    const title = !!req.body.title ? req.body.title : null;
+    const subtitle = !!req.body.subtitle ? req.body.subtitle : null;
+    // const postPrivacyType = !!req.body.postPrivacyType ? req.body.postPrivacyType : null;
+    const pursuitCategory = !!req.body.pursuitCategory ? req.body.pursuitCategory : null;
+    const date = !!req.body.date ? req.body.date : null;
+    const textData = !!req.body.textData ? req.body.textData : null;
+    const minDuration = !!req.body.minDuration ? parseInt(req.body.minDuration) : null;
+    const isMilestone = !!req.body.isMilestone ? req.body.isMilestone : null;
+    const isPaginated = req.body.isPaginated ? true : false;
+    const coverPhotoURL = req.files ? req.files.coverPhoto[0].location : null;
+    console.log(textData);
+
+    return Post.Model.findById(postId)
+      .then(
+        (result) => {
+          let post = result;
+          post.username = username;
+          post.displayPhoto = displayPhoto;
+          post.title = title;
+          post.subtitle = subtitle;
+          post.pursuitCategory = pursuitCategory;
+          post.date = date;
+          post.minDuration = minDuration;
+          post.isMilestone = isMilestone;
+          post.isPaginated = isPaginated;
+          post.coverPhotoURL = coverPhotoURL;
+          post.textData = textData;
+          return post.save()
+            .catch(err => {
+              if (err) {
+                console.log(err);
+                res.status(500).json('Error: ' + err);
+              }
+            });;
+        }
+      )
+      .then(
+        () => {
+          return res.status(200).send();
+        }
+      )
+      .catch(err => {
+        console.log(err);
+        res.status(500).send()
+      })
   })
   .delete((req, res) => {
+    console.log("Hit");
+    console.log(req.body.indexUserId);
+    res.status(200).send();
+    const indexUserId = req.body.indexUserId;
     const userId = req.body.userId;
     const postId = req.body.postId;
     let returnedUser = null;
+    let returnedIndexUser = null;
+    const resolvedIndexUser = IndexUser.Model.findById(indexUserId)
+      .then((user) => {
+        returnedUser = user;
+        console.log(user);
+        let updatedRecentPosts = [];
 
-    return User.Model.findById(userId)
+        for (const post of user.recent_posts) {
+          if (post._id.toString() !== postId) {
+            updatedRecentPosts.push(post);
+          }
+        }
+        returnedIndexUser.recent_posts = updatedRecentPosts;
+        return returnedIndexUser.save();
+      })
+      .catch(
+        (err) => console.log(err)
+      );
+    const resolvedUser = User.Model.findById(userId)
       .then((user) => {
         returnedUser = user;
         let updatedAllPosts = [];
@@ -286,25 +357,24 @@ router.route('/')
             updatedAllPosts.push(post);
           }
         }
-        for (const post of user.recent_posts) {
-          if (post._id.toString() !== postId) {
-            updatedRecentPosts.push(post);
-          }
-        }
         returnedUser.all_posts = updatedAllPosts;
-        returnedUser.recent_posts = updatedRecentPosts;
-
-        return Post.Model.deleteOne({ _id: postId });
-      })
-      .then(() => {
         return returnedUser.save();
       })
-      .then(() => res.status(204).send())
-      .catch((err) => console.log(err));
+      .catch(
+        (err) => console.log(err)
+      );
+    return Promise.all([resolvedIndexUser, resolvedUser]).then((result) => Post.Model.deleteOne({ _id: postId }))
+      .then((result) => res.status(204).send())
+      .catch(err => {
+        console.log(err);
+        res.status(500).send();
+      }
+      );
   });
 
 router.route('/multiple').get((req, res) => {
   const postIdList = req.query.postIdList;
+  const includePostText = req.query.includePostText;
   console.log(postIdList);
   return Post.Model.find({
     '_id': { $in: postIdList }, function(err, docs) {
@@ -317,12 +387,14 @@ router.route('/multiple').get((req, res) => {
     (results) => {
       let coverInfoArray = results;
       console.log(coverInfoArray);
-      for (result of coverInfoArray) {
-        // coverInfoArray.push(
+      if (!includePostText) {
+        for (result of coverInfoArray) {
+          // coverInfoArray.push(
           result.text_data = "";
           result.feedback = "";
           console.log(result.text_data);
-        
+
+        }
       }
       console.log(coverInfoArray);
       res.status(200).send(coverInfoArray);
@@ -332,7 +404,6 @@ router.route('/multiple').get((req, res) => {
 router.route('/feed').get((req, res) => {
   const indexUserId = req.query.indexUserId;
   const postIdList = req.query.postIdList;
-  console.log("ewr");
   console.log(postIdList);
   let updatedPostIdList = [];
   let posts = null;
@@ -372,13 +443,13 @@ router.route('/feed').get((req, res) => {
 
 router.route('/single-text').get((req, res) => {
   return Post.Model.findById(req.query.postId)
-  .then(result => {
-    res.status(200).send(result.text_data);
-  })
-  .catch(err => {
-    console.log(err);
-    res.status(500).send("No Post Found");
-  })
+    .then(result => {
+      res.status(200).send(result.text_data);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).send("No Post Found");
+    })
 })
 
 module.exports = router;

@@ -192,7 +192,7 @@ class InitialCustomizationPage extends React.Component {
     render() {
         console.log(this.state.isTaken);
         const available = this.state.username !== '' && !this.state.isTaken ? "Available" : "Taken";
-        const upperCase = this.state.isUpperCase ? "Please Choose Only Lower Case Characters" : ""; 
+        const upperCase = this.state.isUpperCase ? " But Please Choose Only Lower Case Characters" : ""; 
         const { username, firstName, lastName, pursuits } = this.state;
         let isInvalid =
             username === '' ||
@@ -200,7 +200,10 @@ class InitialCustomizationPage extends React.Component {
             lastName === '' ||
             pursuits === null ||
             pursuits.length === 0 ||
-            this.state.isTaken === true;
+            this.state.isTaken || this.state.isUpperCase;
+            console.log(this.state.isTaken);
+
+            console.log(isInvalid);
 
         const pursuitDetails = this.state.pursuits.length !== 0 ? this.state.experienceSelects : <></>;
 

@@ -5,7 +5,7 @@ import TextareaAutosize from 'react-textarea-autosize';
 
 const INITIAL = "INITIAL";
 const LONG = "LONG";
-
+const SHORT = "SHORT";
 
 const ReviewPost = (props) => {
     const [date, setDate] = useState(props.date);
@@ -39,7 +39,7 @@ const ReviewPost = (props) => {
         if (pursuitCategory) formData.append("pursuitCategory", pursuitCategory)
         if (date) formData.append("date", date);
         if (minDuration) formData.append("minDuration", minDuration);
-        if (props.textData) formData.append("textData", props.textData);
+        if (props.textData) formData.append("textData", props.postType === SHORT ? props.textData : JSON.stringify(props.textData));
         if (coverPhoto) formData.append("coverPhoto", coverPhoto);
         if (props.imageArray && props.imageArray.length > 0) {
             for (const image of props.imageArray) {
