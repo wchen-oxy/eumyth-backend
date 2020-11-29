@@ -30,6 +30,7 @@ class InitialCustomizationPage extends React.Component {
         this.handlePursuitExperienceChange = this.handlePursuitExperienceChange.bind(this);
         this.handleProfilePhotoChange = this.handleProfilePhotoChange.bind(this);
         this.handleImageDrop = this.handleImageDrop.bind(this);
+        this.testForSpecialCharacter = this.testForSpecialCharacter.bind(this);
         this.state = {
             ...INITIAL_STATE
         }
@@ -180,6 +181,9 @@ class InitialCustomizationPage extends React.Component {
         this.setState({ pursuits: previousPursuitState });
     }
 
+    testForSpecialCharacter(str){
+        return /[~`!#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?]/g.test(str);
+    }
     handleProfilePhotoChange(photo) {
         this.setState({ profilePhoto: photo });
     }
@@ -193,6 +197,8 @@ class InitialCustomizationPage extends React.Component {
         console.log(this.state.isTaken);
         const available = this.state.username !== '' && !this.state.isTaken ? "Available" : "Taken";
         const upperCase = this.state.isUpperCase ? " But Please Choose Only Lower Case Characters" : ""; 
+        const specialCharacters =  this.testForSpecialCharacter(this.state.username);
+        const specialCharMessage = specialCharacters ? " But No Special Characters" : "";
         const { username, firstName, lastName, pursuits } = this.state;
         let isInvalid =
             username === '' ||
@@ -200,7 +206,10 @@ class InitialCustomizationPage extends React.Component {
             lastName === '' ||
             pursuits === null ||
             pursuits.length === 0 ||
-            this.state.isTaken || this.state.isUpperCase;
+            this.state.isTaken ||
+            this.state.isUpperCase ||
+            specialCharacters;
+
             console.log(this.state.isTaken);
 
             console.log(isInvalid);
@@ -286,7 +295,7 @@ class InitialCustomizationPage extends React.Component {
                     <div className="info-container">
 
                         <label>
-                            Choose a username! {available} {upperCase}
+                            Choose a username! {available} {upperCase} {specialCharMessage}
                         </label>
                         <input type="text" name="username" placeholder="Username" onChange={this.handleChange} />
                         <label>First Name</label>
