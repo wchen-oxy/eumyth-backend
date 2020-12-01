@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require('../../models/user.model');
 const IndexUser = require('../../models/index.user.model');
 const Post = require("../../models/post.model");
+const PostPreview = require("../../models/post.preview.model");
 const multer = require('multer');
 const AWS = require('aws-sdk');
 const AwsConstants = require('../../constants/aws');
@@ -10,20 +11,28 @@ const multerS3 = require('multer-s3');
 const uuid = require('uuid');
 const userRelation = require('../../models/user.relation.model');
 
+const SHORT = "SHORT";
 const RECENT_POSTS_LIMIT = 8;
-
-const setPursuitAttributes = (isMilestone, pursuit, minDuration) => {
-  if (isMilestone) { pursuit.num_milestones = Number(pursuit.num_milestones) + 1; }
-  pursuit.total_min = Number(pursuit.total_min) + minDuration;
-  pursuit.num_posts = Number(pursuit.num_posts) + 1;
-  return pursuit;
-}
 
 const s3 = new AWS.S3({
   accessKeyId: AwsConstants.ID,
   secretAccessKey: AwsConstants.SECRET
 });
 
+const setPursuitAttributes = (isMilestone, pursuit, minDuration, postId, date) => {
+  if (isMilestone) {
+    pursuit.num_milestones = Number(pursuit.num_milestones) + 1;
+  }
+  if (pursuit.all_posts) {
+    pursuit.all_posts.unshift(new PostPreview.Model({
+      post_id: postId,
+      date: date
+    }))
+  }
+  pursuit.total_min = Number(pursuit.total_min) + minDuration;
+  pursuit.num_posts = Number(pursuit.num_posts) + 1;
+  return pursuit;
+}
 
 var upload = multer({
   storage: multerS3({
@@ -45,6 +54,21 @@ const getImageUrls = (array) => {
     imageArray.push(imageFile.location);
   }
   return imageArray;
+}
+
+const makeTextSnippet = (postType, isPaginated, textData) => {
+  if (postType === SHORT) {
+    if (isPaginated) {
+      return textData[0].length > 140 ? textData[0].substring(0, 140).trim() + "..." : textData[0];
+    }
+    else {
+      return textData.length > 140 ? textData.substring(0, 140).trim() + "..." : textData;
+    }
+  }
+  else {
+    const completeText = JSON.parse(textData).blocks[0].text;
+    return completeText.length > 140 ? completeText.substring(0, 140).trim() + "..." : completeText.trim();
+  }
 }
 
 router.route('/')
@@ -69,19 +93,9 @@ router.route('/')
     let indexUser = null;
     let followerArrayID = null;
     let textSnippet = null;
+
     if (textData) {
-      if (postType === "SHORT") {
-        if (isPaginated) {
-          textSnippet = textData[0].length > 140 ? textData[0].substring(0, 140).trim() + "..." : textData[0];
-        }
-        else {
-          textSnippet = textData.length > 140 ? textData.substring(0, 140).trim() + "..." : textData;
-        }
-      }
-      else {
-        const completeText = JSON.parse(textData).blocks[0].text;
-        textSnippet = completeText.length > 140 ? completeText.substring(0, 140).trim() + "..." : completeText.trim();
-      }
+      textSnippet = makeTextSnippet(postType, isPaginated, textData)
     }
 
     const resolveIndexUser = IndexUser.Model.findOne({ username: username }).then(
@@ -179,7 +193,7 @@ router.route('/')
         if (minDuration) {
           for (const pursuit of user.pursuits) {
             if (pursuit.name === pursuitCategory) {
-              setPursuitAttributes(isMilestone, pursuit, minDuration);
+              setPursuitAttributes(isMilestone, pursuit, minDuration, post._id, date);
               break;
             }
           }
@@ -351,7 +365,6 @@ router.route('/')
       .then((user) => {
         returnedUser = user;
         let updatedAllPosts = [];
-        let updatedRecentPosts = [];
         for (const post of user.all_posts) {
           if (post.toString() !== postId) {
             updatedAllPosts.push(post);

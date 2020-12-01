@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const Post = require("./post.model");
 const IndexPursuit = require("./index.pursuit.model");
 
 const indexUserSchema = new Schema(
@@ -12,11 +11,11 @@ const indexUserSchema = new Schema(
             unique: true,
             trim: true
         },
-        
+
         private: {
             type: Boolean,
             required: true,
-          },
+        },
 
         followers: {
             type: Number
@@ -60,7 +59,7 @@ const indexUserSchema = new Schema(
 
         user_relation_id: {
             type: mongoose.Types.ObjectId,
-          },
+        },
 
         pursuits: [IndexPursuit.Schema],
         following_feed: [mongoose.Types.ObjectId], //feed from others
