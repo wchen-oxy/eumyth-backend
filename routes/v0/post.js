@@ -23,7 +23,10 @@ const setPursuitAttributes = (isMilestone, pursuit, minDuration, postId, date) =
   if (isMilestone) {
     pursuit.num_milestones = Number(pursuit.num_milestones) + 1;
   }
-  if (pursuit.all_posts) {
+
+  if (postId) {
+    if (date) { insertIntoDatedPosts(pursuit.dated_posts, postId, date) }
+    else { pursuit.undated_posts.unshift(postId); }
     pursuit.all_posts.unshift(new PostPreview.Model({
       post_id: postId,
       date: date
@@ -34,6 +37,16 @@ const setPursuitAttributes = (isMilestone, pursuit, minDuration, postId, date) =
   return pursuit;
 }
 
+const insertIntoDatedPosts = (datedPosts, postId, date) => {
+  datedPosts.unshift(new PostPreview.Model({
+    post_id: postId,
+    date: date
+  }));
+  if (datedPosts.length > 1) {
+    datedPosts.sort((a, b) => b.date - a.date);
+  }
+  return datedPosts;
+}
 var upload = multer({
   storage: multerS3({
     s3: s3,
@@ -184,6 +197,10 @@ router.route('/')
       resolvedUser => {
         const user = resolvedUser;
         user.all_posts.push(post._id);
+        if (date) insertIntoDatedPosts(user.dated_posts, post._id, date);
+        else {
+          user.undated_posts.unshift(post._id);
+        }
         // user.recent_posts.push(post);
         // if (user.recent_posts.length > RECENT_POSTS_LIMIT) {
         //   user.recent_posts.shift();

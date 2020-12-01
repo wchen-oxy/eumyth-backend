@@ -1,4 +1,5 @@
 const postPreview = require('./post.preview.model');
+const Project = require('./project.model');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
@@ -40,7 +41,7 @@ const pursuitSchema = new Schema({
   },
 
   all_posts: {
-    type: [postPreview.Schema]
+    type: [mongoose.Types.ObjectId]
   },
 
   dated_posts: {
@@ -52,7 +53,7 @@ const pursuitSchema = new Schema({
   },
 
   projects: {
-    type: [projectSchema]
+    type: [Project.Schema]
   }
 
 }, {
