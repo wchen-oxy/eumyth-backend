@@ -65,7 +65,7 @@ const userSchema = new Schema({
   },
 
   undated_posts: {
-    type: mongoose.Types.ObjectId
+    type: [mongoose.Types.ObjectId]
   }
 
 }, {

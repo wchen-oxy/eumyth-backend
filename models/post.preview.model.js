@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const postPreview = new Schema ({
+const postPreviewSchema = new Schema ({
     post_id : {
       type: mongoose.Types.ObjectId,
       required: true,
@@ -12,7 +12,7 @@ const postPreview = new Schema ({
     }
   });
 
-  const postPreviewModel = mongoose.model('post_preview', postPreview);
+  const postPreviewModel = mongoose.model('post_preview', postPreviewSchema);
 
   module.exports = {
       Schema: postPreviewSchema,

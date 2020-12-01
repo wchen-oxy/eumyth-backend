@@ -26,8 +26,8 @@ const setPursuitAttributes = (isMilestone, pursuit, minDuration, postId, date) =
 
   if (postId) {
     if (date) { insertIntoDatedPosts(pursuit.dated_posts, postId, date) }
-    else { pursuit.undated_posts.unshift(postId); }
-    pursuit.all_posts.unshift(new PostPreview.Model({
+    else { pursuit.undated_posts.push(postId); }
+    pursuit.all_posts.push(new PostPreview.Model({
       post_id: postId,
       date: date
     }))
@@ -38,7 +38,7 @@ const setPursuitAttributes = (isMilestone, pursuit, minDuration, postId, date) =
 }
 
 const insertIntoDatedPosts = (datedPosts, postId, date) => {
-  datedPosts.unshift(new PostPreview.Model({
+  datedPosts.push(new PostPreview.Model({
     post_id: postId,
     date: date
   }));
@@ -197,9 +197,13 @@ router.route('/')
       resolvedUser => {
         const user = resolvedUser;
         user.all_posts.push(post._id);
-        if (date) insertIntoDatedPosts(user.dated_posts, post._id, date);
+        if (date) {
+          insertIntoDatedPosts(user.dated_posts, post._id, date);
+          console.log(user.dated_posts);
+        }
         else {
-          user.undated_posts.unshift(post._id);
+          user.undated_posts.push(post._id);
+          console.log(user.undated_posts);
         }
         // user.recent_posts.push(post);
         // if (user.recent_posts.length > RECENT_POSTS_LIMIT) {
@@ -207,7 +211,7 @@ router.route('/')
         //   console.log("Removed oldest post.");
         // }
         //check if pursuits exists already
-        if (minDuration) {
+        if (pursuitCategory) {
           for (const pursuit of user.pursuits) {
             if (pursuit.name === pursuitCategory) {
               setPursuitAttributes(isMilestone, pursuit, minDuration, post._id, date);
