@@ -106,10 +106,19 @@ class ProfilePage extends React.Component {
     }
 
 
-    handleFeedSwitch(index){
-        this.setState((state) => ({
-            feedId : state.pursuits[index].name, 
-            feedData : state.pursuits[index].all_posts}))
+    handleFeedSwitch(index) {
+        if (index === -1) {
+            this.setState((state) => ({
+                feedId: ALL,
+                feedData: state.allPosts
+            }));
+        }
+        else {
+            this.setState((state) => ({
+                feedId: state.pursuits[index].name,
+                feedData: state.pursuits[index].all_posts
+            }))
+        }
     }
 
     handleDeletePost() {
@@ -163,7 +172,7 @@ class ProfilePage extends React.Component {
             pursuits: targetUserInfo.pursuits,
             pursuitsNames: array,
             allPosts: targetUserInfo.all_posts,
-            feedData : targetUserInfo.all_posts,
+            feedData: targetUserInfo.all_posts,
             feedId: ALL,
             // recentPosts: targetUserInfo.recent_posts,
             userRelationId: targetUserInfo.user_relation_id,
@@ -236,13 +245,13 @@ class ProfilePage extends React.Component {
 
     render() {
         console.log(this.state.feedData);
-        var pursuitHolderArray = [];
+        var pursuitHolderArray = [<PursuitHolder key={ALL} name={ALL} value={-1} onFeedSwitch={this.handleFeedSwitch} />];
         if (this.state.fail) return NoMatch;
         if (this.state.pursuits) {
             let index = 0;
             for (const pursuit of this.state.pursuits) {
                 pursuitHolderArray.push(
-                    <PursuitHolder pursuitData={pursuit} key={pursuit.name} value={index++} onFeedSwitch={this.handleFeedSwitch}/>
+                    <PursuitHolder name={pursuit.name} numEvents={pursuit.num_posts} key={pursuit.name} value={index++} onFeedSwitch={this.handleFeedSwitch} />
                 );
             }
         }
