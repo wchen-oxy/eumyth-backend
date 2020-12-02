@@ -27,10 +27,7 @@ const setPursuitAttributes = (isMilestone, pursuit, minDuration, postId, date) =
   if (postId) {
     if (date) { insertIntoDatedPosts(pursuit.dated_posts, postId, date) }
     else { pursuit.undated_posts.push(postId); }
-    pursuit.all_posts.push(new PostPreview.Model({
-      post_id: postId,
-      date: date
-    }))
+    pursuit.all_posts.push(postId);
   }
   pursuit.total_min = Number(pursuit.total_min) + minDuration;
   pursuit.num_posts = Number(pursuit.num_posts) + 1;

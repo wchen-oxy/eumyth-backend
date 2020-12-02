@@ -22,7 +22,7 @@ class PursuitHolder extends React.Component {
 
         const name = this.state.name;
         return (
-            <div className="pursuit-container no-select" key={name} value={name}>
+            <div className="pursuit-container no-select" key={name}   onClick={() => this.props.onFeedSwitch(this.props.value)}>
                 <h4>
                     {this.state.name}
                 </h4>

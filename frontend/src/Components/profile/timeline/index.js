@@ -83,6 +83,7 @@ class Timeline extends React.Component {
     }
 
     render() {
+        console.log(this.state.feedData);
         if (!this._isMounted) return (
             <div id="timeline-container">
                 <p>Loading</p>

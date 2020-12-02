@@ -16,6 +16,7 @@ import {
 } from "../constants/flags";
 import './index.scss';
 
+const ALL = "ALL";
 
 class ProfilePage extends React.Component {
     _isMounted = false;
@@ -38,7 +39,8 @@ class ProfilePage extends React.Component {
             textData: null,
             userRelationId: null,
             followerStatus: null,
-            feedData: [[]],
+            feedId: null,
+            feedData: null,
             lastRetrievedPostIndex: 0,
             preferredPostType: null,
             isModalShowing: false,
@@ -54,6 +56,7 @@ class ProfilePage extends React.Component {
         this.handleFollowerStatusChange = this.handleFollowerStatusChange.bind(this);
         this.handleOptionsClick = this.handleOptionsClick.bind(this);
         this.handleDeletePost = this.handleDeletePost.bind(this);
+        this.handleFeedSwitch = this.handleFeedSwitch.bind(this);
     }
 
 
@@ -103,6 +106,11 @@ class ProfilePage extends React.Component {
     }
 
 
+    handleFeedSwitch(index){
+        this.setState((state) => ({
+            feedId : state.pursuits[index].name, 
+            feedData : state.pursuits[index].all_posts}))
+    }
 
     handleDeletePost() {
         console.log("Deleting");
@@ -155,6 +163,8 @@ class ProfilePage extends React.Component {
             pursuits: targetUserInfo.pursuits,
             pursuitsNames: array,
             allPosts: targetUserInfo.all_posts,
+            feedData : targetUserInfo.all_posts,
+            feedId: ALL,
             // recentPosts: targetUserInfo.recent_posts,
             userRelationId: targetUserInfo.user_relation_id,
             followerStatus: followerStatus
@@ -225,13 +235,14 @@ class ProfilePage extends React.Component {
 
 
     render() {
-        console.log(this.state.pursuits);
+        console.log(this.state.feedData);
         var pursuitHolderArray = [];
         if (this.state.fail) return NoMatch;
         if (this.state.pursuits) {
+            let index = 0;
             for (const pursuit of this.state.pursuits) {
                 pursuitHolderArray.push(
-                    <PursuitHolder pursuitData={pursuit} key={pursuit.name} value={pursuit.name} />
+                    <PursuitHolder pursuitData={pursuit} key={pursuit.name} value={index++} onFeedSwitch={this.handleFeedSwitch}/>
                 );
             }
         }
@@ -268,10 +279,11 @@ class ProfilePage extends React.Component {
                     </div>
                 </div>
                 <div id="personal-profile-timeline-container">
-                    {this.state.allPosts ?
+                    {this.state.feedData ?
                         <Timeline
                             // recentPosts={this.state.recentPosts}
-                            allPosts={this.state.allPosts}
+                            key={this.state.feedId}
+                            allPosts={this.state.feedData}
                             onEventClick={this.handleEventClick}
                             targetProfileId={this.state.targetProfileId} />
                         : <></>
