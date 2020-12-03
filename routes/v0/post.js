@@ -414,7 +414,7 @@ router.route('/multiple').get((req, res) => {
         console.log(docs);
       }
     }
-  }).then(
+  }).sort({ createdAt: -1 }).then(
     (results) => {
       let coverInfoArray = results;
       console.log(coverInfoArray);
