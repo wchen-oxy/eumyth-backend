@@ -1,28 +1,53 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-
 const projectSchema = new Schema({
-    name: {
-      type: String,
-      required: true,
-      trim: true
-    },
-  
-    cover_image_url : {
-      type: String,
-      required: false,
-      trim: false
-    },
-  
-    post_ids : {
-      type: [mongoose.Types.ObjectId]
-    }
-  });
+  title: {
+    type: String,
+    required: true,
+    trim: true
+  },
 
-  const projectModel = mongoose.model('project', projectSchema);
+  subtitle: {
+    type: String,
+    required: false,
+    trim: true
+  },
 
-  module.exports = {
-    Schema: projectSchema,
-    Model: projectModel
-  };
+  description: {
+    type: String,
+    required: false,
+    trim: true
+  },
+
+  cover_photo_url: {
+    type: String,
+    required: false,
+    trim: false
+  },
+
+  date: {
+    type: Date
+  },
+
+  isComplete: {
+    type: Boolean,
+    required: false,
+  },
+
+  min_duration: {
+    type: Number,
+    required: false
+  },
+
+  post_ids: {
+    type: [mongoose.Types.ObjectId]
+  }
+});
+
+const projectModel = mongoose.model('project', projectSchema);
+
+module.exports = {
+  Schema: projectSchema,
+  Model: projectModel
+};

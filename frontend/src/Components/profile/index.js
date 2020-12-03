@@ -18,6 +18,7 @@ import './index.scss';
 
 const ALL = "ALL";
 const POSTS = "POSTS";
+const PROJECT = "PROJECT";
 const PROJECTS = "PROJECTS";
 
 class ProfilePage extends React.Component {
@@ -40,6 +41,7 @@ class ProfilePage extends React.Component {
             allProjects: null,
             fail: false,
             selectedEvent: null,
+            mediaType: null,
             textData: null,
             userRelationId: null,
             followerStatus: null,
@@ -63,6 +65,7 @@ class ProfilePage extends React.Component {
         this.handleDeletePost = this.handleDeletePost.bind(this);
         this.handleFeedSwitch = this.handleFeedSwitch.bind(this);
         this.handleFeedDataTypeSwitch = this.handleFeedDataTypeSwitch.bind(this);
+        this.handleNewProjectClick = this.handleNewProjectClick.bind(this);
     }
 
 
@@ -251,7 +254,7 @@ class ProfilePage extends React.Component {
                 (result) => {
                     console.log(result.data);
                     if (this._isMounted) {
-                        this.setState({ selectedEvent: selectedEvent, textData: result.data }, this.openModal());
+                        this.setState({ selectedEvent: selectedEvent, textData: result.data, mediaType: selectedEvent.post_format }, this.openModal());
                     }
                 }
             )
@@ -259,6 +262,9 @@ class ProfilePage extends React.Component {
         // .then(() => this.setState({ selectedEvent: selectedEvent }));
     }
 
+    handleNewProjectClick(){
+        this.setState({selectedEvent: PROJECT, mediaType: PROJECT}, this.openModal());
+    }
     handleFollowerStatusChange(action) {
         AxiosHelper.setFollowerStatus(this.state.visitorUsername, this.state.targetUsername, this.state.userRelationId, this.state.isPrivate, action).then(
             (result) => {
@@ -288,6 +294,7 @@ class ProfilePage extends React.Component {
 
 
     render() {
+        const newOrBackButton = (this.state.viewingProject ?  <button onClick={() => console.log()}>Back</button> : <button onClick={this.handleNewProjectClick}>New</button>);
         var pursuitHolderArray = [<PursuitHolder key={ALL} name={ALL} value={-1} onFeedSwitch={this.handleFeedSwitch} />];
         if (this.state.fail) return NoMatch;
         if (this.state.pursuits) {
@@ -329,11 +336,15 @@ class ProfilePage extends React.Component {
 
                     </div>
                 </div>
-                <div id="personal-profile-content-switch-container">
+                <div className="personal-profile-content-switch-container">
                     <div id="personal-profile-buttons-container">
                         <button onClick={() => this.handleFeedDataTypeSwitch(POSTS)}>Posts</button>
-                        <button onClick={() => this.handleFeedDataTypeSwitch(PROJECTS)}>Projects</button>
+                        <button onClick={() => this.handleFeedDataTypeSwitch(PROJECT)}>Projects</button>
                     </div>
+                </div>
+                <div className="personal-profile-content-switch-container">
+                    {this.state.feedDataType === PROJECTS ? newOrBackButton : <></>}
+                    <button id="sort-by-date-button">Sort By Date</button>
                 </div>
                 <div id="personal-profile-timeline-container">
 
@@ -358,6 +369,7 @@ class ProfilePage extends React.Component {
                                 displayPhoto={this.state.smallCroppedDisplayPhoto}
                                 preferredPostType={this.state.preferredPostType}
                                 closeModal={this.closeModal}
+                                mediaType={this.state.mediaType}
                                 // smallProfilePhoto={this.state.smallCroppedDisplayPhoto}
                                 pursuits={this.state.pursuitsNames}
                                 username={this.state.targetUsername}

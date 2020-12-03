@@ -1,21 +1,22 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const postPreviewSchema = new Schema ({
+const postPreviewSchema = new Schema({
+  _id: false,
   
-    post_id : {
-      type: mongoose.Types.ObjectId,
-      required: true,
-    },
-  
-    date : {
-      type : Date,
-    }
-  });
+  post_id: {
+    type: mongoose.Types.ObjectId,
+    required: true,
+  },
 
-  const postPreviewModel = mongoose.model('post_preview', postPreviewSchema);
-
-  module.exports = {
-      Schema: postPreviewSchema,
-      Model: postPreviewModel
+  date: {
+    type: Date,
   }
+});
+
+const postPreviewModel = mongoose.model('post_preview', postPreviewSchema);
+
+module.exports = {
+  Schema: postPreviewSchema,
+  Model: postPreviewModel
+}

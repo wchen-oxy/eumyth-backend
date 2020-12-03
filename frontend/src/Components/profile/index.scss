@@ -58,14 +58,17 @@
     }
 }
 
-#personal-profile-content-switch-container{
+.personal-profile-content-switch-container {
     width: 100%;
     margin: auto;
     max-width: 940px;
 
+    #sort-by-date-button {
+        float: right;
+    }
 }
 
-#personal-profile-buttons-container{
+#personal-profile-buttons-container {
     display: flex;
     justify-content: center;
 }
@@ -81,7 +84,7 @@
     margin: auto;
     max-width: 940px;
 
-    #post-window{
+    #post-window {
         position: fixed;
     }
 }
@@ -109,7 +112,6 @@
 //     background-position: center;
 // }
 
-
 .pursuit-container {
     justify-content: center;
     margin: 0 5px;
@@ -117,7 +119,7 @@
     cursor: pointer;
 }
 
-#user-option-window{
+#user-option-window {
     position: fixed;
     top: 50%;
     left: 50%;
