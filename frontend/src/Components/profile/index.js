@@ -17,6 +17,8 @@ import {
 import './index.scss';
 
 const ALL = "ALL";
+const POSTS = "POSTS";
+const PROJECTS = "PROJECTS";
 
 class ProfilePage extends React.Component {
     _isMounted = false;
@@ -32,14 +34,17 @@ class ProfilePage extends React.Component {
             coverPhoto: "",
             bio: "",
             pursuits: null,
+            selectedPursuitIndex: -1,
             recentPosts: null,
             allPosts: null,
+            allProjects: null,
             fail: false,
             selectedEvent: null,
             textData: null,
             userRelationId: null,
             followerStatus: null,
             feedId: null,
+            feedDataType: null,
             feedData: null,
             lastRetrievedPostIndex: 0,
             preferredPostType: null,
@@ -57,6 +62,7 @@ class ProfilePage extends React.Component {
         this.handleOptionsClick = this.handleOptionsClick.bind(this);
         this.handleDeletePost = this.handleDeletePost.bind(this);
         this.handleFeedSwitch = this.handleFeedSwitch.bind(this);
+        this.handleFeedDataTypeSwitch = this.handleFeedDataTypeSwitch.bind(this);
     }
 
 
@@ -105,18 +111,47 @@ class ProfilePage extends React.Component {
         this._isMounted = false;
     }
 
+    handleFeedDataTypeSwitch(type) {
+        console.log(this.state.feedId);
+        // console.log(ALL + POSTS);
+        // console.log(this.state.pursuits[this.state.selectedPursuitIndex]);
+
+        // console.log(this.state.selectedPursuitIndex);
+        if (this.state.feedId !== ALL + POSTS && this.state.feedId !== ALL + PROJECTS) {
+            if (type === POSTS) {
+                this.setState((state) => ({ feedId: state.pursuits[state.selectedPursuitIndex].name + POSTS, feedDataType: POSTS, feedData: state.pursuits[state.selectedPursuitIndex].all_posts }))
+            }
+            else {
+                this.setState((state) => ({ feedId: state.pursuits[state.selectedPursuitIndex].name + PROJECTS, feedDataType: PROJECTS, feedData: state.pursuits[state.selectedPursuitIndex].all_projects }));
+
+            }
+        }
+        else {
+            console.log(this.state.feedData);
+            if (type === POSTS) {
+                this.setState((state) => ({ feedId: ALL + POSTS, feedDataType: POSTS, feedData: state.allPosts }))
+            }
+            else {
+                this.setState((state) => ({ feedId: ALL + PROJECTS, feedDataType: PROJECTS, feedData: state.allProjects }));
+
+            }
+        }
+    }
+
 
     handleFeedSwitch(index) {
         if (index === -1) {
             this.setState((state) => ({
-                feedId: ALL,
-                feedData: state.allPosts
+                selectedPursuitIndex: -1,
+                feedId: ALL + state.feedDataType,
+                feedData: state.allPosts,
             }));
         }
         else {
             this.setState((state) => ({
-                feedId: state.pursuits[index].name,
-                feedData: state.pursuits[index].all_posts
+                selectedPursuitIndex: index,
+                feedId: state.pursuits[index].name + state.feedDataType,
+                feedData: state.pursuits[index].all_posts,
             }))
         }
     }
@@ -152,11 +187,18 @@ class ProfilePage extends React.Component {
     }
 
     handleResponseData(user, targetUserInfo, followerStatusResponse) {
-        let array = [];
+        let pursuitNameArray = [];
+        let projectArray = [];
         const followerStatus = followerStatusResponse ? this.handleFollowerStatusResponse(followerStatusResponse) : null;
         for (const pursuit of targetUserInfo.pursuits) {
-            array.push(pursuit.name);
+            pursuitNameArray.push(pursuit.name);
+            if (pursuit.projects) {
+                for (const project of pursuit.projects) {
+                    projectArray.push(project);
+                }
+            }
         }
+
         //set visitor user info and targetUserinfo
         if (this._isMounted) this.setState({
             visitorUsername: user ? user.displayName : null,
@@ -170,10 +212,12 @@ class ProfilePage extends React.Component {
             bio: targetUserInfo.bio,
             pinned: targetUserInfo.pinned,
             pursuits: targetUserInfo.pursuits,
-            pursuitsNames: array,
+            pursuitsNames: pursuitNameArray,
             allPosts: targetUserInfo.all_posts,
+            allProjects: projectArray,
             feedData: targetUserInfo.all_posts,
-            feedId: ALL,
+            feedDataType: POSTS,
+            feedId: ALL + POSTS,
             // recentPosts: targetUserInfo.recent_posts,
             userRelationId: targetUserInfo.user_relation_id,
             followerStatus: followerStatus
@@ -244,7 +288,6 @@ class ProfilePage extends React.Component {
 
 
     render() {
-        console.log(this.state.feedData);
         var pursuitHolderArray = [<PursuitHolder key={ALL} name={ALL} value={-1} onFeedSwitch={this.handleFeedSwitch} />];
         if (this.state.fail) return NoMatch;
         if (this.state.pursuits) {
@@ -255,7 +298,6 @@ class ProfilePage extends React.Component {
                 );
             }
         }
-        console.log(this.state.selectedEvent);
         return (
             <div>
                 <div id="personal-profile-container" className="flex-display flex-direction-column">
@@ -287,16 +329,22 @@ class ProfilePage extends React.Component {
 
                     </div>
                 </div>
+                <div id="personal-profile-content-switch-container">
+                    <div id="personal-profile-buttons-container">
+                        <button onClick={() => this.handleFeedDataTypeSwitch(POSTS)}>Posts</button>
+                        <button onClick={() => this.handleFeedDataTypeSwitch(PROJECTS)}>Projects</button>
+                    </div>
+                </div>
                 <div id="personal-profile-timeline-container">
-                    {this.state.feedData ?
-                        <Timeline
-                            // recentPosts={this.state.recentPosts}
-                            key={this.state.feedId}
-                            allPosts={this.state.feedData}
-                            onEventClick={this.handleEventClick}
-                            targetProfileId={this.state.targetProfileId} />
-                        : <></>
-                    }
+
+                    <Timeline
+                        // recentPosts={this.state.recentPosts}
+                        key={this.state.feedId}
+                        allPosts={this.state.feedData}
+                        onEventClick={this.handleEventClick}
+                        targetProfileId={this.state.targetProfileId} />
+
+
                 </div>
                 <div className="modal" ref={this.modalRef}>
                     <div className="overlay" onClick={(() => this.closeModal())}></div>

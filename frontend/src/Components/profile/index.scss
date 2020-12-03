@@ -58,6 +58,18 @@
     }
 }
 
+#personal-profile-content-switch-container{
+    width: 100%;
+    margin: auto;
+    max-width: 940px;
+
+}
+
+#personal-profile-buttons-container{
+    display: flex;
+    justify-content: center;
+}
+
 #temp-cover {
     height: 100%;
     width: 100%;
@@ -67,7 +79,7 @@
 #personal-profile-timeline-container {
     width: 100%;
     margin: auto;
-    max-width: 980px;
+    max-width: 940px;
 
     #post-window{
         position: fixed;

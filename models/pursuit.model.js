@@ -10,7 +10,7 @@ const pursuitSchema = new Schema({
     trim: true
 
   },
-  display_photo : {
+  display_photo: {
     type: String,
     required: false,
   },
@@ -58,7 +58,7 @@ const pursuitSchema = new Schema({
 
 }, {
   timestamps: true,
-}); 
+});
 
 const pursuitModel = mongoose.model('pursuit', pursuitSchema);
 

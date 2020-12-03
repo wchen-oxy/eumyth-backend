@@ -26,6 +26,10 @@ class Timeline extends React.Component {
             console.log(this.props.allPosts);
             this.fetchNextPosts(this.props.allPosts);
         }
+        else{
+            console.log("ELSE");
+            this.setState({hasMore: false});
+        }
     }
 
     createTimelineRow(inputArray) {
@@ -35,7 +39,6 @@ class Timeline extends React.Component {
 
         let j = 0;
         let k = masterArray[index].length; //length of last array 
-        console.log(k);
         //while input array is not empty
         while (j < inputArray.length) {
             //while the last sub array is not empty
@@ -83,7 +86,6 @@ class Timeline extends React.Component {
     }
 
     render() {
-        console.log(this.state.feedData);
         if (!this._isMounted) return (
             <div id="timeline-container">
                 <p>Loading</p>
@@ -105,7 +107,6 @@ class Timeline extends React.Component {
                     {
                         this.state.feedData.map(
                             (item, index) => {
-                                console.log(item);
                                 return (
                                     <div className="flex-display" key={index}>
                                         {item}

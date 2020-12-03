@@ -26,8 +26,8 @@ const setPursuitAttributes = (isMilestone, pursuit, minDuration, postId, date) =
 
   if (postId) {
     if (date) { insertIntoDatedPosts(pursuit.dated_posts, postId, date) }
-    else { pursuit.undated_posts.push(postId); }
-    pursuit.all_posts.push(postId);
+    else { pursuit.undated_posts.unshift(postId); }
+    pursuit.all_posts.unshift(postId);
   }
   pursuit.total_min = Number(pursuit.total_min) + minDuration;
   pursuit.num_posts = Number(pursuit.num_posts) + 1;
@@ -35,7 +35,7 @@ const setPursuitAttributes = (isMilestone, pursuit, minDuration, postId, date) =
 }
 
 const insertIntoDatedPosts = (datedPosts, postId, date) => {
-  datedPosts.push(new PostPreview.Model({
+  datedPosts.unshift(new PostPreview.Model({
     post_id: postId,
     date: date
   }));
@@ -178,7 +178,7 @@ router.route('/')
           }
         }
       }
-      resolvedIndexUser.recent_posts.push(post._id);
+      resolvedIndexUser.recent_posts.unshift(post._id);
       if (resolvedIndexUser.recent_posts.length > RECENT_POSTS_LIMIT) resolvedIndexUser.recent_posts.shift();
       return resolvedIndexUser.user_profile_id;
     }
@@ -193,16 +193,16 @@ router.route('/')
     resolvedUser.then(
       resolvedUser => {
         const user = resolvedUser;
-        user.all_posts.push(post._id);
+        user.all_posts.unshift(post._id);
         if (date) {
           insertIntoDatedPosts(user.dated_posts, post._id, date);
           console.log(user.dated_posts);
         }
         else {
-          user.undated_posts.push(post._id);
+          user.undated_posts.unshift(post._id);
           console.log(user.undated_posts);
         }
-        // user.recent_posts.push(post);
+        // user.recent_posts.unshift(post);
         // if (user.recent_posts.length > RECENT_POSTS_LIMIT) {
         //   user.recent_posts.shift();
         //   console.log("Removed oldest post.");
@@ -253,7 +253,7 @@ router.route('/')
           if (userRelationResult) {
             let followersIdArray = [];
             for (const user of userRelationResult.followers) {
-              followersIdArray.push(user.id);
+              followersIdArray.unshift(user.id);
             }
             return IndexUser.Model.find({
               '_id': { $in: followersIdArray }, function(err, docs) {
@@ -274,7 +274,7 @@ router.route('/')
           //resolved users
           const promisedUpdatedFollowerArray = userArray.map(
             indexUser => new Promise((resolve) => {
-              indexUser.following_feed.push(post._id);
+              indexUser.following_feed.unshift(post._id);
               if (indexUser.following_feed.length > 50) {
                 indexUser.following_feed.shift();
                 console.log("Removed oldest post from a user's following feed");
@@ -370,7 +370,7 @@ router.route('/')
 
         for (const post of user.recent_posts) {
           if (post._id.toString() !== postId) {
-            updatedRecentPosts.push(post);
+            updatedRecentPosts.unshift(post);
           }
         }
         returnedIndexUser.recent_posts = updatedRecentPosts;
@@ -385,7 +385,7 @@ router.route('/')
         let updatedAllPosts = [];
         for (const post of user.all_posts) {
           if (post.toString() !== postId) {
-            updatedAllPosts.push(post);
+            updatedAllPosts.unshift(post);
           }
         }
         returnedUser.all_posts = updatedAllPosts;
@@ -420,7 +420,7 @@ router.route('/multiple').get((req, res) => {
       console.log(coverInfoArray);
       if (!includePostText) {
         for (result of coverInfoArray) {
-          // coverInfoArray.push(
+          // coverInfoArray.unshift(
           result.text_data = "";
           result.feedback = "";
           console.log(result.text_data);
@@ -432,45 +432,45 @@ router.route('/multiple').get((req, res) => {
     })
 });
 
-router.route('/feed').get((req, res) => {
-  const indexUserId = req.query.indexUserId;
-  const postIdList = req.query.postIdList;
-  console.log(postIdList);
-  let updatedPostIdList = [];
-  let posts = null;
-  return Post.Model.find({
-    '_id': { $in: postIdList }, function(err, docs) {
-      if (err) console.log(err);
-      else {
-        console.log(docs);
-      }
-    }
-  }).then(
-    (result) => {
-      console.log(result);
-      posts = result;
-      if (result.length !== postIdList) {
-        for (const post of result) {
-          if (postIdList.includes(post._id.toString())) updatedPostIdList.push(post._id.toString());
-        }
-        return IndexUser.Model.findById(indexUserId).then(
-          (indexUser) => {
-            indexUser.following_feed = updatedPostIdList;
-            return indexUser.save();
-          }
-        );
-      }
-      return;
-    }
-  )
-    .then(() => res.status(200).json({ feed: posts }))
-    .catch((err) => {
-      console.log(err);
-      res.status(500).send();
-    })
+// router.route('/feed').get((req, res) => {
+//   const indexUserId = req.query.indexUserId;
+//   const postIdList = req.query.postIdList;
+//   console.log(postIdList);
+//   let updatedPostIdList = [];
+//   let posts = null;
+//   return Post.Model.find({
+//     '_id': { $in: postIdList }, function(err, docs) {
+//       if (err) console.log(err);
+//       else {
+//         console.log(docs);
+//       }
+//     }
+//   }).then(
+//     (result) => {
+//       console.log(result);
+//       posts = result;
+//       if (result.length !== postIdList) {
+//         for (const post of result) {
+//           if (postIdList.includes(post._id.toString())) updatedPostIdList.unshift(post._id.toString());
+//         }
+//         return IndexUser.Model.findById(indexUserId).then(
+//           (indexUser) => {
+//             indexUser.following_feed = updatedPostIdList;
+//             return indexUser.save();
+//           }
+//         );
+//       }
+//       return;
+//     }
+//   )
+//     .then(() => res.status(200).json({ feed: posts }))
+//     .catch((err) => {
+//       console.log(err);
+//       res.status(500).send();
+//     })
 
 
-});
+// });
 
 router.route('/single-text').get((req, res) => {
   return Post.Model.findById(req.query.postId)

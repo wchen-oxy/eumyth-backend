@@ -92,6 +92,7 @@ class InitialCustomizationPage extends React.Component {
 
     handleSubmit(e) {
         e.preventDefault();
+        console.log("Submitted");
         if (this.editor) {
             // This returns a HTMLCanvasElement, it can be made into a data URL or a blob,
             // drawn on another canvas, or added to the DOM.
@@ -166,6 +167,35 @@ class InitialCustomizationPage extends React.Component {
             //         }
             //     );
         }
+
+        else{
+            Promise.all(
+                [this.props.firebase.writeBasicUserData(
+                    this.state.username,
+                    this.state.firstName,
+                    this.state.lastName
+                ),
+                this.props.firebase.doUsernameUpdate(this.state.username),
+                ]
+            )
+                .then(
+                    (results) => {
+                        console.log(results);
+                        let formData = new FormData();
+                        formData.append("username", this.state.username);
+                        formData.append("pursuits", JSON.stringify(this.state.pursuits));
+                        return AxiosHelper.createUserProfile(formData)
+                    }
+                )
+                .then(
+                    (result) => {
+                        console.log(result);
+                        if (result.status === 201) window.location.reload();
+                    }
+                )
+                .catch((error) => console.log(error));
+        }
+
     }
 
     handlePursuitExperienceChange(e) {

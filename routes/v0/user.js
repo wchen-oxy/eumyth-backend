@@ -52,9 +52,9 @@ router.route('/')
       console.log(req.body);
       const username = req.body.username;
       const pursuitsArray = JSON.parse(req.body.pursuits);
-      const croppedImage = req.files.croppedImage[0].location;
-      const smallCroppedImage = req.files.smallCroppedImage[0].location;
-      const tinyCroppedImage = req.files.tinyCroppedImage[0].location;
+      const croppedImage = req.files.croppedImage ? req.files.croppedImage[0].location : null;
+      const smallCroppedImage = req.files.smallCroppedImage ? req.files.smallCroppedImage[0].location : null;
+      const tinyCroppedImage = req.files.tinyCroppedImage ? req.files.tinyCroppedImage[0].location : null;
 
       let mainPursuitsHolder = [];
       let indexPursuitsHolder = [];
@@ -85,16 +85,17 @@ router.route('/')
         );
       }
 
-      const newUser = new User.Model({
-        username: username,
-        cropped_display_photo: croppedImage,
-        small_cropped_display_photo: smallCroppedImage,
-        tiny_cropped_display_photo: tinyCroppedImage,
-        pursuits: mainPursuitsHolder,
-        private: false
-      });
+      const newUser = 
+        new User.Model({
+          username: username,
+          cropped_display_photo: croppedImage,
+          small_cropped_display_photo: smallCroppedImage,
+          tiny_cropped_display_photo: tinyCroppedImage,
+          pursuits: mainPursuitsHolder,
+          private: false
+        });
 
-      const newIndexUser = new IndexUser.Model({
+      const newIndexUser  =  new IndexUser.Model({
         username: username,
         user_profile_id: newUser._id,
         preferredPostType: "public-feed",
@@ -117,13 +118,13 @@ router.route('/')
       const savedIndexUser = newIndexUser.save();
       const savedUserRelation = newUserRelation.save();
       return Promise.all([savedIndexUser, savedUser, savedUserRelation])
-      .then(() => res.status(201).json("Success!"))
-      .catch(err => {
-        console.log(err);
-        res.status(500).json(err);
-      });
+        .then(() => res.status(201).json("Success!"))
+        .catch(err => {
+          console.log(err);
+          res.status(500).json(err);
+        });
     });
- 
+
 
 
 module.exports = router;

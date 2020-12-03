@@ -59,7 +59,7 @@ const userSchema = new Schema({
   pursuits: [Pursuits.Schema],
 
   all_posts: [mongoose.Types.ObjectId], //all posts including the most recent posts. ID only
-
+  
   dated_posts: {
     type: [PostPreview.Schema]
   },
