@@ -31,7 +31,7 @@ class EventModal extends React.Component {
     render() {
         // if (!this.props.eventData || !this.props.textData) return (<></>);
         if (this.state.window === MAIN) {
-            switch (this.props.mediaType) {
+            switch (this.props.postType) {
                 case (SHORT):
                     return (<ShortPostViewer
                         displayPhoto={this.props.displayPhoto}
@@ -59,11 +59,12 @@ class EventModal extends React.Component {
                         onDeletePost={this.props.onDeletePost}
                         closeModal={this.props.closeModal}
                     />);
-                case (PROJECT):
-                    return (
-                        <ProjectController
-                        />
-                    )
+                // case (PROJECT):
+                //     return (
+                //         <ProjectController
+                //             eventData={this.props.eventData}
+                //         />
+                //     )
                 default:
                     throw new Error("No content type matched in event-modal.js");
             }

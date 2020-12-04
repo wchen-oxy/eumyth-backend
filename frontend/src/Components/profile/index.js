@@ -7,6 +7,8 @@ import NoMatch from '../no-match';
 import EventModal from "./sub-components/event-modal";
 import FollowButton from "./sub-components/follow-buttons";
 import UserOptions from "./sub-components/user-options";
+import ProjectText from "../project/sub-components/project-text";
+
 import {
     NOT_A_FOLLOWER_STATE,
     FOLLOW_ACTION,
@@ -18,8 +20,10 @@ import './index.scss';
 
 const ALL = "ALL";
 const POSTS = "POSTS";
+const POST = "POST";
 const PROJECT = "PROJECT";
 const PROJECTS = "PROJECTS";
+const NEW_PROJECT = "NEW PROJECT";
 
 class ProfilePage extends React.Component {
     _isMounted = false;
@@ -35,22 +39,25 @@ class ProfilePage extends React.Component {
             coverPhoto: "",
             bio: "",
             pursuits: null,
-            selectedPursuitIndex: -1,
             recentPosts: null,
             allPosts: null,
             allProjects: null,
             fail: false,
             selectedEvent: null,
-            mediaType: null,
             textData: null,
             userRelationId: null,
             followerStatus: null,
+
             feedId: null,
-            feedDataType: null,
             feedData: null,
+            mediaType: null,
+            selectedPursuitIndex: -1, //for pursuit name
+
+
             lastRetrievedPostIndex: 0,
             preferredPostType: null,
             isModalShowing: false,
+            newProject: false,
 
 
         }
@@ -64,7 +71,7 @@ class ProfilePage extends React.Component {
         this.handleOptionsClick = this.handleOptionsClick.bind(this);
         this.handleDeletePost = this.handleDeletePost.bind(this);
         this.handleFeedSwitch = this.handleFeedSwitch.bind(this);
-        this.handleFeedDataTypeSwitch = this.handleFeedDataTypeSwitch.bind(this);
+        this.handleMediaTypeSwitch = this.handleMediaTypeSwitch.bind(this);
         this.handleNewProjectClick = this.handleNewProjectClick.bind(this);
     }
 
@@ -114,30 +121,24 @@ class ProfilePage extends React.Component {
         this._isMounted = false;
     }
 
-    handleFeedDataTypeSwitch(type) {
-        console.log(this.state.feedId);
-        // console.log(ALL + POSTS);
-        // console.log(this.state.pursuits[this.state.selectedPursuitIndex]);
+    handleMediaTypeSwitch(mediaType) {
 
-        // console.log(this.state.selectedPursuitIndex);
-        if (this.state.feedId !== ALL + POSTS && this.state.feedId !== ALL + PROJECTS) {
-            if (type === POSTS) {
-                this.setState((state) => ({ feedId: state.pursuits[state.selectedPursuitIndex].name + POSTS, feedDataType: POSTS, feedData: state.pursuits[state.selectedPursuitIndex].all_posts }))
-            }
-            else {
-                this.setState((state) => ({ feedId: state.pursuits[state.selectedPursuitIndex].name + PROJECTS, feedDataType: PROJECTS, feedData: state.pursuits[state.selectedPursuitIndex].all_projects }));
-
-            }
+        if (this.state.selectedPursuitIndex === -1) {
+            this.setState((state) => ({
+                feedId: ALL + mediaType,
+                mediaType: mediaType,
+                feedData: mediaType === POST ? state.allPosts : state.allProjects
+            }));
         }
         else {
-            console.log(this.state.feedData);
-            if (type === POSTS) {
-                this.setState((state) => ({ feedId: ALL + POSTS, feedDataType: POSTS, feedData: state.allPosts }))
-            }
-            else {
-                this.setState((state) => ({ feedId: ALL + PROJECTS, feedDataType: PROJECTS, feedData: state.allProjects }));
-
-            }
+            this.setState((state) => ({
+                feedId: state.pursuits[state.selectedPursuitIndex].name + mediaType,
+                mediaType: mediaType,
+                feedData: mediaType === POST ?
+                    (state.pursuits[state.selectedPursuitIndex].all_posts ? state.pursuits[state.selectedPursuitIndex].all_posts : [])
+                    :
+                    (state.pursuits[state.selectedPursuitIndex].all_projects ? state.pursuits[state.selectedPursuitIndex].all_projects : [])
+            }));
         }
     }
 
@@ -146,15 +147,18 @@ class ProfilePage extends React.Component {
         if (index === -1) {
             this.setState((state) => ({
                 selectedPursuitIndex: -1,
-                feedId: ALL + state.feedDataType,
-                feedData: state.allPosts,
+                feedId: ALL + state.mediaType,
+                feedData: state.mediaType === POST ? state.allPosts : state.allProjects,
             }));
         }
         else {
             this.setState((state) => ({
                 selectedPursuitIndex: index,
-                feedId: state.pursuits[index].name + state.feedDataType,
-                feedData: state.pursuits[index].all_posts,
+                feedId: state.pursuits[index].name + state.mediaType,
+                feedData: state.mediaType === POST ? 
+                state.pursuits[index].all_posts ? state.pursuits[index].all_posts : []
+                :
+                 state.pursuits[index].all_projects ? state.pursuits[index].all_projects : [],
             }))
         }
     }
@@ -163,7 +167,6 @@ class ProfilePage extends React.Component {
         console.log("Deleting");
         return AxiosHelper.deletePost(this.state.targetProfileId, this.state.targetIndexUserId, this.state.selectedEvent._id).then((result) => console.log(result));
     }
-
 
     handleFollowerStatusResponse(followerStatusResponse) {
         if (followerStatusResponse.status === 200) {
@@ -219,7 +222,7 @@ class ProfilePage extends React.Component {
             allPosts: targetUserInfo.all_posts,
             allProjects: projectArray,
             feedData: targetUserInfo.all_posts,
-            feedDataType: POSTS,
+            mediaType: POSTS,
             feedId: ALL + POSTS,
             // recentPosts: targetUserInfo.recent_posts,
             userRelationId: targetUserInfo.user_relation_id,
@@ -229,8 +232,6 @@ class ProfilePage extends React.Component {
         //follower Status Reponse
         console.log("Finished Checking Friend Status");
     }
-
-
 
     openModal() {
         this.modalRef.current.style.display = "block";
@@ -254,7 +255,11 @@ class ProfilePage extends React.Component {
                 (result) => {
                     console.log(result.data);
                     if (this._isMounted) {
-                        this.setState({ selectedEvent: selectedEvent, textData: result.data, mediaType: selectedEvent.post_format }, this.openModal());
+                        this.setState({
+                            selectedEvent: selectedEvent,
+                            textData: result.data,
+                            postType: selectedEvent.post_format
+                        }, this.openModal());
                     }
                 }
             )
@@ -262,9 +267,10 @@ class ProfilePage extends React.Component {
         // .then(() => this.setState({ selectedEvent: selectedEvent }));
     }
 
-    handleNewProjectClick(){
-        this.setState({selectedEvent: PROJECT, mediaType: PROJECT}, this.openModal());
+    handleNewProjectClick() {
+        this.setState((state) => ({ feedId: NEW_PROJECT, feedData: state.allPosts, newProject: true }));
     }
+
     handleFollowerStatusChange(action) {
         AxiosHelper.setFollowerStatus(this.state.visitorUsername, this.state.targetUsername, this.state.userRelationId, this.state.isPrivate, action).then(
             (result) => {
@@ -294,7 +300,7 @@ class ProfilePage extends React.Component {
 
 
     render() {
-        const newOrBackButton = (this.state.viewingProject ?  <button onClick={() => console.log()}>Back</button> : <button onClick={this.handleNewProjectClick}>New</button>);
+        const newOrBackButton = (this.state.viewingProject ? <button onClick={() => console.log()}>Back</button> : <button onClick={this.handleNewProjectClick}>New</button>);
         var pursuitHolderArray = [<PursuitHolder key={ALL} name={ALL} value={-1} onFeedSwitch={this.handleFeedSwitch} />];
         if (this.state.fail) return NoMatch;
         if (this.state.pursuits) {
@@ -305,6 +311,7 @@ class ProfilePage extends React.Component {
                 );
             }
         }
+        console.log(this.state.feedId);
         return (
             <div>
                 <div id="personal-profile-container" className="flex-display flex-direction-column">
@@ -338,15 +345,16 @@ class ProfilePage extends React.Component {
                 </div>
                 <div className="personal-profile-content-switch-container">
                     <div id="personal-profile-buttons-container">
-                        <button onClick={() => this.handleFeedDataTypeSwitch(POSTS)}>Posts</button>
-                        <button onClick={() => this.handleFeedDataTypeSwitch(PROJECT)}>Projects</button>
+                        <button onClick={() => this.handleMediaTypeSwitch(POST)}>Posts</button>
+                        <button onClick={() => this.handleMediaTypeSwitch(PROJECT)}>Projects</button>
                     </div>
                 </div>
                 <div className="personal-profile-content-switch-container">
-                    {this.state.feedDataType === PROJECTS ? newOrBackButton : <></>}
+                    {this.state.mediaType === PROJECT ? newOrBackButton : <></>}
                     <button id="sort-by-date-button">Sort By Date</button>
                 </div>
                 <div id="personal-profile-timeline-container">
+                    {this.state.newProject ? <ProjectText /> : <></>}
 
                     <Timeline
                         // recentPosts={this.state.recentPosts}
@@ -354,7 +362,6 @@ class ProfilePage extends React.Component {
                         allPosts={this.state.feedData}
                         onEventClick={this.handleEventClick}
                         targetProfileId={this.state.targetProfileId} />
-
 
                 </div>
                 <div className="modal" ref={this.modalRef}>
@@ -369,7 +376,7 @@ class ProfilePage extends React.Component {
                                 displayPhoto={this.state.smallCroppedDisplayPhoto}
                                 preferredPostType={this.state.preferredPostType}
                                 closeModal={this.closeModal}
-                                mediaType={this.state.mediaType}
+                                postType={this.state.postType}
                                 // smallProfilePhoto={this.state.smallCroppedDisplayPhoto}
                                 pursuits={this.state.pursuitsNames}
                                 username={this.state.targetUsername}

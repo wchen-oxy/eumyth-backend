@@ -86,14 +86,18 @@ class Timeline extends React.Component {
     }
 
     render() {
-        if (!this._isMounted) return (
+        if (!this._isMounted || !this.props.allPosts) return (
             <div id="timeline-container">
                 <p>Loading</p>
             </div>
         );
+        console.log(this.props.allPosts, this.props.allPosts.length > 0);
         return (
             <div id="timeline-container">
-                <InfiniteScroll
+
+                {
+                    this.props.allPosts && this.props.allPosts.length > 0 ? 
+                    (<InfiniteScroll
                     dataLength={this.state.nextOpenPostIndex}
                     next={this.fetchNextPosts}
                     hasMore={this.state.hasMore}
@@ -117,7 +121,11 @@ class Timeline extends React.Component {
                     }
                     <br />
                     {/* {timelineRows} */}
-                </InfiniteScroll>
+                </InfiniteScroll>)
+                :
+                <p>There doesn't seem to be anything here</p>
+                }
+                
             </div>
         )
     }
