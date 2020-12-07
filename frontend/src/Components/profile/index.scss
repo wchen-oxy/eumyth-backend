@@ -77,10 +77,12 @@
     background-color: blue;
 }
 
-#personal-profile-timeline-container {
+.personal-profile-timeline-container {
     width: 100%;
     margin: auto;
     max-width: 940px;
+    // display: flex;
+    // flex-direction: column;
 
     #post-window {
         position: fixed;

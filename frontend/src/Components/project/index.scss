@@ -1,12 +1,21 @@
-#project-edit-button-container{
+#project-edit-button-container {
     float: right;
-    display: flex;
-    flex-direction: column;
+    display: block;
+   
 }
 
 #sort-by-date-button {
+    float: right;
 }
 
-#project-info-button{
+#project-info-button {
     float: right;
+}
+
+.sortable-project-post {
+    display: inline-block;
+}
+
+#personal-profile-projects-container {
+    text-align: center;
 }

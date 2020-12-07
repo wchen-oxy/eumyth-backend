@@ -90,13 +90,13 @@ class Timeline extends React.Component {
 
     render() {
         if (!this._isMounted || !this.props.allPosts) return (
-            <div id="timeline-container">
+            <div className="timeline-container">
                 <p>Loading</p>
             </div>
         );
         console.log(this.props.allPosts, this.props.allPosts.length > 0);
         return (
-            <div id="timeline-container">
+            <div className="timeline-container">
                 {
                     this.props.allPosts && this.props.allPosts.length > 0 ?
                         (

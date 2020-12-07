@@ -40,7 +40,7 @@ const FileDisplayContainer = (props) =>
 // </Droppable>
 {
 
-    const SortableItem = SortableElement(({ data, fileType, fileSize, errorMessage }) =>
+    const SortableItem = SortableElement(({ data, fileType, fileSize, errorMessage, removeFile }) =>
         (
             <div className="file-status-bar">
                 <div>
@@ -49,12 +49,12 @@ const FileDisplayContainer = (props) =>
                     <span className={`file-name ${data.invalid ? 'file-error' : ''}`}>{data.name}</span>
                     <span className="file-size">({fileSize(data.size)})</span> {data.invalid && <span className='file-error-message'>({errorMessage})</span>}
                 </div>
-                <div className="file-remove" onClick={() => props.removeFile(data.name)}>X</div>
+                <div className="file-remove" onClick={() =>  removeFile(data.name)}>X</div>
             </div>
         )
     );
 
-    const SortableList = SortableContainer(({ items, onSortEnd, fileType, fileSize, errorMessage }) => {
+    const SortableList = SortableContainer(({ items, onSortEnd, fileType, fileSize, errorMessage, removeFile }) => {
         return (
             <ul>
                 {items.map((value, index) => (
@@ -66,6 +66,7 @@ const FileDisplayContainer = (props) =>
                         fileType={fileType}
                         fileSize={fileSize}
                         errorMessage={errorMessage}
+                        removeFile={removeFile}
 
                     />
                 ))}
@@ -81,7 +82,9 @@ const FileDisplayContainer = (props) =>
             onSortEnd={props.onSortEnd}
             fileType={props.fileType}
             fileSize={props.fileSize}
-            errorMessage={props.errorMessage} />
+            errorMessage={props.errorMessage}
+            removeFile={props.removeFile}
+            />
     )
 
 

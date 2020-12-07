@@ -1,5 +1,4 @@
 import React from 'react';
-import { DragDropContext } from 'react-beautiful-dnd';
 import { withFirebase } from '../../../Firebase';
 import ImageSlider from '../../image-carousel';
 import TextareaAutosize from 'react-textarea-autosize';
