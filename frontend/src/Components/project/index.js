@@ -2,7 +2,6 @@ import React from 'react';
 import ProjectText from "./sub-components/project-text";
 import Timeline from "../profile/timeline/index";
 import Event from "../profile/timeline/sub-components/timeline-event";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 
 import "./index.scss";
@@ -15,10 +14,7 @@ const REVIEW = "REVIEW";
 
 const SortableItem = SortableElement(({ data }) =>
     (
-
         <div className="sortable-project-post">
-
-
             <Event
                 eventData={data}
                 newProjectView={false}
@@ -66,18 +62,17 @@ class PostProjectController extends React.Component {
 
 
     handleProjectEventSelect(eventData, isSelected) {
-        if (isSelected) {
-            let updatedProjectData = this.state.selectedPosts;
-            updatedProjectData.push(eventData);
-            this.setState({ selectedPosts: updatedProjectData });
-        }
-        else {
-            let updatedProjectData = [];
-            for (const postData of this.state.selectedPosts) {
-                if (postData._id !== eventData._id) updatedProjectData.push(postData);
+        let updatedProjectData = [];
+        let existsAlready = false;
+        for (const postData of this.state.selectedPosts) {
+            if (postData._id !== eventData._id) updatedProjectData.push(postData);
+            else {
+                existsAlready = true;
             }
-            this.setState({ selectedPosts: updatedProjectData });
         }
+        if (!existsAlready) updatedProjectData.push(eventData);
+        this.setState({ selectedPosts: updatedProjectData });
+
     }
 
 
@@ -106,7 +101,7 @@ class PostProjectController extends React.Component {
                                 <button id="sort-by-date-button">Sort By Date</button>
                             </div>
                             <Timeline
-                                // recentPosts={this.props.recentPosts}
+                                 selectedPosts={this.state.selectedPosts}
                                 newProjectView={this.props.newProject}
                                 onProjectEventSelect={this.handleProjectEventSelect}
                                 key={this.props.feedId}

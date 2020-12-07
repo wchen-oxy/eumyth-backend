@@ -5,7 +5,6 @@ const LongEvent = (props) => {
 
     if (props.post.text_data === undefined) return( <></>);
     const post = props.post;
-    console.log(post);
     const coverImage = <img className="event-cover-photo" src={post.cover_photo_url} />;
 
     // const initialText = JSON.parse(post.text_data).blocks[0].text;

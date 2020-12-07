@@ -1,6 +1,4 @@
-#timeline-container{
-    display: flex;
-    flex-wrap: wrap;
+.custom-infinite-scroll-row{
     margin: auto;
-    margin-top: 5vh;
+    justify-content: space-between;
 }

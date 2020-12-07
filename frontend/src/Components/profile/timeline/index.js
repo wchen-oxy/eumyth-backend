@@ -43,16 +43,23 @@ class Timeline extends React.Component {
         while (j < inputArray.length) {
             //while the last sub array is not empty
             while (k < 4) {
+                let isSelected = false;
                 if (!inputArray[j]) break; //if we finish...
+                if (this.props.selectedPosts) {
+                    for (const selected of this.props.selectedPosts) {
+                        if (selected._id === inputArray[j]._id) isSelected = true;
+                    }
+                }
                 masterArray[index].push(
                     <Event
+                        isSelected={isSelected}
                         newProjectView={this.props.newProjectView}
                         key={nextOpenPostIndex}
                         eventIndex={nextOpenPostIndex}
                         eventData={inputArray[j]}
                         onEventClick={this.props.onEventClick}
                         onProjectEventSelect={this.props.onProjectEventSelect}
-                        />
+                    />
                 );
 
                 nextOpenPostIndex++;
@@ -90,13 +97,13 @@ class Timeline extends React.Component {
 
     render() {
         if (!this._isMounted || !this.props.allPosts) return (
-            <div className="timeline-container">
+            <div className="personal-profile-timeline-container">
                 <p>Loading</p>
             </div>
         );
-        console.log(this.props.allPosts, this.props.allPosts.length > 0);
+        // console.log(this.props.allPosts, this.props.allPosts.length > 0);
         return (
-            <div className="timeline-container">
+            <div className="personal-profile-timeline-container">
                 {
                     this.props.allPosts && this.props.allPosts.length > 0 ?
                         (
@@ -115,7 +122,7 @@ class Timeline extends React.Component {
                                     this.state.feedData.map(
                                         (item, index) => {
                                             return (
-                                                <div className="flex-display" key={index}>
+                                                <div className="flex-display custom-infinite-scroll-row" key={index}>
                                                     {item}
                                                 </div>
                                             )

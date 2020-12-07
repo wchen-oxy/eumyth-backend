@@ -20,11 +20,12 @@ const Event = (props) => {
     }
 
     return (
-        <div className="event-container" >
+        <div className="event-container" unselectable="on"
+        >
             <div onClick={props.disableModalPreview ? () => console.log("Selected") : () => props.onEventClick(props.eventData)}>
                 {content}
             </div>
-            {props.newProjectView ? <input type="checkbox" onClick={(e) => props.onProjectEventSelect(props.eventData, e.target.value)}/> : <></>}
+            {props.newProjectView ? <input type="checkbox" defaultChecked={props.isSelected} onClick={(e) => props.onProjectEventSelect(props.eventData, e.target.value)} /> : <></>}
         </div>
     );
 }

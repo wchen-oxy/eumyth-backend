@@ -3,6 +3,11 @@
     width: 200px;
     margin: 5px;
     word-wrap: break-word;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -o-user-select: none;
 
     // img{
     //     width: 200px;
@@ -25,7 +30,7 @@
     object-fit: cover;
 }
 
-.no-cover-photo{
+.no-cover-photo {
     display: flex;
     align-items: center;
 }

@@ -1,6 +1,7 @@
 #project-edit-button-container {
-    float: right;
-    display: block;
+    // float: right;
+    display: flex;
+    justify-content: flex-end;
    
 }
 

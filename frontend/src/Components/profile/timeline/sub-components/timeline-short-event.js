@@ -2,7 +2,6 @@ import React from 'react';
 
 
 const ShortEvent = (props) => {
-    console.log(props.post);
     const post = props.post;
     //No Cover Photo
     if (post.image_data.length === 0) {
