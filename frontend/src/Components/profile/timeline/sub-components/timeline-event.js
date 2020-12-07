@@ -14,14 +14,17 @@ const Event = (props) => {
             content = <LongEvent post={props.eventData} />
             break;
         default:
-            
-            throw Error("No matching post type: " + post.post_format );
-            
+
+            throw Error("No matching post type: " + post.post_format);
+
     }
 
     return (
-        <div className="event-container" onClick={() => props.onEventClick(props.eventData)}>
-            {content}
+        <div className="event-container" >
+            <div onClick={props.disableModalPreview ? () => console.log("Selected") : () => props.onEventClick(props.eventData)}>
+                {content}
+            </div>
+            {props.newProjectView ? <input type="checkbox" onClick={(e) => props.onProjectEventSelect(props.eventData, e.target.value)}/> : <></>}
         </div>
     );
 }

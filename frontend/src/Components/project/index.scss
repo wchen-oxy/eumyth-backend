@@ -1,5 +1,12 @@
-#project-hero-container {
-    max-width: 940px;
-    background-color: grey;
-    margin: auto;
+#project-edit-button-container{
+    float: right;
+    display: flex;
+    flex-direction: column;
+}
+
+#sort-by-date-button {
+}
+
+#project-info-button{
+    float: right;
 }

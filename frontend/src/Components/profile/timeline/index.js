@@ -26,9 +26,9 @@ class Timeline extends React.Component {
             console.log(this.props.allPosts);
             this.fetchNextPosts(this.props.allPosts);
         }
-        else{
+        else {
             console.log("ELSE");
-            this.setState({hasMore: false});
+            this.setState({ hasMore: false });
         }
     }
 
@@ -46,10 +46,13 @@ class Timeline extends React.Component {
                 if (!inputArray[j]) break; //if we finish...
                 masterArray[index].push(
                     <Event
+                        newProjectView={this.props.newProjectView}
                         key={nextOpenPostIndex}
                         eventIndex={nextOpenPostIndex}
                         eventData={inputArray[j]}
-                        onEventClick={this.props.onEventClick} />
+                        onEventClick={this.props.onEventClick}
+                        onProjectEventSelect={this.props.onProjectEventSelect}
+                        />
                 );
 
                 nextOpenPostIndex++;
@@ -94,38 +97,39 @@ class Timeline extends React.Component {
         console.log(this.props.allPosts, this.props.allPosts.length > 0);
         return (
             <div id="timeline-container">
-
                 {
-                    this.props.allPosts && this.props.allPosts.length > 0 ? 
-                    (<InfiniteScroll
-                    dataLength={this.state.nextOpenPostIndex}
-                    next={this.fetchNextPosts}
-                    hasMore={this.state.hasMore}
-                    loader={<h4>Loading...</h4>}
-                    endMessage=
-                    {
-                        <p style={{ textAlign: 'center' }}>
-                            <b>Yay! You have seen it all</b>
-                        </p>
-                    }>
-                    {
-                        this.state.feedData.map(
-                            (item, index) => {
-                                return (
-                                    <div className="flex-display" key={index}>
-                                        {item}
-                                    </div>
-                                )
-                            }
+                    this.props.allPosts && this.props.allPosts.length > 0 ?
+                        (
+                            <InfiniteScroll
+                                dataLength={this.state.nextOpenPostIndex}
+                                next={this.fetchNextPosts}
+                                hasMore={this.state.hasMore}
+                                loader={<h4>Loading...</h4>}
+                                endMessage=
+                                {
+                                    <p style={{ textAlign: 'center' }}>
+                                        <b>Yay! You have seen it all</b>
+                                    </p>
+                                }>
+                                {
+                                    this.state.feedData.map(
+                                        (item, index) => {
+                                            return (
+                                                <div className="flex-display" key={index}>
+                                                    {item}
+                                                </div>
+                                            )
+                                        }
+                                    )
+                                }
+                                <br />
+                                {/* {timelineRows} */}
+                            </InfiniteScroll>
                         )
-                    }
-                    <br />
-                    {/* {timelineRows} */}
-                </InfiniteScroll>)
-                :
-                <p>There doesn't seem to be anything here</p>
+                        :
+                        <p>There doesn't seem to be anything here</p>
                 }
-                
+
             </div>
         )
     }

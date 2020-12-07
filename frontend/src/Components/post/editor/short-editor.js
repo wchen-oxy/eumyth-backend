@@ -231,16 +231,18 @@ class ShortEditor extends React.Component {
                             fileInputClicked={this.fileInputClicked}
                             filesSelected={this.filesSelected}
                         />
-                        <DragDropContext onDragEnd={this.props.handleDragEnd}>
-                            <FileDisplayContainer
-                                validFiles={this.props.validFiles}
-                                openImageModal={this.openImageModal}
-                                removeFile={this.removeFile}
-                                fileType={this.fileType}
-                                fileSize={this.fileSize}
-                                errorMessage={this.state.errorMessage}
-                            />
-                        </DragDropContext>
+                        {/* <DragDropContext onDragEnd={this.props.handleDragEnd}> */}
+                        <FileDisplayContainer
+
+                            onDragEnd={this.props.handleDragEnd}
+                            validFiles={this.props.validFiles}
+                            openImageModal={this.openImageModal}
+                            removeFile={this.removeFile}
+                            fileType={this.fileType}
+                            fileSize={this.fileSize}
+                            errorMessage={this.state.errorMessage}
+                        />
+                        {/* </DragDropContext> */}
                     </div>
                 </>
             );

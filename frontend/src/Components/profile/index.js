@@ -8,7 +8,7 @@ import EventModal from "./sub-components/event-modal";
 import FollowButton from "./sub-components/follow-buttons";
 import UserOptions from "./sub-components/user-options";
 import ProjectText from "../project/sub-components/project-text";
-
+import PostProjectController from "../project/index";
 import {
     NOT_A_FOLLOWER_STATE,
     FOLLOW_ACTION,
@@ -19,10 +19,8 @@ import {
 import './index.scss';
 
 const ALL = "ALL";
-const POSTS = "POSTS";
 const POST = "POST";
 const PROJECT = "PROJECT";
-const PROJECTS = "PROJECTS";
 const NEW_PROJECT = "NEW PROJECT";
 
 class ProfilePage extends React.Component {
@@ -50,7 +48,7 @@ class ProfilePage extends React.Component {
 
             feedId: null,
             feedData: null,
-            mediaType: null,
+            mediaType: POST,
             selectedPursuitIndex: -1, //for pursuit name
 
 
@@ -72,10 +70,8 @@ class ProfilePage extends React.Component {
         this.handleDeletePost = this.handleDeletePost.bind(this);
         this.handleFeedSwitch = this.handleFeedSwitch.bind(this);
         this.handleMediaTypeSwitch = this.handleMediaTypeSwitch.bind(this);
-        this.handleNewProjectClick = this.handleNewProjectClick.bind(this);
+        this.handleNewBackProjectClick = this.handleNewBackProjectClick.bind(this);
     }
-
-
     //fixme add catch for no found anything
     componentDidMount() {
         this._isMounted = true;
@@ -122,6 +118,11 @@ class ProfilePage extends React.Component {
     }
 
     handleMediaTypeSwitch(mediaType) {
+        if (this.state.newProject) {
+            if (window.confirm("Do you want to discard your new project?")) {
+                this.setState({ newProject: false });
+            }
+        }
 
         if (this.state.selectedPursuitIndex === -1) {
             this.setState((state) => ({
@@ -142,8 +143,12 @@ class ProfilePage extends React.Component {
         }
     }
 
-
     handleFeedSwitch(index) {
+        if (this.state.newProject) {
+            if (window.confirm("Do you want to discard your new project?")) {
+                this.setState({ newProject: false });
+            }
+        }
         if (index === -1) {
             this.setState((state) => ({
                 selectedPursuitIndex: -1,
@@ -155,10 +160,10 @@ class ProfilePage extends React.Component {
             this.setState((state) => ({
                 selectedPursuitIndex: index,
                 feedId: state.pursuits[index].name + state.mediaType,
-                feedData: state.mediaType === POST ? 
-                state.pursuits[index].all_posts ? state.pursuits[index].all_posts : []
-                :
-                 state.pursuits[index].all_projects ? state.pursuits[index].all_projects : [],
+                feedData: state.mediaType === POST ?
+                    state.pursuits[index].all_posts ? state.pursuits[index].all_posts : []
+                    :
+                    state.pursuits[index].all_projects ? state.pursuits[index].all_projects : [],
             }))
         }
     }
@@ -222,9 +227,8 @@ class ProfilePage extends React.Component {
             allPosts: targetUserInfo.all_posts,
             allProjects: projectArray,
             feedData: targetUserInfo.all_posts,
-            mediaType: POSTS,
-            feedId: ALL + POSTS,
-            // recentPosts: targetUserInfo.recent_posts,
+            mediaType: POST,
+            feedId: ALL + POST,
             userRelationId: targetUserInfo.user_relation_id,
             followerStatus: followerStatus
         });
@@ -267,8 +271,18 @@ class ProfilePage extends React.Component {
         // .then(() => this.setState({ selectedEvent: selectedEvent }));
     }
 
-    handleNewProjectClick() {
-        this.setState((state) => ({ feedId: NEW_PROJECT, feedData: state.allPosts, newProject: true }));
+    handleNewBackProjectClick() {
+        console.log(this.state.newProject);
+        if (!this.state.newProject) {
+            this.setState((state) => ({
+                newProject: !state.newProject,
+                feedId: NEW_PROJECT,
+                feedData: state.allPosts
+            }));
+        }
+        else {
+            this.setState({ newProject: false }, this.handleMediaTypeSwitch(this.state.mediaType))
+        }
     }
 
     handleFollowerStatusChange(action) {
@@ -286,6 +300,7 @@ class ProfilePage extends React.Component {
                 console.log(error);
             });
     }
+
     handleFollowClick(action) {
         console.log(action);
         if (action === FOLLOW_ACTION) this.handleFollowerStatusChange(action);
@@ -298,9 +313,7 @@ class ProfilePage extends React.Component {
         this.openModal(this.miniModalRef);
     }
 
-
     render() {
-        const newOrBackButton = (this.state.viewingProject ? <button onClick={() => console.log()}>Back</button> : <button onClick={this.handleNewProjectClick}>New</button>);
         var pursuitHolderArray = [<PursuitHolder key={ALL} name={ALL} value={-1} onFeedSwitch={this.handleFeedSwitch} />];
         if (this.state.fail) return NoMatch;
         if (this.state.pursuits) {
@@ -333,37 +346,29 @@ class ProfilePage extends React.Component {
                                 />
                             </div>
                         </div>
-
                         <div id="personal-profile-description">
                             {this.state.bio ? <p>{this.state.bio}</p> : <p></p>}
                         </div>
                         <div id="pursuit-selection-container">
                             {pursuitHolderArray}
                         </div>
-
                     </div>
                 </div>
                 <div className="personal-profile-content-switch-container">
                     <div id="personal-profile-buttons-container">
-                        <button onClick={() => this.handleMediaTypeSwitch(POST)}>Posts</button>
-                        <button onClick={() => this.handleMediaTypeSwitch(PROJECT)}>Projects</button>
+                        <button disabled={this.state.mediaType === POST ? true : false} onClick={() => this.handleMediaTypeSwitch(POST)}>Posts</button>
+                        <button disabled={this.state.mediaType === PROJECT ? true : false} onClick={() => this.handleMediaTypeSwitch(PROJECT)}>Projects</button>
                     </div>
                 </div>
-                <div className="personal-profile-content-switch-container">
-                    {this.state.mediaType === PROJECT ? newOrBackButton : <></>}
-                    <button id="sort-by-date-button">Sort By Date</button>
-                </div>
-                <div id="personal-profile-timeline-container">
-                    {this.state.newProject ? <ProjectText /> : <></>}
 
-                    <Timeline
-                        // recentPosts={this.state.recentPosts}
-                        key={this.state.feedId}
-                        allPosts={this.state.feedData}
-                        onEventClick={this.handleEventClick}
-                        targetProfileId={this.state.targetProfileId} />
-
-                </div>
+                <PostProjectController
+                    mediaType={this.state.mediaType}
+                    newProject={this.state.newProject}
+                    key={this.state.feedId}
+                    allPosts={this.state.feedData}
+                    onEventClick={this.handleEventClick}
+                    onNewBackProjectClick={this.handleNewBackProjectClick}
+                    targetProfileId={this.state.targetProfileId} />
                 <div className="modal" ref={this.modalRef}>
                     <div className="overlay" onClick={(() => this.closeModal())}></div>
                     <span className="close" onClick={(() => this.closeModal())}>X</span>
