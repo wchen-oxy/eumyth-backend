@@ -192,7 +192,7 @@ router.route('/')
     );
     resolvedUser.then(
       resolvedUser => {
-        const user = resolvedUser;
+        let user = resolvedUser;
         user.all_posts.unshift(post._id);
         if (date) {
           insertIntoDatedPosts(user.dated_posts, post._id, date);

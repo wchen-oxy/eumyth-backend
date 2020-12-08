@@ -8,7 +8,7 @@ const indexPursuitSchema = new Schema({
         type: String,
         required: false,
         trim: true
-      },
+    },
 
     num_posts: {
         type: Number,
@@ -20,11 +20,16 @@ const indexPursuitSchema = new Schema({
         required: false
     },
 
+    num_projects: {
+        type: Number,
+        required: false,
+    },
+
     total_min: {
         type: Number,
-        required:  false,
-      }
-}); 
+        required: false,
+    }
+});
 
 const indexPursuitModel = mongoose.model('index_pursuit', indexPursuitSchema);
 

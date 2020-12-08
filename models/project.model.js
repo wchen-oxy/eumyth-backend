@@ -21,7 +21,7 @@ const projectSchema = new Schema({
   },
 
 
-  description: {
+  overview: {
     type: String,
     required: false,
     trim: true

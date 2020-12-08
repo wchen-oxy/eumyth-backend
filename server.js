@@ -23,6 +23,7 @@ var postRouter = require('./routes/v0/post');
 var imageRouter = require('./routes/v0/image.js');
 var draftRouter = require('./routes/v0/draft.js');
 var relationRouter = require('./routes/v0/relation.js');
+var projectRouter = require('./routes/v0/project');
 var app = express();
 
 // view engine setup
@@ -78,6 +79,7 @@ app.use('/user', usersRouter);
 app.use('/test', testRouter);
 app.use('/post', postRouter);
 app.use('/relation', relationRouter);
+app.use('/project', projectRouter);
 
 // console.log that your server is up and running
 app.listen(port, () => console.log(`Listening on port ${port}`));

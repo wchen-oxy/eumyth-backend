@@ -5,15 +5,16 @@ import Event from "../profile/timeline/sub-components/timeline-event";
 import TextareaAutosize from 'react-textarea-autosize';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import "./index.scss";
+import AxiosHelper from '../../Axios/axios';
 
 const PROJECT = "PROJECT";
 const MAIN = "MAIN";
 const EDIT = "EDIT";
 const REVIEW = "REVIEW";
 const TITLE = "TITLE";
-const DESCRIPTION = "DESCRIPTION";
+const OVERVIEW = "OVERVIEW";
 const PURSUIT = "PURSUIT";
-const START_DATE = "PURSUIT";
+const START_DATE = "START_DATE";
 const END_DATE = "END_DATE";
 const IS_COMPLETE = "IS_COMPLETE";
 const MINUTES = "MINUTES";
@@ -59,10 +60,10 @@ class PostProjectController extends React.Component {
             window: MAIN,
             selectedPosts: [],
             title: "",
-            description: "",
-            pursuitCategory: "",
-            startDate: null,
-            endDate: null,
+            overview: "",
+            pursuitCategory: this.props.pursuitsNames ? this.props.pursuitsNames[0] : null,
+            startDate: "",
+            endDate: "",
             isComplete: false,
             minDuration: null,
             coverPhoto: null
@@ -76,12 +77,14 @@ class PostProjectController extends React.Component {
     }
 
     handleInputChange(id, value) {
+
+        console.log(id, value);
         switch (id) {
             case (TITLE):
                 this.setState({ title: value })
                 break;
-            case (DESCRIPTION):
-                this.setState({ description: value })
+            case (OVERVIEW):
+                this.setState({ overview: value })
                 break;
             case (PURSUIT):
                 this.setState({ pursuitCategory: value });
@@ -145,6 +148,29 @@ class PostProjectController extends React.Component {
 
     handlePost() {
         console.log("POST");
+        let formData = new FormData();
+        console.log("start", this.state.startDate);
+        console.log("end", this.state.endDate);
+        console.log("pursuit", this.state.pursuitCategory)
+        formData.append("userId", this.props.targetProfileId);
+        formData.append("indexUserId", this.props.targetIndexUserId);
+        formData.append("title", this.state.title);
+        formData.append("overview", this.state.overview);
+        formData.append("pursuitCategory", this.state.pursuitCategory);
+        formData.append("startDate", this.state.startDate);
+        formData.append("endDate", this.state.endDate);
+        formData.append("isComplete", this.state.isComplete);
+        formData.append("minDuration", this.state.minDuration);
+        formData.append("coverPhoto", this.state.coverPhoto);
+        for (const post of this.state.selectedPosts) {
+            formData.append("selectedPosts", JSON.stringify(post));
+        }
+        AxiosHelper.createProject(formData)
+            .then((result) => {
+                console.log(result);
+                alert(result);
+            })
+            .catch(err => console.log(err));
     }
 
     render() {
@@ -159,7 +185,7 @@ class PostProjectController extends React.Component {
                             {this.props.newProject ? <button id="project-info-button" onClick={() => this.handleWindowSwitch(EDIT)}>Next Step</button> : <></>}
                         </div>
                         <div className="personal-profile-timeline-container">
-                            {this.props.newProject ? <ProjectText titleValue={this.state.title} descriptionValue={this.state.description} onTextChange={this.handleInputChange} /> : <></>}
+                            {this.props.newProject ? <ProjectText titleValue={this.state.title} descriptionValue={this.state.overview} onTextChange={this.handleInputChange} /> : <></>}
                             {this.props.newProject ? <p>Select the posts you want to include in this project!</p> : <></>}
                             {/* <div id="project-edit-button-container">
                                 <button id="sort-by-date-button">Sort By Date</button>
@@ -209,7 +235,7 @@ class PostProjectController extends React.Component {
                         <div className="personal-profile-timeline-container">
                             <div id="personal-profile-project-submit-container">
                                 <TextareaAutosize value={this.state.title} onChange={(e) => this.handleInputChange(TITLE, e.target.value)} />
-                                <TextareaAutosize value={this.state.description} onChange={(e) => this.handleInputChange(DESCRIPTION, e.target.value)} />
+                                <TextareaAutosize value={this.state.overview} onChange={(e) => this.handleInputChange(OVERVIEW, e.target.value)} />
                                 <label>Pursuit</label>
                                 <select name="pursuit-category" value={this.state.pursuitCategory} onChange={(e) => this.handleInputChange(PURSUIT, e.target.value)}>
                                     {pursuitSelects}

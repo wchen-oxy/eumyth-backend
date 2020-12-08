@@ -360,15 +360,17 @@ class ProfilePage extends React.Component {
                 </div>
 
                 <PostProjectController
+                    targetProfileId={this.state.targetProfileId}
+                    targetIndexUserId={this.state.targetIndexUserId}
                     mediaType={this.state.mediaType}
                     newProject={this.state.newProject}
                     key={this.state.feedId}
                     allPosts={this.state.feedData}
                     onEventClick={this.handleEventClick}
                     onNewBackProjectClick={this.handleNewBackProjectClick}
-                    targetProfileId={this.state.targetProfileId} 
+                    targetProfileId={this.state.targetProfileId}
                     pursuitsNames={this.state.pursuitsNames}
-                    />
+                />
                 <div className="modal" ref={this.modalRef}>
                     <div className="overlay" onClick={(() => this.closeModal())}></div>
                     <span className="close" onClick={(() => this.closeModal())}>X</span>

@@ -104,6 +104,10 @@ export default class AxiosHelper {
         return axios.put(urls.POST_BASE_URL, postInfoForm);
     }
 
+    static createProject(projectInfo){
+        return axios.post(urls.PROJECT_BASE_URL, projectInfo)
+    }
+
     static deletePost(userDataId, indexUserId, postId) {
         return axios.delete(urls.POST_BASE_URL, {
             data: {
