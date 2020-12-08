@@ -119,9 +119,8 @@ class ProfilePage extends React.Component {
 
     handleMediaTypeSwitch(mediaType) {
         if (this.state.newProject) {
-            if (window.confirm("Do you want to discard your new project?")) {
-                this.setState({ newProject: false });
-            }
+            if (!window.confirm("Do you want to discard your new project?")) return;
+            this.setState({ newProject: false });
         }
 
         if (this.state.selectedPursuitIndex === -1) {
@@ -145,9 +144,8 @@ class ProfilePage extends React.Component {
 
     handleFeedSwitch(index) {
         if (this.state.newProject) {
-            if (window.confirm("Do you want to discard your new project?")) {
-                this.setState({ newProject: false });
-            }
+            if (!window.confirm("Do you want to discard your new project?")) return;
+            this.setState({ newProject: false });
         }
         if (index === -1) {
             this.setState((state) => ({
@@ -253,7 +251,6 @@ class ProfilePage extends React.Component {
     handleEventClick(selectedEvent) {
         // console.log(index);
         // const selectedEvent = index < this.state.recentPosts.length ? this.state.recentPosts[index] : this.state.allPosts[index];
-        console.log(selectedEvent);
         return AxiosHelper.retrieveTextData(selectedEvent._id)
             .then(
                 (result) => {
@@ -272,7 +269,6 @@ class ProfilePage extends React.Component {
     }
 
     handleNewBackProjectClick() {
-        console.log(this.state.newProject);
         if (!this.state.newProject) {
             this.setState((state) => ({
                 newProject: !state.newProject,
@@ -281,10 +277,12 @@ class ProfilePage extends React.Component {
             }));
         }
         else {
-            this.setState({ newProject: false }, this.handleMediaTypeSwitch(this.state.mediaType))
+            if (window.confirm("Do you want to discard your new project?")) {
+
+                this.setState({ newProject: false }, this.handleMediaTypeSwitch(this.state.mediaType))
+            }
         }
     }
-
     handleFollowerStatusChange(action) {
         AxiosHelper.setFollowerStatus(this.state.visitorUsername, this.state.targetUsername, this.state.userRelationId, this.state.isPrivate, action).then(
             (result) => {
@@ -368,7 +366,9 @@ class ProfilePage extends React.Component {
                     allPosts={this.state.feedData}
                     onEventClick={this.handleEventClick}
                     onNewBackProjectClick={this.handleNewBackProjectClick}
-                    targetProfileId={this.state.targetProfileId} />
+                    targetProfileId={this.state.targetProfileId} 
+                    pursuitsNames={this.state.pursuitsNames}
+                    />
                 <div className="modal" ref={this.modalRef}>
                     <div className="overlay" onClick={(() => this.closeModal())}></div>
                     <span className="close" onClick={(() => this.closeModal())}>X</span>

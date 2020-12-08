@@ -14,6 +14,13 @@ const projectSchema = new Schema({
     trim: true
   },
 
+  pursuit: {
+    type: String,
+    required: false,
+    trim: true
+  },
+
+
   description: {
     type: String,
     required: false,
@@ -26,11 +33,15 @@ const projectSchema = new Schema({
     trim: false
   },
 
-  date: {
+  start_date: {
     type: Date
   },
 
-  isComplete: {
+  end_date: {
+    type: Date
+  },
+
+  is_complete: {
     type: Boolean,
     required: false,
   },
