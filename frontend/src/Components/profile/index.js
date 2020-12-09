@@ -369,6 +369,8 @@ class ProfilePage extends React.Component {
                     :
 
                     <ProjectController
+                        username={this.state.targetUsername}
+                        displayPhoto={this.state.smallCroppedDisplayPhoto}
                         targetProfileId={this.state.targetProfileId}
                         targetIndexUserId={this.state.targetIndexUserId}
                         mediaType={this.state.mediaType}

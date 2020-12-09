@@ -53,7 +53,7 @@ const pursuitSchema = new Schema({
   },
 
   projects: {
-    type: [Project.Schema]
+    type: [mongoose.Types.ObjectId]
   }
 
 }, {

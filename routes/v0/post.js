@@ -84,15 +84,15 @@ const makeTextSnippet = (postType, isPaginated, textData) => {
 router.route('/')
   .post(upload.fields([{ name: "images" }, { name: "coverPhoto", maxCount: 1 }]), (req, res) => {
 
-    const postType = !!req.body.postType ? req.body.postType : null;
+    const postType = req.body.postType ? req.body.postType : null;
     const username = req.body.username;
     const displayPhoto = req.body.displayPhoto;
-    const title = !!req.body.title ? req.body.title : null;
-    const subtitle = !!req.body.subtitle ? req.body.subtitle : null;
-    const postPrivacyType = !!req.body.postPrivacyType ? req.body.postPrivacyType : null;
-    const pursuitCategory = !!req.body.pursuitCategory ? req.body.pursuitCategory : null;
-    const date = !!req.body.date ? new Date(req.body.date) : null;
-    const textData = !!req.body.textData ? req.body.textData : null;
+    const title = req.body.title ? req.body.title : null;
+    const subtitle = req.body.subtitle ? req.body.subtitle : null;
+    const postPrivacyType = req.body.postPrivacyType ? req.body.postPrivacyType : null;
+    const pursuitCategory = req.body.pursuitCategory ? req.body.pursuitCategory : null;
+    const date = req.body.date ? new Date(req.body.date) : null;
+    const textData = req.body.textData ? req.body.textData : null;
     const minDuration = !!req.body.minDuration ? parseInt(req.body.minDuration) : null;
     const isMilestone = Boolean.prototype.valueOf(req.body.isMilestone);
     const isPaginated = Boolean.prototype.valueOf(req.body.isPaginated);
@@ -192,7 +192,7 @@ router.route('/')
     );
     resolvedUser.then(
       resolvedUser => {
-        let user = resolvedUser;
+        const user = resolvedUser;
         user.all_posts.unshift(post._id);
         if (date) {
           insertIntoDatedPosts(user.dated_posts, post._id, date);

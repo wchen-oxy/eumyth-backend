@@ -96,6 +96,7 @@ class Timeline extends React.Component {
     }
 
     render() {
+        console.log(this.props.allPosts);
         if (!this._isMounted || !this.props.allPosts) return (
             <div className="personal-profile-timeline-container">
                 <p>Loading</p>

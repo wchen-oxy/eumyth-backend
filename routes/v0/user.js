@@ -80,6 +80,7 @@ router.route('/')
             experience_level: pursuit.experience,
             num_posts: 0,
             num_milestones: 0,
+            num_projects: 0,
             total_min: 0,
           })
         );

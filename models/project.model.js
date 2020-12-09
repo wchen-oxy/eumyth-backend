@@ -2,6 +2,23 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const projectSchema = new Schema({
+  username: {
+    type: String,
+    required: true,
+    trim: true
+  },
+
+  author_id: {
+    type: mongoose.Types.ObjectId,
+    required: true,
+    trim: true
+  },
+  display_photo_url: {
+    type: String,
+    required: false,
+    trim: true
+  },
+
   title: {
     type: String,
     required: true,
@@ -19,7 +36,6 @@ const projectSchema = new Schema({
     required: false,
     trim: true
   },
-
 
   overview: {
     type: String,

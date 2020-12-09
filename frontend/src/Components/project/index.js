@@ -66,7 +66,7 @@ class ProjectController extends React.Component {
             endDate: "",
             isComplete: false,
             minDuration: null,
-            coverPhoto: null, 
+            coverPhoto: null,
             newProject: false,
         }
         this.handleProjectEventSelect = this.handleProjectEventSelect.bind(this);
@@ -151,18 +151,23 @@ class ProjectController extends React.Component {
         console.log("POST");
         let formData = new FormData();
         console.log("start", this.state.startDate);
-        console.log("end", this.state.endDate);
+        console.log("end", typeof(this.state.endDate));
         console.log("pursuit", this.state.pursuitCategory)
+        console.log("min", typeof(this.state.minDuration));
+        console.log("min", !!(this.state.minDuration));
+
+        formData.append("username", this.props.username);
+        formData.append("displayPhoto", this.props.displayPhoto)
         formData.append("userId", this.props.targetProfileId);
         formData.append("indexUserId", this.props.targetIndexUserId);
         formData.append("title", this.state.title);
-        formData.append("overview", this.state.overview);
-        formData.append("pursuitCategory", this.state.pursuitCategory);
-        formData.append("startDate", this.state.startDate);
-        formData.append("endDate", this.state.endDate);
-        formData.append("isComplete", this.state.isComplete);
-        formData.append("minDuration", this.state.minDuration);
-        formData.append("coverPhoto", this.state.coverPhoto);
+        if (this.state.overview) formData.append("overview", this.state.overview);
+        if (this.state.pursuitCategory) formData.append("pursuitCategory", this.state.pursuitCategory);
+        if (this.state.startDate) formData.append("startDate", this.state.startDate);
+        if (this.state.endDate) formData.append("endDate", this.state.endDate);
+        if (this.state.isComplete) formData.append("isComplete", this.state.isComplete);
+        if (this.state.minDuration) formData.append("minDuration", this.state.minDuration);
+        if (this.state.coverPhoto) formData.append("coverPhoto", this.state.coverPhoto);
         for (const post of this.state.selectedPosts) {
             formData.append("selectedPosts", JSON.stringify(post));
         }
@@ -175,6 +180,7 @@ class ProjectController extends React.Component {
     }
 
     render() {
+        console.log(this.props.allPosts);
         switch (this.state.window) {
             case (MAIN):
                 return (

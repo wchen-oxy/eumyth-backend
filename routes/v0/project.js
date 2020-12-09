@@ -31,7 +31,8 @@ var upload = multer({
 
 router.route('/').post(
     upload.single({ name: "coverPhoto", maxCount: 1 }), (req, res) => {
-
+        const username = req.body.username;
+        const displayPhoto = req.body.displayPhoto;
         const userId = req.body.userId;
         const indexUserId = req.body.indexUserId;
         const selectedPosts = [];
@@ -43,13 +44,18 @@ router.route('/').post(
         const isComplete = req.body.isComplete ? req.body.isComplete : null;
         const minDuration = req.body.minDuration ? req.body.minDuration : null;
         const coverPhotoURL = req.files ? req.files.coverPhoto[0].location : null;
-        console.log("is it");
+        console.log(typeof(minDuration));
+        console.log(!!minDuration);
         console.log(req.body);
         for (const post of (req.body.selectedPosts)) {
-            selectedPosts.push(post._id);
+            selectedPosts.push(JSON.parse(post)._id);
         }
+        // console.log(selectedPosts);
 
         const newProject = new Project.Model({
+            username: username,
+            author_id: indexUserId,
+            display_photo_url: displayPhoto,
             title: title,
             overview: overview,
             pursuit: pursuitCategory,
@@ -61,42 +67,46 @@ router.route('/').post(
             post_ids: selectedPosts,
         });
 
-        let resolvedIndexUser = IndexUser.Model.findById(indexUserId).then(result => {
+        console.log(
+            "Asdf"
+        );
+
+        const resolvedIndexUser = IndexUser.Model.findById(indexUserId).then(result => {
             let user = result;
             for (const pursuit of user.pursuits) {
                 if (pursuit.name === newProject.pursuit) {
-                    console.log("Yes");
+                    // console.log("Yes");
 
                     pursuit.num_projects++;
                 }
-            } 
+            }
             console.log("here");
             // console.log(user.pursuits);
             return user;
         });
-        let resolvedUser = User.Model.findById(userId).then((result => {
+        const resolvedUser = User.Model.findById(userId).then((result => {
             let user = result;
             for (const pursuit of user.pursuits) {
                 if (pursuit.name === newProject.pursuit) {
-                    console.log("Yes2");
-                    pursuit.projects.push(newProject);
+                    console.log("Yes2", newProject);
+                    pursuit.projects.unshift(newProject._id);
                 }
             }
-            console.log("here2");
             // console.log(user.pursuits);
             return user;
 
         }));
 
-        return Promise.all([resolvedIndexUser, resolvedUser ])
-        .then((result) => {
-            console.log(result);
-            console.log("here 3");
-            const savedIndexUser = result[0].save();
-            const savedUser = result[1].save();
+        return Promise.all([resolvedIndexUser, resolvedUser])
+            .then((result) => {
+                console.log(result);
+                console.log("here 3");
+                const savedIndexUser = result[0].save();
+                const savedUser = result[1].save();
+                const savedProject = newProject.save();
 
-            return (Promise.all([savedIndexUser, savedUser]));
-        })
+                return (Promise.all([savedIndexUser, savedUser, savedProject]));
+            })
             .then((result) => {
                 console.log(result);
                 console.log("Saved Entries");
