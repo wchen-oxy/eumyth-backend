@@ -8,7 +8,7 @@ import EventModal from "./sub-components/event-modal";
 import FollowButton from "./sub-components/follow-buttons";
 import UserOptions from "./sub-components/user-options";
 import ProjectText from "../project/sub-components/project-text";
-import PostProjectController from "../project/index";
+import ProjectController from "../project/index";
 import {
     NOT_A_FOLLOWER_STATE,
     FOLLOW_ACTION,
@@ -359,18 +359,29 @@ class ProfilePage extends React.Component {
                     </div>
                 </div>
 
-                <PostProjectController
-                    targetProfileId={this.state.targetProfileId}
-                    targetIndexUserId={this.state.targetIndexUserId}
-                    mediaType={this.state.mediaType}
-                    newProject={this.state.newProject}
-                    key={this.state.feedId}
-                    allPosts={this.state.feedData}
-                    onEventClick={this.handleEventClick}
-                    onNewBackProjectClick={this.handleNewBackProjectClick}
-                    targetProfileId={this.state.targetProfileId}
-                    pursuitsNames={this.state.pursuitsNames}
-                />
+                {this.state.mediaType === POST ?
+                    < Timeline
+                        mediaType={this.state.mediaType}
+                        key={this.state.feedId}
+                        allPosts={this.state.feedData}
+                        onEventClick={this.handleEventClick}
+                        targetProfileId={this.state.targetProfileId} />
+                    :
+
+                    <ProjectController
+                        targetProfileId={this.state.targetProfileId}
+                        targetIndexUserId={this.state.targetIndexUserId}
+                        mediaType={this.state.mediaType}
+                        newProject={this.state.newProject}
+                        key={this.state.feedId}
+                        allPosts={this.state.feedData}
+                        onEventClick={this.handleEventClick}
+                        onNewBackProjectClick={this.handleNewBackProjectClick}
+                        pursuitsNames={this.state.pursuitsNames}
+                    />
+                }
+
+
                 <div className="modal" ref={this.modalRef}>
                     <div className="overlay" onClick={(() => this.closeModal())}></div>
                     <span className="close" onClick={(() => this.closeModal())}>X</span>

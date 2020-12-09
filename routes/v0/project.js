@@ -72,8 +72,6 @@ router.route('/').post(
             } 
             console.log("here");
             // console.log(user.pursuits);
-
-
             return user;
         });
         let resolvedUser = User.Model.findById(userId).then((result => {

@@ -53,7 +53,7 @@ const SortableList = SortableContainer(({ items, onSortEnd }) => {
     );
 });
 
-class PostProjectController extends React.Component {
+class ProjectController extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -66,7 +66,8 @@ class PostProjectController extends React.Component {
             endDate: "",
             isComplete: false,
             minDuration: null,
-            coverPhoto: null
+            coverPhoto: null, 
+            newProject: false,
         }
         this.handleProjectEventSelect = this.handleProjectEventSelect.bind(this);
         this.handleWindowSwitch = this.handleWindowSwitch.bind(this);
@@ -174,15 +175,23 @@ class PostProjectController extends React.Component {
     }
 
     render() {
-        const newOrBackButton = (this.props.newProject ? <button onClick={this.props.onNewBackProjectClick}>Back</button> : <button onClick={this.props.onNewBackProjectClick}>New</button>);
-
         switch (this.state.window) {
             case (MAIN):
                 return (
                     <>
                         <div className="personal-profile-content-switch-container">
-                            {this.props.mediaType === PROJECT ? newOrBackButton : <></>}
-                            {this.props.newProject ? <button id="project-info-button" onClick={() => this.handleWindowSwitch(EDIT)}>Next Step</button> : <></>}
+                            {
+                                this.props.newProject ?
+                                    <button onClick={this.props.onNewBackProjectClick}>Back</button>
+                                    :
+                                    <button onClick={this.props.onNewBackProjectClick}>New</button>
+                            }
+                            {
+                                this.props.newProject ?
+                                    <button id="project-info-button" onClick={() => this.handleWindowSwitch(EDIT)}>Next Step</button>
+                                    :
+                                    <></>
+                            }
                         </div>
                         <div className="personal-profile-timeline-container">
                             {this.props.newProject ? <ProjectText titleValue={this.state.title} descriptionValue={this.state.overview} onTextChange={this.handleInputChange} /> : <></>}
@@ -191,6 +200,7 @@ class PostProjectController extends React.Component {
                                 <button id="sort-by-date-button">Sort By Date</button>
                             </div> */}
                             <Timeline
+                                mediaType={this.props.mediaType}
                                 selectedPosts={this.state.selectedPosts}
                                 newProjectView={this.props.newProject}
                                 onProjectEventSelect={this.handleProjectEventSelect}
@@ -263,4 +273,4 @@ class PostProjectController extends React.Component {
     }
 }
 
-export default PostProjectController;
+export default ProjectController;
