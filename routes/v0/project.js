@@ -44,7 +44,7 @@ router.route('/').post(
         const isComplete = req.body.isComplete ? req.body.isComplete : null;
         const minDuration = req.body.minDuration ? req.body.minDuration : null;
         const coverPhotoURL = req.files ? req.files.coverPhoto[0].location : null;
-        console.log(typeof(minDuration));
+        console.log(typeof (minDuration));
         console.log(!!minDuration);
         console.log(req.body);
         for (const post of (req.body.selectedPosts)) {
@@ -118,5 +118,24 @@ router.route('/').post(
             })
     });
 
+router.route('/multiple').get((req, res) => {
+    const projectIdList = req.query.projectIdList;
+    console.log(req.body);
+    return Project.Model.find({
+        '_id': { $in: projectIdList }, function(err, docs) {
+            if (err) console.log(err);
+            else {
+                console.log(docs);
+            }
+        }
+    })
+        .then(
+            (results) => {
+                console.log(results);
+                res.status(200).send(results);
+            }
+        )
+}
+);
 module.exports = router;
 

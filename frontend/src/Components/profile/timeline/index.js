@@ -4,6 +4,9 @@ import Event from './sub-components/timeline-event';
 import AxiosHelper from '../../../Axios/axios';
 import './index.scss';
 
+const PROJECT = "PROJECT";
+const POST = "POST";
+
 class Timeline extends React.Component {
     _isMounted = false;
     constructor(props) {
@@ -22,8 +25,8 @@ class Timeline extends React.Component {
     componentDidMount() {
         this._isMounted = true;
         if (this.props.allPosts) {
-            console.log("Mount now");
-            console.log(this.props.allPosts);
+            // console.log("Mount now");
+            // console.log(this.props.allPosts);
             this.fetchNextPosts(this.props.allPosts);
         }
         else {
@@ -32,7 +35,7 @@ class Timeline extends React.Component {
         }
     }
 
-    createTimelineRow(inputArray) {
+    createTimelineRow(inputArray, mediaType) {
         let masterArray = this.state.feedData;
         let index = masterArray.length - 1; //index position of array in masterArray
         let nextOpenPostIndex = this.state.nextOpenPostIndex;
@@ -52,6 +55,7 @@ class Timeline extends React.Component {
                 }
                 masterArray[index].push(
                     <Event
+                        mediaType={mediaType}
                         isSelected={isSelected}
                         newProjectView={this.props.newProjectView}
                         key={nextOpenPostIndex}
@@ -80,23 +84,38 @@ class Timeline extends React.Component {
             console.log("Length of All Posts Exceeded");
             this.setState({ hasMore: false });
         }
-        console.log(this.props.allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength));
-        return AxiosHelper.returnMultiplePosts(
-            this.props.targetProfileId,
-            this.props.allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength),
-            false)
-            .then(
-                (result) => {
-                    console.log(result.data);
-                    if (this._isMounted) this.createTimelineRow(result.data);
-                }
-            )
-            .catch((error) => console.log(error));
+        // console.log(this.props.mediaType === PROJECT);
+        if (this.props.mediaType === PROJECT) {
+            // console.log(this.props.allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength));
+
+            return AxiosHelper.returnMultipleProjects(
+                this.props.allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength))
+                .then(
+                    (result) => {
+                        console.log(result.data);
+                        if (this._isMounted) this.createTimelineRow(result.data, this.props.mediaType);
+                    }
+                )
+                .catch((error) => console.log(error));
+        }
+        else {
+            return AxiosHelper.returnMultiplePosts(
+                this.props.targetProfileId,
+                this.props.allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength),
+                false)
+                .then(
+                    (result) => {
+                        console.log(result.data);
+                        if (this._isMounted) this.createTimelineRow(result.data, this.props.mediaType);
+                    }
+                )
+                .catch((error) => console.log(error));
+        }
 
     }
 
     render() {
-        console.log(this.props.allPosts);
+        // console.log(this.props.allPosts);
         if (!this._isMounted || !this.props.allPosts) return (
             <div className="personal-profile-timeline-container">
                 <p>Loading</p>
@@ -124,7 +143,7 @@ class Timeline extends React.Component {
                                         (item, index) => {
                                             return (
                                                 <div className="flex-display custom-infinite-scroll-row" key={index}>
-                                                    {item}
+                                                        {item}
                                                 </div>
                                             )
                                         }

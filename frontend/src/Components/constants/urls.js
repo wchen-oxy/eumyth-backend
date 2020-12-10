@@ -22,7 +22,10 @@ const SOCIAL_FEED_POSTS_URL = POST_BASE_URL + "/feed";
 
 const SINGLE_POST_TEXT_DATA_URL = POST_BASE_URL + "/single-text"
 
+//project
 const PROJECT_BASE_URL = ROOT_URL + "/project";
+const MULTIPLE_PROJECTS_URL =  PROJECT_BASE_URL + "/multiple";
+
 
 
 //index
@@ -39,6 +42,7 @@ module.exports = {
     RELATION_STATUS_URL,
     POST_BASE_URL,
     PROJECT_BASE_URL,
+    MULTIPLE_PROJECTS_URL,
     MULTIPLE_POSTS_URL,
     WITH_IMAGE_POST_URL,
     NO_IMAGE_POST_URL,

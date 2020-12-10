@@ -68,6 +68,14 @@ export default class AxiosHelper {
         })
     }
 
+    static returnMultipleProjects(projectIdList) {
+        return axios.get(urls.MULTIPLE_PROJECTS_URL, {
+            params: {
+                projectIdList: projectIdList
+            }
+        })
+    }
+
     static returnMultiplePosts(targetUserDataId, postIdList, includePostText) {
         return axios.get(urls.MULTIPLE_POSTS_URL, {
             params: {
@@ -104,7 +112,7 @@ export default class AxiosHelper {
         return axios.put(urls.POST_BASE_URL, postInfoForm);
     }
 
-    static createProject(projectInfo){
+    static createProject(projectInfo) {
         return axios.post(urls.PROJECT_BASE_URL, projectInfo)
     }
 

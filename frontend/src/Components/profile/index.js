@@ -322,7 +322,7 @@ class ProfilePage extends React.Component {
                 );
             }
         }
-        console.log(this.state.feedId);
+        // console.log(this.state.feedId);
         return (
             <div>
                 <div id="personal-profile-container" className="flex-display flex-direction-column">
