@@ -5,6 +5,8 @@ import ProjectEvent from "./timeline-project-event";
 import './timeline-event.scss';
 
 const POST = "POST";
+const PROJECT = "PROJECT";
+
 
 const Event = (props) => {
     const post = props.eventData;
@@ -12,30 +14,41 @@ const Event = (props) => {
     if (props.mediaType === POST) {
         switch (post.post_format) {
             case ("SHORT"):
-                content = <ShortEvent post={props.eventData} />
+                content = <ShortEvent post={post} />
                 break;
             case ("LONG"):
-                content = <LongEvent post={props.eventData} />
+                content = <LongEvent post={post} />
                 break;
             default:
 
                 throw Error("No matching post type: " + post.post_format);
 
         }
+
+        return (
+            <div className="event-container">
+                <div onClick={props.disableModalPreview ? () => console.log("Selected") : () => props.onEventClick(post)}>
+                    {content}
+                </div>
+                {props.newProjectView ? <input type="checkbox" defaultChecked={props.isSelected} onClick={(e) => props.onProjectEventSelect(post, e.target.value)} /> : <></>}
+            </div>
+        );
     }
-    else{
-        content = <ProjectEvent post={props.eventData}/>
+    else if (props.mediaType === PROJECT) {
+        content = <ProjectEvent post={post} />;
+        return (
+            <div className="event-container">
+                <div onClick={props.disableModalPreview ? () => console.log("Selected") : () => props.onProjectClick(post)}>
+                    {content}
+                </div>
+                {props.newProjectView ? <input type="checkbox" defaultChecked={props.isSelected} onClick={(e) => props.onProjectEventSelect(post, e.target.value)} /> : <></>}
+            </div>
+        );
+    }
+    else {
+        throw new Error("No props.mediaType matched");
     }
 
-    return (
-        <div className="event-container" unselectable="on"
-        >
-            <div onClick={props.disableModalPreview ? () => console.log("Selected") : () => props.onEventClick(props.eventData)}>
-                {content}
-            </div>
-            {props.newProjectView ? <input type="checkbox" defaultChecked={props.isSelected} onClick={(e) => props.onProjectEventSelect(props.eventData, e.target.value)} /> : <></>}
-        </div>
-    );
 }
 
 export default Event;

@@ -7,6 +7,7 @@ import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import "./index.scss";
 import AxiosHelper from '../../Axios/axios';
 
+const POST = "POST";
 const PROJECT = "PROJECT";
 const MAIN = "MAIN";
 const EDIT = "EDIT";
@@ -21,10 +22,11 @@ const MINUTES = "MINUTES";
 const COVER_PHOTO = "COVER_PHOTO";
 
 
-const SortableItem = SortableElement(({ data }) =>
+const SortableItem = SortableElement(({ mediaType, data }) =>
     (
         <div className="sortable-project-post">
             <Event
+                mediaType={mediaType}
                 eventData={data}
                 newProjectView={false}
                 key={data._id}
@@ -35,7 +37,7 @@ const SortableItem = SortableElement(({ data }) =>
     )
 );
 
-const SortableList = SortableContainer(({ items, onSortEnd }) => {
+const SortableList = SortableContainer(({ mediaType, items, onSortEnd }) => {
     return (
         <ul>
             {
@@ -44,6 +46,7 @@ const SortableList = SortableContainer(({ items, onSortEnd }) => {
                         key={`item-${index}`}
                         index={index}
                         data={value}
+                        mediaType={mediaType}
                         onSortEnd={onSortEnd}
 
                     />
@@ -68,7 +71,11 @@ class ProjectController extends React.Component {
             minDuration: null,
             coverPhoto: null,
             newProject: false,
+            projectSelected: null,
         }
+
+        this.handleBackClick = this.handleBackClick.bind(this);
+        this.handleProjectClick = this.handleProjectClick.bind(this);
         this.handleProjectEventSelect = this.handleProjectEventSelect.bind(this);
         this.handleWindowSwitch = this.handleWindowSwitch.bind(this);
         this.handleSortEnd = this.handleSortEnd.bind(this);
@@ -77,9 +84,17 @@ class ProjectController extends React.Component {
 
     }
 
-    handleInputChange(id, value) {
+    handleBackClick() {
+        if (this.state.projectSelected) {
+            this.setState({ projectSelected: null });
+        }
+        else {
+            this.props.onNewBackProjectClick();
+        }
 
-        console.log(id, value);
+    }
+
+    handleInputChange(id, value) {
         switch (id) {
             case (TITLE):
                 this.setState({ title: value })
@@ -148,14 +163,7 @@ class ProjectController extends React.Component {
     }
 
     handlePost() {
-        console.log("POST");
         let formData = new FormData();
-        console.log("start", this.state.startDate);
-        console.log("end", typeof(this.state.endDate));
-        console.log("pursuit", this.state.pursuitCategory)
-        console.log("min", typeof(this.state.minDuration));
-        console.log("min", !!(this.state.minDuration));
-
         formData.append("username", this.props.username);
         formData.append("displayPhoto", this.props.displayPhoto)
         formData.append("userId", this.props.targetProfileId);
@@ -179,16 +187,19 @@ class ProjectController extends React.Component {
             .catch(err => console.log(err));
     }
 
+    handleProjectClick(projectData) {
+        this.setState({ projectSelected: projectData });
+    }
+
     render() {
-        console.log(this.props.allPosts);
         switch (this.state.window) {
             case (MAIN):
                 return (
                     <>
                         <div className="personal-profile-content-switch-container">
                             {
-                                this.props.newProject ?
-                                    <button onClick={this.props.onNewBackProjectClick}>Back</button>
+                                this.props.newProject || this.state.projectSelected ?
+                                    <button onClick={this.handleBackClick}>Back</button>
                                     :
                                     <button onClick={this.props.onNewBackProjectClick}>New</button>
                             }
@@ -206,12 +217,13 @@ class ProjectController extends React.Component {
                                 <button id="sort-by-date-button">Sort By Date</button>
                             </div> */}
                             <Timeline
-                                mediaType={this.props.mediaType}
+                                mediaType={this.state.projectSelected || this.props.newProject ? POST : this.props.mediaType}
                                 selectedPosts={this.state.selectedPosts}
                                 newProjectView={this.props.newProject}
                                 onProjectEventSelect={this.handleProjectEventSelect}
-                                key={this.props.feedId}
-                                allPosts={this.props.allPosts}
+                                onProjectClick={this.handleProjectClick}
+                                key={this.state.projectSelected ? this.state.projectSelected._id : this.props.feedId}
+                                allPosts={this.state.projectSelected ? this.state.projectSelected.post_ids : this.props.allPosts}
                                 onEventClick={this.props.onEventClick}
                                 targetProfileId={this.props.targetProfileId} />
                         </div>
@@ -226,6 +238,7 @@ class ProjectController extends React.Component {
                         </div>
                         <div className="personal-profile-timeline-container">
                             <SortableList
+                                mediaType={POST}
                                 items={this.state.selectedPosts}
                                 onSortEnd={this.handleSortEnd}
                                 axis="xy"

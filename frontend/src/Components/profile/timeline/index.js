@@ -25,8 +25,6 @@ class Timeline extends React.Component {
     componentDidMount() {
         this._isMounted = true;
         if (this.props.allPosts) {
-            // console.log("Mount now");
-            // console.log(this.props.allPosts);
             this.fetchNextPosts(this.props.allPosts);
         }
         else {
@@ -50,7 +48,7 @@ class Timeline extends React.Component {
                 if (!inputArray[j]) break; //if we finish...
                 if (this.props.selectedPosts) {
                     for (const selected of this.props.selectedPosts) {
-                        if (selected._id === inputArray[j]._id) isSelected = true;
+                        if (selected.key === inputArray[j]._id) isSelected = true;
                     }
                 }
                 masterArray[index].push(
@@ -62,6 +60,7 @@ class Timeline extends React.Component {
                         eventIndex={nextOpenPostIndex}
                         eventData={inputArray[j]}
                         onEventClick={this.props.onEventClick}
+                        onProjectClick={this.props.onProjectClick}
                         onProjectEventSelect={this.props.onProjectEventSelect}
                     />
                 );
@@ -84,7 +83,6 @@ class Timeline extends React.Component {
             console.log("Length of All Posts Exceeded");
             this.setState({ hasMore: false });
         }
-        // console.log(this.props.mediaType === PROJECT);
         if (this.props.mediaType === PROJECT) {
             // console.log(this.props.allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength));
 
@@ -115,13 +113,11 @@ class Timeline extends React.Component {
     }
 
     render() {
-        // console.log(this.props.allPosts);
         if (!this._isMounted || !this.props.allPosts) return (
             <div className="personal-profile-timeline-container">
                 <p>Loading</p>
             </div>
         );
-        // console.log(this.props.allPosts, this.props.allPosts.length > 0);
         return (
             <div className="personal-profile-timeline-container">
                 {
@@ -143,7 +139,7 @@ class Timeline extends React.Component {
                                         (item, index) => {
                                             return (
                                                 <div className="flex-display custom-infinite-scroll-row" key={index}>
-                                                        {item}
+                                                    {item}
                                                 </div>
                                             )
                                         }

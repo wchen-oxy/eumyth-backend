@@ -2,8 +2,6 @@ import React from 'react';
 
 const ProjectEvent = (props) => {
     const post = props.post;
-
-
     return (
         <div>
             <div className="event-cover-container">

@@ -187,7 +187,6 @@ class ProfilePage extends React.Component {
                 }
             }
             else if (followerStatusResponse.data.error) {
-                console.log(followerStatusResponse.data.error);
                 return followerStatusResponse.data.error === NOT_A_FOLLOWER_STATE || followerStatusResponse.data.error === UNFOLLOWED_STATE ?
                     NOT_A_FOLLOWER_STATE :
                     FOLLOW_REQUESTED_STATE;
@@ -249,8 +248,6 @@ class ProfilePage extends React.Component {
     }
 
     handleEventClick(selectedEvent) {
-        // console.log(index);
-        // const selectedEvent = index < this.state.recentPosts.length ? this.state.recentPosts[index] : this.state.allPosts[index];
         return AxiosHelper.retrieveTextData(selectedEvent._id)
             .then(
                 (result) => {
@@ -277,10 +274,7 @@ class ProfilePage extends React.Component {
             }));
         }
         else {
-            if (window.confirm("Do you want to discard your new project?")) {
-
-                this.setState({ newProject: false }, this.handleMediaTypeSwitch(this.state.mediaType))
-            }
+            this.setState({ newProject: false }, this.handleMediaTypeSwitch(this.state.mediaType))
         }
     }
     handleFollowerStatusChange(action) {
@@ -300,7 +294,6 @@ class ProfilePage extends React.Component {
     }
 
     handleFollowClick(action) {
-        console.log(action);
         if (action === FOLLOW_ACTION) this.handleFollowerStatusChange(action);
         else {
             window.confirm("Are you sure you want to unfollow?") && this.handleFollowerStatusChange(action);
