@@ -9,7 +9,6 @@ const FollowButtons = (props) => {
         let text = "";
         let isFollowing = true;
 
-        // const followState = 
         switch (props.followerStatus) {
             case (NOT_A_FOLLOWER_STATE):
                 text = FOLLOW_BUTTON_TEXT;
@@ -25,9 +24,6 @@ const FollowButtons = (props) => {
                 break;
 
         }
-        console.log(props.followerStatus);
-
-        // props.followerStatus === NOT_A_FOLLOWER ? FOLLOW_BUTTON_TEXT : REQUESTED_BUTTON_TEXT
         if (isFollowing) return (
             <div>
                 <button onClick={() => props.onFollowClick(UNFOLLOW_ACTION)}>{text}</button>

@@ -6,9 +6,8 @@ import TextareaAutosize from 'react-textarea-autosize';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import "./index.scss";
 import AxiosHelper from '../../Axios/axios';
+import {POST} from "../constants/flags";
 
-const POST = "POST";
-const PROJECT = "PROJECT";
 const MAIN = "MAIN";
 const EDIT = "EDIT";
 const REVIEW = "REVIEW";

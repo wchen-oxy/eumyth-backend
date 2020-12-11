@@ -3,9 +3,7 @@ import ShortEvent from "./timeline-short-event";
 import LongEvent from "./timeline-long-event";
 import ProjectEvent from "./timeline-project-event";
 import './timeline-event.scss';
-
-const POST = "POST";
-const PROJECT = "PROJECT";
+import { POST, PROJECT } from "../../../constants/flags";
 
 
 const Event = (props) => {
@@ -20,11 +18,8 @@ const Event = (props) => {
                 content = <LongEvent post={post} />
                 break;
             default:
-
                 throw Error("No matching post type: " + post.post_format);
-
         }
-
         return (
             <div className="event-container">
                 <div onClick={props.disableModalPreview ? () => console.log("Selected") : () => props.onEventClick(post)}>

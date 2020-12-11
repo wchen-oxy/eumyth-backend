@@ -1,9 +1,10 @@
 import React from 'react';
-const UserOptions = (props) => {
+
+const UserOptions = () => {
     return (
         <div>
             <div id="user-option-window">
-            <p>Hello</p>
+                <p>Hello</p>
             </div>
         </div>)
 }

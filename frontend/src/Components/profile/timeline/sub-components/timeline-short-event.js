@@ -1,20 +1,10 @@
 import React from 'react';
 
-
 const ShortEvent = (props) => {
     const post = props.post;
-    //No Cover Photo
     if (!post.cover_photo_url) {
-        // let intitialText = null;
-        // if (typeof (post.text_data) === 'string') intitialText = (post.text_data.length > 140 ? post.text_data.substring(0, 140).trim() + "..." : post.text_data);
-        // else {
-        //     intitialText = post.text_data[0].length > 140 ? post.text_data[0].substring(0, 140).trim() + "..." : post.text_data[0]
-        // }
-
         const intitialText = post.text_snippet;
         const activityType = post.is_milestone ? "MileStone" : "Progress";
-
-
             return (
                 <div>
                     <div className="event-cover-container no-cover-photo">
@@ -28,9 +18,7 @@ const ShortEvent = (props) => {
             );
         
     }
-    //YES COVER PHOTO
     else {
-        console.log(post.cover_photo_url);
         if (!post.title) {
             const activityType = post.is_milestone ? "MileStone" : "Progress";
             return (

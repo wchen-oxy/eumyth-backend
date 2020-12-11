@@ -6,13 +6,11 @@ import { Link } from 'react-router-dom';
 import './index.scss';
 
 const Navigation = () => (
-
   <AuthUserContext.Consumer>
     {authUser =>
       authUser && authUser.emailVerified ? <NavigationAuthBase /> : <NavigationNonAuth />
     }
   </AuthUserContext.Consumer>
-
 );
 
 const NavigationNonAuth = () => (

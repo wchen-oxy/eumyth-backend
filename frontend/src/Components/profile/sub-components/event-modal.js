@@ -1,13 +1,10 @@
 import React from 'react';
 import ShortPostViewer from "../../post/viewer/short-post";
 import LongPostViewer from "../../post/viewer/long-post";
-import AxiosHelper from '../../../Axios/axios';
-import ProjectController from '../../project';
 
 const MAIN = "MAIN";
 const SHORT = "SHORT";
 const LONG = "LONG";
-const PROJECT = "PROJECT";
 const LARGE_VIEW_MODE = true;
 
 class EventModal extends React.Component {
@@ -33,19 +30,20 @@ class EventModal extends React.Component {
         if (this.state.window === MAIN) {
             switch (this.props.postType) {
                 case (SHORT):
-                    return (<ShortPostViewer
-                        displayPhoto={this.props.displayPhoto}
-                        username={this.props.username}
-                        pursuits={this.props.pursuits}
-                        preferredPostType={this.props.preferredPostType}
-                        textData={this.props.textData}
-                        largeViewMode={LARGE_VIEW_MODE}
-                        isOwnProfile={this.props.isOwnProfile}
-                        eventData={this.props.eventData}
-                        onDeletePost={this.props.onDeletePost}
-                        closeModal={this.props.closeModal}
+                    return (
+                        <ShortPostViewer
+                            displayPhoto={this.props.displayPhoto}
+                            username={this.props.username}
+                            pursuits={this.props.pursuits}
+                            preferredPostType={this.props.preferredPostType}
+                            textData={this.props.textData}
+                            largeViewMode={LARGE_VIEW_MODE}
+                            isOwnProfile={this.props.isOwnProfile}
+                            eventData={this.props.eventData}
+                            onDeletePost={this.props.onDeletePost}
+                            closeModal={this.props.closeModal}
 
-                    />);
+                        />);
 
                 case (LONG):
                     return (<LongPostViewer
@@ -59,23 +57,14 @@ class EventModal extends React.Component {
                         onDeletePost={this.props.onDeletePost}
                         closeModal={this.props.closeModal}
                     />);
-                // case (PROJECT):
-                //     return (
-                //         <ProjectController
-                //             eventData={this.props.eventData}
-                //         />
-                //     )
+
                 default:
                     throw new Error("No content type matched in event-modal.js");
             }
 
         }
         else {
-            return (
-                <div>
-
-                </div>
-            )
+            throw new Error("Nothing matched for post viewer type");
         }
     }
 }

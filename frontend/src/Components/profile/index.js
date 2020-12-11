@@ -7,7 +7,6 @@ import NoMatch from '../no-match';
 import EventModal from "./sub-components/event-modal";
 import FollowButton from "./sub-components/follow-buttons";
 import UserOptions from "./sub-components/user-options";
-import ProjectText from "../project/sub-components/project-text";
 import ProjectController from "../project/index";
 import {
     NOT_A_FOLLOWER_STATE,
@@ -16,11 +15,10 @@ import {
     FOLLOW_REQUESTED_STATE,
     FOLLOWED_STATE
 } from "../constants/flags";
+import { POST, PROJECT } from "../constants/flags";
 import './index.scss';
 
 const ALL = "ALL";
-const POST = "POST";
-const PROJECT = "PROJECT";
 const NEW_PROJECT = "NEW PROJECT";
 
 class ProfilePage extends React.Component {
@@ -167,7 +165,6 @@ class ProfilePage extends React.Component {
     }
 
     handleDeletePost() {
-        console.log("Deleting");
         return AxiosHelper.deletePost(this.state.targetProfileId, this.state.targetIndexUserId, this.state.selectedEvent._id).then((result) => console.log(result));
     }
 
@@ -229,9 +226,6 @@ class ProfilePage extends React.Component {
             userRelationId: targetUserInfo.user_relation_id,
             followerStatus: followerStatus
         });
-
-        //follower Status Reponse
-        console.log("Finished Checking Friend Status");
     }
 
     openModal() {
@@ -251,7 +245,6 @@ class ProfilePage extends React.Component {
         return AxiosHelper.retrieveTextData(selectedEvent._id)
             .then(
                 (result) => {
-                    console.log(result.data);
                     if (this._isMounted) {
                         this.setState({
                             selectedEvent: selectedEvent,
@@ -280,7 +273,6 @@ class ProfilePage extends React.Component {
     handleFollowerStatusChange(action) {
         AxiosHelper.setFollowerStatus(this.state.visitorUsername, this.state.targetUsername, this.state.userRelationId, this.state.isPrivate, action).then(
             (result) => {
-                console.log(result);
                 if (result.status === 200) {
                     if (result.data.success) this.setState({ followerStatus: result.data.success });
                     else {
@@ -315,7 +307,6 @@ class ProfilePage extends React.Component {
                 );
             }
         }
-        // console.log(this.state.feedId);
         return (
             <div>
                 <div id="personal-profile-container" className="flex-display flex-direction-column">

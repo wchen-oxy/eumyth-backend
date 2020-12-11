@@ -5,4 +5,5 @@ export const UNFOLLOWED_STATE = "UNFOLLOWED";
 export const FOLLOW_ACTION = "FOLLOW";
 export const UNFOLLOW_ACTION = "UNFOLLOW";
 
-
+export const POST = "POST";
+export const PROJECT = "PROJECT";

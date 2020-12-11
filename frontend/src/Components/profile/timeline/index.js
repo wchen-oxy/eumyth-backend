@@ -2,10 +2,8 @@ import React from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Event from './sub-components/timeline-event';
 import AxiosHelper from '../../../Axios/axios';
+import { PROJECT } from "../../constants/flags";
 import './index.scss';
-
-const PROJECT = "PROJECT";
-const POST = "POST";
 
 class Timeline extends React.Component {
     _isMounted = false;
@@ -84,8 +82,6 @@ class Timeline extends React.Component {
             this.setState({ hasMore: false });
         }
         if (this.props.mediaType === PROJECT) {
-            // console.log(this.props.allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength));
-
             return AxiosHelper.returnMultipleProjects(
                 this.props.allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength))
                 .then(
@@ -109,7 +105,6 @@ class Timeline extends React.Component {
                 )
                 .catch((error) => console.log(error));
         }
-
     }
 
     render() {
@@ -146,7 +141,6 @@ class Timeline extends React.Component {
                                     )
                                 }
                                 <br />
-                                {/* {timelineRows} */}
                             </InfiniteScroll>
                         )
                         :
