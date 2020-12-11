@@ -126,6 +126,15 @@ export default class AxiosHelper {
         });
     }
 
+    static deleteAccountPhoto(displayName, contentType) {
+        return axios.delete(urls.PHOTO_URL, {
+            data: {
+                displayName: displayName,
+                contentType: contentType
+            }
+        })
+    }
+
     //FIXME 
     //STEAL THE UPLOAD THING FROM HERE
     // static postShortPost(formData, progressRef, uploadRef, textOnly){

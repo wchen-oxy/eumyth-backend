@@ -1,6 +1,10 @@
 const ROOT_URL = "http://localhost:5000";
 
+//image
 const IMAGE_BASE_URL = ROOT_URL + "/image";
+const DISPLAY_PHOTO_URL = IMAGE_BASE_URL + "/display";
+const COVER_PHOTO_URL = IMAGE_BASE_URL + "/cover";
+
 const DRAFT_BASE_URL = ROOT_URL + "/draft";
 
 //user
@@ -36,6 +40,8 @@ const INDEX_USER_PURSUITS_URL = INDEX_BASE_URL + '/pursuits';
 module.exports = {
     ROOT_URL,
     IMAGE_BASE_URL,
+    DISPLAY_PHOTO_URL,
+    COVER_PHOTO_URL,
     DRAFT_BASE_URL,
     USER_BASE_URL,
     RELATION_BASE_URL,

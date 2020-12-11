@@ -214,6 +214,7 @@ class InitialCustomizationPage extends React.Component {
     testForSpecialCharacter(str){
         return /[~`!#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?]/g.test(str);
     }
+
     handleProfilePhotoChange(photo) {
         this.setState({ profilePhoto: photo });
     }
@@ -271,19 +272,7 @@ class InitialCustomizationPage extends React.Component {
                         </div>
                     )}
                 </Dropzone>
-                {/* <AvatarEditor
-                    image={this.state.profilePhoto}
-                    width={250}
-                    height={250}
-                    borderRadius={250}
-                    border={50}
-                    color={[255, 255, 255, 0.6]} // RGBA
-                    scale={this.state.imageScale}
-                    rotate={this.state.imageRotation}
-                    onPositionChange={(position) => {
-                        this.setState({ imagePosition: position });
-                    }}
-                /> */}
+                 
                 <label>Rotation</label>
                 <input
                     type="range"
@@ -292,7 +281,7 @@ class InitialCustomizationPage extends React.Component {
                     min="-20"
                     max="20"
                     value={this.state.imageRotation}
-                    onChange={(e) => this.setState({ imageRotation: e.target.value })} />
+                    onChange={(e) => this.setState({ imageRotation: parseFloat(e.target.value) })} />
                 <label>Scale</label>
                 <input
                     type="range"
@@ -302,7 +291,7 @@ class InitialCustomizationPage extends React.Component {
                     min="1"
                     max="10"
                     value={this.state.imageScale}
-                    onChange={(e) => this.setState({ imageScale: e.target.value })} />
+                    onChange={(e) => this.setState({ imageScale: parseFloat(e.target.value) })} />
 
             </>
 
