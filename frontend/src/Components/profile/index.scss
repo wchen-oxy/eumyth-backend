@@ -8,6 +8,12 @@
     #personal-profile-header {
         height: 345px;
         background-color: red;
+        overflow: hidden;
+
+        #profile-cover-photo {
+            object-fit: cover;
+            width: 100%;
+        }
     }
 
     #personal-profile-intro-container {
@@ -62,8 +68,6 @@
     width: 100%;
     margin: auto;
     max-width: 940px;
-
-   
 }
 
 #personal-profile-buttons-container {

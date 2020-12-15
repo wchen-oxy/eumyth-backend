@@ -76,7 +76,13 @@ const AccountPage = (props) => {
       formData.append('coverPhoto', coverPhoto);
       console.log(coverPhoto);
     }
-    return AxiosHelper.updateAccountImage(formData, photoType);
+    return AxiosHelper.deleteAccountPhoto(props.firebase.returnUsername(), COVER)
+      .then(() => AxiosHelper.updateAccountImage(formData, photoType)).then(() => alert("Successfully updated!"))
+      .catch((err) => {
+        console.log(err);
+        alert("Something has gone wrong while updating :(")
+      });
+
   }
 
   return (

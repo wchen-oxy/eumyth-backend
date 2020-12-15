@@ -39,7 +39,12 @@ var profileUpload = multer({
       cb(null, "images/profile/" + uuid.v1())
     }
   })
-}, (err) => console.log(err));
+}, function (err, data) {
+  if (err) {
+    console.log(err, err.stack);
+    throw new Error("Something went wrong while uploading the file to  Amazon.", err)
+  };
+});
 
 router.route('/').post(upload.single('file'), (req, res, err) => {
   console.log(req.file);
@@ -65,11 +70,10 @@ router.route('/multiple').post(upload.array('files'), (req, res, err) => {
 
 router.route('/cover')
   .post(profileUpload.single("coverPhoto"), (req, res) => {
-    console.log(req.file.coverPhoto);
-
-    console.log(req.file); console.log('Cover');
+    console.log(req.file);
     const username = req.body.displayName;
-    const coverPhoto = req.file[0].key;
+    const coverPhoto = req.file.key;
+    console.log(req.file.key);
     let returnedUser = null;
     if (!coverPhoto) return res.status(500).send("No Cover Image");
     return User.Model.findOne({ username: username })
@@ -77,23 +81,32 @@ router.route('/cover')
         (user) => {
           if (!user) throw new Error("Could not find user!");
           returnedUser = user;
-          user.cover_photo = coverPhoto;
-          if (user.cover_photo !== "") {
-            return s3.deleteObject({
-              Bucket: AwsConstants.BUCKET_NAME,
-              Key: user.cover_photo,
-            }, function (err, data) {
-              if (err) {console.log(err, err.stack);
-              throw new Error("Something went wrong while deleting the file from Amazon.", err)};
-            });
-          }
-          return;
+          user.cover_photo_key = coverPhoto;
+          // console.log(user);
+          // if (user.cover_photo_key !== "") {
+          //   console.log("key exist")
+          //   return s3.deleteObject({
+          //     Bucket: AwsConstants.BUCKET_NAME,
+          //     Key: user.cover_photo_key,
+          //   }, function (err, data) {
+          //     if (err) {
+          //       console.log(err, err.stack);
+          //       throw new Error("Something went wrong while deleting the file from Amazon.", err)
+          //     };
+          //   });
+          // }
+          // return;
+          user.cover_photo_key = coverPhoto;
+          console.log(user.cover_photo_key);
+          return returnedUser.save();
         }
       )
-      .then(() => {
-        returnedUser.cover_photo = coverPhoto;
-        return returnedUser.save();
-      })
+      // .then(() => {
+      //   // console.log(returnedUser);
+      //   returnedUser.cover_photo_key = coverPhoto;
+      //   console.log(returnedUser.cover_photo_key);
+      //   return returnedUser.save();
+      // })
       .then(() => res.status(200).send())
       .catch(err => { console.log(err); res.status(500).send(); })
   })
@@ -105,23 +118,25 @@ router.route('/cover')
     // s3.deleteObject({
     //   Bucket: AwsConstants.BUCKET_NAME,
     //   Key: user.cover_photo,
-      
+
     // })
     return User.Model.findOne({ username: username }).then(
       (user) => {
         returnedUser = user;
         return s3.deleteObject({
           Bucket: AwsConstants.BUCKET_NAME,
-          Key: user.cover_photo,
+          Key: user.cover_photo_key,
         }, function (err, data) {
-          if (err) {console.log(err, err.stack);
-            throw new Error("Something went wrong while deleting the file from Amazon.", err)};
+          if (err) {
+            console.log(err, err.stack);
+            throw new Error("Something went wrong while deleting the file from Amazon.", err)
+          };
         });
 
       }
     )
       .then(() => {
-        returnedUser.cover_photo = "";
+        returnedUser.cover_photo_key = "";
         return returnedUser.save();
       })
       .then((res.status(204).send()))
