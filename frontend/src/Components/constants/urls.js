@@ -1,3 +1,10 @@
+//AWS
+const BUCKET_NAME = 'eumyth-bucket-1';
+const REGION = 'us-west-1';
+
+const returnUserImageURL = (key) => ("http://" + BUCKET_NAME + ".s3." + REGION + ".amazonaws.com/" + key);
+
+
 const ROOT_URL = "http://localhost:5000";
 
 //image
@@ -38,6 +45,7 @@ const CHECK_USERNAME_URL = INDEX_BASE_URL + '/username';
 const INDEX_USER_PURSUITS_URL = INDEX_BASE_URL + '/pursuits';
 
 module.exports = {
+    returnUserImageURL: returnUserImageURL,
     ROOT_URL,
     IMAGE_BASE_URL,
     DISPLAY_PHOTO_URL,

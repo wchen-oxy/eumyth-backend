@@ -95,6 +95,7 @@ const ReviewPost = (props) => {
     const returnToShortButton = (<button id="toggle-button" value={INITIAL} onClick={e => props.onClick(e.target.value)}>Return</button>);
     const returnToLongButton = (<button id="toggle-button" value={INITIAL} onClick={e => props.setPostStage(e.target.value, false)}>Return</button>);
     // console.log(subtitle);
+    console.log(props.displayPhoto);
     return (
         <div className="small-post-window">
             <div className="inner-small-post-container post-button-container">

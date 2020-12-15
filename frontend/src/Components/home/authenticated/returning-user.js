@@ -5,6 +5,7 @@ import { withFirebase } from '../../../Firebase';
 import AxiosHelper from '../../../Axios/axios';
 import RecentWorkObject from "./sub-components/recent-work-object";
 import FeedObject from "./sub-components/feed-object"
+import { returnUserImageURL } from "../../constants/urls";
 import LongPostViewer from '../../post/viewer/long-post';
 import ShortPostViewer from '../../post/viewer/short-post';
 // import FeedObject from "./feed-object";
@@ -20,7 +21,7 @@ class ReturningUserPage extends React.Component {
             firstName: null,
             lastName: null,
             pursuits: null,
-            displayPhoto: "https://i.redd.it/73j1cgr028u21.jpg",
+            displayPhoto: null,
             indexUserData: null,
 
             allPosts: [],
@@ -51,7 +52,7 @@ class ReturningUserPage extends React.Component {
                     (result) => {
                         allPosts = result.data.following_feed;
                         indexUserData = result.data;
-                        displayPhoto = result.data.cropped_display_photo;
+                        displayPhoto = result.data.cropped_display_photo_key;
                         pursuits = result.data.pursuits;
                         return result.data.following_feed;
                     }
@@ -59,7 +60,7 @@ class ReturningUserPage extends React.Component {
                 .then(
                     (feed) => {
                         const slicedFeed = allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength);
-                        if (!feed || feed.length === 0) return this.setState({hasMore : false});
+                        if (!feed || feed.length === 0) return this.setState({ hasMore: false });
                         return AxiosHelper.returnMultiplePosts(
                             this.props.targetProfileId,
                             slicedFeed,
@@ -68,20 +69,13 @@ class ReturningUserPage extends React.Component {
                                 (result) => {
                                     console.log(result.data);
                                     if (this._isMounted) {
-                                        for (const item of result.data){
+                                        for (const item of result.data) {
                                             feedData.push(item);
                                         }
                                     };
-                                   
                                 }
                             )
                             .catch((error) => console.log(error));
-                        // else if (feed.length < this.state.dataLength) {
-                        //     return AxiosHelper.returnSocialFeedPosts(indexUserData._id, feed.slice(0, feed.length));
-                        // }
-                        // else {
-                        //     return AxiosHelper.returnSocialFeedPosts(indexUserData._id, feed.slice(0, this.state.dataLength));
-                        // }
                     }
                 )
                 .then(
@@ -111,10 +105,10 @@ class ReturningUserPage extends React.Component {
     }
 
     fetchNextPosts() {
-      
+
         const slicedFeed = this.state.allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength);
         console.log("fetch");
-           if (this.state.nextOpenPostIndex + this.state.fixedDataLoadLength >= this.state.allPosts.length) {
+        if (this.state.nextOpenPostIndex + this.state.fixedDataLoadLength >= this.state.allPosts.length) {
             console.log("Length of All Posts Exceeded");
             this.setState({ hasMore: false });
         }
@@ -125,10 +119,10 @@ class ReturningUserPage extends React.Component {
             .then(
                 (result) => {
                     let newFeedData = this.state.feedData;
-                    for (const item of result.data){
+                    for (const item of result.data) {
                         newFeedData.push(item);
                     }
-                    if (this._isMounted) this.setState(state => ({ feedData: newFeedData, nextOpenPostIndex : state.nextOpenPostIndex + state.fixedDataLoadLength}));
+                    if (this._isMounted) this.setState(state => ({ feedData: newFeedData, nextOpenPostIndex: state.nextOpenPostIndex + state.fixedDataLoadLength }));
                 }
             )
             .catch((error) => console.log(error));
@@ -149,7 +143,7 @@ class ReturningUserPage extends React.Component {
 
 
     render() {
-       
+
         let pursuitInfoArray = [];
         let totalMin = 0;
         if (this.state.pursuits) {
@@ -173,7 +167,7 @@ class ReturningUserPage extends React.Component {
             <div >
                 <div className="home-row-container flex-display">
                     <div className="home-profile-column-container">
-                        <img alt="" id="home-profile-photo" src={this.state.displayPhoto}></img>
+                        <img alt="" id="home-profile-photo" src={this.state.displayPhoto ? returnUserImageURL(this.state.displayPhoto) : "https://i.redd.it/73j1cgr028u21.jpg"}></img>
                         <div className="home-profile-text">
                             <p>{this.state.username}</p>
                             <p>{this.state.firstName}</p>
@@ -227,27 +221,27 @@ class ReturningUserPage extends React.Component {
                         {/* {feed} */}
 
                         {/* {this.state.feedData.length > 0 ? */}
-                            <InfiniteScroll
-                                dataLength={this.state.nextOpenPostIndex}
-                                next={this.fetchNextPosts}
-                                hasMore={this.state.hasMore}
-                                loader={<h4>Loading...</h4>}
-                                endMessage={
-                                    <p style={{ textAlign: 'center' }}>
-                                        <b>Yay! You have seen it all</b>
-                                    </p>
-                                }>
-                                {
-                                    this.state.feedData.map((feedItem, index) =>
-                                        <div className="feed-object-container">
-                                            <FeedObject feedItem={feedItem} key={index} />
-                                        </div>
+                        <InfiniteScroll
+                            dataLength={this.state.nextOpenPostIndex}
+                            next={this.fetchNextPosts}
+                            hasMore={this.state.hasMore}
+                            loader={<h4>Loading...</h4>}
+                            endMessage={
+                                <p style={{ textAlign: 'center' }}>
+                                    <b>Yay! You have seen it all</b>
+                                </p>
+                            }>
+                            {
+                                this.state.feedData.map((feedItem, index) =>
+                                    <div className="feed-object-container">
+                                        <FeedObject feedItem={feedItem} key={index} />
+                                    </div>
 
-                                    )
-                                }
+                                )
+                            }
 
-                            </InfiniteScroll>
-                            {/* : <></>} */}
+                        </InfiniteScroll>
+                        {/* : <></>} */}
                     </div>
 
                 </div>

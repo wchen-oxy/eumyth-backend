@@ -52,9 +52,9 @@ router.route('/')
       console.log(req.body);
       const username = req.body.username;
       const pursuitsArray = JSON.parse(req.body.pursuits);
-      const croppedImage = req.files.croppedImage ? req.files.croppedImage[0].location : null;
-      const smallCroppedImage = req.files.smallCroppedImage ? req.files.smallCroppedImage[0].location : null;
-      const tinyCroppedImage = req.files.tinyCroppedImage ? req.files.tinyCroppedImage[0].location : null;
+      const croppedImage = req.files.croppedImage ? req.files.croppedImage[0].key : null;
+      const smallCroppedImage = req.files.smallCroppedImage ? req.files.smallCroppedImage[0].key : null;
+      const tinyCroppedImage = req.files.tinyCroppedImage ? req.files.tinyCroppedImage[0].key : null;
 
       let mainPursuitsHolder = [];
       let indexPursuitsHolder = [];
@@ -66,7 +66,7 @@ router.route('/')
         mainPursuitsHolder.push(
           new Pursuit.Model({
             name: pursuit.name,
-            display_photo: "",
+            display_photo_key: "",
             private: false,
             experience_level: pursuit.experience,
             total_min: 0,
@@ -86,23 +86,23 @@ router.route('/')
         );
       }
 
-      const newUser = 
+      const newUser =
         new User.Model({
           username: username,
-          cropped_display_photo: croppedImage,
-          small_cropped_display_photo: smallCroppedImage,
-          tiny_cropped_display_photo: tinyCroppedImage,
+          cropped_display_photo_key: croppedImage,
+          small_cropped_display_photo_key: smallCroppedImage,
+          tiny_cropped_display_photo_key: tinyCroppedImage,
           pursuits: mainPursuitsHolder,
           private: false
         });
 
-      const newIndexUser  =  new IndexUser.Model({
+      const newIndexUser = new IndexUser.Model({
         username: username,
         user_profile_id: newUser._id,
         preferredPostType: "public-feed",
-        cropped_display_photo: croppedImage,
-        small_cropped_display_photo: smallCroppedImage,
-        tiny_cropped_display_photo: tinyCroppedImage,
+        cropped_display_photo_key: croppedImage,
+        small_cropped_display_photo_key: smallCroppedImage,
+        tiny_cropped_display_photo_key: tinyCroppedImage,
         private: false,
         draft: null,
         pursuits: indexPursuitsHolder

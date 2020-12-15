@@ -10,7 +10,7 @@ const pursuitSchema = new Schema({
     trim: true
 
   },
-  display_photo: {
+  display_photo_key: {
     type: String,
     required: false,
   },

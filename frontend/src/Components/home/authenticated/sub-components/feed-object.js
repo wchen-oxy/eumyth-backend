@@ -12,7 +12,7 @@ const FeedObject = (props) => {
         feedItem.post_format === SHORT ?
         
             <ShortPostViewer
-                displayPhoto={feedItem.display_photo_url}
+                displayPhoto={feedItem.display_photo_key}
                 username={feedItem.username}
                 pursuits={null}
                 preferredPostType={null}

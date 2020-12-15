@@ -6,6 +6,8 @@ import ShortPostMetaInfo from './sub-components/short-post-meta';
 import ShortReEditor from '../editor/short-re-editor';
 import Arrow from "../../image-carousel/arrow";
 import ReviewPost from "../draft/review-post";
+import { returnUserImageURL } from "../../constants/urls";
+
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
@@ -36,7 +38,7 @@ class ShortPostViewer extends React.Component {
         this.handleWindowChange = this.handleWindowChange.bind(this);
         this.handleIndexChange = this.handleIndexChange.bind(this);
         this.handleTextChange = this.handleTextChange.bind(this);
-        this.handlePaginatedChange = this.handlePaginatedChange.bind(this); 
+        this.handlePaginatedChange = this.handlePaginatedChange.bind(this);
     }
 
     handleWindowChange(newWindow) {
@@ -62,7 +64,7 @@ class ShortPostViewer extends React.Component {
         this.setState((state) => ({ isPaginated: !state.isPaginated }));
     }
 
-    componentWillUnmount(){
+    componentWillUnmount() {
         console.log("unmount");
     }
 
@@ -92,7 +94,7 @@ class ShortPostViewer extends React.Component {
 
                                     isOwnProfile={this.props.isOwnProfile}
                                     username={this.props.username}
-                                    displayPhoto={this.props.eventData.display_photo_url}
+                                    displayPhoto={this.props.eventData.display_photo_key}
                                     onEditClick={this.handleWindowChange}
                                     onDeletePost={this.props.onDeletePost}
                                 />
@@ -117,7 +119,7 @@ class ShortPostViewer extends React.Component {
                                 <ShortPostHeader
                                     isOwnProfile={this.props.isOwnProfile}
                                     username={this.props.username}
-                                    displayPhoto={this.props.eventData.display_photo_url}
+                                    displayPhoto={this.props.eventData.display_photo_key}
                                 />
                                 <ShortHeroText
                                     text={this.props.textData} />
@@ -140,9 +142,9 @@ class ShortPostViewer extends React.Component {
             //with images
             else {
                 const transformedTextArray = this.state.textData;
-                const container = this.props.eventData.image_data.map((url, i) =>
+                const container = this.props.eventData.image_data.map((key, i) =>
                     <div className="image-container">
-                        <img className="preview-image" key={i} src={url} />
+                        <img className="preview-image" key={i} src={returnUserImageURL(key)} />
                     </div>
                 );
                 const imageDisplay =
@@ -165,7 +167,7 @@ class ShortPostViewer extends React.Component {
                                 <ShortPostHeader
                                     isOwnProfile={this.props.isOwnProfile}
                                     username={this.props.username}
-                                    displayPhoto={this.props.eventData.display_photo_url}
+                                    displayPhoto={this.props.eventData.display_photo_key}
                                     onEditClick={this.handleWindowChange}
                                     onDeletePost={this.props.onDeletePost}
                                 />
@@ -188,7 +190,7 @@ class ShortPostViewer extends React.Component {
                             <ShortPostHeader
                                 isOwnProfile={this.props.isOwnProfile}
                                 username={this.props.username}
-                                displayPhoto={this.props.eventData.display_photo_url}
+                                displayPhoto={this.props.eventData.display_photo_key}
                             />
                             {imageDisplay}
                             <div className="mini-short-viewer-side-container">
@@ -234,7 +236,10 @@ class ShortPostViewer extends React.Component {
             let formattedDate = null;
             if (this.props.eventData.date) {
                 rawDate = new Date(this.props.eventData.date);
-                formattedDate = rawDate.getFullYear().toString() + "-" + rawDate.getMonth().toString() + "-" + rawDate.getDate().toString();
+                formattedDate =
+                    rawDate.getFullYear().toString() +
+                    "-" + rawDate.getMonth().toString() +
+                    "-" + rawDate.getDate().toString();
             }
             return (
                 <ReviewPost
@@ -245,7 +250,7 @@ class ShortPostViewer extends React.Component {
                     isMilestone={this.props.eventData.is_milestone}
                     previewTitle={this.props.eventData.title}
                     previewSubtitle={this.props.eventData.subtitle}
-                    coverPhoto={this.props.eventData.cover_photo_url}
+                    coverPhoto={this.props.eventData.cover_photo_key}
                     date={formattedDate}
                     min={this.props.eventData.min_duration}
                     selectedPursuit={this.props.eventData.pursuit_category}

@@ -35,12 +35,12 @@ const postSchema = new Schema({
     required: false,
   },
 
-  display_photo_url: {
+  display_photo_key: {
     type: String,
     required: false,
   },
 
-  cover_photo_url: {
+  cover_photo_key: {
     type: String,
     required: false,
   },

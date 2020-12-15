@@ -6,11 +6,11 @@ router.route('/').get((req, res) => {
     const username = req.query.username;
     return IndexUser.Model.findOne({ username: username })
         .then((user) => {
-            if (user.draft === undefined) {
+            if (!user) {
                 return res.status(204);
             }
             return res.status(200).send({
-                smallDisplayPhoto: user.small_cropped_display_photo,
+                smallDisplayPhoto: user.tiny_cropped_display_photo_key,
                 draft: user.draft
             });
         })

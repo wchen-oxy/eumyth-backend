@@ -20,7 +20,7 @@ const draftSchema = new Schema(
             required: false,
         },
 
-        cover_photo_url: {
+        cover_photo_key: {
             type: String,
             required: false,
         },

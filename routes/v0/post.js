@@ -44,6 +44,7 @@ const insertIntoDatedPosts = (datedPosts, postId, date) => {
   }
   return datedPosts;
 }
+
 var upload = multer({
   storage: multerS3({
     s3: s3,
@@ -61,7 +62,7 @@ var upload = multer({
 const getImageUrls = (array) => {
   let imageArray = [];
   for (const imageFile of array) {
-    imageArray.push(imageFile.location);
+    imageArray.push(imageFile.key);
   }
   return imageArray;
 }
@@ -96,7 +97,7 @@ router.route('/')
     const minDuration = !!req.body.minDuration ? parseInt(req.body.minDuration) : null;
     const isMilestone = Boolean.prototype.valueOf(req.body.isMilestone);
     const isPaginated = Boolean.prototype.valueOf(req.body.isPaginated);
-    const coverPhotoURL = req.files && req.files.coverPhoto ? req.files.coverPhoto[0].location : null;
+    const coverPhotoKey = req.files && req.files.coverPhoto ? req.files.coverPhoto[0].key : null;
     const imageData = req.files && req.files.images ? getImageUrls(req.files.images) : [];
 
     let post = null;
@@ -130,8 +131,8 @@ router.route('/')
             date: date,
             author_id: resolvedIndexUser.user_profile_id,
             pursuit_category: pursuitCategory,
-            display_photo_url: displayPhoto,
-            cover_photo_url: coverPhotoURL,
+            display_photo_key: displayPhoto,
+            cover_photo_key: coverPhotoKey,
             post_format: postType,
             is_paginated: isPaginated,
             is_milestone: isMilestone,
@@ -149,8 +150,8 @@ router.route('/')
             private: postPrivacyType,
             author_id: resolvedIndexUser.user_profile_id,
             pursuit_category: pursuitCategory,
-            display_photo_url: displayPhoto,
-            cover_photo_url: coverPhotoURL,
+            display_photo_key: displayPhoto,
+            cover_photo_key: coverPhotoKey,
             post_format: postType,
             is_paginated: isPaginated,
             is_milestone: isMilestone,
@@ -316,7 +317,7 @@ router.route('/')
     const minDuration = !!req.body.minDuration ? parseInt(req.body.minDuration) : null;
     const isMilestone = !!req.body.isMilestone ? req.body.isMilestone : null;
     const isPaginated = req.body.isPaginated ? true : false;
-    const coverPhotoURL = req.files ? req.files.coverPhoto[0].location : null;
+    const coverPhotoKey = req.files ? req.files.coverPhoto[0].key : null;
     console.log(textData);
 
     return Post.Model.findById(postId)
@@ -324,16 +325,16 @@ router.route('/')
         (result) => {
           let post = result;
           post.username = username;
-          post.displayPhoto = displayPhoto;
+          post.display_photo_key = displayPhoto;
           post.title = title;
           post.subtitle = subtitle;
-          post.pursuitCategory = pursuitCategory;
+          post.pursuit_category = pursuitCategory;
           post.date = date;
-          post.minDuration = minDuration;
-          post.isMilestone = isMilestone;
-          post.isPaginated = isPaginated;
-          post.coverPhotoURL = coverPhotoURL;
-          post.textData = textData;
+          post.min_duration = minDuration;
+          post.is_milestone = isMilestone;
+          post.is_paginated = isPaginated;
+          post.cover_photo_key = coverPhotoKey;
+          post.text_data = textData;
           return post.save()
             .catch(err => {
               if (err) {

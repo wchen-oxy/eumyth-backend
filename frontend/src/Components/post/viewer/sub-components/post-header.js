@@ -1,12 +1,14 @@
 import React from 'react';
 import "./post-header.scss";
+import { returnUserImageURL } from "../../../constants/urls";
+
 
 const EDIT = "EDIT";
 const ShortPostHeader = (props) => {
     return (
         <div id="post-header-container">
             <div id="loading-display-photo">
-                <img src={props.displayPhoto} />
+                <img src={returnUserImageURL(props.displayPhoto)} />
             </div>
             <h4>{props.username}</h4>
             {props.isOwnProfile ? <button onClick={props.onDeletePost}>Remove</button> : <></>}

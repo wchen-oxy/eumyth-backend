@@ -116,6 +116,10 @@ export default class AxiosHelper {
         return axios.post(urls.PROJECT_BASE_URL, projectInfo)
     }
 
+    static updateAccountImage(formData, photoType) {
+        return axios.post(photoType === "COVER" ? urls.COVER_PHOTO_URL : urls.DISPLAY_PHOTO_URL, formData)
+    }
+
     static deletePost(userDataId, indexUserId, postId) {
         return axios.delete(urls.POST_BASE_URL, {
             data: {
@@ -127,9 +131,9 @@ export default class AxiosHelper {
     }
 
     static deleteAccountPhoto(displayName, contentType) {
-        return axios.delete(urls.PHOTO_URL, {
+        return axios.delete(urls.COVER_PHOTO_URL, {
             data: {
-                displayName: displayName,
+                username: displayName,
                 contentType: contentType
             }
         })
@@ -168,7 +172,7 @@ export default class AxiosHelper {
             { username: username, draft: JSON.stringify(draft) }
         )
     }
-    static retrieveDraft(username) {
+    static retrieveNewPostInfo(username) {
         return axios.get(urls.DRAFT_BASE_URL,
             { params: { username: username } }
         )

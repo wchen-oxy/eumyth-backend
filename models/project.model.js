@@ -13,7 +13,7 @@ const projectSchema = new Schema({
     required: true,
     trim: true
   },
-  display_photo_url: {
+  display_photo_key: {
     type: String,
     required: false,
     trim: true
@@ -43,7 +43,7 @@ const projectSchema = new Schema({
     trim: true
   },
 
-  cover_photo_url: {
+  cover_photo_key: {
     type: String,
     required: false,
     trim: false

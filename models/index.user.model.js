@@ -25,17 +25,17 @@ const indexUserSchema = new Schema(
             type: Number
         },
 
-        cropped_display_photo: {
+        cropped_display_photo_key: {
             type: String,
             required: false
         },
 
-        small_cropped_display_photo: {
+        small_cropped_display_photo_key: {
             type: String,
             required: false
         },
 
-        tiny_cropped_display_photo: {
+        tiny_cropped_display_photo_key: {
             type: String,
             required: false
         },

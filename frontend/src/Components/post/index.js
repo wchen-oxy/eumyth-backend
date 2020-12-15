@@ -111,7 +111,7 @@ class PostController extends React.Component {
 
   retrieveDraft(isInitial) {
     this.setState({ updatingOnlineDraft: true });
-    AxiosHelper.retrieveDraft(this.props.username).then(
+    AxiosHelper.retrieveNewPostInfo(this.props.username).then(
       (response) => {
         if (response.status === 200) {
           if (isInitial) this.setState({ onlineDraftRetrieved: true });

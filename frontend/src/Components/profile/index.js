@@ -8,6 +8,8 @@ import EventModal from "./sub-components/event-modal";
 import FollowButton from "./sub-components/follow-buttons";
 import UserOptions from "./sub-components/user-options";
 import ProjectController from "../project/index";
+import { returnUserImageURL } from "../constants/urls";
+
 import {
     NOT_A_FOLLOWER_STATE,
     FOLLOW_ACTION,
@@ -211,9 +213,9 @@ class ProfilePage extends React.Component {
             targetProfileId: targetUserInfo._id,
             targetIndexUserId: targetUserInfo.index_user_id,
             isPrivate: targetUserInfo.private,
-            coverPhoto: targetUserInfo.cover_photo,
-            croppedDisplayPhoto: targetUserInfo.cropped_display_photo,
-            smallCroppedDisplayPhoto: targetUserInfo.small_cropped_display_photo,
+            coverPhoto: targetUserInfo.cover_photo_key,
+            croppedDisplayPhoto: targetUserInfo.cropped_display_photo_key,
+            smallCroppedDisplayPhoto: targetUserInfo.small_cropped_display_photo_key,
             bio: targetUserInfo.bio,
             pinned: targetUserInfo.pinned,
             pursuits: targetUserInfo.pursuits,
@@ -311,11 +313,11 @@ class ProfilePage extends React.Component {
             <div>
                 <div id="personal-profile-container" className="flex-display flex-direction-column">
                     <div id="personal-profile-header">
-                        {this.state.coverPhoto ? (<img src={this.state.coverPhoto}></img>) : (<div id="temp-cover"></div>)}
+                        {this.state.coverPhoto ? (<img src={returnUserImageURL(this.state.coverPhoto)}></img>) : (<div id="temp-cover"></div>)}
                     </div>
                     <div id="personal-profile-intro-container">
                         <div id="personal-profile-photo-container">
-                            {this.state.croppedDisplayPhoto ? <img src={this.state.croppedDisplayPhoto}></img> : <></>}
+                            {this.state.croppedDisplayPhoto ? <img src={returnUserImageURL(this.state.croppedDisplayPhoto)}></img> : <></>}
                             <div id="personal-profile-name-container">
                                 <h4 id="personal-profile-name">{this.state.targetUsername}</h4>
                             </div>

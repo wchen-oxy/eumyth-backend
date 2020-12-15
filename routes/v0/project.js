@@ -43,7 +43,7 @@ router.route('/').post(
         const endDate = req.body.endDate ? req.body.endDate : null;
         const isComplete = req.body.isComplete ? req.body.isComplete : null;
         const minDuration = req.body.minDuration ? req.body.minDuration : null;
-        const coverPhotoURL = req.files ? req.files.coverPhoto[0].location : null;
+        const coverPhotoURL = req.files ? req.files.coverPhoto[0].key : null;
         console.log(typeof (minDuration));
         console.log(!!minDuration);
         console.log(req.body);
@@ -55,7 +55,7 @@ router.route('/').post(
         const newProject = new Project.Model({
             username: username,
             author_id: indexUserId,
-            display_photo_url: displayPhoto,
+            display_photo_key: displayPhoto,
             title: title,
             overview: overview,
             pursuit: pursuitCategory,
@@ -63,7 +63,7 @@ router.route('/').post(
             end_date: endDate,
             is_complete: isComplete,
             min_duration: minDuration,
-            cover_photo_url: coverPhotoURL,
+            cover_photo_key: coverPhotoURL,
             post_ids: selectedPosts,
         });
 
