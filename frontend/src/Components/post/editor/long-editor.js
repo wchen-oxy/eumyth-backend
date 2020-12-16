@@ -58,6 +58,7 @@ class LongEditor extends React.Component {
                     (editor) => {
                         const editorState = editor.emitSerializedOutput();
                         console.log("ANY CHANGE???");
+                        console.log(editorState.blocks);
                         if (this.props.hasContent === false) {
                             for (let block of editorState.blocks) {
                                 if (block.text !== '') {

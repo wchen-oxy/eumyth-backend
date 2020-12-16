@@ -48,7 +48,7 @@ var profileUpload = multer({
 
 router.route('/').post(upload.single('file'), (req, res, err) => {
   console.log(req.file);
-  return res.status(200).json({ 'url': req.file.key });
+  return res.status(200).json({ 'url': req.file.location, 'file': req.file.key });
 })
 
 router.route('/single').post(upload.single('file'), (req, res, err) => {

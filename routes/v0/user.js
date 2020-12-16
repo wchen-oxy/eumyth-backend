@@ -6,6 +6,7 @@ let IndexUser = require('../../models/index.user.model');
 let Pursuit = require('../../models/pursuit.model');
 let IndexPursuit = require('../../models/index.pursuit.model');
 const UserRelation = require('../../models/user.relation.model');
+let Draft = require("../../models/draft.model");
 const upload = require('../../constants/multer').profileImageUpload;
 
 // const s3 = new AWS.S3({
@@ -95,6 +96,7 @@ router.route('/')
           pursuits: mainPursuitsHolder,
           private: false
         });
+        console.log("33");
 
       const newIndexUser = new IndexUser.Model({
         username: username,
@@ -104,10 +106,14 @@ router.route('/')
         small_cropped_display_photo_key: smallCroppedImage,
         tiny_cropped_display_photo_key: tinyCroppedImage,
         private: false,
-        draft: null,
+        draft: new Draft.Model({
+          text: null,
+          links: []
+        }),
         pursuits: indexPursuitsHolder
       });
 
+      console.log("123123");
       const newUserRelation = new UserRelation.Model({
         parent_index_user_id: newIndexUser._id,
       });

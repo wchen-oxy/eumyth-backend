@@ -10,9 +10,17 @@ const S3 = new AWS.S3({
   secretAccessKey: SECRET
 });
 
-const returnUserImageURL = (key) => ("http://" + BUCKET_NAME + ".s3." + REGION + ".amazonaws.com/" + key);
+const returnUserImageURL = (key) => {
+  if (key) {
+    return ("https://" + BUCKET_NAME + ".s3." + REGION + ".amazonaws.com/" + key);
+  }
+  else {
+    return ("https://" + BUCKET_NAME + ".s3." + REGION + ".amazonaws.com/" );
+  }
+}
 
 module.exports = {
+  returnUserImageURL : returnUserImageURL,
   ID: ID,
   SECRET: SECRET,
   BUCKET_NAME: BUCKET_NAME,

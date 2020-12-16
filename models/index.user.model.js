@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const IndexPursuit = require("./index.pursuit.model");
+const Draft = require("./draft.model");
 
 const indexUserSchema = new Schema(
     {
@@ -53,7 +54,7 @@ const indexUserSchema = new Schema(
         },
 
         draft: {
-            type: String,
+            type: Draft.Schema,
             required: false,
         },
 
