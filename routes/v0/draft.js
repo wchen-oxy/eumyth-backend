@@ -47,12 +47,9 @@ router.route('/').get((req, res) => {
                 let toDeleteURLs = [];
                 let currentURLs = [];
                 const previousURLs = indexUser.draft.links;
-                console.log(JSON.parse(draft).blocks);
                 for (const block of JSON.parse(draft).blocks) {
                     if (Object.keys(block.data).length) {
                         const url = block.data.url;
-                        console.log(block.type);
-                        // console.log(block.data.type);
                         if (block.type !== 'unstyled') currentURLs.push(url);
                     }
                 }
@@ -61,19 +58,13 @@ router.route('/').get((req, res) => {
                         console.log(url);
                         const path = new URL(url).pathname;
                         const key = path[0] == '/' ? path.substr(1) : path;
-                        console.log(key);
                         toDeleteURLs.push({ Key: key }
                         );
                     }
                 }
-                console.log(currentURLs);
-                console.log("\n");
+              
                 indexUser.draft.text = draft;
-                // console.log(indexUser.draft.links);
-
                 indexUser.draft.links = currentURLs;
-                // console.log(indexUser.draft.links);
-                console.log(toDeleteURLs);
                 if (toDeleteURLs.length > 0)
                     return Promise.all(
                         [indexUser.save((err) => {
