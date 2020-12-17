@@ -21,23 +21,26 @@ const LongPost = (props) => {
   const dummyScrollRef = useRef(null);
   useEffect(() => {
     // this.setState({ lastBlockText: editorState.blocks[editorState.blocks.length - 1].text })
+    // console.log(editorContainerSize);
+    // console.log(window.innerHeight);
+    console.log(editorContainerRef.current);
+    console.log(windowState);
 
-    console.log(lastTwoBlockIdentical);
-    console.log(lastBlockChanged);
-    if ((editorContainerRef.current.offsetHeight !== editorContainerSize &&
-      editorContainerRef.current.offsetHeight + postHeaderRef.current.offsetHeight > window.innerHeight
-      && lastBlockChanged
+    if (editorContainerRef.current) {
+      if (editorContainerRef.current.offsetHeight && (editorContainerRef.current.offsetHeight !== editorContainerSize &&
+        editorContainerRef.current.offsetHeight + postHeaderRef.current.offsetHeight > window.innerHeight
+        && lastBlockChanged
       ) ||
-      (editorContainerRef.current.offsetHeight !== editorContainerSize &&
-        editorContainerRef.current.offsetHeight + postHeaderRef.current.offsetHeight > window.innerHeight &&
-        lastTwoBlockIdentical)
-    ) {
-      console.log("hit");
-      dummyScrollRef.current.scrollIntoView();
+        (editorContainerRef.current.offsetHeight !== editorContainerSize &&
+          editorContainerRef.current.offsetHeight + postHeaderRef.current.offsetHeight > window.innerHeight &&
+          lastTwoBlockIdentical)
+      ) {
+        console.log("hit");
+        dummyScrollRef.current.scrollIntoView();
+      }
+      setEditorContainerSize(editorContainerRef.current.offsetHeight);
     }
-    setEditorContainerSize(editorContainerRef.current.offsetHeight);
-  }
-  )
+  })
 
 
   const handleSavePending = (currentlySaving) => {
@@ -92,6 +95,7 @@ const LongPost = (props) => {
       }
     }
   }
+  console.log(windowState);
   if (windowState === INITIAL)
     return (
       <div className="long-post-window">
