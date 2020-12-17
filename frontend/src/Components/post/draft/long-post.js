@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useLayoutEffect, useEffect } from 'react';
 import LongEditor from '../editor/long-editor';
 import ReviewPost from './review-post';
 
@@ -12,6 +12,33 @@ const LongPost = (props) => {
   const [hasContent, setHasContent] = useState(props.onlineDraft !== null);
   const [isSavePending, setSavePending] = useState(false);
   const [localDraft, setLocalDraft] = useState(props.onlineDraft);
+  const [editorContainerSize, setEditorContainerSize] = useState(0);
+  const [lastTwoBlockIdentical, setLastTwoBlockIdentical] = useState(false);
+  const [lastBlockText, setLastBlockText] = useState("");
+  const [lastBlockChanged, setLastBlockChanged] = useState(false);
+  const editorContainerRef = useRef(null);
+  const postHeaderRef = useRef(null);
+  const dummyScrollRef = useRef(null);
+  useEffect(() => {
+    // this.setState({ lastBlockText: editorState.blocks[editorState.blocks.length - 1].text })
+
+    console.log(lastTwoBlockIdentical);
+    console.log(lastBlockChanged);
+    if ((editorContainerRef.current.offsetHeight !== editorContainerSize &&
+      editorContainerRef.current.offsetHeight + postHeaderRef.current.offsetHeight > window.innerHeight
+      && lastBlockChanged
+      ) ||
+      (editorContainerRef.current.offsetHeight !== editorContainerSize &&
+        editorContainerRef.current.offsetHeight + postHeaderRef.current.offsetHeight > window.innerHeight &&
+        lastTwoBlockIdentical)
+    ) {
+      console.log("hit");
+      dummyScrollRef.current.scrollIntoView();
+    }
+    setEditorContainerSize(editorContainerRef.current.offsetHeight);
+  }
+  )
+
 
   const handleSavePending = (currentlySaving) => {
     setSavePending(currentlySaving);
@@ -68,7 +95,7 @@ const LongPost = (props) => {
   if (windowState === INITIAL)
     return (
       <div className="long-post-window">
-        <div>
+        <div ref={postHeaderRef}>
           <h2>Long Entry</h2>
           {isSavePending ? (<p>Saving</p>) : (<p>Saved</p>)}
           <div id="button-container">
@@ -82,7 +109,7 @@ const LongPost = (props) => {
         </div>
         {props.onlineDraftRetrieved && !props.loading ?
           (
-            <div className="long-editor-container">
+            <div className="long-editor-container" ref={editorContainerRef}>
               <LongEditor
                 username={props.username}
                 isSavePending={isSavePending}
@@ -93,8 +120,20 @@ const LongPost = (props) => {
                 localDraft={localDraft}
                 syncChanges={syncChanges}
                 setLocalDraft={setLocalDraft}
+                lastTwoBlockIdentical={lastTwoBlockIdentical}
+                setLastTwoBlockIdentical={setLastTwoBlockIdentical}
+                lastBlockChanged={lastBlockChanged}
+                setLastBlockChanged={setLastBlockChanged}
+                lastBlockText={lastBlockText}
+                setLastBlockText={setLastBlockText}
               />
+              <br />
+              <br />
+              <br />
+              <br />
+              <div id="dummy-scroll" ref={dummyScrollRef}></div>
             </div>
+
           )
           : (
             <div>

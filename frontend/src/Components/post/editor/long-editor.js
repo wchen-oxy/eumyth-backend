@@ -15,6 +15,7 @@ class LongEditor extends React.Component {
             username: this.props.username,
             isInitial: true,
             needOnlineSync: false,
+            lastBlockText: ''
         }
         this.handleSave = this.handleSave.bind(this);
         this.handleSaveSuccess = this.handleSaveSuccess.bind(this);
@@ -58,7 +59,6 @@ class LongEditor extends React.Component {
                     (editor) => {
                         const editorState = editor.emitSerializedOutput();
                         console.log("ANY CHANGE???");
-                        console.log(editorState.blocks);
                         if (this.props.hasContent === false) {
                             for (let block of editorState.blocks) {
                                 if (block.text !== '') {
@@ -82,7 +82,17 @@ class LongEditor extends React.Component {
                                 console.log("After Mount");
                                 const draftsIdentical = _.isEqual(editorState, this.props.localDraft);
                                 if (!draftsIdentical) {
-                                    console.log(editorState);
+                                    if (editorState.blocks.length >= 2
+                                    ) {
+                                        console.log(editorState.blocks[editorState.blocks.length - 1].text);
+                                        this.props.setLastTwoBlockIdentical(
+                                            editorState.blocks[editorState.blocks.length - 1].text
+                                            ===
+                                            editorState.blocks[editorState.blocks.length - 2].text
+                                        );
+                                    }
+                                    this.props.setLastBlockChanged(this.state.lastBlockText === editorState.blocks[editorState.blocks.length - 1].text);
+                                    this.props.setLastBlockText(editorState.blocks[editorState.blocks.length - 1].text);
                                     this.props.onSavePending(true);
                                     this.props.setLocalDraft(editorState);
                                 }
