@@ -84,10 +84,6 @@ class LongEditor extends React.Component {
                                 if (!draftsIdentical) {
                                     if (editorState.blocks.length >= 2
                                     ) {
-                                        // console.log(editorState.blocks[editorState.blocks.length - 1].text
-                                        //     ===
-                                        //     editorState.blocks[editorState.blocks.length - 2].text
-                                        //     );
                                         this.props.setLastTwoBlockIdentical(
                                             editorState.blocks[editorState.blocks.length - 1].text
                                             ===

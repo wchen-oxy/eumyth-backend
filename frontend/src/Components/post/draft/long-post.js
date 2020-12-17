@@ -20,12 +20,6 @@ const LongPost = (props) => {
   const postHeaderRef = useRef(null);
   const dummyScrollRef = useRef(null);
   useEffect(() => {
-    // this.setState({ lastBlockText: editorState.blocks[editorState.blocks.length - 1].text })
-    // console.log(editorContainerSize);
-    // console.log(window.innerHeight);
-    console.log(editorContainerRef.current);
-    console.log(windowState);
-
     if (editorContainerRef.current) {
       if (editorContainerRef.current.offsetHeight && (editorContainerRef.current.offsetHeight !== editorContainerSize &&
         editorContainerRef.current.offsetHeight + postHeaderRef.current.offsetHeight > window.innerHeight
@@ -35,7 +29,6 @@ const LongPost = (props) => {
           editorContainerRef.current.offsetHeight + postHeaderRef.current.offsetHeight > window.innerHeight &&
           lastTwoBlockIdentical)
       ) {
-        console.log("hit");
         dummyScrollRef.current.scrollIntoView();
       }
       setEditorContainerSize(editorContainerRef.current.offsetHeight);
@@ -95,8 +88,7 @@ const LongPost = (props) => {
       }
     }
   }
-  console.log(windowState);
-  if (windowState === INITIAL)
+   if (windowState === INITIAL)
     return (
       <div className="long-post-window">
         <div ref={postHeaderRef}>
