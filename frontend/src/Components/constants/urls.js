@@ -16,6 +16,7 @@ const DRAFT_BASE_URL = ROOT_URL + "/draft";
 
 //user
 const USER_BASE_URL = ROOT_URL + "/user";
+const USER_BIO_URL = USER_BASE_URL + "/bio";
 
 //relation
 const RELATION_BASE_URL = ROOT_URL + "/relation";
@@ -52,6 +53,7 @@ module.exports = {
     COVER_PHOTO_URL,
     DRAFT_BASE_URL,
     USER_BASE_URL,
+    USER_BIO_URL,
     RELATION_BASE_URL,
     RELATION_STATUS_URL,
     POST_BASE_URL,

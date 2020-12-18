@@ -71,12 +71,17 @@ router.route('/multiple').post(upload.array('files'), (req, res, err) => {
 router.route('/display-photo')
   .post(upload.fields([{ name: "croppedImage" }, { name: "smallCroppedImage" }, { name: "tinyCroppedImage" }]),
     (req, res) => {
-      const username = req.body.username;
+      const username = req.body.displayName;
       const croppedImage = req.files.croppedImage ? req.files.croppedImage[0].key : null;
       const smallCroppedImage = req.files.smallCroppedImage ? req.files.smallCroppedImage[0].key : null;
       const tinyCroppedImage = req.files.tinyCroppedImage ? req.files.tinyCroppedImage[0].key : null;
+      console.log(croppedImage);
+      console.log(username);
       let returnedIndexUser = null;
-      if (!croppedImage || smallCroppedImage || tinyCroppedImage) return res.status(500).send("Something went wrong during image upload.");
+      if (!croppedImage || !smallCroppedImage || !tinyCroppedImage) {
+        console.log("No image here");
+        return res.status(500).send("Something went wrong during image upload.");
+      }
       return IndexUser.Model.findOne({ username: username })
         .then((result) => {
           returnedIndexUser = result;
@@ -102,7 +107,7 @@ router.route('/display-photo')
     })
   .delete(
     (req, res) => {
-      const username = req.body.username;
+      const username = req.body.displayName;
       const contentType = req.body.contentType;
       let returnedUser = null;
       let returnedIndexUser = null;
@@ -136,13 +141,13 @@ router.route('/display-photo')
           }).promise()])
         })
         .then((results) => {
-          results[1].cropped_display_photo_key = "";
-          results[1].small_cropped_display_photo_key = "";
-          results[1].tiny_cropped_display_photo_key = "";
+          results[0].cropped_display_photo_key = "";
+          results[0].small_cropped_display_photo_key = "";
+          results[0].tiny_cropped_display_photo_key = "";
           returnedIndexUser.cropped_display_photo_key = "";
           returnedIndexUser.small_cropped_display_photo_key = "";
           returnedIndexUser.tiny_cropped_display_photo_key = "";
-          return Promise.all([returnedIndexUser.save(), results[1].save()]);
+          return Promise.all([results[0].save(), returnedIndexUser.save()]);
         })
         .then(
           () =>
@@ -204,12 +209,12 @@ router.route('/cover')
       .catch(err => { console.log(err); res.status(500).send(); })
   })
   .delete((req, res) => {
-    const username = req.body.username;
-    const contentType = req.body.contentType;
+    const username = req.body.displayName;
     let returnedUser = null;
     return User.Model.findOne({ username: username }).then(
       (user) => {
         returnedUser = user;
+        if (returnedUser.cover_photo_key === "") throw 204;
         return s3.deleteObject({
 
           Bucket: AwsConstants.BUCKET_NAME,
@@ -229,6 +234,9 @@ router.route('/cover')
       })
       .then((res.status(204).send()))
       .catch((err) => {
+        if (err === 204) {
+          return res.status(204).json("No Content");
+        }
         console.log(err);
         res.status(500).send()
       });

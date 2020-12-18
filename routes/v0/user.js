@@ -9,25 +9,6 @@ const UserRelation = require('../../models/user.relation.model');
 const Draft = require("../../models/draft.model");
 const upload = require('../../constants/multer').profileImageUpload;
 
-// const s3 = new AWS.S3({
-//   accessKeyId: AwsConstants.ID,
-//   secretAccessKey: AwsConstants.SECRET
-// });
-
-// var upload = multer({
-//   storage: multerS3({
-//     s3: s3,
-//     bucket: AwsConstants.BUCKET_NAME,
-//     contentType: multerS3.AUTO_CONTENT_TYPE,
-//     metadata: function (req, file, cb) {
-//       cb(null, { fieldName: file.fieldname });
-//     },
-//     key: function (req, file, cb) {
-//       cb(null, "images/profile/" + uuid.v1())
-//     }
-//   })
-// });
-
 router.route('/')
   .get((req, res) => {
     const username = req.query.username;
@@ -96,7 +77,7 @@ router.route('/')
           pursuits: mainPursuitsHolder,
           private: false
         });
-        console.log("33");
+      console.log("33");
 
       const newIndexUser = new IndexUser.Model({
         username: username,
@@ -131,6 +112,22 @@ router.route('/')
           res.status(500).json(err);
         });
     });
+
+router.route('/bio').put((req, res) => {
+  const username = req.body.username;
+  const bio = req.body.bio;
+ 
+  return User.Model.findOne({ username: username })
+    .then((result) => {
+      result.bio = bio;
+      return result.save();
+    })
+    .then(() => res.status(201).send())
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send()
+    });
+})
 
 
 

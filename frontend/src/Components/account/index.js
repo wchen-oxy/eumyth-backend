@@ -62,10 +62,20 @@ const AccountPage = (props) => {
         alert("Something has gone wrong while updating :(")
       })
   );
+
+  const handleBioSubmit = () => {
+    return (
+      AxiosHelper.updateBio({
+        bio: bio,
+        username: props.firebase.returnUsername()
+      })
+        .then(() => alert("Successfully updated your bio!"))
+        .catch((err) => console.log(err))
+    );
+  }
   const processImage = (photoType) => {
     let formData = new FormData();
     formData.append('displayName', props.firebase.returnUsername());
-
     if (photoType === DISPLAY) {
       const titles = ["normal", "small", "tiny"];
       const canvas = AvatarEditorInstance.getImage();
@@ -89,11 +99,16 @@ const AccountPage = (props) => {
         )
     }
     else if (photoType === COVER) {
-      const image = imageCompression(coverPhoto, { maxWidthOrHeight: 250, maxSizeMB: 1, fileType: "image/jpeg" })
-      image.then(formattedImage => formData.append('coverPhoto', formattedImage)).then(() => handleSubmit(formData, photoType));
+      console.log(coverPhoto.size);
+      if (coverPhoto.size > 1000000) {
+        return imageCompression(coverPhoto, { maxSizeMB: 1, fileType: "image/jpeg" })
+          .then(formattedImage => formData.append('coverPhoto', formattedImage)).then(() => handleSubmit(formData, photoType));
+      }
+      else {
+        formData.append('coverPhoto', coverPhoto);
+        return handleSubmit(formData, photoType);
+      }
     }
-
-
   }
 
   return (
@@ -175,7 +190,8 @@ const AccountPage = (props) => {
               <button onClick={() => removePhoto(COVER)}>Remove your cover photo</button>
             </div>
             <label>Edit your bio</label>
-            <input type="text" onChange={e => setBioText(e.target.value)} />
+            <textarea type="text" onChange={e => setBioText(e.target.value)} maxLength={500} />
+            <button onClick={handleBioSubmit}>Submit Bio</button>
           </div>
         );
       }}

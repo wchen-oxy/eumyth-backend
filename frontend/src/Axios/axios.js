@@ -108,6 +108,9 @@ export default class AxiosHelper {
         return axios.post(urls.POST_BASE_URL, postInfoForm);
     }
 
+    static updateBio(formData){
+        return axios.put(urls.USER_BIO_URL, formData);
+    }
     static updatePost(postInfoForm) {
         return axios.put(urls.POST_BASE_URL, postInfoForm);
     }
@@ -133,7 +136,7 @@ export default class AxiosHelper {
     static deleteAccountPhoto(displayName, photoType) {
         return axios.delete(photoType === "COVER" ? urls.COVER_PHOTO_URL : urls.DISPLAY_PHOTO_URL, {
             data: {
-                username: displayName,
+                displayName: displayName,
                 contentType: photoType
             }
         })
