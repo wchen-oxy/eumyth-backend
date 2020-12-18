@@ -6,6 +6,7 @@ const SECRET = process.env.AWS_KEY;
 const BUCKET_NAME = 'eumyth-bucket-1';
 const REGION = 'us-west-1';
 const S3 = new AWS.S3({
+  REGION : REGION,
   accessKeyId: ID,
   secretAccessKey: SECRET
 });
@@ -21,6 +22,7 @@ const returnUserImageURL = (key) => {
 
 module.exports = {
   returnUserImageURL : returnUserImageURL,
+  REGION : REGION,
   ID: ID,
   SECRET: SECRET,
   BUCKET_NAME: BUCKET_NAME,

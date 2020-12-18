@@ -9,7 +9,7 @@ const ROOT_URL = "http://localhost:5000";
 
 //image
 const IMAGE_BASE_URL = ROOT_URL + "/image";
-const DISPLAY_PHOTO_URL = IMAGE_BASE_URL + "/display";
+const DISPLAY_PHOTO_URL = IMAGE_BASE_URL + "/display-photo";
 const COVER_PHOTO_URL = IMAGE_BASE_URL + "/cover";
 
 const DRAFT_BASE_URL = ROOT_URL + "/draft";

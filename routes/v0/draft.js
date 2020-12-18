@@ -6,6 +6,7 @@ const AWS = require('aws-sdk');
 const AwsConstants = require('../../constants/aws');
 
 const s3 = new AWS.S3({
+    // region: AwsConstants.REGION,
     accessKeyId: AwsConstants.ID,
     secretAccessKey: AwsConstants.SECRET
 });

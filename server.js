@@ -20,9 +20,9 @@ var usersRouter = require('./routes/v0/user');
 var testRouter = require('./routes/v0/test');
 var pursuitsRouter = require('./routes/v0/pursuit');
 var postRouter = require('./routes/v0/post');
-var imageRouter = require('./routes/v0/image.js');
-var draftRouter = require('./routes/v0/draft.js');
-var relationRouter = require('./routes/v0/relation.js');
+var imageRouter = require('./routes/v0/image');
+var draftRouter = require('./routes/v0/draft');
+var relationRouter = require('./routes/v0/relation');
 var projectRouter = require('./routes/v0/project');
 var app = express();
 
@@ -55,23 +55,23 @@ connection.once('open', () => {
   console.log("GFS image connection succesful");
 })
 
-app.use('/image', function (req, res, next) {
-  console.log('the response will be sent by the next function ...');
-  req.image_config = {
-    gfs: gfs,
+// app.use('/image', function (req, res, next) {
+//   console.log('the response will be sent by the next function ...');
+//   req.image_config = {
+//     gfs: gfs,
 
-  };
-  next();
-}, imageRouter);
+//   };
+//   next();
+// }, imageRouter);
 
-app.use('/draft', function (req, res, next) {
-  console.log('the response will be sent by the next function ...');
-  req.draft_config = {
-    gfs: gfs,
-    db: db
-  };
-  next();
-}, draftRouter);
+// app.use('/draft', function (req, res, next) {
+//   console.log('the response will be sent by the next function ...');
+//   req.draft_config = {
+//     gfs: gfs,
+//     db: db
+//   };
+//   next();
+// }, draftRouter);
 
 app.use('/pursuit', pursuitsRouter);
 app.use('/index', indexUserRouter);
@@ -80,7 +80,8 @@ app.use('/test', testRouter);
 app.use('/post', postRouter);
 app.use('/relation', relationRouter);
 app.use('/project', projectRouter);
-
+app.use('/image', imageRouter);
+app.use('/draft', draftRouter);
 // console.log that your server is up and running
 app.listen(port, () => console.log(`Listening on port ${port}`));
 

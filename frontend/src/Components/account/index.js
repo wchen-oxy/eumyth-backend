@@ -19,9 +19,9 @@ const AccountPage = (props) => {
   const [bio, setBioText] = useState('');
   const [imageScale, setImageScale] = useState(1);
   const [imageRotation, setImageRotation] = useState(0);
+  const [AvatarEditorInstance, setAvatarEditorInstance] = useState(null);
   const displayRef = React.createRef();
   const coverRef = React.createRef();
-  const editorRef = React.createRef();
 
   const handleImageDrop = (dropped) => {
     setDisplay(dropped);
@@ -52,36 +52,47 @@ const AccountPage = (props) => {
         });
     }
   }
-  const handleSubmit = (photoType) => {
-    let formData = new FormData();
-    formData.append('displayName', props.firebase.returnUsername());
-    if (photoType === DISPLAY) {
-      const titles = ["normal", "small", "tiny"];
-      const image = imageCompression.canvasToFile(this.editorRef.getImage());
-      const results =
-        [
-          imageCompression(image, { maxWidthOrHeight: 250, maxSizeMB: 1, fileType: "image/jpeg" }),
-          imageCompression(image, { maxWidthOrHeight: 125, maxSizeMB: 1, fileType: "image/jpeg" }),
-          imageCompression(image, { maxWidthOrHeight: 62, maxSizeMB: 1, fileType: "image/jpeg" })
-        ]
-      let imageArray = [];
-      for (let i = 0; i < 3; i++) {
-        imageArray.push(new File([results[i]], titles[i], { type: "image/jpeg" }));
-      }
-      formData.append("croppedImage", results[0]);
-      formData.append("smallCroppedImage", results[1]);
-      formData.append("tinyCroppedImage", results[2]);
-    }
-    else if (photoType === COVER) {
-      formData.append('coverPhoto', coverPhoto);
-      console.log(coverPhoto);
-    }
-    return AxiosHelper.deleteAccountPhoto(props.firebase.returnUsername(), COVER)
-      .then(() => AxiosHelper.updateAccountImage(formData, photoType)).then(() => alert("Successfully updated!"))
+
+  const handleSubmit = (formData, photoType) => (
+    AxiosHelper.deleteAccountPhoto(props.firebase.returnUsername(), photoType)
+      .then(
+        () => AxiosHelper.updateAccountImage(formData, photoType)).then(() => alert("Successfully updated!"))
       .catch((err) => {
         console.log(err);
         alert("Something has gone wrong while updating :(")
-      });
+      })
+  );
+  const processImage = (photoType) => {
+    let formData = new FormData();
+    formData.append('displayName', props.firebase.returnUsername());
+
+    if (photoType === DISPLAY) {
+      const titles = ["normal", "small", "tiny"];
+      const canvas = AvatarEditorInstance.getImage();
+      const image = imageCompression.canvasToFile(canvas);
+      image.then((result) => Promise.all([
+        imageCompression(result, { maxWidthOrHeight: 250, maxSizeMB: 1, fileType: "image/jpeg" }),
+        imageCompression(result, { maxWidthOrHeight: 125, maxSizeMB: 1, fileType: "image/jpeg" }),
+        imageCompression(result, { maxWidthOrHeight: 62, maxSizeMB: 1, fileType: "image/jpeg" })
+      ]))
+        .then((results) => {
+          let imageArray = [];
+          for (let i = 0; i < 3; i++) {
+            imageArray.push(new File([results[i]], titles[i], { type: "image/jpeg" }));
+          }
+
+          formData.append("croppedImage", results[0]);
+          formData.append("smallCroppedImage", results[1]);
+          formData.append("tinyCroppedImage", results[2]);
+          return handleSubmit(formData, photoType);
+        }
+        )
+    }
+    else if (photoType === COVER) {
+      const image = imageCompression(coverPhoto, { maxWidthOrHeight: 250, maxSizeMB: 1, fileType: "image/jpeg" })
+      image.then(formattedImage => formData.append('coverPhoto', formattedImage)).then(() => handleSubmit(formData, photoType));
+    }
+
 
   }
 
@@ -112,7 +123,7 @@ const AccountPage = (props) => {
                         return (
                           <div {...getRootProps()}>
                             <AvatarEditor
-                              ref={editorRef}
+                              ref={(editor) => setAvatarEditorInstance(editor)}
                               image={displayPhoto}
                               width={170}
                               height={170}
@@ -151,7 +162,7 @@ const AccountPage = (props) => {
                   :
                   <div id="temp-profile-photo-container"></div>
               }
-              <button onClick={() => handleSubmit(DISPLAY)}>Submit your display photo!</button>
+              <button onClick={() => processImage(DISPLAY)}>Submit your display photo!</button>
               <button onClick={() => removePhoto(DISPLAY)}>Remove display Photo?</button>
             </div>
             <button onClick={() => manageDisplayDiv(coverRef)}>Edit your Cover Photo</button>
@@ -160,7 +171,7 @@ const AccountPage = (props) => {
               <input type="file" onChange={(e) => {
                 setCover(e.target.files[0]);
               }}></input>
-              <button onClick={() => handleSubmit(COVER)}>Submit your cover photo!</button>
+              <button onClick={() => processImage(COVER)}>Submit your cover photo!</button>
               <button onClick={() => removePhoto(COVER)}>Remove your cover photo</button>
             </div>
             <label>Edit your bio</label>

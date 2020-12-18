@@ -6,7 +6,7 @@ let IndexUser = require('../../models/index.user.model');
 let Pursuit = require('../../models/pursuit.model');
 let IndexPursuit = require('../../models/index.pursuit.model');
 const UserRelation = require('../../models/user.relation.model');
-let Draft = require("../../models/draft.model");
+const Draft = require("../../models/draft.model");
 const upload = require('../../constants/multer').profileImageUpload;
 
 // const s3 = new AWS.S3({

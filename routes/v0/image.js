@@ -1,14 +1,16 @@
 var express = require('express');
-const router = express.Router();
+var router = express.Router();
 const multer = require('multer');
 const AWS = require('aws-sdk');
 const AwsConstants = require('../../constants/aws');
 const multerS3 = require('multer-s3')
 const uuid = require('uuid');
 const User = require('../../models/user.model');
+const IndexUser = require('../../models/index.user.model');
 // const profileUpload = require('../../constants/multer').profileImageUpload;
 
 const s3 = new AWS.S3({
+  region: AwsConstants.REGION,
   accessKeyId: AwsConstants.ID,
   secretAccessKey: AwsConstants.SECRET
 });
@@ -66,6 +68,97 @@ router.route('/multiple').post(upload.array('files'), (req, res, err) => {
   return res.status(200).json({ 'imageUrls': imageArray });
 });
 
+router.route('/display-photo')
+  .post(upload.fields([{ name: "croppedImage" }, { name: "smallCroppedImage" }, { name: "tinyCroppedImage" }]),
+    (req, res) => {
+      const username = req.body.username;
+      const croppedImage = req.files.croppedImage ? req.files.croppedImage[0].key : null;
+      const smallCroppedImage = req.files.smallCroppedImage ? req.files.smallCroppedImage[0].key : null;
+      const tinyCroppedImage = req.files.tinyCroppedImage ? req.files.tinyCroppedImage[0].key : null;
+      let returnedIndexUser = null;
+      if (!croppedImage || smallCroppedImage || tinyCroppedImage) return res.status(500).send("Something went wrong during image upload.");
+      return IndexUser.Model.findOne({ username: username })
+        .then((result) => {
+          returnedIndexUser = result;
+          returnedIndexUser.cropped_display_photo_key = croppedImage;
+          returnedIndexUser.small_cropped_display_photo_key = smallCroppedImage;
+          returnedIndexUser.tiny_cropped_display_photo_key = tinyCroppedImage;
+          return User.Model.findById(result.user_profile_id)
+        })
+        .then((result) => {
+          result.cropped_display_photo_key = croppedImage;
+          result.small_cropped_display_photo_key = smallCroppedImage;
+          result.tiny_cropped_display_photo_key = tinyCroppedImage;
+          return Promise.all([returnedIndexUser.save(), result.save()]);
+        })
+        .then(
+          () =>
+            res.status(201).send("Display photo successfully changed!")
+        )
+        .catch((err) => {
+          console.log(err);
+          res.status(500).send()
+        });
+    })
+  .delete(
+    (req, res) => {
+      const username = req.body.username;
+      const contentType = req.body.contentType;
+      let returnedUser = null;
+      let returnedIndexUser = null;
+
+      return IndexUser.Model.findOne({ username: username })
+        .then((result) => {
+          returnedIndexUser = result;
+          if (returnedIndexUser.cropped_display_photo_key === '') {
+            throw 204;
+          }
+          console.log(returnedIndexUser.cropped_display_photo_key === '');
+          console.log(returnedIndexUser.cropped_display_photo_key);
+          const displayPhotoKeys = [
+            { Key: returnedIndexUser.cropped_display_photo_key },
+            { Key: returnedIndexUser.small_cropped_display_photo_key },
+            { Key: returnedIndexUser.tiny_cropped_display_photo_key }
+          ];
+          return Promise.all([User.Model.findById(returnedIndexUser.user_profile_id),
+          s3.deleteObjects({
+
+            Bucket: AwsConstants.BUCKET_NAME,
+            Delete: {
+              Objects: displayPhotoKeys
+            }
+          }, function (err, data) {
+            if (err) {
+              console.log(err, err.stack);
+              throw new Error(err);
+            }
+            else { console.log("Success", data); }
+          }).promise()])
+        })
+        .then((results) => {
+          results[1].cropped_display_photo_key = "";
+          results[1].small_cropped_display_photo_key = "";
+          results[1].tiny_cropped_display_photo_key = "";
+          returnedIndexUser.cropped_display_photo_key = "";
+          returnedIndexUser.small_cropped_display_photo_key = "";
+          returnedIndexUser.tiny_cropped_display_photo_key = "";
+          return Promise.all([returnedIndexUser.save(), results[1].save()]);
+        })
+        .then(
+          () =>
+            res.status(201).send({ userId: returnedIndexUser.user_profile_id })
+        )
+        .catch((err) => {
+          if (err === 204) {
+            return res.status(204).json("No Content");
+          }
+          console.log(err);
+          res.status(500).send()
+        });
+
+    })
+  ;
+
 
 
 router.route('/cover')
@@ -114,16 +207,11 @@ router.route('/cover')
     const username = req.body.username;
     const contentType = req.body.contentType;
     let returnedUser = null;
-
-    // s3.deleteObject({
-    //   Bucket: AwsConstants.BUCKET_NAME,
-    //   Key: user.cover_photo,
-
-    // })
     return User.Model.findOne({ username: username }).then(
       (user) => {
         returnedUser = user;
         return s3.deleteObject({
+
           Bucket: AwsConstants.BUCKET_NAME,
           Key: user.cover_photo_key,
         }, function (err, data) {
@@ -145,14 +233,6 @@ router.route('/cover')
         res.status(500).send()
       });
 
-
-
-    //delete the s3 bucket first
-    //then delete the references to it
-    //then delete post references to it
-
-
-    return res.status(200).send();
-  })
+  });
 
 module.exports = router;
