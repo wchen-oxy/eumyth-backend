@@ -94,7 +94,6 @@ class Timeline extends React.Component {
         }
         else {
             return AxiosHelper.returnMultiplePosts(
-                this.props.targetProfileId,
                 this.props.allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength),
                 false)
                 .then(

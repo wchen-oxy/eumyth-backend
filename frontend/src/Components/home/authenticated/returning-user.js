@@ -4,7 +4,9 @@ import { withAuthorization } from '../../session';
 import { withFirebase } from '../../../Firebase';
 import AxiosHelper from '../../../Axios/axios';
 import RecentWorkObject from "./sub-components/recent-work-object";
-import FeedObject from "./sub-components/feed-object"
+import FeedObject from "./sub-components/feed-object";
+import EventModal from "../../profile/sub-components/event-modal";
+import Event from "../../profile/timeline/sub-components/timeline-event";
 import { returnUserImageURL } from "../../constants/urls";
 import LongPostViewer from '../../post/viewer/long-post';
 import ShortPostViewer from '../../post/viewer/short-post';
@@ -12,6 +14,7 @@ import ShortPostViewer from '../../post/viewer/short-post';
 import './returning-user.scss';
 
 
+const POST = "POST";
 class ReturningUserPage extends React.Component {
     _isMounted = false;
     constructor(props) {
@@ -28,11 +31,22 @@ class ReturningUserPage extends React.Component {
             hasMore: true,
             fixedDataLoadLength: 4,
             nextOpenPostIndex: 0,
-            feedData: []
+            feedData: [],
+
+            isModalShowing: false,
+            selectedEvent: null,
+            textData: '',
+            postType: null,
+            recentPosts: null
         }
+
+        this.modalRef = React.createRef();
         this.handlePursuitClick = this.handlePursuitClick.bind(this);
         this.handleRecentWorkClick = this.handleRecentWorkClick.bind(this);
-        this.fetchNextPosts = this.fetchNextPosts.bind(this);
+        this.handleEventClick = this.handleEventClick.bind(this);
+        this.openModal = this.openModal.bind(this);
+        this.closeModal = this.closeModal.bind(this);
+        this.handleDeletePost = this.handleDeletePost.bind(this);
 
     }
 
@@ -47,22 +61,37 @@ class ReturningUserPage extends React.Component {
             let displayPhoto = "";
             let pursuits = null;
             let feedData = [];
-            AxiosHelper.returnIndexUser(this.state.username)
-                .then(
-                    (result) => {
-                        allPosts = result.data.following_feed;
-                        indexUserData = result.data;
-                        displayPhoto = result.data.cropped_display_photo_key;
-                        pursuits = result.data.pursuits;
-                        return result.data.following_feed;
-                    }
-                )
+            let recentPosts = null;
+            return AxiosHelper.returnIndexUser(this.state.username).then(
+                (result) => {
+                    allPosts = result.data.following_feed;
+                    indexUserData = result.data;
+                    displayPhoto = result.data.cropped_display_photo_key;
+                    pursuits = result.data.pursuits;
+                    return AxiosHelper.returnMultiplePosts(result.data.recent_posts, false);
+                }
+            )
+                .then((result) => {
+                    console.log(result.data);
+                    console.log(typeof(result.data));
+                    recentPosts = result.data.map((value, index) => {
+                        return (
+                            <Event
+                                mediaType={POST}
+                                newProjectView={this.props.newProjectView}
+                                key={index}
+                                eventData={value}
+                                onEventClick={this.handleEventClick}
+                            />
+                        );
+                    });
+                    return result.data.following_feed;
+                })
                 .then(
                     (feed) => {
                         const slicedFeed = allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength);
                         if (!feed || feed.length === 0) return this.setState({ hasMore: false });
                         return AxiosHelper.returnMultiplePosts(
-                            this.props.targetProfileId,
                             slicedFeed,
                             true)
                             .then(
@@ -89,6 +118,7 @@ class ReturningUserPage extends React.Component {
                                 indexUserData: indexUserData,
                                 displayPhoto: displayPhoto,
                                 pursuits: pursuits,
+                                recentPosts: recentPosts ? recentPosts : null
                             });
                     }
                 )
@@ -104,29 +134,27 @@ class ReturningUserPage extends React.Component {
         this._isMounted = false;
     }
 
-    fetchNextPosts() {
+    handleDeletePost() {
+        return AxiosHelper.deletePost(
+            this.state.indexUserData.user_profile_id,
+            this.state.indexUserData._id,
+            this.state.selectedEvent._id
+        ).then(
+            (result) => console.log(result)
+        );
+    }
 
-        const slicedFeed = this.state.allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength);
-        console.log("fetch");
-        if (this.state.nextOpenPostIndex + this.state.fixedDataLoadLength >= this.state.allPosts.length) {
-            console.log("Length of All Posts Exceeded");
-            this.setState({ hasMore: false });
-        }
-        return AxiosHelper.returnMultiplePosts(
-            this.props.targetProfileId,
-            slicedFeed,
-            true)
-            .then(
-                (result) => {
-                    let newFeedData = this.state.feedData;
-                    for (const item of result.data) {
-                        newFeedData.push(item);
-                    }
-                    if (this._isMounted) this.setState(state => ({ feedData: newFeedData, nextOpenPostIndex: state.nextOpenPostIndex + state.fixedDataLoadLength }));
-                }
-            )
-            .catch((error) => console.log(error));
+    openModal() {
+        this.modalRef.current.style.display = "block";
+        document.body.style.overflow = "hidden";
+        this.setState({ isModalShowing: true });
 
+    }
+
+    closeModal() {
+        this.modalRef.current.style.display = "none";
+        document.body.style.overflow = "visible";
+        this.setState({ isModalShowing: false, selectedEvent: null });
     }
 
     handlePursuitClick(e) {
@@ -141,10 +169,29 @@ class ReturningUserPage extends React.Component {
     }
 
 
+    handleEventClick(selectedEvent) {
+        return AxiosHelper.retrieveTextData(selectedEvent._id)
+            .then(
+                (result) => {
+                    console.log(selectedEvent);
+                    console.log(selectedEvent.post_format);
+                    if (this._isMounted) {
+                        this.setState({
+                            selectedEvent: selectedEvent,
+                            textData: result.data,
+                            postType: selectedEvent.post_format
+                        }, this.openModal());
+                    }
+                }
+            )
+            .catch(error => console.log(error));
+        // .then(() => this.setState({ selectedEvent: selectedEvent }));
+    }
 
     render() {
 
         let pursuitInfoArray = [];
+        let pursuitNames = []
         let totalMin = 0;
         if (this.state.pursuits) {
             for (const pursuit of this.state.pursuits) {
@@ -158,8 +205,10 @@ class ReturningUserPage extends React.Component {
                         <td key={pursuit.num_milestones + " milestones"}>{pursuit.num_milestones}</td>
                     </tr>);
                 pursuitInfoArray.push(hobbyTableData);
+                pursuitNames.push(pursuit.name);
             }
         }
+
 
         //TEST 
         const recentWork = (<RecentWorkObject value="test" onRecentWorkClick={this.handleRecentWorkClick} />);
@@ -206,11 +255,8 @@ class ReturningUserPage extends React.Component {
                             <button onClick={this.handlePursuitClick}>Pursuits</button>
                         </div>
                     </div>
-                    <div className="flex-display flex-direction-column">
-                        <div className="flex-display">
-                            {recentWork}
-                            {recentWork}
-                        </div>
+                    <div className="flex-display">
+                        {this.state.recentPosts}
                     </div>
                 </div>
                 <div className="home-row-container flex-display flex-direction-column">
@@ -244,6 +290,31 @@ class ReturningUserPage extends React.Component {
                         {/* : <></>} */}
                     </div>
 
+                </div>
+
+                <div className="modal" ref={this.modalRef}>
+                    <div className="overlay" onClick={(() => this.closeModal())}></div>
+                    <span className="close" onClick={(() => this.closeModal())}>X</span>
+                    {
+                        this.state.isModalShowing && this.state.selectedEvent ?
+
+                            <EventModal
+                                key={this.state.selectedEvent._id}
+                                isOwnProfile={true}
+                                displayPhoto={this.state.indexUserData.tiny_cropped_display_photo_key}
+                                preferredPostType={this.state.indexUserData.preferredPostType}
+                                closeModal={this.closeModal}
+                                postType={this.state.postType}
+                                pursuits={pursuitNames}
+                                username={this.state.username}
+                                eventData={this.state.selectedEvent}
+                                textData={this.state.textData}
+                                onDeletePost={this.handleDeletePost}
+                            />
+                            :
+                            <>                            {console.log("Disappear")}
+                            </>
+                    }
                 </div>
             </div>
         )

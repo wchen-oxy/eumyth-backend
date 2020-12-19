@@ -407,7 +407,7 @@ router.route('/')
 router.route('/multiple').get((req, res) => {
   const postIdList = req.query.postIdList;
   const includePostText = req.query.includePostText;
-  console.log(postIdList);
+  // console.log(postIdList);
   return Post.Model.find({
     '_id': { $in: postIdList }, function(err, docs) {
       if (err) console.log(err);
@@ -424,12 +424,11 @@ router.route('/multiple').get((req, res) => {
           // coverInfoArray.unshift(
           result.text_data = "";
           result.feedback = "";
-          console.log(result.text_data);
-
         }
       }
       console.log(coverInfoArray);
-      res.status(200).send(coverInfoArray);
+      console.log("This way");
+      return res.status(200).send(coverInfoArray);
     })
 });
 

@@ -76,10 +76,9 @@ export default class AxiosHelper {
         })
     }
 
-    static returnMultiplePosts(targetUserDataId, postIdList, includePostText) {
+    static returnMultiplePosts( postIdList, includePostText) {
         return axios.get(urls.MULTIPLE_POSTS_URL, {
             params: {
-                targetUserDataId: targetUserDataId,
                 postIdList: postIdList,
                 includePostText: includePostText
             }
