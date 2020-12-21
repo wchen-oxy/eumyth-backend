@@ -139,10 +139,10 @@ export default class AxiosHelper {
         });
     }
 
-    static deleteAccountPhoto(displayName, photoType) {
+    static deleteAccountPhoto(username, photoType) {
         return axios.delete(photoType === "COVER" ? urls.COVER_PHOTO_URL : urls.DISPLAY_PHOTO_URL, {
             data: {
-                displayName: displayName,
+                username: username,
                 contentType: photoType
             }
         })

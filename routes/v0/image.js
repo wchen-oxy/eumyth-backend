@@ -71,7 +71,7 @@ router.route('/multiple').post(upload.array('files'), (req, res, err) => {
 router.route('/display-photo')
   .post(upload.fields([{ name: "croppedImage" }, { name: "smallCroppedImage" }, { name: "tinyCroppedImage" }]),
     (req, res) => {
-      const username = req.body.displayName;
+      const username = req.body.username;
       const croppedImage = req.files.croppedImage ? req.files.croppedImage[0].key : null;
       const smallCroppedImage = req.files.smallCroppedImage ? req.files.smallCroppedImage[0].key : null;
       const tinyCroppedImage = req.files.tinyCroppedImage ? req.files.tinyCroppedImage[0].key : null;
@@ -107,7 +107,7 @@ router.route('/display-photo')
     })
   .delete(
     (req, res) => {
-      const username = req.body.displayName;
+      const username = req.body.username;
       const contentType = req.body.contentType;
       let returnedUser = null;
       let returnedIndexUser = null;
@@ -169,7 +169,7 @@ router.route('/display-photo')
 router.route('/cover')
   .post(profileUpload.single("coverPhoto"), (req, res) => {
     console.log(req.file);
-    const username = req.body.displayName;
+    const username = req.body.username;
     const coverPhoto = req.file.key;
     console.log(req.file.key);
     let returnedUser = null;
@@ -209,7 +209,7 @@ router.route('/cover')
       .catch(err => { console.log(err); res.status(500).send(); })
   })
   .delete((req, res) => {
-    const username = req.body.displayName;
+    const username = req.body.username;
     let returnedUser = null;
     return User.Model.findOne({ username: username }).then(
       (user) => {
