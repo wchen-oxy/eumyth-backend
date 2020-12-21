@@ -15,7 +15,6 @@ export default class AxiosHelper {
         return axios.post(urls.USER_BASE_URL, formData);
     }
 
-
     static setFollowerStatus(visitorUsername, targetUsername, targetUserRelationId, isPrivate, action) {
         return axios.put(urls.RELATION_STATUS_URL, {
             visitorUsername: visitorUsername,
@@ -147,30 +146,6 @@ export default class AxiosHelper {
             }
         })
     }
-
-    //FIXME 
-    //STEAL THE UPLOAD THING FROM HERE
-    // static postShortPost(formData, progressRef, uploadRef, textOnly){
-    //     if (textOnly) return axios.post(PostEndpoint.SHORT_POST_URL, formData);
-    //     else{
-    //         return axios.post(PostEndpoint.SHORT_POST_URL, formData, {
-    //         onUploadProgress: (progressEvent) => {
-    //             const uploadPercentage = Math.floor((progressEvent.loaded / progressEvent.total) * 100);
-    //             progressRef.current.innerHTML = `${uploadPercentage}%`;
-    //             progressRef.current.style.width = `${uploadPercentage}%`;
-
-    //             if (uploadPercentage === 100) {
-    //                 uploadRef.current.innerHTML = 'File(s) Uploaded';
-    //                 // alert("Upload Complete!")
-    //                 // validFiles.length = 0;
-    //                 // setValidFiles([...validFiles]);
-    //                 // setSelectedFiles([...validFiles]);
-    //                 // setUnsupportedFiles([...validFiles]);
-    //             }
-    //         },
-    //     });
-    //     }
-    // }
 
     static saveDraftMetaInfo(metaInfoForm) {
         return axios.put(urls.DRAFT_BASE_URL, metaInfoForm)

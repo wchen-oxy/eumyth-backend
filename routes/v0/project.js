@@ -3,21 +3,14 @@ const router = express.Router();
 const User = require('../../models/user.model');
 const IndexUser = require('../../models/index.user.model');
 const multer = require('multer');
-const AWS = require('aws-sdk');
 const AwsConstants = require('../../constants/aws');
 const multerS3 = require('multer-s3');
 const uuid = require('uuid');
 const Project = require('../../models/project.model');
 
-
-const s3 = new AWS.S3({
-    accessKeyId: AwsConstants.ID,
-    secretAccessKey: AwsConstants.SECRET
-});
-
 var upload = multer({
     storage: multerS3({
-        s3: s3,
+        s3: AwsConstants.S3_INTERFACE,
         bucket: AwsConstants.BUCKET_NAME,
         contentType: multerS3.AUTO_CONTENT_TYPE,
         metadata: function (req, file, cb) {

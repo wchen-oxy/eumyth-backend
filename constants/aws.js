@@ -6,7 +6,7 @@ const SECRET = process.env.AWS_KEY;
 const BUCKET_NAME = 'eumyth-bucket-1';
 const REGION = 'us-west-1';
 const S3 = new AWS.S3({
-  REGION : REGION,
+  region : REGION,
   accessKeyId: ID,
   secretAccessKey: SECRET
 });

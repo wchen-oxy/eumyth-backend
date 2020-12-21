@@ -5,11 +5,11 @@ let IndexUser = require('../../models/index.user.model');
 const AWS = require('aws-sdk');
 const AwsConstants = require('../../constants/aws');
 
-const s3 = new AWS.S3({
-    // region: AwsConstants.REGION,
-    accessKeyId: AwsConstants.ID,
-    secretAccessKey: AwsConstants.SECRET
-});
+// const s3 = new AWS.S3({
+//     // region: AwsConstants.REGION,
+//     accessKeyId: AwsConstants.ID,
+//     secretAccessKey: AwsConstants.SECRET
+// });
 
 router.route('/').get((req, res) => {
     const username = req.query.username;
@@ -63,7 +63,7 @@ router.route('/').get((req, res) => {
                         );
                     }
                 }
-              
+                console.log(AwsConstants.S3_INTERFACE);
                 indexUser.draft.text = draft;
                 indexUser.draft.links = currentURLs;
                 if (toDeleteURLs.length > 0)
@@ -74,7 +74,7 @@ router.route('/').get((req, res) => {
                                 res.status(500).json(err);
                             }
                         }),
-                        s3.deleteObjects({
+                        AwsConstants.S3_INTERFACE.deleteObjects({
                             Bucket: AwsConstants.BUCKET_NAME,
                             Delete: {
                                 Objects: toDeleteURLs

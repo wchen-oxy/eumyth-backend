@@ -5,19 +5,12 @@ const IndexUser = require('../../models/index.user.model');
 const Post = require("../../models/post.model");
 const PostPreview = require("../../models/post.preview.model");
 const multer = require('multer');
-const AWS = require('aws-sdk');
 const AwsConstants = require('../../constants/aws');
 const multerS3 = require('multer-s3');
 const uuid = require('uuid');
 const userRelation = require('../../models/user.relation.model');
-
 const SHORT = "SHORT";
 const RECENT_POSTS_LIMIT = 8;
-
-const s3 = new AWS.S3({
-  accessKeyId: AwsConstants.ID,
-  secretAccessKey: AwsConstants.SECRET
-});
 
 const setPursuitAttributes = (isMilestone, pursuit, minDuration, postId, date) => {
   if (isMilestone) {
@@ -47,7 +40,7 @@ const insertIntoDatedPosts = (datedPosts, postId, date) => {
 
 var upload = multer({
   storage: multerS3({
-    s3: s3,
+    s3: AwsConstants.S3_INTERFACE,
     bucket: AwsConstants.BUCKET_NAME,
     contentType: multerS3.AUTO_CONTENT_TYPE,
     metadata: function (req, file, cb) {

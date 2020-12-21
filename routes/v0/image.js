@@ -9,15 +9,10 @@ const User = require('../../models/user.model');
 const IndexUser = require('../../models/index.user.model');
 // const profileUpload = require('../../constants/multer').profileImageUpload;
 
-const s3 = new AWS.S3({
-  region: AwsConstants.REGION,
-  accessKeyId: AwsConstants.ID,
-  secretAccessKey: AwsConstants.SECRET
-});
 
 var upload = multer({
   storage: multerS3({
-    s3: s3,
+    s3: AwsConstants.S3_INTERFACE,
     bucket: AwsConstants.BUCKET_NAME,
     contentType: multerS3.AUTO_CONTENT_TYPE,
     metadata: function (req, file, cb) {
@@ -31,7 +26,7 @@ var upload = multer({
 
 var profileUpload = multer({
   storage: multerS3({
-    s3: s3,
+    s3: AwsConstants.S3_INTERFACE,
     bucket: AwsConstants.BUCKET_NAME,
     contentType: multerS3.AUTO_CONTENT_TYPE,
     metadata: function (req, file, cb) {
@@ -126,7 +121,7 @@ router.route('/display-photo')
             { Key: returnedIndexUser.tiny_cropped_display_photo_key }
           ];
           return Promise.all([User.Model.findById(returnedIndexUser.user_profile_id),
-          s3.deleteObjects({
+          AwsConstants.S3_INTERFACE.deleteObjects({
 
             Bucket: AwsConstants.BUCKET_NAME,
             Delete: {
@@ -179,32 +174,10 @@ router.route('/cover')
         (user) => {
           if (!user) throw new Error("Could not find user!");
           returnedUser = user;
-          user.cover_photo_key = coverPhoto;
-          // console.log(user);
-          // if (user.cover_photo_key !== "") {
-          //   console.log("key exist")
-          //   return s3.deleteObject({
-          //     Bucket: AwsConstants.BUCKET_NAME,
-          //     Key: user.cover_photo_key,
-          //   }, function (err, data) {
-          //     if (err) {
-          //       console.log(err, err.stack);
-          //       throw new Error("Something went wrong while deleting the file from Amazon.", err)
-          //     };
-          //   });
-          // }
-          // return;
-          user.cover_photo_key = coverPhoto;
-          console.log(user.cover_photo_key);
+          user.cover_photo_key = coverPhoto;        
           return returnedUser.save();
         }
       )
-      // .then(() => {
-      //   // console.log(returnedUser);
-      //   returnedUser.cover_photo_key = coverPhoto;
-      //   console.log(returnedUser.cover_photo_key);
-      //   return returnedUser.save();
-      // })
       .then(() => res.status(200).send())
       .catch(err => { console.log(err); res.status(500).send(); })
   })
@@ -215,8 +188,7 @@ router.route('/cover')
       (user) => {
         returnedUser = user;
         if (returnedUser.cover_photo_key === "") throw 204;
-        return s3.deleteObject({
-
+        return AwsConstants.S3_INTERFACE.deleteObject({
           Bucket: AwsConstants.BUCKET_NAME,
           Key: user.cover_photo_key,
         }, function (err, data) {
