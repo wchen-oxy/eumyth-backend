@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PasswordChangeForm from '../password/change';
 import AvatarEditor from 'react-avatar-editor';
 import Dropzone from 'react-dropzone';
@@ -22,6 +22,14 @@ const AccountPage = (props) => {
   const [AvatarEditorInstance, setAvatarEditorInstance] = useState(null);
   const displayRef = React.createRef();
   const coverRef = React.createRef();
+
+  useEffect(
+    () => {
+      AxiosHelper.returnBio(props.firebase.returnUsername()).then((result) => {
+        console.log(result);
+        setBioText(result.data); });
+    }
+    , [props.firebase])
 
   const handleImageDrop = (dropped) => {
     setDisplay(dropped);
@@ -190,7 +198,7 @@ const AccountPage = (props) => {
               <button onClick={() => removePhoto(COVER)}>Remove your cover photo</button>
             </div>
             <label>Edit your bio</label>
-            <textarea type="text" onChange={e => setBioText(e.target.value)} maxLength={500} />
+            <textarea type="text" onChange={e => setBioText(e.target.value)} value={bio} maxLength={500} />
             <button onClick={handleBioSubmit}>Submit Bio</button>
           </div>
         );

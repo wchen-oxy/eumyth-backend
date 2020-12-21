@@ -76,7 +76,7 @@ export default class AxiosHelper {
         })
     }
 
-    static returnMultiplePosts( postIdList, includePostText) {
+    static returnMultiplePosts(postIdList, includePostText) {
         return axios.get(urls.MULTIPLE_POSTS_URL, {
             params: {
                 postIdList: postIdList,
@@ -107,7 +107,14 @@ export default class AxiosHelper {
         return axios.post(urls.POST_BASE_URL, postInfoForm);
     }
 
-    static updateBio(formData){
+    static returnBio(username) {
+        return axios.get(urls.USER_BIO_URL, {
+            params: {
+                username: username
+            }
+        })
+    }
+    static updateBio(formData) {
         return axios.put(urls.USER_BIO_URL, formData);
     }
     static updatePost(postInfoForm) {

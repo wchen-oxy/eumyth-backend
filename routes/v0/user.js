@@ -113,21 +113,35 @@ router.route('/')
         });
     });
 
-router.route('/bio').put((req, res) => {
-  const username = req.body.username;
-  const bio = req.body.bio;
- 
-  return User.Model.findOne({ username: username })
-    .then((result) => {
-      result.bio = bio;
-      return result.save();
-    })
-    .then(() => res.status(201).send())
-    .catch((err) => {
-      console.log(err);
-      res.status(500).send()
-    });
-})
+router.route('/bio')
+  .get((req, res) => {
+    const username = req.query.username;
+    return User.Model.findOne({ username: username })
+      .then((result) => {
+        return res.send(result.bio);
+      })
+      .catch(
+        (err) => {
+          console.log(err);
+          res.status(500).send();
+        }
+      )
+  })
+  .put((req, res) => {
+    const username = req.body.username;
+    const bio = req.body.bio;
+
+    return User.Model.findOne({ username: username })
+      .then((result) => {
+        result.bio = bio;
+        return result.save();
+      })
+      .then(() => res.status(201).send())
+      .catch((err) => {
+        console.log(err);
+        res.status(500).send()
+      });
+  })
 
 
 
