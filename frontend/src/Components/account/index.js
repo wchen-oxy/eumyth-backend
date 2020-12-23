@@ -12,6 +12,8 @@ import "./index.scss";
 
 const DISPLAY = "DISPLAY";
 const COVER = "COVER";
+const PUBLIC = "PUBLIC";
+const PRIVATE = "PRIVATE";
 
 const AccountPage = (props) => {
   const [displayPhoto, setDisplay] = useState(null);
@@ -20,20 +22,24 @@ const AccountPage = (props) => {
   const [imageScale, setImageScale] = useState(1);
   const [imageRotation, setImageRotation] = useState(0);
   const [AvatarEditorInstance, setAvatarEditorInstance] = useState(null);
+  const [isPrivate, setIsPrivate] = useState(null);
   const displayRef = React.createRef();
   const coverRef = React.createRef();
 
   useEffect(
     () => {
-      AxiosHelper.returnBio(props.firebase.returnUsername()).then((result) => {
+      AxiosHelper.returnAccountSettingsInfo(props.firebase.returnUsername()).then((result) => {
         console.log(result);
-        setBioText(result.data); });
+        setBioText(result.data.bio);
+        setIsPrivate(result.data.private);
+      });
     }
     , [props.firebase])
 
   const handleImageDrop = (dropped) => {
     setDisplay(dropped);
   }
+
   const manageDisplayDiv = (ref) => {
     console.log(ref.current.style.display);
     if (ref.current.style.display === "") { ref.current.style.display = "flex" }
@@ -118,7 +124,7 @@ const AccountPage = (props) => {
       }
     }
   }
-
+console.log(isPrivate);
   return (
     <AuthUserContext.Consumer>
       {authUser => {
@@ -127,6 +133,20 @@ const AccountPage = (props) => {
           <div id="settings-hero-container">
             <h1>Account: {authUser.email}</h1>
             <PasswordChangeForm />
+            <select name="pursuit-category" value={isPrivate ? PRIVATE : PUBLIC} onChange={(e) =>{
+              const isPrivate = e.target.value === PRIVATE ? true : false;
+              setIsPrivate(isPrivate);
+              AxiosHelper.setProfilePrivacy(props.firebase.returnUsername(), isPrivate).catch((err) => {
+                console.log(err);
+                alert("Unable to update Profile Privacy.");
+              })
+
+            }
+              
+              }>
+              <option key="Private" value={PRIVATE}>Private</option>
+              <option key="Public" value={PUBLIC}>Public</option>
+            </select>
             <button onClick={() => manageDisplayDiv(displayRef)}>Edit your Display Photo</button>
             <div ref={displayRef} className="photo-edit-input-container">
               <label>Change your display photo!</label>

@@ -37,14 +37,10 @@ router.route('/').post(
         const isComplete = req.body.isComplete ? req.body.isComplete : null;
         const minDuration = req.body.minDuration ? req.body.minDuration : null;
         const coverPhotoURL = req.files ? req.files.coverPhoto[0].key : null;
-        console.log(typeof (minDuration));
-        console.log(!!minDuration);
-        console.log(req.body);
+      
         for (const post of (req.body.selectedPosts)) {
             selectedPosts.push(JSON.parse(post)._id);
         }
-        // console.log(selectedPosts);
-
         const newProject = new Project.Model({
             username: username,
             author_id: indexUserId,
@@ -60,49 +56,35 @@ router.route('/').post(
             post_ids: selectedPosts,
         });
 
-        console.log(
-            "Asdf"
-        );
-
         const resolvedIndexUser = IndexUser.Model.findById(indexUserId).then(result => {
             let user = result;
             for (const pursuit of user.pursuits) {
                 if (pursuit.name === newProject.pursuit) {
-                    // console.log("Yes");
-
                     pursuit.num_projects++;
                 }
             }
-            console.log("here");
-            // console.log(user.pursuits);
+
             return user;
         });
         const resolvedUser = User.Model.findById(userId).then((result => {
             let user = result;
             for (const pursuit of user.pursuits) {
                 if (pursuit.name === newProject.pursuit) {
-                    console.log("Yes2", newProject);
                     pursuit.projects.unshift(newProject._id);
                 }
             }
-            // console.log(user.pursuits);
             return user;
 
         }));
 
         return Promise.all([resolvedIndexUser, resolvedUser])
             .then((result) => {
-                console.log(result);
-                console.log("here 3");
                 const savedIndexUser = result[0].save();
                 const savedUser = result[1].save();
                 const savedProject = newProject.save();
-
                 return (Promise.all([savedIndexUser, savedUser, savedProject]));
             })
             .then((result) => {
-                console.log(result);
-                console.log("Saved Entries");
                 res.status(201).send();
             })
             .catch(err => {
@@ -113,7 +95,6 @@ router.route('/').post(
 
 router.route('/multiple').get((req, res) => {
     const projectIdList = req.query.projectIdList;
-    console.log(req.body);
     return Project.Model.find({
         '_id': { $in: projectIdList }, function(err, docs) {
             if (err) console.log(err);

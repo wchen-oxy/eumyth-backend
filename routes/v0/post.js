@@ -10,6 +10,7 @@ const multerS3 = require('multer-s3');
 const uuid = require('uuid');
 const userRelation = require('../../models/user.relation.model');
 const SHORT = "SHORT";
+const LONG = "LONG";
 const RECENT_POSTS_LIMIT = 8;
 
 const setPursuitAttributes = (isMilestone, pursuit, minDuration, postId, date) => {
@@ -116,11 +117,11 @@ router.route('/')
 
     let resolveNewPost = resolveIndexUser.then(resolvedIndexUser => {
       switch (postType) {
-        case ("SHORT"):
+        case (SHORT):
           post = new Post.Model({
             username: username,
             title: title,
-            private: postPrivacyType,
+            post_privacy_type: postPrivacyType,
             date: date,
             author_id: resolvedIndexUser.user_profile_id,
             pursuit_category: pursuitCategory,
@@ -135,12 +136,12 @@ router.route('/')
             min_duration: minDuration
           });
           break;
-        case ("LONG"):
+        case (LONG):
           post = new Post.Model({
             username: username,
             title: title,
             subtitle: subtitle,
-            private: postPrivacyType,
+            post_privacy_type: postPrivacyType,
             author_id: resolvedIndexUser.user_profile_id,
             pursuit_category: pursuitCategory,
             display_photo_key: displayPhoto,
@@ -156,10 +157,7 @@ router.route('/')
         default:
           res.status(500).send();
       }
-      //save followerArray for query
       followerArrayID = indexUser.user_relation_id;
-      //modify new post array for indexUser
-
       if (indexUser.preferred_post_type !== postPrivacyType) {
         indexUser.preferred_post_type = postPrivacyType;
       }
@@ -178,7 +176,6 @@ router.route('/')
     }
     );
 
-    //modify new post array for User
     let resolvedUser = resolveNewPost.then(
       (result) => {
         return User.Model.findById(result);
@@ -196,12 +193,7 @@ router.route('/')
           user.undated_posts.unshift(post._id);
           console.log(user.undated_posts);
         }
-        // user.recent_posts.unshift(post);
-        // if (user.recent_posts.length > RECENT_POSTS_LIMIT) {
-        //   user.recent_posts.shift();
-        //   console.log("Removed oldest post.");
-        // }
-        //check if pursuits exists already
+
         if (pursuitCategory) {
           for (const pursuit of user.pursuits) {
             if (pursuit.name === pursuitCategory) {
@@ -242,8 +234,7 @@ router.route('/')
       )
       .then(
         (userRelationResult) => {
-          //INSERT CODE TO PUSH TO FRIENDS
-          //ADD THE PROMISE INTO THE INDEXUSER.FINDBYID
+
           if (userRelationResult) {
             let followersIdArray = [];
             for (const user of userRelationResult.followers) {
@@ -265,7 +256,6 @@ router.route('/')
       )
       .then(
         (userArray) => {
-          //resolved users
           const promisedUpdatedFollowerArray = userArray.map(
             indexUser => new Promise((resolve) => {
               indexUser.following_feed.unshift(post._id);
@@ -292,18 +282,12 @@ router.route('/')
 
   })
   .put(upload.single({ name: "coverPhoto", maxCount: 1 }), (req, res) => {
-    console.log("Hit");
-    console.log(req.body);
-    console.log(req.files);
-
     const postId = !!req.body.postId ? req.body.postId : null;
-
-    const postType = !!req.body.postType ? req.body.postType : null;
     const username = req.body.username;
     const displayPhoto = req.body.displayPhoto;
     const title = !!req.body.title ? req.body.title : null;
     const subtitle = !!req.body.subtitle ? req.body.subtitle : null;
-    // const postPrivacyType = !!req.body.postPrivacyType ? req.body.postPrivacyType : null;
+    const postPrivacyType = !!req.body.postPrivacyType ? req.body.postPrivacyType : null;
     const pursuitCategory = !!req.body.pursuitCategory ? req.body.pursuitCategory : null;
     const date = !!req.body.date ? req.body.date : null;
     const textData = !!req.body.textData ? req.body.textData : null;
@@ -311,7 +295,6 @@ router.route('/')
     const isMilestone = !!req.body.isMilestone ? req.body.isMilestone : null;
     const isPaginated = req.body.isPaginated ? true : false;
     const coverPhotoKey = req.files ? req.files.coverPhoto[0].key : null;
-    console.log(textData);
 
     return Post.Model.findById(postId)
       .then(
@@ -328,6 +311,7 @@ router.route('/')
           post.is_paginated = isPaginated;
           post.cover_photo_key = coverPhotoKey;
           post.text_data = textData;
+          post.post_privacy_type = postPrivacyType;
           return post.save()
             .catch(err => {
               if (err) {
@@ -348,9 +332,6 @@ router.route('/')
       })
   })
   .delete((req, res) => {
-    console.log("Hit");
-    console.log(req.body.indexUserId);
-    res.status(200).send();
     const indexUserId = req.body.indexUserId;
     const userId = req.body.userId;
     const postId = req.body.postId;
@@ -359,7 +340,6 @@ router.route('/')
     const resolvedIndexUser = IndexUser.Model.findById(indexUserId)
       .then((user) => {
         returnedUser = user;
-        console.log(user);
         let updatedRecentPosts = [];
 
         for (const post of user.recent_posts) {
@@ -400,7 +380,6 @@ router.route('/')
 router.route('/multiple').get((req, res) => {
   const postIdList = req.query.postIdList;
   const includePostText = req.query.includePostText;
-  // console.log(postIdList);
   return Post.Model.find({
     '_id': { $in: postIdList }, function(err, docs) {
       if (err) console.log(err);
@@ -414,56 +393,15 @@ router.route('/multiple').get((req, res) => {
       console.log(coverInfoArray);
       if (!includePostText) {
         for (result of coverInfoArray) {
-          // coverInfoArray.unshift(
           result.text_data = "";
           result.feedback = "";
         }
       }
       console.log(coverInfoArray);
       console.log("This way");
-      return res.status(200).send(coverInfoArray);
+      return res.send(coverInfoArray);
     })
 });
-
-// router.route('/feed').get((req, res) => {
-//   const indexUserId = req.query.indexUserId;
-//   const postIdList = req.query.postIdList;
-//   console.log(postIdList);
-//   let updatedPostIdList = [];
-//   let posts = null;
-//   return Post.Model.find({
-//     '_id': { $in: postIdList }, function(err, docs) {
-//       if (err) console.log(err);
-//       else {
-//         console.log(docs);
-//       }
-//     }
-//   }).then(
-//     (result) => {
-//       console.log(result);
-//       posts = result;
-//       if (result.length !== postIdList) {
-//         for (const post of result) {
-//           if (postIdList.includes(post._id.toString())) updatedPostIdList.unshift(post._id.toString());
-//         }
-//         return IndexUser.Model.findById(indexUserId).then(
-//           (indexUser) => {
-//             indexUser.following_feed = updatedPostIdList;
-//             return indexUser.save();
-//           }
-//         );
-//       }
-//       return;
-//     }
-//   )
-//     .then(() => res.status(200).json({ feed: posts }))
-//     .catch((err) => {
-//       console.log(err);
-//       res.status(500).send();
-//     })
-
-
-// });
 
 router.route('/single-text').get((req, res) => {
   return Post.Model.findById(req.query.postId)

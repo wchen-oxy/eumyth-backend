@@ -8,11 +8,8 @@ import FeedObject from "./sub-components/feed-object";
 import EventModal from "../../profile/sub-components/event-modal";
 import Event from "../../profile/timeline/sub-components/timeline-event";
 import { returnUserImageURL } from "../../constants/urls";
-import LongPostViewer from '../../post/viewer/long-post';
-import ShortPostViewer from '../../post/viewer/short-post';
-// import FeedObject from "./feed-object";
+import { PRIVATE, PERSONAL_PAGE } from "../../constants/flags";
 import './returning-user.scss';
-
 
 const POST = "POST";
 class ReturningUserPage extends React.Component {
@@ -99,6 +96,7 @@ class ReturningUserPage extends React.Component {
                                     console.log(result.data);
                                     if (this._isMounted) {
                                         for (const item of result.data) {
+                                            if (item.post_privacy_type !== PRIVATE && item.post_privacy_type !== PERSONAL_PAGE )
                                             feedData.push(item);
                                         }
                                     };
@@ -209,7 +207,6 @@ class ReturningUserPage extends React.Component {
             }
         }
 
-
         //TEST 
         const recentWork = (<RecentWorkObject value="test" onRecentWorkClick={this.handleRecentWorkClick} />);
         return (
@@ -263,10 +260,6 @@ class ReturningUserPage extends React.Component {
 
                     <h4>Your Feed</h4>
                     <div id="feed-container" className="flex-display flex-direction-column">
-
-                        {/* {feed} */}
-
-                        {/* {this.state.feedData.length > 0 ? */}
                         <InfiniteScroll
                             dataLength={this.state.nextOpenPostIndex}
                             next={this.fetchNextPosts}

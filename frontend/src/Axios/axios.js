@@ -15,6 +15,21 @@ export default class AxiosHelper {
         return axios.post(urls.USER_BASE_URL, formData);
     }
 
+    static returnUserRelationInfo(username) {
+        return axios.get(urls.RELATION_INFO_URL, {
+            params: {
+                username: username
+            }
+        });
+    }
+
+    static setProfilePrivacy(username, isPrivate) {
+        return axios.put(urls.USER_PRIVACY, {
+            username: username,
+            private: isPrivate
+        });
+    }
+
     static setFollowerStatus(visitorUsername, targetUsername, targetUserRelationId, isPrivate, action) {
         return axios.put(urls.RELATION_STATUS_URL, {
             visitorUsername: visitorUsername,
@@ -106,8 +121,8 @@ export default class AxiosHelper {
         return axios.post(urls.POST_BASE_URL, postInfoForm);
     }
 
-    static returnBio(username) {
-        return axios.get(urls.USER_BIO_URL, {
+    static returnAccountSettingsInfo(username) {
+        return axios.get(urls.USER_ACCOUNT_SETTINGS_INFO, {
             params: {
                 username: username
             }

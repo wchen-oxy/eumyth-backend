@@ -1,14 +1,11 @@
 var express = require('express');
 var router = express.Router();
 const multer = require('multer');
-const AWS = require('aws-sdk');
 const AwsConstants = require('../../constants/aws');
 const multerS3 = require('multer-s3')
 const uuid = require('uuid');
 const User = require('../../models/user.model');
 const IndexUser = require('../../models/index.user.model');
-// const profileUpload = require('../../constants/multer').profileImageUpload;
-
 
 var upload = multer({
   storage: multerS3({
@@ -44,18 +41,15 @@ var profileUpload = multer({
 });
 
 router.route('/').post(upload.single('file'), (req, res, err) => {
-  console.log(req.file);
   return res.status(200).json({ 'url': req.file.location, 'file': req.file.key });
 })
 
 router.route('/single').post(upload.single('file'), (req, res, err) => {
-  console.log(req.file);
   return res.status(200).json({ 'imageUrl': req.file.key });
 });
 
 
 router.route('/multiple').post(upload.array('files'), (req, res, err) => {
-  console.log(req.files);
   let imageArray = [];
   for (const imageFile of req.files) {
     imageArray.push(imageFile.key);
@@ -70,8 +64,6 @@ router.route('/display-photo')
       const croppedImage = req.files.croppedImage ? req.files.croppedImage[0].key : null;
       const smallCroppedImage = req.files.smallCroppedImage ? req.files.smallCroppedImage[0].key : null;
       const tinyCroppedImage = req.files.tinyCroppedImage ? req.files.tinyCroppedImage[0].key : null;
-      console.log(croppedImage);
-      console.log(username);
       let returnedIndexUser = null;
       if (!croppedImage || !smallCroppedImage || !tinyCroppedImage) {
         console.log("No image here");
@@ -103,8 +95,6 @@ router.route('/display-photo')
   .delete(
     (req, res) => {
       const username = req.body.username;
-      const contentType = req.body.contentType;
-      let returnedUser = null;
       let returnedIndexUser = null;
 
       return IndexUser.Model.findOne({ username: username })
@@ -113,8 +103,6 @@ router.route('/display-photo')
           if (returnedIndexUser.cropped_display_photo_key === '') {
             throw 204;
           }
-          console.log(returnedIndexUser.cropped_display_photo_key === '');
-          console.log(returnedIndexUser.cropped_display_photo_key);
           const displayPhotoKeys = [
             { Key: returnedIndexUser.cropped_display_photo_key },
             { Key: returnedIndexUser.small_cropped_display_photo_key },
@@ -166,7 +154,6 @@ router.route('/cover')
     console.log(req.file);
     const username = req.body.username;
     const coverPhoto = req.file.key;
-    console.log(req.file.key);
     let returnedUser = null;
     if (!coverPhoto) return res.status(500).send("No Cover Image");
     return User.Model.findOne({ username: username })
@@ -174,7 +161,7 @@ router.route('/cover')
         (user) => {
           if (!user) throw new Error("Could not find user!");
           returnedUser = user;
-          user.cover_photo_key = coverPhoto;        
+          user.cover_photo_key = coverPhoto;
           return returnedUser.save();
         }
       )

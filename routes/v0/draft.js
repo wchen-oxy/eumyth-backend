@@ -1,15 +1,7 @@
 var express = require('express');
-const { returnUserImageURL } = require('../../constants/aws');
 var router = express.Router();
 let IndexUser = require('../../models/index.user.model');
-const AWS = require('aws-sdk');
 const AwsConstants = require('../../constants/aws');
-
-// const s3 = new AWS.S3({
-//     // region: AwsConstants.REGION,
-//     accessKeyId: AwsConstants.ID,
-//     secretAccessKey: AwsConstants.SECRET
-// });
 
 router.route('/').get((req, res) => {
     const username = req.query.username;
@@ -63,7 +55,6 @@ router.route('/').get((req, res) => {
                         );
                     }
                 }
-                console.log(AwsConstants.S3_INTERFACE);
                 indexUser.draft.text = draft;
                 indexUser.draft.links = currentURLs;
                 if (toDeleteURLs.length > 0)
@@ -103,7 +94,6 @@ router.route('/').get((req, res) => {
         IndexUser.Model.findOne({ username: username },
             (err, indexUserProfile) => {
                 if (err) {
-                    // console.log("Error");
                     console.log(err);
                     res.status(500).json("Error: " + err)
                 }
@@ -123,57 +113,58 @@ router.route('/').get((req, res) => {
 
     })
 
-router.route('/title').put((req, res) => {
-    const username = req.body.username;
-    const title = req.body.title;
-    IndexUser.Model.findOne({ username: username },
-        (err, indexUserProfile) => {
-            if (err) {
-                console.log(err);
-                res.status(500).json("Error: " + err)
-            }
-        }
-    )
-        .then(
-            (indexUser) => {
-                indexUser.draft.title = req.body.title;
-                return indexUser.save((err) => {
-                    if (err) {
-                        console.error('ERROR: ' + err);
-                        res.status(500).json(err);
-                    }
-                });
+// router.route('/title').put((req, res) => {
+//     const username = req.body.username;
+//     const title = req.body.title;
+//     IndexUser.Model.findOne({ username: username },
+//         (err, indexUserProfile) => {
+//             if (err) {
+//                 console.log(err);
+//                 res.status(500).json("Error: " + err)
+//             }
+//         }
+//     )
+//         .then(
+//             (indexUser) => {
+//                 indexUser.draft.title = title;
+//                 return indexUser.save((err) => {
+//                     if (err) {
+//                         console.error('ERROR: ' + err);
+//                         res.status(500).json(err);
+//                     }
+//                 });
 
-            }
-        ).then(() => res.sendStatus(201)).catch(err => console.log(err));
+//             }
+//         ).then(() => res.sendStatus(201)).catch(err => console.log(err));
 
-}
-)
+// }
+// )
 
-router.route('/desc').put((req, res) => {
-    const username = req.body.username;
-    const title = req.body.title;
-    IndexUser.Model.findOne({ username: username },
-        (err, indexUserProfile) => {
-            if (err) {
-                console.log(err);
-                res.status(500).json("Error: " + err)
-            }
-        }
-    )
-        .then(
-            (indexUser) => {
-                indexUser.draft.title = req.body.title;
-                return indexUser.save((err) => {
-                    if (err) {
-                        console.error('ERROR: ' + err);
-                        res.status(500).json(err);
-                    }
-                });
-            }
-        ).then(() => res.sendStatus(201)).catch(err => console.log(err));
-
-}
-)
+// router.route('/desc').put((req, res) => {
+//     const username = req.body.username;
+//     const desc = req.body.desc;
+//     IndexUser.Model.findOne({ username: username },
+//         (err, indexUserProfile) => {
+//             if (err) {
+//                 console.log(err);
+//                 res.status(500).json("Error: " + err)
+//             }
+//         }
+//     )
+//         .then(
+//             (indexUser) => {
+//                 indexUser.draft.desc = req.body.desc;
+//                 return indexUser.save((err) => {
+//                     if (err) {
+//                         console.error('ERROR: ' + err);
+//                         res.status(500).json(err);
+//                     }
+//                 });
+//             }
+//         ).then(
+//             () => res.sendStatus(201)).catch(err => console.log(err)
+//             );
+// }
+// );
 
 module.exports = router;

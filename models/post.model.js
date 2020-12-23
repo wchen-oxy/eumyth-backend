@@ -26,7 +26,7 @@ const postSchema = new Schema({
   },
 
   post_privacy_type: {
-    type: Boolean,
+    type: String,
     required: false,
   },
 

@@ -17,10 +17,14 @@ const DRAFT_BASE_URL = ROOT_URL + "/draft";
 //user
 const USER_BASE_URL = ROOT_URL + "/user";
 const USER_BIO_URL = USER_BASE_URL + "/bio";
+const USER_ACCOUNT_SETTINGS_INFO = USER_BASE_URL + "/account-settings-info";
+const USER_PRIVACY = USER_BASE_URL + "/private";
+
 
 //relation
 const RELATION_BASE_URL = ROOT_URL + "/relation";
 const RELATION_STATUS_URL = RELATION_BASE_URL + "/status";
+const RELATION_INFO_URL = RELATION_BASE_URL + "/info";
 
 //post
 const POST_BASE_URL = ROOT_URL + "/post";
@@ -38,8 +42,6 @@ const SINGLE_POST_TEXT_DATA_URL = POST_BASE_URL + "/single-text"
 const PROJECT_BASE_URL = ROOT_URL + "/project";
 const MULTIPLE_PROJECTS_URL =  PROJECT_BASE_URL + "/multiple";
 
-
-
 //index
 const INDEX_BASE_URL = ROOT_URL + "/index";
 const CHECK_USERNAME_URL = INDEX_BASE_URL + '/username';
@@ -54,8 +56,11 @@ module.exports = {
     DRAFT_BASE_URL,
     USER_BASE_URL,
     USER_BIO_URL,
+    USER_ACCOUNT_SETTINGS_INFO,
+    USER_PRIVACY,
     RELATION_BASE_URL,
     RELATION_STATUS_URL,
+    RELATION_INFO_URL,
     POST_BASE_URL,
     PROJECT_BASE_URL,
     MULTIPLE_PROJECTS_URL,

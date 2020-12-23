@@ -7,3 +7,7 @@ export const UNFOLLOW_ACTION = "UNFOLLOW";
 
 export const POST = "POST";
 export const PROJECT = "PROJECT";
+
+export const PRIVATE = "PRIVATE";
+export const PERSONAL_PAGE = "PERSONAL_PAGE";
+export const PUBLIC_FEED = "PUBLIC_FEED";

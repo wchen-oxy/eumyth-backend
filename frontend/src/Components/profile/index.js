@@ -17,7 +17,7 @@ import {
     FOLLOW_REQUESTED_STATE,
     FOLLOWED_STATE
 } from "../constants/flags";
-import { POST, PROJECT } from "../constants/flags";
+import { POST, PROJECT, PRIVATE } from "../constants/flags";
 import './index.scss';
 
 const ALL = "ALL";
@@ -196,6 +196,11 @@ class ProfilePage extends React.Component {
     handleResponseData(user, targetUserInfo, followerStatusResponse) {
         let pursuitNameArray = [];
         let projectArray = [];
+        let postsArray = user.displayName === targetUserInfo.username ? targetUserInfo.all_posts : targetUserInfo.all_posts.reduce((result, value) => {
+            console.log(value.post_privacy_type);
+            if (value.post_privacy_type !== PRIVATE) { result.push(value); }
+            return result;
+        }, []);
         const followerStatus = followerStatusResponse ? this.handleFollowerStatusResponse(followerStatusResponse) : null;
         for (const pursuit of targetUserInfo.pursuits) {
             pursuitNameArray.push(pursuit.name);
@@ -205,6 +210,7 @@ class ProfilePage extends React.Component {
                 }
             }
         }
+        console.log(targetUserInfo);
 
         //set visitor user info and targetUserinfo
         if (this._isMounted) this.setState({
@@ -220,9 +226,9 @@ class ProfilePage extends React.Component {
             pinned: targetUserInfo.pinned,
             pursuits: targetUserInfo.pursuits,
             pursuitsNames: pursuitNameArray,
-            allPosts: targetUserInfo.all_posts,
+            allPosts: postsArray,
             allProjects: projectArray,
-            feedData: targetUserInfo.all_posts,
+            feedData: postsArray,
             mediaType: POST,
             feedId: ALL + POST,
             userRelationId: targetUserInfo.user_relation_id,
@@ -345,31 +351,47 @@ class ProfilePage extends React.Component {
                     </div>
                 </div>
 
-                {this.state.mediaType === POST ?
-                    < Timeline
-                        mediaType={this.state.mediaType}
-                        key={this.state.feedId}
-                        allPosts={this.state.feedData}
-                        onEventClick={this.handleEventClick}
-                        targetProfileId={this.state.targetProfileId} />
-                    :
-
-                    <ProjectController
-                        username={this.state.targetUsername}
-                        displayPhoto={this.state.smallCroppedDisplayPhoto}
-                        targetProfileId={this.state.targetProfileId}
-                        targetIndexUserId={this.state.targetIndexUserId}
-                        mediaType={this.state.mediaType}
-                        newProject={this.state.newProject}
-                        key={this.state.feedId}
-                        allPosts={this.state.feedData}
-                        onEventClick={this.handleEventClick}
-                        onNewBackProjectClick={this.handleNewBackProjectClick}
-                        pursuitsNames={this.state.pursuitsNames}
-                    />
+                {console.log(
+                    (this.state.visitorUsername === null && this.state.isPrivate)
+                    ,
+                    this.state.visitorUsername !== this.state.targetUsername && this.state.isPrivate && (this.state.followerStatus !== "FOLLOWING" || this.state.followerStatus !==
+                        "REQUEST_ACCEPTED"
+                    )
+                )
                 }
 
+                {
 
+                    this.state.visitorUsername === null && this.state.isPrivate ||
+                    (this.state.visitorUsername !== this.state.targetUsername && this.state.isPrivate) && (this.state.followerStatus !== "FOLLOWING" && this.state.followerStatus !== "REQUEST_ACCEPTED")
+
+                        ?
+
+                        <p>This profile is private. To see these posts, please request access. </p> :
+                        this.state.mediaType === POST ?
+                            < Timeline
+                                mediaType={this.state.mediaType}
+                                key={this.state.feedId}
+                                allPosts={this.state.feedData}
+                                onEventClick={this.handleEventClick}
+                                targetProfileId={this.state.targetProfileId} />
+                            :
+
+                            <ProjectController
+                                username={this.state.targetUsername}
+                                displayPhoto={this.state.smallCroppedDisplayPhoto}
+                                targetProfileId={this.state.targetProfileId}
+                                targetIndexUserId={this.state.targetIndexUserId}
+                                mediaType={this.state.mediaType}
+                                newProject={this.state.newProject}
+                                key={this.state.feedId}
+                                allPosts={this.state.feedData}
+                                onEventClick={this.handleEventClick}
+                                onNewBackProjectClick={this.handleNewBackProjectClick}
+                                pursuitsNames={this.state.pursuitsNames}
+                            />
+
+                }
                 <div className="modal" ref={this.modalRef}>
                     <div className="overlay" onClick={(() => this.closeModal())}></div>
                     <span className="close" onClick={(() => this.closeModal())}>X</span>

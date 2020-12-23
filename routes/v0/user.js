@@ -112,6 +112,21 @@ router.route('/')
         });
     });
 
+router.route('/account-settings-info')
+  .get((req, res) => {
+    const username = req.query.username;
+    return User.Model.findOne({ username: username })
+      .then((result) => {
+        return res.status(200).json({ bio: result.bio, private: result.private });
+      })
+      .catch(
+        (err) => {
+          console.log(err);
+          res.status(500).send();
+        }
+      )
+  });
+
 router.route('/bio')
   .get((req, res) => {
     const username = req.query.username;
@@ -141,6 +156,23 @@ router.route('/bio')
         res.status(500).send()
       });
   })
+
+router.route('/private').put((req, res) => {
+  const username = req.body.username;
+  const isPrivate = req.body.private;
+  return User.Model.findOne({ username: username })
+    .then((result) => {
+      if (result === null ) throw 204;
+      result.private = isPrivate;
+      return result.save()
+    })
+    .then(() => res.status(200).send())
+    .catch((err) => {
+      if (err === 204) res.status(500).send("No User Found");
+      console.log(err);
+      res.status(500).send();
+    })
+})
 
 
 
