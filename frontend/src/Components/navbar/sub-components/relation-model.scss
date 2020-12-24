@@ -1,5 +1,28 @@
-#relation-window{
+#relation-window {
     position: fixed;
     z-index: top;
     background-color: white;
+    margin-top: -38vh;
+    margin-left: -38vw;
+    top: 50%;
+    left: 50%;
+    z-index: 22;
+    height: 74vh;
+    width: 76vw;
+    #relation-info {
+        display: flex;
+
+        .relation-column {
+            margin: auto;
+            width: 33.32%;
+        }
+        .relation-profile-row {
+            display: flex;
+            align-items: center;
+            img {
+                height: 25px;
+                width: 25px;
+            }
+        }
+    }
 }

@@ -34,15 +34,68 @@ router.route('/').get((req, res) => {
 
 router.route('/info').get((req, res) => {
   const username = req.query.username;
-  return User.Model.findOne({username: username})
-  .then((user) => {
-    return UserRelation.Model.findById(user.user_relation_id)
-  })
-  .then((result) => res.status(200).json(result))
-  .catch(err => {
-    console.log(err);
-    return res.status(500).send();
-  })
+  let id = null;
+  return User.Model.findOne({ username: username })
+    .then((user) => {
+      return UserRelation.Model.findById(user.user_relation_id)
+    })
+    .then((result) => {
+      id = result._id;
+      let following = [];
+      let followers = [];
+      let requested = [];
+      for (const profile of result.following) {
+        following.push(profile.id);
+      }
+      for (const profile of result.followers) {
+        if (profile.status === "FOLLOW_REQUESTED") {
+          requested.push(profile.id);
+        }
+        else if (profile.status === "FOLLOWING") {
+          followers.push(profile.id);
+        }
+      }
+      const resolvedFollowing = IndexUser.Model.find({
+        '_id': { $in: following }
+      }, function (err, docs) {
+        console.log(docs);
+      });
+      const resolvedFollowers = IndexUser.Model.find({
+        '_id': { $in: followers }
+      }, function (err, docs) {
+        console.log(docs);
+      });
+      const resolvedRequested = IndexUser.Model.find({
+        '_id': { $in: requested }
+      }, function (err, docs) {
+        console.log(docs);
+      });
+
+      return Promise.all([resolvedFollowing, resolvedFollowers, resolvedRequested]);
+    })
+    .then((profiles) => {
+      let finalFollowing = [];
+      let finalFollowers = [];
+      let finalRequested = [];
+      for (const profile of profiles[0]) {
+        const username = profile.username;
+        finalFollowing.push({ username: username, display_photo: profile.tiny_cropped_display_photo_key });
+      }
+      for (const profile of profiles[1]) {
+        const username = profile.username;
+        finalFollowers.push({ username: username, display_photo: profile.tiny_cropped_display_photo_key });
+      }
+      for (const profile of profiles[2]) {
+        const username = profile.username;
+        finalRequested.push({ username: username, display_photo: profile.tiny_cropped_display_photo_key });
+      }
+      return res.status(200).json({ _id: id, following: finalFollowing, followers: finalFollowers, requested: finalRequested });
+
+    })
+    .catch(err => {
+      console.log(err);
+      return res.status(500).send();
+    })
 })
 
 router.route('/status').put((req, res) => {
@@ -96,11 +149,13 @@ router.route('/status').put((req, res) => {
               targetFollowersArray.push(new UserPreview.Model({
                 status: FOLLOW_REQUESTED,
                 id: visitorUser.parent_index_user_id,
+                user_relation_id: visitingIndexUser.user_relation_id,
                 username: visitorUsername,
               }));
               visitorFollowingArray.push(new UserPreview.Model({
                 status: FOLLOW_REQUESTED,
                 id: targetUser.parent_index_user_id,
+                user_relation_id: targetUserRelationId,
                 username: targetUsername,
               }));
               resultStatus = FOLLOW_REQUESTED;
@@ -109,11 +164,13 @@ router.route('/status').put((req, res) => {
               targetFollowersArray.push(new UserPreview.Model({
                 status: FOLLOWING,
                 id: visitorUser.parent_index_user_id,
+                user_relation_id: visitingIndexUser.user_relation_id,
                 username: visitorUsername,
               }));
               visitorFollowingArray.push(new UserPreview.Model({
                 status: FOLLOWING,
                 id: targetUser.parent_index_user_id,
+                user_relation_id: targetUserRelationId,
                 username: targetUsername,
               }));
               resultStatus = FOLLOWING;
@@ -172,5 +229,40 @@ router.route('/status').put((req, res) => {
       res.status(500).send(error);
     });
 
+});
+
+router.route('/set').put((req, res) => {
+  const id = req.body.id;
+  const username = req.body.username;
+  const action = req.body.action;
+  let userRelation = null;
+
+   return UserRelation.Model.findById(id)
+    .then((result) => {
+      userRelation = result;
+      for (const profile of userRelation.followers) {
+        if (profile.username === username) {
+          profile.status = action === 'ACCEPT' ? "FOLLOWING" : "DECLINED";
+          userRelation.save();
+          return UserRelation.Model.findById(profile.user_relation_id);
+        }
+      }
+    })
+    .then((result) => {
+      for (const profile of result.followers) {
+        if (profile.user_relation_id === id) {
+          profile.status = action === 'ACCEPT' ? "FOLLOWING" : "DECLINED";
+          result.save();
+          return UserRelation.Model.findById(profile.user_relation_id);
+        }
+      }
+    })
+    .then(() => res.status(200).send())
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send();
+    })
+
 })
+
 module.exports = router;

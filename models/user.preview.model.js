@@ -10,6 +10,10 @@ const userPreviewSchema = new Schema({
         type: mongoose.Types.ObjectId,
     },
 
+    user_relation_id: {
+        type: mongoose.Types.ObjectId,
+    },
+
     username: {
         type: String,
     },

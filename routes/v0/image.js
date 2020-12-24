@@ -57,6 +57,8 @@ router.route('/multiple').post(upload.array('files'), (req, res, err) => {
   return res.status(200).json({ 'imageUrls': imageArray });
 });
 
+
+
 router.route('/display-photo')
   .post(upload.fields([{ name: "croppedImage" }, { name: "smallCroppedImage" }, { name: "tinyCroppedImage" }]),
     (req, res) => {

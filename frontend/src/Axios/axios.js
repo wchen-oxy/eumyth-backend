@@ -176,5 +176,13 @@ export default class AxiosHelper {
             { params: { username: username } }
         )
     }
+
+    static changeRelationStatus(action, username, id) {
+        return axios.put(urls.RELATION_SET_FOLLOWER_URL, {
+            action: action,
+            username: username,
+            id: id
+        })
+    }
 }
 

@@ -3,7 +3,6 @@ import PasswordChangeForm from '../password/change';
 import AvatarEditor from 'react-avatar-editor';
 import Dropzone from 'react-dropzone';
 import imageCompression from 'browser-image-compression';
-
 import AxiosHelper from "../../Axios/axios";
 import { AuthUserContext, withAuthorization } from '../session';
 import { withFirebase } from '../../Firebase';

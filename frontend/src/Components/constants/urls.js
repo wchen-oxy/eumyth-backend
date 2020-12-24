@@ -11,7 +11,6 @@ const ROOT_URL = "http://localhost:5000";
 const IMAGE_BASE_URL = ROOT_URL + "/image";
 const DISPLAY_PHOTO_URL = IMAGE_BASE_URL + "/display-photo";
 const COVER_PHOTO_URL = IMAGE_BASE_URL + "/cover";
-
 const DRAFT_BASE_URL = ROOT_URL + "/draft";
 
 //user
@@ -25,6 +24,8 @@ const USER_PRIVACY = USER_BASE_URL + "/private";
 const RELATION_BASE_URL = ROOT_URL + "/relation";
 const RELATION_STATUS_URL = RELATION_BASE_URL + "/status";
 const RELATION_INFO_URL = RELATION_BASE_URL + "/info";
+const RELATION_SET_FOLLOWER_URL = RELATION_BASE_URL + "/set";
+
 
 //post
 const POST_BASE_URL = ROOT_URL + "/post";
@@ -61,6 +62,7 @@ module.exports = {
     RELATION_BASE_URL,
     RELATION_STATUS_URL,
     RELATION_INFO_URL,
+    RELATION_SET_FOLLOWER_URL,
     POST_BASE_URL,
     PROJECT_BASE_URL,
     MULTIPLE_PROJECTS_URL,
