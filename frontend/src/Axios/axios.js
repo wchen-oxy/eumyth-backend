@@ -177,10 +177,11 @@ export default class AxiosHelper {
         )
     }
 
-    static changeRelationStatus(action, username, id) {
+    static changeRelationStatus(action, targetUsername, currentUsername, id) {
         return axios.put(urls.RELATION_SET_FOLLOWER_URL, {
             action: action,
-            username: username,
+            targetUsername: targetUsername,
+            currentUsername: currentUsername,
             id: id
         })
     }

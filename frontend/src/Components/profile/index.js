@@ -279,7 +279,13 @@ class ProfilePage extends React.Component {
         }
     }
     handleFollowerStatusChange(action) {
-        AxiosHelper.setFollowerStatus(this.state.visitorUsername, this.state.targetUsername, this.state.userRelationId, this.state.isPrivate, action).then(
+        AxiosHelper.setFollowerStatus(
+            this.state.visitorUsername,
+            this.state.targetUsername,
+            this.state.userRelationId,
+            this.state.isPrivate,
+            action
+        ).then(
             (result) => {
                 if (result.status === 200) {
                     if (result.data.success) this.setState({ followerStatus: result.data.success });
@@ -363,7 +369,7 @@ class ProfilePage extends React.Component {
                 {
 
                     this.state.visitorUsername === null && this.state.isPrivate ||
-                    (this.state.visitorUsername !== this.state.targetUsername && this.state.isPrivate) && (this.state.followerStatus !== "FOLLOWING" && this.state.followerStatus !== "REQUEST_ACCEPTED")
+                        (this.state.visitorUsername !== this.state.targetUsername && this.state.isPrivate) && (this.state.followerStatus !== "FOLLOWING" && this.state.followerStatus !== "REQUEST_ACCEPTED")
 
                         ?
 

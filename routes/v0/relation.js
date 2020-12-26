@@ -233,35 +233,73 @@ router.route('/status').put((req, res) => {
 
 router.route('/set').put((req, res) => {
   const id = req.body.id;
-  const username = req.body.username;
+  const targetUsername = req.body.targetUsername;
+  const currentUsername = req.body.currentUsername;
   const action = req.body.action;
   let userRelation = null;
 
-   return UserRelation.Model.findById(id)
-    .then((result) => {
-      userRelation = result;
-      for (const profile of userRelation.followers) {
-        if (profile.username === username) {
-          profile.status = action === 'ACCEPT' ? "FOLLOWING" : "DECLINED";
-          userRelation.save();
-          return UserRelation.Model.findById(profile.user_relation_id);
+  
+  if (action === "UNFOLLOW") {
+    return UserRelation.Model.findById(id)
+      .then(result => {
+        if (!result) throw 204;
+        userRelation = result;
+        let updatedFollowing = [];
+        let followingUserRelationId = null;
+        for (const profile of userRelation.following) {
+          if (profile.username === targetUsername) {
+            followingUserRelationId = profile.user_relation_id;
+          }
+          else if (profile.username !== targetUsername) {
+            updatedFollowing.push(profile);
+          }
         }
-      }
-    })
-    .then((result) => {
-      for (const profile of result.followers) {
-        if (profile.user_relation_id === id) {
-          profile.status = action === 'ACCEPT' ? "FOLLOWING" : "DECLINED";
-          result.save();
-          return UserRelation.Model.findById(profile.user_relation_id);
+        userRelation.following = updatedFollowing;
+        userRelation.save();
+        return UserRelation.Model.findById(followingUserRelationId);
+      })
+      .then((result) => {
+        let followerUserRelation = result;
+        let updatedFollowers = [];
+        for (const profile of followerUserRelation.followers) {
+          if (profile.username !== currentUsername) {
+            updatedFollowers.push(profile);
+          }
         }
-      }
-    })
-    .then(() => res.status(200).send())
-    .catch((err) => {
-      console.log(err);
-      res.status(500).send();
-    })
+        console.log(followerUserRelation.followers);
+        followerUserRelation.followers = updatedFollowers;
+        return followerUserRelation.save();
+      })
+      .then(() => res.status(200).send());
+  }
+  else {
+    return UserRelation.Model.findById(id)
+      .then((result) => {
+        userRelation = result;
+        for (const profile of userRelation.followers) {
+          if (profile.username === targetUsername) {
+            profile.status = action === 'ACCEPT' ? "FOLLOWING" : "DECLINED";
+            userRelation.save();
+            return UserRelation.Model.findById(profile.user_relation_id);
+          }
+        }
+      })
+      .then((result) => {
+        for (const profile of result.followers) {
+          if (profile.user_relation_id === id) {
+            profile.status = action === 'ACCEPT' ? "FOLLOWING" : "DECLINED";
+            result.save();
+            return UserRelation.Model.findById(profile.user_relation_id);
+          }
+        }
+      })
+      .then(() => res.status(200).send())
+      .catch((err) => {
+        if (204) res.status(204).send("No User Found");
+        console.log(err);
+        res.status(500).send();
+      })
+  }
 
 })
 

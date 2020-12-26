@@ -3,6 +3,7 @@ import AxiosHelper from '../../../Axios/axios';
 import { returnUserImageURL } from "../../constants/urls";
 import "./relation-model.scss";
 
+const UNFOLLOW = "UNFOLLOW";
 const REQUEST = "REQUEST";
 const FOLLOWING = "FOLLOWING";
 const FOLLOW_REQUESTED = "FOLLOW_REQUESTED";
@@ -31,14 +32,16 @@ class RelationModal extends React.Component {
     }
 
     handleStatusChange(action, username) {
-        let formData = new FormData();
-        formData.append("action", action);
-        formData.append("username", username);
-        formData.append("id", this.state.userRelation._id);
-        console.log(action);
-        console.log(username);
-        console.log(this.state.userRelation._id);
-        return AxiosHelper.changeRelationStatus(action, username, this.state.userRelation._id);
+        console.log(this.props.username);
+        return AxiosHelper.changeRelationStatus(action, username, this.props.username, this.state.userRelation._id)
+        .then((result) => AxiosHelper.returnUserRelationInfo(this.props.username)
+        .then((result) => {
+            if (this._isMounted) {
+                console.log(result.data);
+                this.setState({ userRelation: result.data });
+            }
+        }))
+        .catch((err) => window.alert("Something went wrong :("));
     }
 
     render() {
@@ -54,7 +57,7 @@ class RelationModal extends React.Component {
                     <div className="relation-profile-row">
                         <img src={returnUserImageURL(user.display_photo)} />
                         <p>{user.username}</p>
-                        <button>Following</button>
+                        <button onClick={() => this.handleStatusChange(UNFOLLOW, user.username)}>Following</button>
                     </div>
                 )
                 console.log(user);
@@ -66,7 +69,7 @@ class RelationModal extends React.Component {
                     <div className="relation-profile-row">
                         <img src={returnUserImageURL(user.display_photo)} />
                         <p>{user.username}</p>
-                        <button>Following</button>
+                        <button onClick={() => this.handleStatusChange(UNFOLLOW, user.username)}>Following</button>
                     </div>
                 )
 
