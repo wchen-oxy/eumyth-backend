@@ -62,7 +62,7 @@ class ReturningUserPage extends React.Component {
             let pursuits = null;
             let pursuitNames = [];
             let feedData = [];
-            let recentPosts = null;
+            let recentPosts = [];
             let hasMore = true;
             return AxiosHelper.returnIndexUser(this.state.username).then(
                 (result) => {
@@ -88,15 +88,20 @@ class ReturningUserPage extends React.Component {
             )
                 .then(result => {
                     console.log(result);
-                    result[0].data.map((value, index) =>
-                        <Event
-                            mediaType={POST}
-                            newProjectView={this.props.newProjectView}
-                            key={index}
-                            eventData={value}
-                            onEventClick={this.handleEventClick}
-                        />
-                    );
+
+                    if (result[0]) {
+                        let index = 0;
+                        for (const value of result[0].data) {
+                            recentPosts.push(
+                                <Event
+                                    mediaType={POST}
+                                    key={index++}
+                                    eventData={value}
+                                    onEventClick={this.handleEventClick}
+                                />
+                            )
+                        }
+                    }
                     if (result[1] !== null) return this.createFeed(result[1].data);
                 })
                 .then(
@@ -110,7 +115,7 @@ class ReturningUserPage extends React.Component {
                                 displayPhoto: displayPhoto,
                                 pursuits: pursuits,
                                 pursuitNames: pursuitNames,
-                                recentPosts: recentPosts ? recentPosts : null,
+                                recentPosts: recentPosts.length > 0 ? recentPosts : null,
                                 feedData: result ? result[0] : [],
                                 nextOpenPostIndex: result ? result[1] : 0,
                                 hasMore: hasMore
@@ -137,10 +142,9 @@ class ReturningUserPage extends React.Component {
         console.log(inputArray);
         //FIXME
         for (const feedItem of inputArray) {
-            nextOpenPostIndex++
             masterArray.push(
                 <PostViewerController
-                    key={nextOpenPostIndex}
+                    key={nextOpenPostIndex++}
                     isOwnProfile={feedItem.username === this.state.username}
                     displayPhoto={feedItem.display_photo_key}
                     preferredPostType={feedItem.username === this.state.username ? this.state.indexUserData.preferredPostType : null}
@@ -191,7 +195,7 @@ class ReturningUserPage extends React.Component {
     }
 
     openFullModal(data) {
-         this.setState({
+        this.setState({
             selectedEvent: data,
             textData: JSON.parse(data.text_data),
             postType: data.post_format

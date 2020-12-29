@@ -11,7 +11,7 @@ const uuid = require('uuid');
 const userRelation = require('../../models/user.relation.model');
 const SHORT = "SHORT";
 const LONG = "LONG";
-const RECENT_POSTS_LIMIT = 8;
+const RECENT_POSTS_LIMIT = 5;
 
 const setPursuitAttributes = (isMilestone, pursuit, minDuration, postId, date) => {
   if (isMilestone) {
@@ -103,19 +103,10 @@ router.route('/')
       textSnippet = makeTextSnippet(postType, isPaginated, textData)
     }
 
-    const resolveIndexUser = IndexUser.Model.findOne({ username: username }).then(
-      indexUserResult => {
-        indexUser = indexUserResult;
-        return indexUserResult;
-      }
-    ).catch(
-      err => {
-        console.log(err);
-        res.status(500).send(err);
-      }
-    );
 
-    let resolveNewPost = resolveIndexUser.then(resolvedIndexUser => {
+
+    let resolvedNewPost = IndexUser.Model.findOne({ username: username }).then(resolvedIndexUser => {
+      indexUser = resolvedIndexUser;
       switch (postType) {
         case (SHORT):
           post = new Post.Model({
@@ -170,13 +161,21 @@ router.route('/')
           }
         }
       }
-      resolvedIndexUser.recent_posts.unshift(post._id);
-      if (resolvedIndexUser.recent_posts.length > RECENT_POSTS_LIMIT) resolvedIndexUser.recent_posts.shift();
-      return resolvedIndexUser.user_profile_id;
+      let newRecentPosts = resolvedIndexUser.recent_posts;
+      console.log(newRecentPosts, "BEFORE");
+      newRecentPosts.unshift(post._id);
+      if (newRecentPosts.length > RECENT_POSTS_LIMIT) {
+        console.log(newRecentPosts, "DURING");
+        newRecentPosts.pop();
+      }
+      console.log(newRecentPosts, "AFTER");
+
+      indexUser.recent_posts = newRecentPosts;
+      return indexUser.user_profile_id;
     }
     );
 
-    let resolvedUser = resolveNewPost.then(
+    let resolvedUser = resolvedNewPost.then(
       (result) => {
         return User.Model.findById(result);
       }
@@ -191,7 +190,6 @@ router.route('/')
         }
         else {
           user.undated_posts.unshift(post._id);
-          console.log(user.undated_posts);
         }
 
         if (pursuitCategory) {
@@ -404,7 +402,7 @@ router.route('/multiple').get((req, res) => {
 });
 
 router.route('/single').get((req, res) => {
-  const textOnly =  req.query.textOnly.toUpperCase();
+  const textOnly = req.query.textOnly.toUpperCase();
   const postId = req.query.postId;
   console.log(textOnly);
   return Post.Model.findById(postId)
