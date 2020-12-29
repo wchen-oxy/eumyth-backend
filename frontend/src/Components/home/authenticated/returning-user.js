@@ -10,7 +10,7 @@ import Event from "../../profile/timeline/sub-components/timeline-event";
 import { returnUserImageURL } from "../../constants/urls";
 import { PRIVATE, PERSONAL_PAGE } from "../../constants/flags";
 import './returning-user.scss';
-
+const LONG = "LONG";
 const POST = "POST";
 class ReturningUserPage extends React.Component {
     _isMounted = false;
@@ -43,6 +43,7 @@ class ReturningUserPage extends React.Component {
         this.handleRecentWorkClick = this.handleRecentWorkClick.bind(this);
         this.handleEventClick = this.handleEventClick.bind(this);
         this.openModal = this.openModal.bind(this);
+        this.openFullModal = this.openFullModal.bind(this);
         this.closeModal = this.closeModal.bind(this);
         this.handleDeletePost = this.handleDeletePost.bind(this);
         this.fetchNextPosts = this.fetchNextPosts.bind(this);
@@ -132,24 +133,27 @@ class ReturningUserPage extends React.Component {
     createFeed(inputArray) {
         let masterArray = this.state.feedData;
         let nextOpenPostIndex = this.state.nextOpenPostIndex;
-        let newFeedData = [];
         //while input array is not empty    
         console.log(inputArray);
         //FIXME
         for (const feedItem of inputArray) {
-            masterArray.push(<PostViewerController
-                isOwnProfile={feedItem.username === this.state.username}
-                displayPhoto={feedItem.display_photo_key}
-                preferredPostType={feedItem.username === this.state.username ? this.state.indexUserData.preferredPostType : null}
-                closeModal={null}
-                postType={feedItem.post_format}
-                pursuits={this.state.pursuitNames}
-                username={feedItem.username}
-                eventData={feedItem}
-                textData={feedItem.text_data}
-                onDeletePost={feedItem.username === this.state.username ? this.handleDeletePost : null}
-                largeViewMode={false}
-            />);
+            nextOpenPostIndex++
+            masterArray.push(
+                <PostViewerController
+                    key={nextOpenPostIndex}
+                    isOwnProfile={feedItem.username === this.state.username}
+                    displayPhoto={feedItem.display_photo_key}
+                    preferredPostType={feedItem.username === this.state.username ? this.state.indexUserData.preferredPostType : null}
+                    closeModal={null}
+                    postType={feedItem.post_format}
+                    pursuits={this.state.pursuitNames}
+                    username={feedItem.username}
+                    eventData={feedItem}
+                    textData={feedItem.post_format === LONG ? JSON.parse(feedItem.text_data) : feedItem.text_data}
+                    onDeletePost={feedItem.username === this.state.username ? this.handleDeletePost : null}
+                    openFullModal={this.openFullModal}
+                    largeViewMode={false}
+                />);
         }
 
         console.log(masterArray);
@@ -184,6 +188,16 @@ class ReturningUserPage extends React.Component {
         ).then(
             (result) => console.log(result)
         );
+    }
+
+    openFullModal(data) {
+         this.setState({
+            selectedEvent: data,
+            textData: JSON.parse(data.text_data),
+            postType: data.post_format
+        },
+            this.openModal()
+        )
     }
 
     openModal() {

@@ -3,9 +3,9 @@ import DanteEditor from 'Dante2';
 import { ImageBlockConfig } from 'Dante2/package/es/components/blocks/image.js';
 import { PlaceholderBlockConfig } from 'Dante2/package/es/components/blocks/placeholder';
 import _ from 'lodash';
-import { IMAGE_BASE_URL } from '../../constants/urls';
+import { IMAGE_BASE_URL, returnUserImageURL } from '../../constants/urls';
 import ReviewPost from "../draft/review-post";
-
+ 
 const SAVE_INTERVAL = 1000;
 const INITIAL = "INITIAL";
 const EDIT = "EDIT";
@@ -32,39 +32,69 @@ const LongPostViewer = (props) => {
     }
     console.log(window);
     console.log(localDraft);
-    console.log(props.textData);
+    console.log(typeof (props.textData));
 
 
     if (window === INITIAL) {
- 
+
         const monthNames = ["January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"
         ];
         const date = props.eventData.date ? new Date(props.eventData.date) : null;
-        console.log(props.eventData.pursuit_category);
+        console.log(props.eventData);
         // console.log(date.getMonth());
-        return (
-            <div className="long-post-window">
-                <div className="long-editor-container" id="long-editor-buttons">
-                    {props.isOwnProfile ? <button onClick={() => windowSwitch(EDIT)}>Edit</button> : <></>}
-                    {props.isOwnProfile ? <button onClick={props.onDeletePost}>Remove</button> : <></>}
-                </div>
-                <div id="long-post-stats-container">
+        if (props.largeViewMode) {
+            return (
+                <div className="long-post-window">
+                    <div className="long-editor-container" id="long-editor-buttons">
+                        {props.isOwnProfile ? <button onClick={() => windowSwitch(EDIT)}>Edit</button> : <></>}
+                        {props.isOwnProfile ? <button onClick={props.onDeletePost}>Remove</button> : <></>}
+                    </div>
+                    <div id="long-post-stats-container">
 
-                    {props.eventData.is_milestone ? <p>Milestone :)</p> : <></>}
-                    {props.eventData.date ? <p>{monthNames[date.getMonth()]} {date.getDate()}, {date.getFullYear()} </p> : <></>}
-                    {props.eventData.pursuit_category ? <p>{props.pursuit_category }</p> : <></>}
-                    {props.eventData.min_duration ? <p>{props.eventData.min_duration} minutes</p> : <></>}
+                        {props.eventData.is_milestone ? <p>Milestone :)</p> : <></>}
+                        {props.eventData.date ? <p>{monthNames[date.getMonth()]} {date.getDate()}, {date.getFullYear()} </p> : <></>}
+                        {props.eventData.pursuit_category ? <p>{props.pursuit_category}</p> : <></>}
+                        {props.eventData.min_duration ? <p>{props.eventData.min_duration} minutes</p> : <></>}
+                    </div>
+                    <div className="long-editor-container">
+                        < DanteEditor
+                            key={key}
+                            content={props.textData}
+                            read_only={true}
+                        />
+                    </div>
                 </div>
-                <div className="long-editor-container">
-                    < DanteEditor
-                        key={key}
-                        content={props.textData}
-                        read_only={true}
-                    />
+            );
+        }
+        else {
+            return (
+                <div className="long-post-feed-object-container" onClick={() => props.openFullModal(props.eventData)}>
+                    <div id="long-post-intro-container">
+                        {props.eventData.title ? <h2>{props.eventData.title}</h2> : <></>}
+                        {props.eventData.subtitle ? <h4>{props.eventData.subtitle}</h4> : <></>}
+                        <div className="loading-display-photo">
+                            <img src={returnUserImageURL(props.displayPhoto)} />
+                        </div>
+                        <h4>{props.username}</h4>
+                        {props.eventData.cover_photo_key ? <img src={returnUserImageURL(props.eventData.cover_photo_key)} /> : <></>}
+                    </div>
+                    <div id="long-post-stats-container">
+                        {props.eventData.is_milestone ? <p>Milestone :)</p> : <></>}
+                        {props.eventData.date ? <p>{monthNames[date.getMonth()]} {date.getDate()}, {date.getFullYear()} </p> : <></>}
+                        {props.eventData.pursuit_category ? <p>{props.eventData.pursuit_category}</p> : <></>}
+                        {props.eventData.min_duration ? <p>{props.eventData.min_duration} minutes</p> : <></>}
+                    </div>
+                    <div className="long-editor-container">
+                        < DanteEditor
+                            key={key}
+                            content={props.textData}
+                            read_only={true}
+                        />
+                    </div>
                 </div>
-            </div>
-        );
+            )
+        }
     }
 
     else if (window === EDIT) {

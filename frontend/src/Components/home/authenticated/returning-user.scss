@@ -23,6 +23,11 @@
     background-color: grey;
 }
 
+.long-post-feed-object-container{
+    max-height: 500px;
+    overflow: hidden;
+}
+
 //table
 #profile-info-table {
     width: 100%;

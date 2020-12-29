@@ -4,10 +4,10 @@ import { returnUserImageURL } from "../../../constants/urls";
 
 
 const EDIT = "EDIT";
-const ShortPostHeader = (props) => {
+const PostHeader = (props) => {
     return (
-        <div id="post-header-container">
-            <div id="loading-display-photo">
+        <div className="post-header-container">
+            <div className="loading-display-photo">
                 <img src={returnUserImageURL(props.displayPhoto)} />
             </div>
             <h4>{props.username}</h4>
@@ -18,4 +18,4 @@ const ShortPostHeader = (props) => {
 
 }
 
-export default ShortPostHeader;
+export default PostHeader;

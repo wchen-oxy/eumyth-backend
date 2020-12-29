@@ -1,6 +1,6 @@
 import React from 'react';
 import Slider from 'react-slick';
-import ShortPostHeader from './sub-components/post-header';
+import PostHeader from './sub-components/post-header';
 import ShortHeroText from './sub-components/short-text';
 import ShortPostMetaInfo from './sub-components/short-post-meta';
 import ShortReEditor from '../editor/short-re-editor';
@@ -89,8 +89,7 @@ class ShortPostViewer extends React.Component {
                                     text={this.props.textData} />
                             </div>
                             <div className="short-viewer-side-container">
-                                <ShortPostHeader
-
+                                <PostHeader
                                     isOwnProfile={this.props.isOwnProfile}
                                     username={this.props.username}
                                     displayPhoto={this.props.eventData.display_photo_key}
@@ -115,7 +114,7 @@ class ShortPostViewer extends React.Component {
                     return (
                         <div className="flex-display flex-direction-column" >
                             <div className="mini-short-viewer-hero-container">
-                                <ShortPostHeader
+                                <PostHeader
                                     isOwnProfile={this.props.isOwnProfile}
                                     username={this.props.username}
                                     displayPhoto={this.props.eventData.display_photo_key}
@@ -163,7 +162,7 @@ class ShortPostViewer extends React.Component {
                         <div className="flex-display small-post-window">
                             {imageDisplay}
                             <div className="short-viewer-side-container">
-                                <ShortPostHeader
+                                <PostHeader
                                     isOwnProfile={this.props.isOwnProfile}
                                     username={this.props.username}
                                     displayPhoto={this.props.eventData.display_photo_key}
@@ -186,7 +185,7 @@ class ShortPostViewer extends React.Component {
                 else {
                     return (
                         <div className="flex-display flex-direction-column" >
-                            <ShortPostHeader
+                            <PostHeader
                                 isOwnProfile={this.props.isOwnProfile}
                                 username={this.props.username}
                                 displayPhoto={this.props.eventData.display_photo_key}

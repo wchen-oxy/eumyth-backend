@@ -52,12 +52,12 @@ class PostViewerController extends React.Component {
                         pursuits={this.props.pursuits}
                         preferredPostType={this.props.preferredPostType}
                         largeViewMode={this.props.largeViewMode}
-
                         textData={this.props.textData}
                         isOwnProfile={this.props.isOwnProfile}
                         eventData={this.props.eventData}
                         onDeletePost={this.props.onDeletePost}
                         closeModal={this.props.closeModal}
+                        openFullModal={this.props.openFullModal}
                     />
                 );
 

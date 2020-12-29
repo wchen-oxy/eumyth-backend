@@ -22,6 +22,7 @@ import './index.scss';
 
 const ALL = "ALL";
 const NEW_PROJECT = "NEW PROJECT";
+const LONG =  "LONG";
 
 class ProfilePage extends React.Component {
     _isMounted = false;
@@ -348,7 +349,7 @@ class ProfilePage extends React.Component {
                     pursuits={this.state.pursuitsNames}
                     username={this.state.selectedEvent.username}
                     eventData={this.state.selectedEvent}
-                    textData={this.state.selectedEvent.text_data}
+                    textData={this.state.selectedEvent.post_format === LONG ? JSON.parse(this.state.selectedEvent.text_data) : this.state.selectedEvent.text_data}
                     onDeletePost={this.handleDeletePost}
                 />
             )
