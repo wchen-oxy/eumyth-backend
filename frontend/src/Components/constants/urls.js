@@ -37,7 +37,7 @@ const WITH_IMAGE_POST_URL = POST_BASE_URL + "/with-image";
 const NO_IMAGE_POST_URL = POST_BASE_URL + "/no-image";
 const SOCIAL_FEED_POSTS_URL = POST_BASE_URL + "/feed";
 
-const SINGLE_POST_TEXT_DATA_URL = POST_BASE_URL + "/single-text"
+const SINGLE_POST_TEXT_DATA_URL = POST_BASE_URL + "/single"
 
 //project
 const PROJECT_BASE_URL = ROOT_URL + "/project";

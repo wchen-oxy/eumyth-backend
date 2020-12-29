@@ -1,5 +1,5 @@
 import React from 'react';
-import PostController from '../post/index';
+import PostDraftController from '../post/draft/index';
 import RelationModal from "./sub-components/relation-modal";
 import { AuthUserContext } from '../../Components/session/'
 import { withFirebase } from '../../Firebase';
@@ -97,7 +97,7 @@ class NavigationAuth extends React.Component {
               <div className="overlay"></div>
               {
                 this.state.isPostModalShowing ?
-                  <PostController
+                  <PostDraftController
                     username={this.state.username}
                     closeModal={this.closeModal}
                   />

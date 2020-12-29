@@ -99,10 +99,11 @@ export default class AxiosHelper {
         })
     }
 
-    static retrieveTextData(postId) {
+    static retrievePost(postId, textOnly) {
         return axios.get(urls.SINGLE_POST_TEXT_DATA_URL, {
             params: {
-                postId: postId
+                postId: postId,
+                textOnly: textOnly 
             }
         })
     }

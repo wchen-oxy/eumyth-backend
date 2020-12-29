@@ -5,7 +5,7 @@ import { withFirebase } from '../../../Firebase';
 import AxiosHelper from '../../../Axios/axios';
 import RecentWorkObject from "./sub-components/recent-work-object";
 import FeedObject from "./sub-components/feed-object";
-import EventModal from "../../profile/sub-components/event-modal";
+import PostViewerController from "../../post/viewer/post-viewer-controller";
 import Event from "../../profile/timeline/sub-components/timeline-event";
 import { returnUserImageURL } from "../../constants/urls";
 import { PRIVATE, PERSONAL_PAGE } from "../../constants/flags";
@@ -21,6 +21,7 @@ class ReturningUserPage extends React.Component {
             firstName: null,
             lastName: null,
             pursuits: null,
+            pursuitNames: null,
             displayPhoto: null,
             indexUserData: null,
 
@@ -44,7 +45,8 @@ class ReturningUserPage extends React.Component {
         this.openModal = this.openModal.bind(this);
         this.closeModal = this.closeModal.bind(this);
         this.handleDeletePost = this.handleDeletePost.bind(this);
-
+        this.fetchNextPosts = this.fetchNextPosts.bind(this);
+        this.createFeed = this.createFeed.bind(this);
     }
 
     componentDidMount() {
@@ -57,66 +59,61 @@ class ReturningUserPage extends React.Component {
             let indexUserData = null;
             let displayPhoto = "";
             let pursuits = null;
+            let pursuitNames = [];
             let feedData = [];
             let recentPosts = null;
+            let hasMore = true;
             return AxiosHelper.returnIndexUser(this.state.username).then(
                 (result) => {
                     allPosts = result.data.following_feed;
                     indexUserData = result.data;
                     displayPhoto = result.data.cropped_display_photo_key;
                     pursuits = result.data.pursuits;
-                    return AxiosHelper.returnMultiplePosts(result.data.recent_posts, false);
+                    if (!allPosts || allPosts.length === 0) hasMore = false;
+                    const slicedFeed = allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength);
+
+                    if (result.data.pursuits) {
+                        for (const pursuit of result.data.pursuits) {
+                            pursuitNames.push(pursuit.name);
+                        }
+                    }
+                    // return AxiosHelper.returnMultiplePosts(result.data.recent_posts, false);
+                    return Promise.all([
+                        AxiosHelper.returnMultiplePosts(result.data.recent_posts, false),
+                        (hasMore === false ? null : AxiosHelper.returnMultiplePosts(
+                            slicedFeed,
+                            true))])
                 }
             )
-                .then((result) => {
-                    console.log(result.data);
-                    console.log(typeof(result.data));
-                    recentPosts = result.data.map((value, index) => {
-                        return (
-                            <Event
-                                mediaType={POST}
-                                newProjectView={this.props.newProjectView}
-                                key={index}
-                                eventData={value}
-                                onEventClick={this.handleEventClick}
-                            />
-                        );
-                    });
-                    return result.data.following_feed;
+                .then(result => {
+                    console.log(result);
+                    result[0].data.map((value, index) =>
+                        <Event
+                            mediaType={POST}
+                            newProjectView={this.props.newProjectView}
+                            key={index}
+                            eventData={value}
+                            onEventClick={this.handleEventClick}
+                        />
+                    );
+                    if (result[1] !== null) return this.createFeed(result[1].data);
                 })
                 .then(
-                    (feed) => {
-                        const slicedFeed = allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength);
-                        if (!feed || feed.length === 0) return this.setState({ hasMore: false });
-                        return AxiosHelper.returnMultiplePosts(
-                            slicedFeed,
-                            true)
-                            .then(
-                                (result) => {
-                                    console.log(result.data);
-                                    if (this._isMounted) {
-                                        for (const item of result.data) {
-                                            if (item.post_privacy_type !== PRIVATE && item.post_privacy_type !== PERSONAL_PAGE )
-                                            feedData.push(item);
-                                        }
-                                    };
-                                }
-                            )
-                            .catch((error) => console.log(error));
-                    }
-                )
-                .then(
-                    () => {
+                    (result) => {
                         console.log(allPosts);
                         this.setState(
                             {
                                 allPosts: allPosts ? allPosts : null,
-                                feedData: feedData.length > 0 ? feedData : [],
-                                nextOpenPostIndex: this.state.nextOpenPostIndex + this.state.fixedDataLoadLength,
+                                // feedData: feedData.length > 0 ? feedData : [],
                                 indexUserData: indexUserData,
                                 displayPhoto: displayPhoto,
                                 pursuits: pursuits,
-                                recentPosts: recentPosts ? recentPosts : null
+                                pursuitNames: pursuitNames,
+                                recentPosts: recentPosts ? recentPosts : null,
+                                feedData: result ? result[0] : [],
+                                nextOpenPostIndex: result ? result[1] : 0,
+                                hasMore: hasMore
+
                             });
                     }
                 )
@@ -130,6 +127,53 @@ class ReturningUserPage extends React.Component {
 
     componentWillUnmount() {
         this._isMounted = false;
+    }
+
+    createFeed(inputArray) {
+        let masterArray = this.state.feedData;
+        let nextOpenPostIndex = this.state.nextOpenPostIndex;
+        let newFeedData = [];
+        //while input array is not empty    
+        console.log(inputArray);
+        //FIXME
+        for (const feedItem of inputArray) {
+            masterArray.push(<PostViewerController
+                isOwnProfile={feedItem.username === this.state.username}
+                displayPhoto={feedItem.display_photo_key}
+                preferredPostType={feedItem.username === this.state.username ? this.state.indexUserData.preferredPostType : null}
+                closeModal={null}
+                postType={feedItem.post_format}
+                pursuits={this.state.pursuitNames}
+                username={feedItem.username}
+                eventData={feedItem}
+                textData={feedItem.text_data}
+                onDeletePost={feedItem.username === this.state.username ? this.handleDeletePost : null}
+                largeViewMode={false}
+            />);
+        }
+
+        console.log(masterArray);
+        return [masterArray, nextOpenPostIndex];
+
+    }
+
+    fetchNextPosts() {
+        console.log("fetch");
+        if (this.state.nextOpenPostIndex + this.state.fixedDataLoadLength >= this.state.allPosts.length) {
+            console.log("Length of All Posts Exceeded");
+            this.setState({ hasMore: false });
+        }
+        return AxiosHelper.returnMultiplePosts(
+            this.state.allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength),
+            false)
+            .then(
+                (result) => {
+                    console.log(result.data);
+                    if (this._isMounted) this.createFeed(result.data, this.props.mediaType);
+                }
+            )
+            .catch((error) => console.log(error));
+        // }
     }
 
     handleDeletePost() {
@@ -168,7 +212,7 @@ class ReturningUserPage extends React.Component {
 
 
     handleEventClick(selectedEvent) {
-        return AxiosHelper.retrieveTextData(selectedEvent._id)
+        return AxiosHelper.retrievePost(selectedEvent._id, true)
             .then(
                 (result) => {
                     console.log(selectedEvent);
@@ -187,9 +231,8 @@ class ReturningUserPage extends React.Component {
     }
 
     render() {
-
+        console.log(this.state.feedData);
         let pursuitInfoArray = [];
-        let pursuitNames = []
         let totalMin = 0;
         if (this.state.pursuits) {
             for (const pursuit of this.state.pursuits) {
@@ -203,7 +246,6 @@ class ReturningUserPage extends React.Component {
                         <td key={pursuit.num_milestones + " milestones"}>{pursuit.num_milestones}</td>
                     </tr>);
                 pursuitInfoArray.push(hobbyTableData);
-                pursuitNames.push(pursuit.name);
             }
         }
 
@@ -272,8 +314,22 @@ class ReturningUserPage extends React.Component {
                             }>
                             {
                                 this.state.feedData.map((feedItem, index) =>
-                                    <div className="feed-object-container">
-                                        <FeedObject feedItem={feedItem} key={index} />
+                                    <div className="feed-object-container"  >
+                                        {/* <PostViewerController
+                                            key={index}
+                                            isOwnProfile={feedItem.username === this.state.username}
+                                            displayPhoto={feedItem.display_photo_key}
+                                            preferredPostType={feedItem.username === this.state.username ? this.state.indexUserData.preferredPostType : null}
+                                            closeModal={null}
+                                            postType={feedItem.post_format}
+                                            pursuits={this.state.pursuitNames}
+                                            username={feedItem.username}
+                                            eventData={feedItem}
+                                            textData={feedItem.text_data}
+                                            onDeletePost={this.handleDeletePost}
+                                        /> */}
+                                        {feedItem}
+                                        {/* <FeedObject feedItem={feedItem} key={index} /> */}
                                     </div>
 
                                 )
@@ -291,15 +347,16 @@ class ReturningUserPage extends React.Component {
                     {
                         this.state.isModalShowing && this.state.selectedEvent ?
 
-                            <EventModal
+                            <PostViewerController
+                                largeViewMode={true}
                                 key={this.state.selectedEvent._id}
                                 isOwnProfile={true}
                                 displayPhoto={this.state.indexUserData.tiny_cropped_display_photo_key}
                                 preferredPostType={this.state.indexUserData.preferredPostType}
                                 closeModal={this.closeModal}
                                 postType={this.state.postType}
-                                pursuits={pursuitNames}
-                                username={this.state.username}
+                                pursuits={this.state.pursuitNames}
+                                username={this.state.selectedEvent.username}
                                 eventData={this.state.selectedEvent}
                                 textData={this.state.textData}
                                 onDeletePost={this.handleDeletePost}

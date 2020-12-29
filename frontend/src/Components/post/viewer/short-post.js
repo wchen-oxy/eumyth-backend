@@ -79,12 +79,11 @@ class ShortPostViewer extends React.Component {
             prevArrow: <Arrow direction="left" />
         };
 
-        if (this.state.window === INITIAL) {
+         if (this.state.window === INITIAL) {
             if (!this.props.eventData.image_data.length) {
-
                 if (this.props.largeViewMode) {
                     return (
-                        <div className="flex-display small-post-window" >
+                        <div className={this.props.largeViewMode ? "flex-display small-post-window" : "flex-display"}>
                             <div className="short-viewer-hero-container">
                                 <ShortHeroText
                                     text={this.props.textData} />

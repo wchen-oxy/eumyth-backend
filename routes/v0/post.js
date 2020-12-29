@@ -403,15 +403,28 @@ router.route('/multiple').get((req, res) => {
     })
 });
 
-router.route('/single-text').get((req, res) => {
-  return Post.Model.findById(req.query.postId)
+router.route('/single').get((req, res) => {
+  const textOnly =  req.query.textOnly.toUpperCase();
+  const postId = req.query.postId;
+  console.log(textOnly);
+  return Post.Model.findById(postId)
     .then(result => {
-      res.status(200).send(result.text_data);
+      if (textOnly === "TRUE") {
+        res.status(200).send(result.text_data);
+      }
+      else {
+        console.log(result);
+        res.status(200).send(result);
+      }
     })
     .catch(err => {
       console.log(err);
+      if (err.name === 'CastError') {
+        return res.status(500).send("Malformed Object ID");
+      }
       res.status(500).send("No Post Found");
-    })
+    });
+
 })
 
 module.exports = router;

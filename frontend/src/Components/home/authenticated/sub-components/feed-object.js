@@ -6,11 +6,11 @@ import './feed-object.scss';
 const LARGE_VIEW_MODE = false;
 const IS_OWN_PROFILE = false;
 const SHORT = "SHORT";
+const LONG = "LONG";
 const FeedObject = (props) => {
     const feedItem = props.feedItem;
-    return (
-        feedItem.post_format === SHORT ?
-        
+    if (feedItem.post_format === SHORT) {
+        return (
             <ShortPostViewer
                 displayPhoto={feedItem.display_photo_key}
                 username={feedItem.username}
@@ -21,19 +21,21 @@ const FeedObject = (props) => {
                 isOwnProfile={IS_OWN_PROFILE}
                 eventData={feedItem}
                 onDeletePost={null}
-            />
-            :
-            <LongPostViewer
-                displayPhoto={feedItem.displayPhoto}
-                username={feedItem.username}
-                pursuits={feedItem.pursuits}
-                preferredPostType={feedItem.preferredPostType}
-                textData={feedItem.textData}
-                isOwnProfile={IS_OWN_PROFILE}
-                eventData={feedItem}
-                onDeletePost={null}
-            />
+            />)
+    }
+    else if (feedItem.post_format === LONG) return (
+
+        <LongPostViewer
+            displayPhoto={feedItem.displayPhoto}
+            username={feedItem.username}
+            pursuits={feedItem.pursuits}
+            preferredPostType={feedItem.preferredPostType}
+            textData={feedItem.textData}
+            isOwnProfile={IS_OWN_PROFILE}
+            eventData={feedItem}
+            onDeletePost={null}
+        />
     );
-}
+};
 
 export default FeedObject;

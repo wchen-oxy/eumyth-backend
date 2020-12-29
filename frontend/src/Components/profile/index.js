@@ -4,7 +4,7 @@ import PursuitHolder from './sub-components/pursuit-holder';
 import Timeline from "./timeline/index";
 import AxiosHelper from '../../Axios/axios';
 import NoMatch from '../no-match';
-import EventModal from "./sub-components/event-modal";
+import PostViewerController from "../post/viewer/post-viewer-controller";
 import FollowButton from "./sub-components/follow-buttons";
 import UserOptions from "./sub-components/user-options";
 import ProjectController from "../project/index";
@@ -57,7 +57,7 @@ class ProfilePage extends React.Component {
             isModalShowing: false,
             newProject: false,
 
-
+            postOnlyView: null,
         }
         this.modalRef = React.createRef();
         this.miniModalRef = React.createRef();
@@ -75,7 +75,7 @@ class ProfilePage extends React.Component {
     //fixme add catch for no found anything
     componentDidMount() {
         this._isMounted = true;
-        if (this._isMounted) {
+        if (this._isMounted && this.state.targetUsername) {
             this.props.firebase.auth.onAuthStateChanged(
                 (user) => {
                     if (user) {
@@ -110,6 +110,19 @@ class ProfilePage extends React.Component {
                     }
                 }
             )
+        }
+        else if (this._isMounted && this.props.match.params.postId) {
+            console.log(this.props.match.params.postId);
+            AxiosHelper.retrievePost(this.props.match.params.postId, false).then(
+                (result => {
+                    console.log(result);
+                    if (this._isMounted) this.setState({
+                        selectedEvent: result.data,
+                        postOnlyView: true,
+                        postType: result.data.post_format
+                    })
+                })
+            );
         }
     }
 
@@ -232,25 +245,27 @@ class ProfilePage extends React.Component {
             mediaType: POST,
             feedId: ALL + POST,
             userRelationId: targetUserInfo.user_relation_id,
-            followerStatus: followerStatus
+            followerStatus: followerStatus,
+            postOnlyView: false,
         });
     }
 
-    openModal() {
+    openModal(postId) {
+
         this.modalRef.current.style.display = "block";
         document.body.style.overflow = "hidden";
-        this.setState({ isModalShowing: true });
+        this.setState({ isModalShowing: true }, this.props.history.replace("/p/" + postId));
 
     }
 
     closeModal() {
         this.modalRef.current.style.display = "none";
         document.body.style.overflow = "visible";
-        this.setState({ isModalShowing: false });
+        this.setState({ isModalShowing: false }, this.props.history.replace("/" + this.state.targetUsername));
     }
 
     handleEventClick(selectedEvent) {
-        return AxiosHelper.retrieveTextData(selectedEvent._id)
+        return AxiosHelper.retrievePost(selectedEvent._id, true)
             .then(
                 (result) => {
                     if (this._isMounted) {
@@ -258,7 +273,7 @@ class ProfilePage extends React.Component {
                             selectedEvent: selectedEvent,
                             textData: result.data,
                             postType: selectedEvent.post_format
-                        }, this.openModal());
+                        }, this.openModal(selectedEvent._id));
                     }
                 }
             )
@@ -321,114 +336,136 @@ class ProfilePage extends React.Component {
                 );
             }
         }
-        return (
-            <div>
-                <div id="personal-profile-container" className="flex-display flex-direction-column">
-                    <div id="personal-profile-header">
-                        {this.state.coverPhoto ? (<img id="profile-cover-photo" src={returnUserImageURL(this.state.coverPhoto)}></img>) : (<div id="temp-cover"></div>)}
-                    </div>
-                    <div id="personal-profile-intro-container">
-                        <div id="personal-profile-photo-container">
-                            {this.state.croppedDisplayPhoto ? <img src={returnUserImageURL(this.state.croppedDisplayPhoto)}></img> : <></>}
-                            <div id="personal-profile-name-container">
-                                <h4 id="personal-profile-name">{this.state.targetUsername}</h4>
+        if (this.state.postOnlyView) {
+            return (
+                <PostViewerController
+                    key={this.state.selectedEvent._id}
+                    isOwnProfile={this.state.visitorUsername === this.state.selectedEvent.username}
+                    displayPhoto={this.state.selectedEvent.display_photo_key}
+                    preferredPostType={this.state.preferredPostType}
+                    closeModal={this.closeModal}
+                    postType={this.state.postType}
+                    pursuits={this.state.pursuitsNames}
+                    username={this.state.selectedEvent.username}
+                    eventData={this.state.selectedEvent}
+                    textData={this.state.selectedEvent.text_data}
+                    onDeletePost={this.handleDeletePost}
+                />
+            )
+        }
+        else if (!this.state.postOnlyView)
+            return (
+                <div>
+                    <div id="personal-profile-container" className="flex-display flex-direction-column">
+                        <div id="personal-profile-header">
+                            {this.state.coverPhoto ? (<img id="profile-cover-photo" src={returnUserImageURL(this.state.coverPhoto)}></img>) : (<div id="temp-cover"></div>)}
+                        </div>
+                        <div id="personal-profile-intro-container">
+                            <div id="personal-profile-photo-container">
+                                {this.state.croppedDisplayPhoto ? <img src={returnUserImageURL(this.state.croppedDisplayPhoto)}></img> : <></>}
+                                <div id="personal-profile-name-container">
+                                    <h4 id="personal-profile-name">{this.state.targetUsername}</h4>
+                                </div>
+                                <div id="personal-profile-actions-container">
+                                    <FollowButton
+                                        isOwner={this.state.targetUsername === this.state.visitorUsername}
+                                        followerStatus={this.state.followerStatus}
+                                        onFollowClick={this.handleFollowClick}
+                                        onOptionsClick={this.handleOptionsClick}
+                                    />
+                                </div>
                             </div>
-                            <div id="personal-profile-actions-container">
-                                <FollowButton
-                                    isOwner={this.state.targetUsername === this.state.visitorUsername}
-                                    followerStatus={this.state.followerStatus}
-                                    onFollowClick={this.handleFollowClick}
-                                    onOptionsClick={this.handleOptionsClick}
-                                />
+                            <div id="personal-profile-description">
+                                {this.state.bio ? <p>{this.state.bio}</p> : <p></p>}
+                            </div>
+                            <div id="pursuit-selection-container">
+                                {pursuitHolderArray}
                             </div>
                         </div>
-                        <div id="personal-profile-description">
-                            {this.state.bio ? <p>{this.state.bio}</p> : <p></p>}
-                        </div>
-                        <div id="pursuit-selection-container">
-                            {pursuitHolderArray}
+                    </div>
+                    <div className="personal-profile-content-switch-container">
+                        <div id="personal-profile-buttons-container">
+                            <button disabled={this.state.mediaType === POST ? true : false} onClick={() => this.handleMediaTypeSwitch(POST)}>Posts</button>
+                            <button disabled={this.state.mediaType === PROJECT ? true : false} onClick={() => this.handleMediaTypeSwitch(PROJECT)}>Projects</button>
                         </div>
                     </div>
-                </div>
-                <div className="personal-profile-content-switch-container">
-                    <div id="personal-profile-buttons-container">
-                        <button disabled={this.state.mediaType === POST ? true : false} onClick={() => this.handleMediaTypeSwitch(POST)}>Posts</button>
-                        <button disabled={this.state.mediaType === PROJECT ? true : false} onClick={() => this.handleMediaTypeSwitch(PROJECT)}>Projects</button>
-                    </div>
-                </div>
 
-                {console.log(
-                    (this.state.visitorUsername === null && this.state.isPrivate)
-                    ,
-                    this.state.visitorUsername !== this.state.targetUsername && this.state.isPrivate && (this.state.followerStatus !== "FOLLOWING" || this.state.followerStatus !==
-                        "REQUEST_ACCEPTED"
+                    {console.log(
+                        (this.state.visitorUsername === null && this.state.isPrivate)
+                        ,
+                        this.state.visitorUsername !== this.state.targetUsername && this.state.isPrivate && (this.state.followerStatus !== "FOLLOWING" || this.state.followerStatus !==
+                            "REQUEST_ACCEPTED"
+                        )
                     )
-                )
-                }
-
-                {
-
-                    this.state.visitorUsername === null && this.state.isPrivate ||
-                        (this.state.visitorUsername !== this.state.targetUsername && this.state.isPrivate) && (this.state.followerStatus !== "FOLLOWING" && this.state.followerStatus !== "REQUEST_ACCEPTED")
-
-                        ?
-
-                        <p>This profile is private. To see these posts, please request access. </p> :
-                        this.state.mediaType === POST ?
-                            < Timeline
-                                mediaType={this.state.mediaType}
-                                key={this.state.feedId}
-                                allPosts={this.state.feedData}
-                                onEventClick={this.handleEventClick}
-                                targetProfileId={this.state.targetProfileId} />
-                            :
-
-                            <ProjectController
-                                username={this.state.targetUsername}
-                                displayPhoto={this.state.smallCroppedDisplayPhoto}
-                                targetProfileId={this.state.targetProfileId}
-                                targetIndexUserId={this.state.targetIndexUserId}
-                                mediaType={this.state.mediaType}
-                                newProject={this.state.newProject}
-                                key={this.state.feedId}
-                                allPosts={this.state.feedData}
-                                onEventClick={this.handleEventClick}
-                                onNewBackProjectClick={this.handleNewBackProjectClick}
-                                pursuitsNames={this.state.pursuitsNames}
-                            />
-
-                }
-                <div className="modal" ref={this.modalRef}>
-                    <div className="overlay" onClick={(() => this.closeModal())}></div>
-                    <span className="close" onClick={(() => this.closeModal())}>X</span>
-                    {
-                        this.state.isModalShowing && this.state.selectedEvent ?
-
-                            <EventModal
-                                key={this.state.selectedEvent._id}
-                                isOwnProfile={this.visitorUsername === this.targetUsername}
-                                displayPhoto={this.state.smallCroppedDisplayPhoto}
-                                preferredPostType={this.state.preferredPostType}
-                                closeModal={this.closeModal}
-                                postType={this.state.postType}
-                                // smallProfilePhoto={this.state.smallCroppedDisplayPhoto}
-                                pursuits={this.state.pursuitsNames}
-                                username={this.state.targetUsername}
-                                eventData={this.state.selectedEvent}
-                                textData={this.state.textData}
-                                onDeletePost={this.handleDeletePost}
-                            />
-                            :
-                            <>                            {console.log("Disappear")}
-                            </>
                     }
+
+                    {
+
+                        this.state.visitorUsername === null && this.state.isPrivate ||
+                            (this.state.visitorUsername !== this.state.targetUsername && this.state.isPrivate) && (this.state.followerStatus !== "FOLLOWING" && this.state.followerStatus !== "REQUEST_ACCEPTED")
+
+                            ?
+
+                            <p>This profile is private. To see these posts, please request access. </p> :
+                            this.state.mediaType === POST ?
+                                < Timeline
+                                    mediaType={this.state.mediaType}
+                                    key={this.state.feedId}
+                                    allPosts={this.state.feedData}
+                                    onEventClick={this.handleEventClick}
+                                    targetProfileId={this.state.targetProfileId} />
+                                :
+
+                                <ProjectController
+                                    username={this.state.targetUsername}
+                                    displayPhoto={this.state.smallCroppedDisplayPhoto}
+                                    targetProfileId={this.state.targetProfileId}
+                                    targetIndexUserId={this.state.targetIndexUserId}
+                                    mediaType={this.state.mediaType}
+                                    newProject={this.state.newProject}
+                                    key={this.state.feedId}
+                                    allPosts={this.state.feedData}
+                                    onEventClick={this.handleEventClick}
+                                    onNewBackProjectClick={this.handleNewBackProjectClick}
+                                    pursuitsNames={this.state.pursuitsNames}
+                                />
+
+                    }
+                    <div className="modal" ref={this.modalRef}>
+                        <div className="overlay" onClick={(() => this.closeModal())}></div>
+                        <span className="close" onClick={(() => this.closeModal())}>X</span>
+                        {
+                            this.state.isModalShowing && this.state.selectedEvent ?
+
+                                <PostViewerController
+                                    key={this.state.selectedEvent._id}
+                                    isOwnProfile={this.state.visitorUsername === this.state.targetUsername}
+                                    displayPhoto={this.state.smallCroppedDisplayPhoto}
+                                    preferredPostType={this.state.preferredPostType}
+                                    closeModal={this.closeModal}
+                                    postType={this.state.postType}
+                                    largeViewMode={true}
+                                    // smallProfilePhoto={this.state.smallCroppedDisplayPhoto}
+                                    pursuits={this.state.pursuitsNames}
+                                    username={this.state.targetUsername}
+                                    eventData={this.state.selectedEvent}
+                                    textData={this.state.textData}
+                                    onDeletePost={this.handleDeletePost}
+                                />
+                                :
+                                <>                            {console.log("Disappear")}
+                                </>
+                        }
+                    </div>
+                    <div className="modal" ref={this.miniModalRef}>
+                        <div className="overlay" onClick={(() => this.closeModal())}></div>
+                        <UserOptions />
+                    </div>
                 </div>
-                <div className="modal" ref={this.miniModalRef}>
-                    <div className="overlay" onClick={(() => this.closeModal())}></div>
-                    <UserOptions />
-                </div>
-            </div>
-        );
+            );
+        else {
+            return new Error("State condition for postOnlyView was null");
+        }
 
     }
 }

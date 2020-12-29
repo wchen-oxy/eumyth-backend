@@ -1,7 +1,7 @@
 import React from 'react';
 import ShortEditor from '../editor/short-editor';
 import ReviewPost from './review-post';
-import "../index.scss";
+import "./index.scss";
 
 const NONE = "NONE";
 const INITIAL = "INITIAL";

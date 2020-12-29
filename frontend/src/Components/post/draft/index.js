@@ -1,10 +1,9 @@
 import React from 'react';
-import NewPost from './draft/new-post';
-import ShortPost from './draft/short-post';
-import LongPost from './draft/long-post';
-import AxiosHelper from '../../Axios/axios';
-import { withFirebase } from '../../Firebase';
-
+import NewPost from './new-post';
+import ShortPost from './short-post';
+import LongPost from './long-post';
+import AxiosHelper from '../../../Axios/axios';
+import { withFirebase } from '../../../Firebase';
 
 const NONE = "NONE";
 const SHORT = "SHORT";
@@ -12,7 +11,7 @@ const LONG = "LONG";
 const NEW_LONG = "NEW_LONG";
 const OLD_LONG = "OLD_LONG";
 
-class PostController extends React.Component {
+class PostDraftController extends React.Component {
   _isMounted = false;
   constructor(props) {
     super(props);
@@ -225,4 +224,4 @@ class PostController extends React.Component {
   }
 }
 
-export default withFirebase(PostController);
+export default withFirebase(PostDraftController);
