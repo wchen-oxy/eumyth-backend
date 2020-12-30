@@ -103,8 +103,6 @@ router.route('/')
       textSnippet = makeTextSnippet(postType, isPaginated, textData)
     }
 
-
-
     let resolvedNewPost = IndexUser.Model.findOne({ username: username }).then(resolvedIndexUser => {
       indexUser = resolvedIndexUser;
       switch (postType) {

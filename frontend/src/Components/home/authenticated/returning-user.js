@@ -167,9 +167,10 @@ class ReturningUserPage extends React.Component {
 
     fetchNextPosts() {
         console.log("fetch");
+        let hasMore = true;
         if (this.state.nextOpenPostIndex + this.state.fixedDataLoadLength >= this.state.allPosts.length) {
             console.log("Length of All Posts Exceeded");
-            this.setState({ hasMore: false });
+            hasMore = false;
         }
         return AxiosHelper.returnMultiplePosts(
             this.state.allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength),
@@ -177,9 +178,15 @@ class ReturningUserPage extends React.Component {
             .then(
                 (result) => {
                     console.log(result.data);
-                    if (this._isMounted) this.createFeed(result.data, this.props.mediaType);
+                    if (this._isMounted && result.data) return this.createFeed(result.data, this.props.mediaType);
                 }
             )
+            .then((result) => {
+                if (result) this.setState({ feedData: result[0], nextOpenPostIndex: result[1], hasMore: hasMore })
+                else {
+                    this.setState({ hasMore: false })
+                }
+            })
             .catch((error) => console.log(error));
         // }
     }
