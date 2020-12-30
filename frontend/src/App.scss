@@ -18,7 +18,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-.no-select {
+.app-no-select {
   -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none; /* Safari */
   -khtml-user-select: none; /* Konqueror HTML */
@@ -28,17 +28,6 @@ body {
                                   supported by Chrome, Edge, Opera and Firefox */
 }
 
-.flex-display{
-  display: flex;
-}
-
-.flex-direction-column{
-  flex-direction: column;
-}
-
-.flex-direction-row{
-  flex-direction: row;    
-}
 
 
 .preview-image{
@@ -48,38 +37,37 @@ body {
   object-fit: contain;
 }
 
-.black-background{
-  background-color: black;
+ 
+.modal {
+  z-index: 10;
+  display: none;
+  overflow: hidden;
 }
 
-.test1{
-  height: 100%;
-  width: auto;
-}
-.test2{
-  height: 100%;
-  width: 335px;
-  background-color: green;
+.overlay {
+  width: 100%;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.66);
+  position: fixed;
+  top: 0;
+  left: 0;
 }
 
-// .inner-small-post-container {
-//   height: 100%;
-//   margin: auto;
-//   min-height: 450px;
-//   min-width: 600px;
-//   max-height: 600px;
-//   max-width: 935px;
-// }
+.close {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
 
-// @media screen and (max-width: 935px) {
-//   .inner-small-post-container {
-//     // margin-right:
-//   }
-//   //   .inner-small-post-container {
-//   //     background-color: grey;
-//   //     min-height: 450px;
-//   //     min-width: 600px;
-//   //     max-height: 600px;
-//   //     max-width: 935px;
-//   // }
-// }
+  position: fixed;
+  top: 15px;
+  right: 35px;
+  color: grey;
+  font-size: 40px;
+  font-weight: bold;
+  transition: 0.3s;
+  z-index: 21;
+}
+

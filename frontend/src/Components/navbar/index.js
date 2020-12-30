@@ -9,7 +9,7 @@ import './index.scss';
 const POST = "POST";
 const REQUEST = "REQUEST";
 
-const Navigation = () => (
+const NavBar = () => (
   <AuthUserContext.Consumer>
     {authUser =>
       authUser && authUser.emailVerified ? <NavigationAuthBase /> : <NavigationNonAuth />
@@ -74,7 +74,6 @@ class NavigationAuth extends React.Component {
   }
 
   renderModal() {
-
     let modal = null;
     if (this.state.isPostModalShowing) {
       modal = (
@@ -104,7 +103,7 @@ class NavigationAuth extends React.Component {
       <>
         <nav>
           <div>
-            <Link to={"/"} className="navigation-link">interestHub</Link>
+            <Link to={"/"} className="navbar-navigation-link">interestHub</Link>
             {this.state.existingUserLoading ?
               (<></>) :
               (<button onClick={() => this.openModal(POST)}>New Entry</button>)}
@@ -125,4 +124,4 @@ class NavigationAuth extends React.Component {
 
 const NavigationAuthBase = withFirebase(NavigationAuth);
 
-export default Navigation;
+export default NavBar;

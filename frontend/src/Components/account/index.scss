@@ -1,10 +1,11 @@
-#settings-hero-container{
-    display: flex;
-    flex-direction: column;
+@import '../../partials';
+
+#account-container {
     width: fit-content;
+    @include flex-display-column;
 }
 
-.photo-edit-input-container {
+.account-photo-edit-container {
     display: none;
     flex-direction: column;
 }
