@@ -18,9 +18,9 @@ const Navigation = () => (
 );
 
 const NavigationNonAuth = () => (
-  <nav className="welcome-navbar-container">
-    <div className="navbar-item-group">
-      <Link to={"/"} className="navbar-item">interestHub</Link>
+  <nav  >
+    <div  >
+      <Link to={"/"} className="navigation-link">interestHub</Link>
     </div>
   </nav>
 );
@@ -37,6 +37,7 @@ class NavigationAuth extends React.Component {
       isRequestModalShowing: false,
     };
     this.modalRef = React.createRef();
+    this.renderModal = this.renderModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.openModal = this.openModal.bind(this);
 
@@ -72,12 +73,38 @@ class NavigationAuth extends React.Component {
     }
   }
 
+  renderModal() {
+
+    let modal = null;
+    if (this.state.isPostModalShowing) {
+      modal = (
+        <PostDraftController
+          username={this.state.username}
+          closeModal={this.closeModal}
+        />
+      );
+    }
+    else if (this.state.isRequestModalShowing) {
+      modal = (
+        <RelationModal
+          username={this.state.username}
+          closeModal={this.closeModal} />
+      )
+    }
+    return (
+      <div className="modal" ref={this.modalRef}>
+        <div className="overlay"></div>
+        {modal}
+      </div>
+    );
+  }
+
   render() {
     return (
       <>
         <nav>
           <div>
-            <Link to={"/"} id="hero-logo-link">interestHub</Link>
+            <Link to={"/"} className="navigation-link">interestHub</Link>
             {this.state.existingUserLoading ?
               (<></>) :
               (<button onClick={() => this.openModal(POST)}>New Entry</button>)}
@@ -90,29 +117,7 @@ class NavigationAuth extends React.Component {
             <button onClick={this.props.firebase.doSignOut} >SignOut</button>
           </div>
         </nav>
-        {this.state.existingUserLoading ?
-          (<></>) :
-          (
-            <div className="modal" ref={this.modalRef}>
-              <div className="overlay"></div>
-              {
-                this.state.isPostModalShowing ?
-                  <PostDraftController
-                    username={this.state.username}
-                    closeModal={this.closeModal}
-                  />
-                  :
-                  <></>
-              }
-              {
-                this.state.isRequestModalShowing ?
-                  <>
-                    <RelationModal username={this.state.username} closeModal={this.closeModal} />
-                  </> : <></>
-              }
-            </div>
-          )
-        }
+        {this.state.existingUserLoading ? <></> : this.renderModal()}
       </>
     );
   }
