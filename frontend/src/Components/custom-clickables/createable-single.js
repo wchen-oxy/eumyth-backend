@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import CreatableSelect from 'react-select/creatable';
 import {components} from 'react-select';
 import {options as pursuitOptions}  from './options';
-// import { colourOptions } from '../data';
 
 const Menu = props => {
   const optionSelectedLength = props.getValue().length || 0;
@@ -17,14 +16,11 @@ const Menu = props => {
   );
 };
 
-
 export default class CustomMultiSelect extends Component {
 
   isValidNewOption = (inputValue, selectValue) =>
         inputValue.length > 0 && selectValue.length < 5;
-      
   render() {
-    
     return (
       <CreatableSelect
         components={{ Menu }}

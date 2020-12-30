@@ -1,5 +1,3 @@
-
-
 export const options = 
 [
     { value: '3D printing', label: '3D printing' },

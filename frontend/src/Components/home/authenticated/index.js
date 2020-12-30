@@ -6,30 +6,33 @@ import { withFirebase } from '../../../Firebase';
 
 class UserHomePage extends React.Component {
     _isMounted = false;
-
     constructor(props) {
         super(props)
         this.state = {
-            newUser: null
+            isNewUser: null
         }
     }
-    
+
     componentDidMount() {
         this._isMounted = true;
-        if (this._isMounted) this.props.firebase.checkIsExistingUser().then(
+        this.props.firebase.checkIsExistingUser().then(
             result => {
-                console.log(result);
-                result ? this.setState({ newUser: false }) : this.setState({ newUser: true });
+                if (this._isMounted) {
+                    result ? this.setState({ isNewUser: false }) : this.setState({ isNewUser: true });
+                }
             }
         );
     }
-    componentWillUnmount(){
+
+    componentWillUnmount() {
         this._isMounted = false;
     }
 
     render() {
-        if (this.state.newUser === null) return( <div>Grabbing User Info</div>);
-        return (this.state.newUser ? <InitialCustomizationPage /> : <ReturningUserPage />);
+        if (this.state.isNewUser === null) {
+            return (<div>Grabbing User Info</div>);
+        }
+        return (this.state.isNewUser ? <InitialCustomizationPage /> : <ReturningUserPage />);
     }
 }
 
