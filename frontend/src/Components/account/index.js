@@ -10,8 +10,8 @@ import { PUBLIC, PRIVATE, DISPLAY, COVER } from "../constants/flags";
 import "./index.scss";
 
 const AccountPage = (props) => {
-  const [displayPhoto, setDisplay] = useState(null);
-  const [coverPhoto, setCover] = useState(null);
+  const [displayPhoto, setDisplayPhoto] = useState(null);
+  const [coverPhoto, setCoverPhoto] = useState(null);
   const [bio, setBioText] = useState('');
   const [displayPhotoScale, setDisplayPhotoScale] = useState(1);
   const [displayPhotoRotation, setDisplayPhotoRotation] = useState(0);
@@ -31,7 +31,7 @@ const AccountPage = (props) => {
     }, [props.firebase])
 
   const handleImageDrop = (dropped) => {
-    setDisplay(dropped);
+    setDisplayPhoto(dropped);
   }
 
   const showPhotoEditor = (ref) => {
@@ -199,7 +199,7 @@ const AccountPage = (props) => {
               <button onClick={() => showPhotoEditor(displayPhotoRef)}>Edit your Display Photo</button>
               <div ref={displayPhotoRef} className="account-photo-edit-container">
                 <label>Change your display photo!</label>
-                <input type="file" onChange={(e) => setDisplay(e.target.files[0])} />
+                <input type="file" onChange={(e) => setDisplayPhoto(e.target.files[0])} />
                 {displayPhoto ? renderProfilePhotoEditor() : <div></div>}
                 <button onClick={() => submitPhoto(DISPLAY)}>Submit your display photo!</button>
                 <button onClick={() => removePhoto(DISPLAY)}>Remove display Photo?</button>
@@ -208,7 +208,7 @@ const AccountPage = (props) => {
               <div ref={coverPhotoRef} className="account-photo-edit-container">
                 <label>Change your cover photo!</label>
                 <input type="file" onChange={(e) => {
-                  setCover(e.target.files[0]);
+                  setCoverPhoto(e.target.files[0]);
                 }} />
                 <button onClick={() => submitPhoto(COVER)}>Submit your cover photo!</button>
                 <button onClick={() => removePhoto(COVER)}>Remove your cover photo</button>
