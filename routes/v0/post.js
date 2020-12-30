@@ -163,13 +163,9 @@ router.route('/')
       }
       let newRecentPosts = resolvedIndexUser.recent_posts;
       console.log(newRecentPosts, "BEFORE");
-      newRecentPosts.unshift(post._id);
       if (newRecentPosts.length > RECENT_POSTS_LIMIT) {
-        console.log(newRecentPosts, "DURING");
         newRecentPosts.pop();
       }
-      console.log(newRecentPosts, "AFTER");
-
       indexUser.recent_posts = newRecentPosts;
       return indexUser.user_profile_id;
     }
