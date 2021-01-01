@@ -1,11 +1,9 @@
 import React from 'react';
 import Isemail from 'isemail';
-import WelcomeLoginComponent from './sub-components/login';
-import WelcomeRegisterComponent from './sub-components/register';
-import VerifyPage from './sub-components/verify';
+import WelcomeLoginForm from './sub-components/login';
+import WelcomeRegisterForm from './sub-components/register';
+import VerifyForm from './sub-components/verify';
 import './index.scss';
-
-
 
 const INITIAL_STATE = {
   currentUser: '',
@@ -26,17 +24,18 @@ export default class WelcomePage extends React.Component {
       ...INITIAL_STATE
     }
 
-    this.toggleLoginRegisterWindow = this.toggleLoginRegisterWindow.bind(this);
+    this.handleLongRegisterToggle = this.handleLongRegisterToggle.bind(this);
     this.handleLoginSubmit = this.handleLoginSubmit.bind(this);
     this.handleRegisterSubmit = this.handleRegisterSubmit.bind(this);
     this.handleSendEmailVerication = this.handleSendEmailVerication.bind(this);
     this.handleSignOut = this.handleSignOut.bind(this);
     this.handleRegisterSuccess = this.handleRegisterSuccess.bind(this);
-    this.handleChange = this.handleChange.bind(this);
+    this.handleTextChange = this.handleTextChange.bind(this);
     this.handleVerifiedState = this.handleVerifiedState.bind(this);
+    this.renderLoginRegister = this.renderLoginRegister.bind(this);
   }
 
-  handleChange(e) {
+  handleTextChange(e) {
     e.preventDefault();
     this.setState({ [e.target.name]: e.target.value });
   }
@@ -73,7 +72,7 @@ export default class WelcomePage extends React.Component {
     })
   }
 
-  toggleLoginRegisterWindow(e) {
+  handleLongRegisterToggle(e) {
     e.preventDefault();
     this.setState(state => ({
       isLoginMode: !state.isLoginMode
@@ -106,7 +105,6 @@ export default class WelcomePage extends React.Component {
       alert("Password is too short!");
     }
     else {
-      console.log("Submitted");
       this.props.firebase.doCreateUser(this.state.email, this.state.password)
         .then(
           this.setState({ showRegisterSuccess: true })
@@ -114,60 +112,58 @@ export default class WelcomePage extends React.Component {
     }
   }
 
-  render() {
-    let LoginRegisterHome;
-    if (this.state.showRegisterSuccess) {
-      return (
-        <main>
-          <section className="overview-login-register-container flex-display">
-            <div className="overview-description-container flex-display flex-direction-column">
-              <p>Welcome to interestHub! Login or sign up to get started!</p>
-            </div>
-            <div>
-              Please check your email for a verification link.
-              <span>Didn't see the link?  <button onClick={this.props.firebase.doSendEmailVerification}>Resend!</button></span>
-              <button onClick={this.handleRegisterSuccess}>Return</button>
-            </div>
-          </section>
-        </main>
-      );
-    }
-    if (this.state.isLoginMode) {
-      LoginRegisterHome = (this.props.firebase.auth.currentUser && !this.state.verified) ?
-        <VerifyPage
+  renderLoginRegister(isLogin) {
+    if (isLogin) {
+      return (this.props.firebase.auth.currentUser && !this.state.verified ?
+        <VerifyForm
           current_user={this.state.currentUser}
-          onToggleLoginRegisterWindow={this.toggleLoginRegisterWindow}
+          onToggleLoginRegisterWindow={this.handleLongRegisterToggle}
           onSendEmailVerification={this.handleSendEmailVerication}
           onSignOut={this.handleSignOut}
         />
         :
-        <WelcomeLoginComponent
-          onToggleLoginRegisterWindow={this.toggleLoginRegisterWindow}
-          onLoginEmailChange={this.handleChange}
-          onLoginPasswordChange={this.handleChange}
+        <WelcomeLoginForm
+          onToggleLoginRegisterWindow={this.handleLongRegisterToggle}
+          onLoginEmailChange={this.handleTextChange}
+          onLoginPasswordChange={this.handleTextChange}
           onLoginSubmit={this.handleLoginSubmit}
-        />;
+        />);
     }
-    else {
-      LoginRegisterHome = (
-        <WelcomeRegisterComponent
-          onToggleLoginRegisterWindow={this.toggleLoginRegisterWindow}
-          onRegisterEmailChange={this.handleChange}
-          onRegisterPasswordChange={this.handleChange}
+    else
+      return (
+        <WelcomeRegisterForm
+          onToggleLoginRegisterWindow={this.handleLongRegisterToggle}
+          onRegisterEmailChange={this.handleTextChange}
+          onRegisterPasswordChange={this.handleTextChange}
           onRegisterSubmit={this.handleRegisterSubmit}
         />
       )
-    }
+  }
 
-    return (
-      <main>
-        <section className="overview-login-register-container flex-display">
-          <div className="overview-description-container flex-display flex-direction-column">
+  render() {
+    if (this.state.showRegisterSuccess) {
+      return (
+        <section className="welcome-login-register-section">
+          <div className="welcome-hero-hero-container">
             <p>Welcome to interestHub! Login or sign up to get started!</p>
           </div>
-          {LoginRegisterHome}
+          <div>
+            Please check your email for a verification link.
+              <span>Didn't see the link?  <button onClick={this.props.firebase.doSendEmailVerification}>Resend!</button></span>
+            <button onClick={this.handleRegisterSuccess}>Return</button>
+          </div>
         </section>
-      </main>
+      );
+    }
+    return (
+
+      <section className="welcome-login-register-section">
+        <div className="welcome-hero-hero-container">
+          <p>Welcome to interestHub! Login or sign up to get started!</p>
+        </div>
+        {this.renderLoginRegister(this.state.isLoginMode)}
+      </section>
+
     )
   }
 }

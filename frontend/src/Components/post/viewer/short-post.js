@@ -252,7 +252,7 @@ class ShortPostViewer extends React.Component {
                     date={formattedDate}
                     min={this.props.eventData.min_duration}
                     selectedPursuit={this.props.eventData.pursuit_category}
-                    pursuits={this.props.pursuits}
+                    pursuitNames={this.props.pursuitNames}
                     closeModal={this.props.closeModal}
                     postType={SHORT}
                     onClick={this.handleWindowChange}

@@ -3,7 +3,7 @@ import Slider from "react-slick";
 import Arrow from "./arrow";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-
+import "./index.scss";
 
 // https://css-tricks.com/centering-css-complete-guide/#center-vertically
 //Explains the weird -50% and top 50% thing
@@ -47,12 +47,15 @@ class ImageSlider extends React.Component {
         newArray =>
           newArray.map(item =>
             item = (
-              <div className="image-container">
-                <img alt="" className="preview-image" key={count++} src={item} />
+              <div className="image-slider-preview-image-container">
+                <img alt="" className="imageslider-preview-image" key={count++} src={item} />
               </div>
             ))
       ).then(result => {
-        this.setState({ transformedImageArray: result, displayedItemCount: result.length })
+        this.setState({
+          transformedImageArray: result,
+          displayedItemCount: result.length
+        })
       });
   }
 

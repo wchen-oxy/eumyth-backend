@@ -7,7 +7,6 @@ import AxiosHelper from '../../../Axios/axios';
 import { withFirebase } from '../../../Firebase';
 import './initial-customization.scss';
 
-
 const INITIAL_STATE = {
     firstName: '',
     lastName: '',
@@ -24,9 +23,9 @@ const INITIAL_STATE = {
 class InitialCustomizationPage extends React.Component {
     constructor(props) {
         super(props);
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSelect = this.handleSelect.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleTextChange = this.handleTextChange.bind(this);
+        this.handleExperienceSelect = this.handleExperienceSelect.bind(this);
+        this.handleProfileSubmit = this.handleProfileSubmit.bind(this);
         this.handlePursuitExperienceChange = this.handlePursuitExperienceChange.bind(this);
         this.handleProfilePhotoChange = this.handleProfilePhotoChange.bind(this);
         this.handleImageDrop = this.handleImageDrop.bind(this);
@@ -36,37 +35,30 @@ class InitialCustomizationPage extends React.Component {
         }
     }
 
-    handleChange(e) {
+    handleTextChange(e) {
         e.preventDefault();
-        console.log(e.target.value);
         this.setState({ [e.target.name]: e.target.value });
         if (e.target.name === "username") {
             if (e.target.value === e.target.value.toLowerCase()) {
                 AxiosHelper.checkUsernameAvailable(e.target.value)
                     .then(
                         (response) => {
-                            console.log(response);
-                            console.log(response.data);
-                            response.status === 200 ? this.setState({ isTaken: true }) : this.setState({ isTaken: false });
+                            if (response.status === 200) { this.setState({ isTaken: true }); }
+                            else if (response.state === 204) { this.setState({ isTaken: false }); }
                             this.setState({ isUpperCase: false });
                         }
-                    );
+                    )
+                    .catch((err) => {
+                        console.log(err);
+                    });
             }
             else {
                 this.setState({ isUpperCase: true });
-
             }
-
-
         }
     }
-    handleSelect(newValue, actionMeta) {
-        console.group('Value Changed');
-        console.log(newValue);
-        this.setState({ pursuits: newValue });
-        console.log(`action: ${actionMeta.action}`);
-        console.groupEnd();
 
+    handleExperienceSelect(newValue) {
         let pursuitArray = [];
         let experienceSelects = [];
         if (newValue) {
@@ -75,7 +67,7 @@ class InitialCustomizationPage extends React.Component {
                 experienceSelects.push(
                     <span key={pursuit.value}>
                         <label>{pursuit.value}</label>
-                        <select name={pursuit.value} id="experience-select" onChange={this.handlePursuitExperienceChange}>
+                        <select name={pursuit.value} className="initialcustomization-select" onChange={this.handlePursuitExperienceChange}>
                             <option value=""></option>
                             <option value="Beginner">Beginner</option>
                             <option value="Familiar">Familiar</option>
@@ -86,24 +78,13 @@ class InitialCustomizationPage extends React.Component {
                 );
             }
         }
-        console.log(pursuitArray);
         this.setState({ pursuits: pursuitArray, experienceSelects: experienceSelects });
     }
 
-    handleSubmit(e) {
+    handleProfileSubmit(e) {
         e.preventDefault();
-        console.log("Submitted");
         if (this.editor) {
-            // This returns a HTMLCanvasElement, it can be made into a data URL or a blob,
-            // drawn on another canvas, or added to the DOM.
-            // const canvas = this.editor.getImage();
-            // If you want the image resized to the canvas size (also a HTMLCanvasElement)
             const canvasScaled = this.editor.getImage();
-            // this.setState({ croppedImage: canvasScaled.toDataURL(), fullImage: canvas.toDataURL() });
-
-            //make several async calls, wait untill firebase is done, compress image 1 and compress image 2 are done
-
-            //update firebase
             Promise.all(
                 [this.props.firebase.writeBasicUserData(
                     this.state.username,
@@ -115,8 +96,7 @@ class InitialCustomizationPage extends React.Component {
                 ]
             )
                 .then(
-                    results => {
-                        console.log(results);
+                    (results) => {
                         return Promise.all([
                             imageCompression(results[2], { maxWidthOrHeight: 250, maxSizeMB: 1, fileType: "image/jpeg" }),
                             imageCompression(results[2], { maxWidthOrHeight: 125, maxSizeMB: 1, fileType: "image/jpeg" }),
@@ -126,7 +106,6 @@ class InitialCustomizationPage extends React.Component {
                 )
                 .then(
                     (results) => {
-                        console.log(results);
                         const titles = ["normal", "small", "tiny"];
                         let imageArray = [];
                         for (let i = 0; i < 3; i++) {
@@ -137,7 +116,6 @@ class InitialCustomizationPage extends React.Component {
                 )
                 .then(
                     (results) => {
-                        console.log(results);
                         let formData = new FormData();
                         formData.append("username", this.state.username);
                         formData.append("pursuits", JSON.stringify(this.state.pursuits));
@@ -150,25 +128,12 @@ class InitialCustomizationPage extends React.Component {
                 )
                 .then(
                     (result) => {
-                        console.log(result);
                         if (result.status === 201) window.location.reload();
                     }
                 )
                 .catch((error) => console.log(error));
-
-            // imageCompression.
-            //     .then(
-            //     () => AxiosHelper.createUserProfile(this.state.username, this.state.pursuits, canvas.toDataURL(), canvasScaled.toDataURL())
-            // )
-            //     .then(
-            //         (success) => {
-            //             console.log(success);
-            //             if (success) window.location.reload();
-            //         }
-            //     );
         }
-
-        else{
+        else {
             Promise.all(
                 [this.props.firebase.writeBasicUserData(
                     this.state.username,
@@ -180,17 +145,16 @@ class InitialCustomizationPage extends React.Component {
             )
                 .then(
                     (results) => {
-                        console.log(results);
                         let formData = new FormData();
                         formData.append("username", this.state.username);
                         formData.append("pursuits", JSON.stringify(this.state.pursuits));
-                        return AxiosHelper.createUserProfile(formData)
+                        return AxiosHelper.createUserProfile(formData);
                     }
                 )
                 .then(
                     (result) => {
-                        console.log(result);
                         if (result.status === 201) window.location.reload();
+                        else { alert("Something unexpected happen: (", result.status) }
                     }
                 )
                 .catch((error) => console.log(error));
@@ -199,20 +163,15 @@ class InitialCustomizationPage extends React.Component {
     }
 
     handlePursuitExperienceChange(e) {
-        const pursuit = e.target.name;
-        const experience = e.target.value;
-        console.log(pursuit);
-        console.log(experience);
         let previousPursuitState = this.state.pursuits;
-        console.log(previousPursuitState);
         for (const pursuit of previousPursuitState) {
             if (pursuit.name === e.target.name) pursuit.experience = e.target.value;
         }
         this.setState({ pursuits: previousPursuitState });
     }
 
-    testForSpecialCharacter(str){
-        return /[~`!#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?]/g.test(str);
+    testForSpecialCharacter(string) {
+        return /[~`!#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?]/g.test(string);
     }
 
     handleProfilePhotoChange(photo) {
@@ -222,13 +181,13 @@ class InitialCustomizationPage extends React.Component {
     handleImageDrop(dropped) {
         this.setState({ profilePhoto: dropped[0] })
     }
+
     setEditorRef = (editor) => this.editor = editor;
 
     render() {
-        console.log(this.state.isTaken);
         const available = this.state.username !== '' && !this.state.isTaken ? "Available" : "Taken";
-        const upperCase = this.state.isUpperCase ? " But Please Choose Only Lower Case Characters" : ""; 
-        const specialCharacters =  this.testForSpecialCharacter(this.state.username);
+        const upperCase = this.state.isUpperCase ? " But Please Choose Only Lower Case Characters" : "";
+        const specialCharacters = this.testForSpecialCharacter(this.state.username);
         const specialCharMessage = specialCharacters ? " But No Special Characters" : "";
         const { username, firstName, lastName, pursuits } = this.state;
         let isInvalid =
@@ -241,12 +200,7 @@ class InitialCustomizationPage extends React.Component {
             this.state.isUpperCase ||
             specialCharacters;
 
-            console.log(this.state.isTaken);
-
-            console.log(isInvalid);
-
         const pursuitDetails = this.state.pursuits.length !== 0 ? this.state.experienceSelects : <></>;
-
         const photoArea = (
             <>
                 <Dropzone
@@ -272,7 +226,6 @@ class InitialCustomizationPage extends React.Component {
                         </div>
                     )}
                 </Dropzone>
-                 
                 <label>Rotation</label>
                 <input
                     type="range"
@@ -292,46 +245,38 @@ class InitialCustomizationPage extends React.Component {
                     max="10"
                     value={this.state.imageScale}
                     onChange={(e) => this.setState({ imageScale: parseFloat(e.target.value) })} />
-
             </>
-
-        )
-
+        );
 
         return (
-            <div className="basic-info-container">
-                <form className="basic-info-form-container" onSubmit={this.handleSubmit}>
+            <div className="initialcustomization-container">
+                <form onSubmit={this.handleProfileSubmit}>
                     <h2>Let us know about you!</h2>
                     <label>
                         Don't worry this won't be public if you don't want it to.
                     </label>
-                    <div className="info-container">
+                    <div className="initialcustomization-content-container">
                         <label>Choose a display profile!</label>
                         <input type="file" name="displayPhoto" onChange={(e) => this.handleProfilePhotoChange(e.target.files[0])} />
-                        {this.state.profilePhoto ? photoArea : <div id="temp-profile-photo-container"></div>}
-
+                        {this.state.profilePhoto ? photoArea : <div id="initialcustomization-display-photo-container"></div>}
                     </div>
-                    <div className="info-container">
-
+                    <div className="initialcustomization-content-container">
                         <label>
                             Choose a username! {available} {upperCase} {specialCharMessage}
                         </label>
-                        <input type="text" name="username" placeholder="Username" onChange={this.handleChange} />
+                        <input type="text" name="username" placeholder="Username" onChange={this.handleTextChange} />
                         <label>First Name</label>
-                        <input type="text" name="firstName" placeholder="First Name" onChange={this.handleChange} />
+                        <input type="text" name="firstName" placeholder="First Name" onChange={this.handleTextChange} />
                         <label>Last Name</label>
-                        <input type="text" name="lastName" placeholder="Last Name" onChange={this.handleChange} />
+                        <input type="text" name="lastName" placeholder="Last Name" onChange={this.handleTextChange} />
                     </div>
-                    <div className="info-container">
-
+                    <div className="initialcustomization-content-container">
                         <label>
                             Tell us what you want to pursue or choose one from the list!
-                    </label>
-                        <CustomMultiSelect name="pursuits" onSelect={this.handleSelect} />
+                        </label>
+                        <CustomMultiSelect name="pursuits" onSelect={this.handleExperienceSelect} />
                         {pursuitDetails}
-                        <button disabled={isInvalid} type="submit" >
-                            Submit
-                    </button>
+                        <button disabled={isInvalid} type="submit">Submit</button>
                     </div>
                 </form>
 

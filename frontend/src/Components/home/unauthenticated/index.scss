@@ -1,37 +1,33 @@
+@import "../../../partials";
 @import "../../../App.scss";
 
-p {
-    color: $primary-text-color;
-}
-
-main {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    width: 100%;
-    height: 100%;
-}
-
-.overview-login-register-container {
-    min-width: 100%;
-    height: 100vh;
-}
-
-.overview-description-container,
-.login-signup-container {
-    flex-direction: column;
-    justify-content: center;
-    button{
-
+.welcome-login-register-section {
+    @include flex-display-row;
+    height: calc(100vh - 50px);
+    p {
+        color: $primary-text-color;
     }
 }
 
-.overview-description-container {
-    width: 65%;
-    padding-left: 10vh;
-    font-size: $primary-medium-font-size;
+.welcome-hero-hero-container,
+.welcome-hero-side-container {
+    @include flex-display-column;
+    margin: auto;
+    justify-content: center;
+ 
 }
 
-.login-signup-container {
+.welcome-hero-hero-container {
+    width: 65%;
+    text-align: center;
+    font-size: $primary-medium-font-size;
+    height: 100%;
+}
+
+.welcome-hero-side-container {
+    height: 100%;
     width: 35%;
+    button{
+        width:fit-content;   
+    }
 }

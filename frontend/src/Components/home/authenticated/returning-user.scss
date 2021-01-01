@@ -1,47 +1,55 @@
-.home-row-container {
+@import "../../../partials";
+
+#returninguser-profile-container,
+#returninguser-feed-container {
+    @include flex-display-row;
+}
+
+.returninguser-main-row {
     padding: 2vh;
 
-    .home-profile-column-container {
+    #returninguser-recent-work-container {
+        @include flex-display-column;
+    }
+
+    #returninguser-profile-photo {
+        object-fit: cover;
+        border-radius: 50%;
+        @include medium-profile-photo;
+    }
+
+    .returninguser-profile-text-container {
+        text-align: center;
+    }
+
+    .returninguser-profile-column {
+        @include flex-display-column;
         margin: auto;
+    }
+
+    #returninguser-pursuit-info-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: center;
+
+        td,
+        th {
+            padding: 8px;
+        }
     }
 }
 
-
-.home-profile-text {
-    text-align: center;
+.returninguser-row {
+    @include flex-display-row;
 }
 
-#home-profile-photo {
-    object-fit: cover;
-    border-radius: 50%;
-    height: 100px;
-    width: 100px;
-}
-
-.feed-object-container{
-    margin: 100px;
-    background-color: grey;
-}
-
-.long-post-feed-object-container{
-    max-height: 500px;
-    overflow: hidden;
-}
-
-//table
-#profile-info-table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: center;
-}
-
-td,
-th {
-    padding: 8px;
-}
-
-//
-#feed-container{
+#returninguser-infinite-scroll-container {
     margin: auto;
     width: 800px;
+    @include flex-display-column;
+
+    .returninguser-feed-object-container {
+        margin: 100px;
+        background-color: grey;
+    }
 }

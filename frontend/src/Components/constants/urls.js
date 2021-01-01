@@ -4,6 +4,8 @@ const REGION = 'us-west-1';
 
 const returnUserImageURL = (key) => ("http://" + BUCKET_NAME + ".s3." + REGION + ".amazonaws.com/" + key);
 
+//Temporary Profile Photo
+const TEMP_PROFILE_PHOTO_URL = "https://i.redd.it/73j1cgr028u21.jpg";
 
 const ROOT_URL = "http://localhost:5000";
 
@@ -49,6 +51,7 @@ const CHECK_USERNAME_URL = INDEX_BASE_URL + '/username';
 const INDEX_USER_PURSUITS_URL = INDEX_BASE_URL + '/pursuits';
 
 module.exports = {
+    TEMP_PROFILE_PHOTO_URL: TEMP_PROFILE_PHOTO_URL,
     returnUserImageURL: returnUserImageURL,
     ROOT_URL,
     IMAGE_BASE_URL,

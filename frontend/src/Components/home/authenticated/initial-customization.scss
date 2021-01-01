@@ -1,7 +1,20 @@
-.basic-info-container {
-    display: flex;
+@import "../../../partials";
+
+.initialcustomization-container {
+    @include flex-display-row;
     justify-content: center;
     margin-bottom: 10vh;
+
+    form {
+        @include flex-display-column;
+        justify-content: center;
+        width: 55%;
+    }
+
+    .initialcustomization-content-container {
+        @include flex-display-column;
+        padding: 2vh;
+    }
 
     input,
     label,
@@ -11,26 +24,12 @@
     span {
         margin-top: 1vh;
     }
+
+    #initialcustomization-display-photo-container {
+        @include main-profile-photo-container;
+    }
 }
 
-.basic-info-form-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    width: 55%;
-}
-
-.info-container {
-    padding: 2vh;
-    display: flex;
-    flex-direction: column;
-}
-
-#temp-profile-photo-container {
-    height: 250px;
-    width: 250px;
-}
-
-#experience-select {
-    display: flex;
+.initialcustomization-select {
+    @include flex-display-row;
 }

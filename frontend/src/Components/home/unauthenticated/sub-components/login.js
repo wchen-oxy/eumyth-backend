@@ -1,9 +1,9 @@
 import React from 'react';
 import PasswordForgetPage from '../../../password/forget/index'
 
-const WelcomeLoginComponent = (props) =>
+const WelcomeLoginForm = (props) =>
   (
-    <div className="login-signup-container flex-display">
+    <div className="welcome-hero-side-container">
       <section >
         <h4>Sign In</h4>
           <button onClick={props.onToggleLoginRegisterWindow}>Create Account</button>
@@ -14,7 +14,6 @@ const WelcomeLoginComponent = (props) =>
           <div>
             <input type="password" placeholder="Password" name="password" autoComplete="off" onChange={props.onLoginPasswordChange} />
           </div>
-
           <input type="submit" value="Log in" />
         </form>
         <PasswordForgetPage />
@@ -25,4 +24,4 @@ const WelcomeLoginComponent = (props) =>
 
 
 
-export default WelcomeLoginComponent;
+export default WelcomeLoginForm;

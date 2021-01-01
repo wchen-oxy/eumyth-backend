@@ -1,18 +1,24 @@
 import React from 'react';
 import AxiosHelper from '../../../Axios/axios';
 import { returnUserImageURL } from "../../constants/urls";
-import { UNFOLLOW_ACTION, REQUEST_ACTION } from "../../constants/flags";
+import { UNFOLLOW_ACTION, REQUEST_ACTION, ACCEPT_ACTION, DECLINE_ACTION } from "../../constants/flags";
 import "./relation-modal.scss";
-
 
 class RelationModal extends React.Component {
     _isMounted = false;
     constructor() {
         super();
         this.state = {
-            userRelation: null
+            userRelationId: null,
+            following: [],
+            followers: [],
+            requested: []
         }
         this.handleStatusChange = this.handleStatusChange.bind(this);
+        this.handleRenderRelation = this.handleRenderRelation.bind(this);
+        this.renderFollower = this.renderFollower.bind(this);
+        this.renderFollow = this.renderFollow.bind(this);
+        this.renderRequester = this.renderRequester.bind(this);
     }
 
     componentDidMount() {
@@ -20,7 +26,12 @@ class RelationModal extends React.Component {
         AxiosHelper.returnUserRelationInfo(this.props.username)
             .then((result) => {
                 if (this._isMounted) {
-                    this.setState({ userRelation: result.data });
+                    this.setState({
+                        userRelationId: result.data._id,
+                        following: this.handleRenderRelation(this.renderFollow, result.data.following),
+                        followers: this.handleRenderRelation(this.renderFollower, result.data.followers),
+                        requested: this.handleRenderRelation(this.renderRequester, result.data.requested)
+                    });
                 }
             })
     }
@@ -45,56 +56,74 @@ class RelationModal extends React.Component {
             ;
     }
 
-    render() {
-        let requests = [];
+    renderFollower(data) {
         let followers = [];
-        let following = [];
-        if (this.state.userRelation) {
-            for (const user of this.state.userRelation.followers) {
-                followers.push(
-                    <div className="relationmodal-profile-row">
-                        <img src={returnUserImageURL(user.display_photo)} />
-                        <p>{user.username}</p>
-                        <button onClick={() => this.handleStatusChange(UNFOLLOW_ACTION, user.username)}>Following</button>
-                    </div>
-                )
-            }
-            for (const user of this.state.userRelation.following) {
-                following.push(
-                    <div className="relationmodal-profile-row">
-                        <img src={returnUserImageURL(user.display_photo)} />
-                        <p>{user.username}</p>
-                        <button onClick={() => this.handleStatusChange(UNFOLLOW_ACTION, user.username)}>Following</button>
-                    </div>
-                )
-
-            }
-            for (const user of this.state.userRelation.requested) {
-                requests.push(
-                    <div className="relationmodal-profile-row">
-                        <img src={returnUserImageURL(user.display_photo)} />
-                        <p>{user.username}</p>
-                        <button onClick={() => this.handleStatusChange("ACCEPT", user.username)}>Accept Request</button>
-                        <button onClick={() => this.handleStatusChange("DECLINE", user.username)}>Decline Request</button>
-                    </div >
-                )
-            }
+        for (const user of data) {
+            followers.push(
+                <div className="relationmodal-profile-row">
+                    <img src={returnUserImageURL(user.display_photo)} />
+                    <p>{user.username}</p>
+                    <button onClick={() => this.handleStatusChange(UNFOLLOW_ACTION, user.username)}>Following</button>
+                </div>
+            )
         }
+        return followers;
+    }
+
+    renderFollow(data) {
+        let following = [];
+        for (const user of data) {
+            following.push(
+                <div className="relationmodal-profile-row">
+                    <img src={returnUserImageURL(user.display_photo)} />
+                    <p>{user.username}</p>
+                    <button onClick={() => this.handleStatusChange(UNFOLLOW_ACTION, user.username)}>Following</button>
+                </div>
+            )
+        }
+        return following;
+    }
+
+    renderRequester(data) {
+        let requests = [];
+        for (const user of data) {
+            requests.push(
+                <div className="relationmodal-profile-row">
+                    <img src={returnUserImageURL(user.display_photo)} />
+                    <p>{user.username}</p>
+                    <button onClick={() => this.handleStatusChange(ACCEPT_ACTION, user.username)}>Accept Request</button>
+                    <button onClick={() => this.handleStatusChange(DECLINE_ACTION, user.username)}>Decline Request</button>
+                </div >
+            )
+        }
+        return requests;
+    }
+
+    handleRenderRelation(renderFunction, data) {
+        if (data) {
+            return renderFunction(data);
+        }
+        else {
+            return null;
+        }
+    }
+
+    render() {
         return (
             <div id="relationmodal-window">
                 <span className="close" onClick={(() => this.props.closeModal(REQUEST_ACTION))}>X</span>
                 <div id="relationmodal-info">
                     <div className="relationmodal-column">
                         <h2>Requests</h2>
-                        {requests}
+                        {this.state.requested}
                     </div>
                     <div className="relationmodal-column">
                         <h2>Followers</h2>
-                        {followers}
+                        {this.state.followers}
                     </div>
                     <div className="relationmodal-column">
                         <h2>Following</h2>
-                        {following}
+                        {this.state.following}
                     </div>
                 </div>
             </div>

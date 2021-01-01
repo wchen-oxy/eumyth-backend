@@ -1,12 +1,12 @@
 import React from 'react';
 import LongPostViewer from '../../../post/viewer/long-post';
 import ShortPostViewer from '../../../post/viewer/short-post';
-import './feed-object.scss';
 
 const LARGE_VIEW_MODE = false;
 const IS_OWN_PROFILE = false;
 const SHORT = "SHORT";
 const LONG = "LONG";
+
 const FeedObject = (props) => {
     const feedItem = props.feedItem;
     if (feedItem.post_format === SHORT) {

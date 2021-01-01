@@ -5,12 +5,16 @@ export const UNFOLLOWED_STATE = "UNFOLLOWED";
 export const FOLLOW_ACTION = "FOLLOW";
 export const UNFOLLOW_ACTION = "UNFOLLOW";
 export const REQUEST_ACTION = "REQUEST";
+export const ACCEPT_ACTION = "ACCEPT";
+export const DECLINE_ACTION = "DECLINE";
 
 //CONTENT
 export const POST = "POST";
 export const PROJECT = "PROJECT";
 export const DISPLAY = "DISPLAY";
 export const COVER = "COVER";
+export const LONG = "LONG";
+export const SHORT = "SHORT";
 
 export const PUBLIC = "PUBLIC";
 export const PRIVATE = "PRIVATE";

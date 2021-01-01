@@ -27,13 +27,13 @@ class PostViewerController extends React.Component {
 
     render() {
 
-        switch (this.props.postType) {
+        switch (this.props.eventData.post_format) {
             case (SHORT):
                 return (
                     <ShortPostViewer
                         displayPhoto={this.props.displayPhoto}
                         username={this.props.username}
-                        pursuits={this.props.pursuits}
+                        pursuitNames={this.props.pursuitNames}
                         preferredPostType={this.props.preferredPostType}
                         textData={this.props.textData}
                         largeViewMode={this.props.largeViewMode}
@@ -49,7 +49,7 @@ class PostViewerController extends React.Component {
                     <LongPostViewer
                         displayPhoto={this.props.displayPhoto}
                         username={this.props.username}
-                        pursuits={this.props.pursuits}
+                        pursuitNames={this.props.pursuitNames}
                         preferredPostType={this.props.preferredPostType}
                         largeViewMode={this.props.largeViewMode}
                         textData={this.props.textData}
@@ -57,7 +57,7 @@ class PostViewerController extends React.Component {
                         eventData={this.props.eventData}
                         onDeletePost={this.props.onDeletePost}
                         closeModal={this.props.closeModal}
-                        openFullModal={this.props.openFullModal}
+                        openLongPostModal={this.props.openLongPostModal}
                     />
                 );
 

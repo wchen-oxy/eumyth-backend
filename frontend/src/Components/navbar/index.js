@@ -18,9 +18,9 @@ const NavBar = () => (
 );
 
 const NavigationNonAuth = () => (
-  <nav  >
-    <div  >
-      <Link to={"/"} className="navigation-link">interestHub</Link>
+  <nav>
+    <div>
+      <Link to={"/"} className="navbar-navigation-link">interestHub</Link>
     </div>
   </nav>
 );

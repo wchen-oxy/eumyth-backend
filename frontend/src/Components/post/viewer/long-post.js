@@ -30,10 +30,6 @@ const LongPostViewer = (props) => {
     const handleSave = (editorContext, content) => {
 
     }
-    console.log(window);
-    console.log(localDraft);
-    console.log(typeof (props.textData));
-
 
     if (window === INITIAL) {
 
@@ -41,8 +37,7 @@ const LongPostViewer = (props) => {
             "July", "August", "September", "October", "November", "December"
         ];
         const date = props.eventData.date ? new Date(props.eventData.date) : null;
-        console.log(props.eventData);
-        // console.log(date.getMonth());
+      
         if (props.largeViewMode) {
             return (
                 <div className="long-post-window">
@@ -69,7 +64,7 @@ const LongPostViewer = (props) => {
         }
         else {
             return (
-                <div className="long-post-feed-object-container" onClick={() => props.openFullModal(props.eventData)}>
+                <div className="long-post-feed-object-container" onClick={() => props.openLongPostModal(props.eventData)}>
                     <div id="long-post-intro-container">
                         {props.eventData.title ? <h2>{props.eventData.title}</h2> : <></>}
                         {props.eventData.subtitle ? <h4>{props.eventData.subtitle}</h4> : <></>}
@@ -174,7 +169,7 @@ const LongPostViewer = (props) => {
                 setPostStage={setWindow}
                 username={props.username}
                 preferredPostType={props.preferredPostType}
-                pursuits={props.pursuits}
+                pursuitNames={props.pursuitNames}
                 handlePreferredPostTypeChange={props.handlePreferredPostTypeChange}
 
                 isUpdateToPost={true}
