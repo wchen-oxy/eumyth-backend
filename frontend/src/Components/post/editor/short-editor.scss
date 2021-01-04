@@ -1,7 +1,28 @@
-.post-preview-container {
+@import "../../../partials";
+
+#shorteditor-text-container {
     max-width: 900px;
     min-width: 600px;
     width: 100%;
+}
+
+#shortviewer-main-container {
+    @include flex-display-row;
+}
+
+#shortviewer-hero-container {
+    height: 100%;
+    width: 65%;
+    margin: auto;
+    text-align: center;
+    justify-content: center;
+
+    #shortviewer-image-slider-container {
+    height: 30vh;
+    }
+}
+#shortviewer-side-container {
+    width: 35%;
 }
 
 .editor-component-container {

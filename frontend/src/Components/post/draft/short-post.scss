@@ -1,0 +1,4 @@
+@import "../../../partials";
+#shortpost-draft-container {
+    @include flex-display-column;
+}

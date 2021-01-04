@@ -1,8 +1,8 @@
 import React from 'react';
 import ShortEditor from '../editor/short-editor';
 import ReviewPost from './review-post';
-import "./index.scss";
-
+import "./short-post.scss";
+ 
 const NONE = "NONE";
 const INITIAL = "INITIAL";
 const REVIEW = "REVIEW";
@@ -37,16 +37,11 @@ class ShortPost extends React.Component {
     this.generateValidFiles = this.generateValidFiles.bind(this);
     this.handleCaptionStyleChange = this.handleCaptionStyleChange.bind(this);
     this.handleSortEnd = this.handleSortEnd.bind(this);
-
-
   }
+
   handleIndexChange(value) {
     this.setState({ imageIndex: value });
   }
-
-  // handlePaginatedToggle() {
-  //   this.setState((state) => ({ isPaginated: !state.isPaginated }))
-  // }
 
   handleCaptionStyleChange() {
     if (this.state.isPaginated === false) {
@@ -65,8 +60,6 @@ class ShortPost extends React.Component {
       }
     }
   }
-
-  // handleTitleChange(e)
 
   setImageArray(imageArray) {
     this.setState({ imageArray: imageArray });
@@ -87,7 +80,6 @@ class ShortPost extends React.Component {
   }
 
   handleTextChange(e) {
-    // console.log(e.target.value);
     const text = e.target.value;
     if (e.target.name === TITLE) {
       this.setState({ previewTitle: text });
@@ -143,27 +135,26 @@ class ShortPost extends React.Component {
   }
 
 
-  handleSortEnd({oldIndex, newIndex}) {
+  handleSortEnd({ oldIndex, newIndex }) {
     const items = Array.from(this.state.validFiles);
     const [reorderedItem] = items.splice(oldIndex, 1);
     items.splice(newIndex, 0, reorderedItem);
-    this.setState({validFiles: items});
-}
+    this.setState({ validFiles: items });
+  }
 
 
   render() {
-    console.log(this.state.validFiles);
     if (this.state.window === INITIAL) {
       return (
-        <div className="flex-display flex-direction-column small-post-window">
-          <div className="post-button-container">
+        <div id="shortpost-draft-container" className="postdraft-small-window">
+          <div className="postdraft-button-container">
             <h2>Placeholder for short</h2>
-            <div id="button-container">
-              <span id="toggle-button-span">
-                <button id="toggle-button" value={NONE} onClick={e => this.props.onPostTypeSet(e.target.value, false)}>Return</button>
+            <div>
+              <span >
+                <button value={NONE} onClick={e => this.props.onPostTypeSet(e.target.value, false)}>Return</button>
               </span>
-              <span id="post-button-span">
-                <button id="post-button" value={REVIEW} disabled={this.state.postDisabled} onClick={e => this.handleClick(e.target.value)}>Review Post</button>
+              <span >
+                <button value={REVIEW} disabled={this.state.postDisabled} onClick={e => this.handleClick(e.target.value)}>Review Post</button>
               </span>
             </div>
           </div>

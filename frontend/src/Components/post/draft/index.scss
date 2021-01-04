@@ -1,4 +1,5 @@
-.small-post-window {
+@import "../../../partials";
+.postdraft-small-window {
   background-color: grey;
   position: fixed;
   margin-top: -38vh;
@@ -15,6 +16,11 @@
   select {
     width: fit-content;
   }
+
+  .postdraft-button-container {
+    @include flex-display-column;
+    align-items: center;
+  }
 }
 
 .long-post-window {
@@ -27,18 +33,8 @@
   overflow: scroll;
 }
 
-.short-viewer-hero-container {
-  height: 100%;
-  width: 65%;
-  margin: auto;
-  text-align: center;
-  justify-content: center;
-}
-.short-viewer-side-container {
-  width: 35%;
-}
 
-.mini-short-viewer-hero-container{
+.mini-short-viewer-hero-container {
   height: auto;
   // width: 100;
   // margin: auto;
@@ -46,7 +42,7 @@
   // justify-content: center;
 }
 
-.mini-short-viewer-side-container{
+.mini-short-viewer-side-container {
   width: 100%;
 }
 

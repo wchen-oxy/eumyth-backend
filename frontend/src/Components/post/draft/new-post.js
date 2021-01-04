@@ -1,9 +1,5 @@
 import React from 'react';
-import "./new-post.scss";
-
-const SHORT = "SHORT";
-const NEW_LONG = "NEW_LONG";
-const OLD_LONG = "OLD_LONG";
+import { SHORT, NEW_LONG, OLD_LONG } from "../../constants/flags";
 
 const NewPost = (props) => {
     const handleClick = (e) => {
@@ -12,8 +8,8 @@ const NewPost = (props) => {
             props.onPostTypeSet(e.target.value, null) : props.onPostTypeSet(e.target.value, null);
     }
     return (
-        <div className="small-post-window">
-            <div className="post-button-container">
+        <div className="postdraft-small-window">
+            <div className="postdraft-button-container">
                 <h3>Document Your Progress</h3>
                 <h4>Begin a New Check-In!</h4>
                 <button value={SHORT} onClick={(e) => props.onPostTypeSet(e.target.value, null)}> New Short</button>

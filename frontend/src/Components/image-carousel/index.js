@@ -7,17 +7,28 @@ import "./index.scss";
 
 // https://css-tricks.com/centering-css-complete-guide/#center-vertically
 //Explains the weird -50% and top 50% thing
+const settings = {
+  className: "slider-settings",
+  speed: 500,
+  slidesToShow: 1,
+  slidesToScroll: 1,
+  centerPadding: 0,
+  nextArrow: <Arrow direction="right" />,
+  prevArrow: <Arrow direction="left" />
+
+};
 
 class ImageSlider extends React.Component {
   _isMounted = false;
   constructor(props) {
     super(props);
     this.state = {
-      transformedImageArray: null,
+      imageArray: null,
       displayedItemCount: 0
     }
     this.loadImage = this.loadImage.bind(this);
     this.transformImageProp = this.transformImageProp.bind(this);
+    this.renderImageContainers = this.renderImageContainers.bind(this);
   }
 
   componentDidMount() {
@@ -41,19 +52,10 @@ class ImageSlider extends React.Component {
 
   transformImageProp() {
     let imageArray = this.props.fileArray;
-    let count = 0;
     Promise.all(imageArray.map((file) => this.loadImage(file)))
-      .then(
-        newArray =>
-          newArray.map(item =>
-            item = (
-              <div className="image-slider-preview-image-container">
-                <img alt="" className="imageslider-preview-image" key={count++} src={item} />
-              </div>
-            ))
-      ).then(result => {
+      .then(result => {
         this.setState({
-          transformedImageArray: result,
+          imageArray: result,
           displayedItemCount: result.length
         })
       });
@@ -71,22 +73,26 @@ class ImageSlider extends React.Component {
       reader.readAsDataURL(file);
     });
   }
+
+  renderImageContainers(isLoaded) {
+    let count = 0;
+    if (isLoaded) {
+      return (this.state.imageArray.map(item =>
+        <div className="imageslider-image-container">
+          <img alt="" key={count++} src={item} />
+        </div>
+      ))
+    }
+    else {
+      return (<p>IMAGE IS STILL LOADING</p>);
+    }
+  }
   render() {
-    const settings = {
-      speed: 500,
-      slidesToShow: 1,
-      slidesToScroll: 1,
-      centerPadding: 0,
-      nextArrow: <Arrow direction="right" />,
-      prevArrow: <Arrow direction="left" />
-
-    };
-
-    const container =
-      (!!this.state.transformedImageArray ? this.state.transformedImageArray : <p>IMAGE IS STILL LOADING</p>);
+   
     return (
       <Slider afterChange={index => (this.props.onIndexChange(index))} {...settings}>
-        {container}
+        {this.renderImageContainers(!!this.state.imageArray)
+        }
       </Slider>
     );
   }

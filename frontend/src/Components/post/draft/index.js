@@ -4,12 +4,8 @@ import ShortPost from './short-post';
 import LongPost from './long-post';
 import AxiosHelper from '../../../Axios/axios';
 import { withFirebase } from '../../../Firebase';
-
-const NONE = "NONE";
-const SHORT = "SHORT";
-const LONG = "LONG";
-const NEW_LONG = "NEW_LONG";
-const OLD_LONG = "OLD_LONG";
+import { NONE, SHORT, LONG, NEW_LONG, OLD_LONG } from "../../constants/flags";
+import "./index.scss";
 
 class PostDraftController extends React.Component {
   _isMounted = false;
@@ -32,16 +28,17 @@ class PostDraftController extends React.Component {
     this.handleLocalSync = this.handleLocalSync.bind(this);
     this.handleLocalOnlineSync = this.handleLocalOnlineSync.bind(this);
     this.handlePostTypeSet = this.handlePostTypeSet.bind(this);
-    this.retrieveDraft = this.retrieveDraft.bind(this);
-    this.setIndexUserData = this.setIndexUserData.bind(this);
+    this.handleDraftRetrieval = this.handleDraftRetrieval.bind(this);
+    this.handleIndexUserDataSet = this.handleIndexUserDataSet.bind(this);
     this.onPreferredPostTypeChange = this.onPreferredPostTypeChange.bind(this);
+    this.renderWindow = this.renderWindow.bind(this);
   }
 
   componentDidMount() {
     this._isMounted = true;
     if (this._isMounted && this.props.username) {
-      this.setIndexUserData();
-      this.retrieveDraft(true);
+      this.handleIndexUserDataSet();
+      this.handleDraftRetrieval(true);
     }
   }
   componentWillUnmount() {
@@ -86,7 +83,7 @@ class PostDraftController extends React.Component {
     }
   }
 
-  setIndexUserData() {
+  handleIndexUserDataSet() {
     AxiosHelper.returnIndexUser(this.props.username)
       .then(
         (result) => {
@@ -108,7 +105,7 @@ class PostDraftController extends React.Component {
         );
   }
 
-  retrieveDraft(isInitial) {
+  handleDraftRetrieval(isInitial) {
     this.setState({ updatingOnlineDraft: true });
     AxiosHelper.retrieveNewPostInfo(this.props.username).then(
       (response) => {
@@ -121,7 +118,11 @@ class PostDraftController extends React.Component {
           });
         }
         else {
-          this.setState({ onlineDraftRetrieved: true, updatingOnlineDraft: false, errorRetrievingDraft: true });
+          this.setState({
+            onlineDraftRetrieved: true,
+            updatingOnlineDraft: false,
+            errorRetrievingDraft: true
+          });
           alert(
             `Something went wrong retrieving your long post draft. 
             Please do not edit your old draft or you will your saved data. 
@@ -145,8 +146,10 @@ class PostDraftController extends React.Component {
     switch (postType) {
       case (NONE):
         if (localDraft) {
-          console.log(localDraft);
-          this.setState({ postType: postType, onlineDraft: localDraft });
+          this.setState({
+            postType: postType,
+            onlineDraft: localDraft
+          });
         }
         else {
           this.setState({ postType: postType })
@@ -166,19 +169,16 @@ class PostDraftController extends React.Component {
     }
   }
 
-  render() {
-    let postType = '';
-    if (!this.state.indexUserData) return (<>updatingOnlineDraft...</>)
-    switch (this.state.postType) {
+  renderWindow(postType) {
+    switch (postType) {
       case (NONE):
-        postType = (
-          <NewPost 
-          onlineDraft={this.state.onlineDraft} 
-          onPostTypeSet={this.handlePostTypeSet} />
+        return (
+          <NewPost
+            onlineDraft={this.state.onlineDraft}
+            onPostTypeSet={this.handlePostTypeSet} />
         );
-        break;
       case (SHORT):
-        postType = (
+        return (
           <ShortPost
             displayPhoto={this.state.displayPhoto}
             username={this.props.username}
@@ -191,10 +191,8 @@ class PostDraftController extends React.Component {
             handlePreferredPostTypeChange={this.onPreferredPostTypeChange}
           />
         );
-        break;
       case (LONG):
-        // const previewTitle = this.state.indexUserData ? this.state.indexUserData.draft.previewTitle : "";
-        postType = (
+        return (
           <LongPost
             displayPhoto={this.state.displayPhoto}
             username={this.props.username}
@@ -210,15 +208,18 @@ class PostDraftController extends React.Component {
             disablePost={this.handleDisablePost}
             handlePreferredPostTypeChange={this.onPreferredPostTypeChange}
             closeModal={this.props.closeModal}
-          />);
-        break;
+          />
+        );
       default:
         throw Error("No postType options matched :(");
     }
+  }
+  render() {
+    if (!this.state.indexUserData) return (<>updatingOnlineDraft...</>)
     return (
       <>
         <span className="close" onClick={(() => this.props.closeModal())}>X</span>
-        {postType}
+        {this.renderWindow(this.state.postType)}
       </>
     );
   }

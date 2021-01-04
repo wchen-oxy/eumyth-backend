@@ -22,6 +22,7 @@ class ShortEditor extends React.Component {
 
         this.setErrorMessage = this.setErrorMessage.bind(this);
         this.validateFile = this.validateFile.bind(this);
+        this.renderTextContainer = this.renderTextContainer.bind(this);
 
     }
 
@@ -153,9 +154,8 @@ class ShortEditor extends React.Component {
         this.modalImageRef.current.style.backgroundImage = 'none';
     }
 
-    render() {
-
-        const textContainer = (
+    renderTextContainer() {
+        return (
             <div id="text-container flex-display">
                 <div className=" description-container flex-display flex-direction-column">
                     <h4>{this.props.username}</h4>
@@ -177,6 +177,10 @@ class ShortEditor extends React.Component {
                 </div>
             </div>
         );
+    }
+    render() {
+
+
 
         if (!isAdvancedUpload) {
             console.log("It's not a modern browser!");
@@ -184,8 +188,8 @@ class ShortEditor extends React.Component {
         if (this.props.validFiles.length === 0) {
             return (
                 <>
-                    <div className="post-preview-container flex-display flex-direction-column"  >
-                        {textContainer}
+                    <div id="shorteditor-text-container">
+                        {this.renderTextContainer()}
                     </div>
                     {this.props.unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
                     <ImageDrop
@@ -203,12 +207,14 @@ class ShortEditor extends React.Component {
         else {
             return (
                 <>
-                    <div className="short-viewer-main-container flex-display">
-                        <div className="short-viewer-hero-container flex-display flex-direction-column black-background">
+                    <div id="shortviewer-main-container">
+                        <div id="shortviewer-hero-container">
                             {this.props.unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
-                            <ImageSlider onIndexChange={this.props.onIndexChange} fileArray={this.props.validFiles} setImageArray={this.props.setImageArray} />
+                            <div id="shortviewer-image-slider-container">
+                                <ImageSlider  onIndexChange={this.props.onIndexChange} fileArray={this.props.validFiles} setImageArray={this.props.setImageArray} />
+                            </div>
                         </div>
-                        <div className="short-viewer-side-container">
+                        <div id="shortviewer-side-container">
                             <TextContainer
                                 validFilesLength={this.props.validFiles.length}
                                 isPaginated={this.props.isPaginated}
@@ -230,10 +236,8 @@ class ShortEditor extends React.Component {
                             fileInputClicked={this.fileInputClicked}
                             filesSelected={this.filesSelected}
                         />
-                        {/* <DragDropContext onDragEnd={this.props.handleDragEnd}> */}
-                        <FileDisplayContainer
-
-                            onDragEnd={this.props.handleDragEnd}
+                         <FileDisplayContainer
+                            onSortEnd={this.props.onSortEnd}
                             validFiles={this.props.validFiles}
                             openImageModal={this.openImageModal}
                             removeFile={this.removeFile}
@@ -241,8 +245,7 @@ class ShortEditor extends React.Component {
                             fileSize={this.fileSize}
                             errorMessage={this.state.errorMessage}
                         />
-                        {/* </DragDropContext> */}
-                    </div>
+                     </div>
                 </>
             );
         }

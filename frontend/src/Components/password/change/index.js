@@ -1,23 +1,28 @@
 import React, { Component } from 'react';
 import { withFirebase } from '../../../Firebase';
 import './index.scss';
- 
+
 const INITIAL_STATE = {
   passwordOne: '',
   passwordTwo: '',
   error: null,
-};
- 
+}
+
 class PasswordChangeForm extends Component {
   constructor(props) {
     super(props);
- 
-    this.state = { ...INITIAL_STATE };
+
+    this.state = {
+      ...INITIAL_STATE
+    };
+
+    this.handlePasswordUpdateSubmit = this.handlePasswordUpdateSubmit.bind(this);
+    this.handleTextUpdate = this.handleTextUpdate.bind(this);
   }
- 
-  onSubmit = event => {
+
+  handlePasswordUpdateSubmit(event) {
+    event.preventDefault();
     const { passwordOne } = this.state;
- 
     this.props.firebase
       .doPasswordUpdate(passwordOne)
       .then(() => {
@@ -26,44 +31,43 @@ class PasswordChangeForm extends Component {
       .catch(error => {
         this.setState({ error });
       });
- 
-    event.preventDefault();
   };
- 
-  onChange = event => {
+
+  handleTextUpdate(event) {
     this.setState({ [event.target.name]: event.target.value });
   };
- 
+
   render() {
     const { passwordOne, passwordTwo, error } = this.state;
- 
-    const isInvalid =
-      passwordOne !== passwordTwo || passwordOne === '';
- 
+    const isInvalid = passwordOne !== passwordTwo || passwordOne === '';
+
     return (
-      <form onSubmit={this.onSubmit}>
+      <form onSubmit={this.handlePasswordUpdateSubmit}>
         <input
           name="passwordOne"
           value={passwordOne}
-          onChange={this.onChange}
+          onChange={this.handleTextUpdate}
           type="password"
           placeholder="New Password"
         />
         <input
           name="passwordTwo"
           value={passwordTwo}
-          onChange={this.onChange}
+          onChange={this.handleTextUpdate}
           type="password"
           placeholder="Confirm New Password"
         />
-        <button id='reset-button' disabled={isInvalid} type="submit">
+        <button
+          id='passwordchange-reset-button'
+          disabled={isInvalid}
+          type="submit"
+        >
           Reset My Password
         </button>
- 
         {error && <p>{error.message}</p>}
       </form>
     );
   }
 }
- 
+
 export default withFirebase(PasswordChangeForm);

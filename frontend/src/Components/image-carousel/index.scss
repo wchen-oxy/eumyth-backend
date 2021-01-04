@@ -1,8 +1,27 @@
+.imageslider-image-container {
+  height: 100%;
 
-.image-slider-preview-image{
-    max-height: 50vh;
+  img {
+    height: 100%;
     width: 100%;
-    height: auto;
     object-fit: contain;
   }
-  
+}
+
+.slick-slider {
+  height: 100%;
+}
+
+.slick-list {
+  height: 100%;
+}
+
+.slick-track {
+  display: flex;
+  height: 100%;
+}
+
+.slick-track .slick-slide {
+  display: flex;
+  height: 100%;
+}

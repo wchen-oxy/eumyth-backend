@@ -13,9 +13,11 @@ export const POST = "POST";
 export const PROJECT = "PROJECT";
 export const DISPLAY = "DISPLAY";
 export const COVER = "COVER";
-export const LONG = "LONG";
+export const NONE = "NONE";
 export const SHORT = "SHORT";
-
+export const LONG = "LONG";
+export const NEW_LONG = "NEW_LONG";
+export const OLD_LONG = "OLD_LONG";
 export const PUBLIC = "PUBLIC";
 export const PRIVATE = "PRIVATE";
 export const PERSONAL_PAGE = "PERSONAL_PAGE";
