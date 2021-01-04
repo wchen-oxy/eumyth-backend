@@ -88,7 +88,7 @@ class ImageSlider extends React.Component {
     }
   }
   render() {
-   
+
     return (
       <Slider afterChange={index => (this.props.onIndexChange(index))} {...settings}>
         {this.renderImageContainers(!!this.state.imageArray)

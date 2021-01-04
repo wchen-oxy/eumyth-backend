@@ -85,23 +85,23 @@ const ReviewPost = (props) => {
         );
     }
 
-    const returnToShortButton = (<button id="toggle-button" value={INITIAL} onClick={e => props.onClick(e.target.value)}>Return</button>);
-    const returnToLongButton = (<button id="toggle-button" value={INITIAL} onClick={e => props.setPostStage(e.target.value, false)}>Return</button>);
+    const returnToShortButton = (<button value={INITIAL} onClick={e => props.onClick(e.target.value)}>Return</button>);
+    const returnToLongButton = (<button value={INITIAL} onClick={e => props.setPostStage(e.target.value, false)}>Return</button>);
 
     return (
-        <div className="small-post-window">
-            <div className="inner-small-post-container post-button-container">
+        <div className="postdraft-small-window">
+            <div  >
                 <div>
                     {props.postType === SHORT ? <h2>Placeholder for short</h2> : <h2>Placeholder for Long</h2>}
-                    <div id="button-container">
-                        <span id="toggle-button-span">
+                    <div>
+                        <span >
                             {props.postType === SHORT ? returnToShortButton : returnToLongButton}
                         </span>
                     </div>
                 </div>
-                <div className="post-button-container">
+                <div className="postdraft-button-container">
                     <label>Preview Title</label>
-                    <TextareaAutosize name="title" id='review-post-text' placeholder='Create an Optional Preview Title Text' value={title ? title : null} onChange={(e) => setTitle(e.target.value)} maxLength={100} />
+                    <TextareaAutosize name="title" placeholder='Create an Optional Preview Title Text' value={title ? title : null} onChange={(e) => setTitle(e.target.value)} maxLength={100} />
                     {props.postType === LONG ? <TextareaAutosize name="subtitle" id='review-post-text' placeholder='Create an Optional Description' onChange={(e) => setSubtitle(e.target.value)} maxLength={140} /> : <></>}
                     {props.coverPhoto ? <label>Upload New Cover Photo?</label> : <label>Upload a Cover Photo</label>}
                     <input type="file" onChange={(e) => {
@@ -118,9 +118,9 @@ const ReviewPost = (props) => {
                     <label>Is Milestone</label>
                     <input type="checkbox" value={milestone} onClick={() => setMilestone(!milestone)}></input>
                 </div>
-                <div className="post-button-container">
+                <div className="postdraft-button-container">
                     <p>Post to:</p>
-                    <div className="post-button-container">
+                    <div  >
                         <select name="posts" id="cars" value={props.preferredPostType ? props.preferredPostType : PUBLIC_FEED} onChange={(e) => setPostPrivacyType(e.target.value)}>
                             <option value={PRIVATE}>Make post private on your page</option>
                             <option value={PERSONAL_PAGE}>Make post public on your page:</option>
@@ -130,11 +130,11 @@ const ReviewPost = (props) => {
                     <button onClick={(e) => handlePostSubmit()}>Post!</button>
                 </div>
                 {error ? <p>An Error Occured. Please try again. </p> : <></>}
-                {loading ?
+                {/* {loading ?
                     <div className="short-post-container" id="modal-overlay">
                         <p> Loading...</p>
                     </div> :
-                    <></>}
+                    <></>} */}
             </div>
         </div>
     );

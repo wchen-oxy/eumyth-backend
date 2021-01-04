@@ -1,7 +1,6 @@
 import React from 'react';
 import { withFirebase } from '../../../Firebase';
 import ImageSlider from '../../image-carousel';
-import TextareaAutosize from 'react-textarea-autosize';
 import ImageDrop from './sub-components/image-drop';
 import FileDisplayContainer from './sub-components/file-display-container';
 import TextContainer from './sub-components/text-container';
@@ -22,7 +21,6 @@ class ShortEditor extends React.Component {
 
         this.setErrorMessage = this.setErrorMessage.bind(this);
         this.validateFile = this.validateFile.bind(this);
-        this.renderTextContainer = this.renderTextContainer.bind(this);
 
     }
 
@@ -82,8 +80,6 @@ class ShortEditor extends React.Component {
                 this.props.onUnsupportedFileChange(files[i]);
             }
         }
-        console.log("validity");
-        console.log(invalidFound);
 
         this.updateDisabilityState(invalidFound);
 
@@ -154,42 +150,25 @@ class ShortEditor extends React.Component {
         this.modalImageRef.current.style.backgroundImage = 'none';
     }
 
-    renderTextContainer() {
-        return (
-            <div id="text-container flex-display">
-                <div className=" description-container flex-display flex-direction-column">
-                    <h4>{this.props.username}</h4>
-                    {/* {this.props.validFiles.length > 0 && !this.props.isPaginated ? <button onClick={this.props.onCaptionStyleChange}>Caption Photos Individually</button> : <></>}
-                    {this.props.validFiles.length > 0 && this.props.isPaginated ? <button onClick={this.props.onCaptionStyleChange}>Return to Single Caption</button> : <></>} */}
-                    <div id="description-input-container">
-                        <TextareaAutosize
-                            id='short-post-text'
-                            placeholder='Write something here.'
-                            onChange={this.props.onTextChange}
-                            minRows={5}
-                            value={
-                                this.props.isPaginated ?
-                                    this.props.textPageText[this.props.textPageIndex] :
-                                    this.props.textPageText
-                            }
-                        />
-                    </div>
-                </div>
-            </div>
-        );
-    }
     render() {
-
-
 
         if (!isAdvancedUpload) {
             console.log("It's not a modern browser!");
         }
+
         if (this.props.validFiles.length === 0) {
             return (
                 <>
                     <div id="shorteditor-text-container">
-                        {this.renderTextContainer()}
+                        <TextContainer
+                            validFilesLength={this.props.validFiles.length}
+                            isPaginated={this.props.isPaginated}
+                            onCaptionStyleChange={this.props.onCaptionStyleChange}
+                            onTextChange={this.props.onTextChange}
+                            textPageText={this.props.textPageText}
+                            textPageIndex={this.props.textPageIndex}
+
+                        />
                     </div>
                     {this.props.unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
                     <ImageDrop
@@ -211,7 +190,7 @@ class ShortEditor extends React.Component {
                         <div id="shortviewer-hero-container">
                             {this.props.unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
                             <div id="shortviewer-image-slider-container">
-                                <ImageSlider  onIndexChange={this.props.onIndexChange} fileArray={this.props.validFiles} setImageArray={this.props.setImageArray} />
+                                <ImageSlider onIndexChange={this.props.onIndexChange} fileArray={this.props.validFiles} setImageArray={this.props.setImageArray} />
                             </div>
                         </div>
                         <div id="shortviewer-side-container">
@@ -226,7 +205,7 @@ class ShortEditor extends React.Component {
                             />
                         </div>
                     </div>
-                    <div className="flex-display flex-direction-column">
+                    <div id="shortviewer-file-manager-container">
                         <ImageDrop
                             reference={this.fileInputRef}
                             dragOver={this.dragOver}
@@ -236,7 +215,7 @@ class ShortEditor extends React.Component {
                             fileInputClicked={this.fileInputClicked}
                             filesSelected={this.filesSelected}
                         />
-                         <FileDisplayContainer
+                        <FileDisplayContainer
                             onSortEnd={this.props.onSortEnd}
                             validFiles={this.props.validFiles}
                             openImageModal={this.openImageModal}
@@ -245,7 +224,7 @@ class ShortEditor extends React.Component {
                             fileSize={this.fileSize}
                             errorMessage={this.state.errorMessage}
                         />
-                     </div>
+                    </div>
                 </>
             );
         }

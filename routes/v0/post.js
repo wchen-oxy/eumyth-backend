@@ -161,6 +161,7 @@ router.route('/')
       }
       let newRecentPosts = resolvedIndexUser.recent_posts;
       console.log(newRecentPosts, "BEFORE");
+      newRecentPosts.unshift(post);
       if (newRecentPosts.length > RECENT_POSTS_LIMIT) {
         newRecentPosts.pop();
       }

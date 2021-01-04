@@ -17,7 +17,7 @@ class PostDraftController extends React.Component {
       displayPhoto: null,
       updatingOnlineDraft: false,
       postType: NONE,
-      pursuits: null,
+      pursuitNames: null,
       indexUserData: null,
       errorRetrievingDraft: false,
       errorSaving: false,
@@ -93,7 +93,7 @@ class PostDraftController extends React.Component {
               pursuitArray.push(pursuit.name);
             }
             this.setState({
-              pursuits: pursuitArray,
+              pursuitNames: pursuitArray,
               indexUserData: result.data
             });
           }
@@ -183,7 +183,7 @@ class PostDraftController extends React.Component {
             displayPhoto={this.state.displayPhoto}
             username={this.props.username}
             closeModal={this.props.closeModal}
-            pursuits={this.state.pursuits}
+            pursuitNames={this.state.pursuitNames}
             disablePost={this.handleDisablePost}
             setImageArray={this.setImageArray}
             onPostTypeSet={this.handlePostTypeSet}
@@ -197,7 +197,7 @@ class PostDraftController extends React.Component {
             displayPhoto={this.state.displayPhoto}
             username={this.props.username}
             onlineDraft={this.state.onlineDraft}
-            pursuits={this.state.pursuits}
+            pursuitNames={this.state.pursuitNames}
             onlineDraftRetrieved={this.state.onlineDraftRetrieved}
             preferredPostType={this.state.indexUserData.preferredPostType}
             updatingOnlineDraft={this.state.updatingOnlineDraft}

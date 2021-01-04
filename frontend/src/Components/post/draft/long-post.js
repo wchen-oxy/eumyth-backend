@@ -151,7 +151,7 @@ const LongPost = (props) => {
         setPostStage={setPostStage}
         username={props.username}
         preferredPostType={props.preferredPostType}
-        pursuits={props.pursuits}
+        pursuitNames={props.pursuitNames}
         handlePreferredPostTypeChange={props.handlePreferredPostTypeChange}
       />
     )

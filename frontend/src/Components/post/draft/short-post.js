@@ -194,7 +194,7 @@ class ShortPost extends React.Component {
           textData={this.state.textData}
           username={this.props.username}
           preferredPostType={this.props.preferredPostType}
-          pursuits={this.props.pursuits}
+          pursuitNames={this.props.pursuitNames}
           handlePreferredPostTypeChange={this.props.handlePreferredPostTypeChange}
         />
       );
