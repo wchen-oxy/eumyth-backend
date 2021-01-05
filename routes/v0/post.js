@@ -78,6 +78,7 @@ const makeTextSnippet = (postType, isPaginated, textData) => {
 
 router.route('/')
   .post(upload.fields([{ name: "images" }, { name: "coverPhoto", maxCount: 1 }]), (req, res) => {
+    console.log("123");
 
     const postType = req.body.postType ? req.body.postType : null;
     const username = req.body.username;
@@ -98,11 +99,10 @@ router.route('/')
     let indexUser = null;
     let followerArrayID = null;
     let textSnippet = null;
-
     if (textData) {
       textSnippet = makeTextSnippet(postType, isPaginated, textData)
     }
-
+    console.log("1");
     let resolvedNewPost = IndexUser.Model.findOne({ username: username }).then(resolvedIndexUser => {
       indexUser = resolvedIndexUser;
       switch (postType) {
@@ -168,7 +168,15 @@ router.route('/')
       indexUser.recent_posts = newRecentPosts;
       return indexUser.user_profile_id;
     }
-    );
+    )      
+    .catch(
+      (err) => {
+        console.log(err);
+        res.status(500).json(err);
+      }
+    );;
+
+    console.log("2");
 
     let resolvedUser = resolvedNewPost.then(
       (result) => {
@@ -271,7 +279,7 @@ router.route('/')
           console.log(err);
           res.status(500).json(err);
         }
-      )
+      );
 
   })
   .put(upload.single({ name: "coverPhoto", maxCount: 1 }), (req, res) => {

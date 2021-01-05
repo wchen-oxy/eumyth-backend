@@ -26,52 +26,29 @@ class ImageSlider extends React.Component {
       imageArray: null,
       displayedItemCount: 0
     }
-    this.loadImage = this.loadImage.bind(this);
-    this.transformImageProp = this.transformImageProp.bind(this);
+
     this.renderImageContainers = this.renderImageContainers.bind(this);
   }
 
   componentDidMount() {
     this._isMounted = true;
     if (this._isMounted) {
+      this.setState({ imageArray: this.props.imageArray })
       // this.props.setImageArray(this.props.fileArray);
-      this.transformImageProp();
+      // this.transformImageProp();
     }
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.fileArray !== prevProps.fileArray) {
-      this.props.setImageArray(this.props.fileArray);
-      this.transformImageProp();
+    if (this.props.imageArray !== prevProps.imageArray) {
+      this.setState({ imageArray: this.props.imageArray })
+      // this.props.setImageArray(this.props.fileArray);
+      // this.transformImageProp();
     }
   }
 
   componentWillUnmount() {
     this._isMounted = false;
-  }
-
-  transformImageProp() {
-    let imageArray = this.props.fileArray;
-    Promise.all(imageArray.map((file) => this.loadImage(file)))
-      .then(result => {
-        this.setState({
-          imageArray: result,
-          displayedItemCount: result.length
-        })
-      });
-  }
-
-  loadImage(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        resolve(e.target.result);
-      };
-      reader.onerror = function () {
-        reject(reader.error);
-      }
-      reader.readAsDataURL(file);
-    });
   }
 
   renderImageContainers(isLoaded) {
@@ -87,6 +64,7 @@ class ImageSlider extends React.Component {
       return (<p>IMAGE IS STILL LOADING</p>);
     }
   }
+
   render() {
 
     return (

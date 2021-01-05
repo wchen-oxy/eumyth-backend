@@ -37,6 +37,33 @@ class ShortPost extends React.Component {
     this.generateValidFiles = this.generateValidFiles.bind(this);
     this.handlePaginatedChange = this.handlePaginatedChange.bind(this);
     this.handleSortEnd = this.handleSortEnd.bind(this);
+    this.loadImage = this.loadImage.bind(this);
+    this.transformImageProp = this.transformImageProp.bind(this);
+  }
+
+  transformImageProp(validFiles) {
+    let imageArray = validFiles;
+    Promise.all(imageArray.map((file) => this.loadImage(file)))
+      .then(result => {
+        this.setState({
+          imageArray: result,
+          displayedItemCount: result.length,
+          validFiles: validFiles
+        })
+      });
+  }
+
+  loadImage(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        resolve(e.target.result);
+      };
+      reader.onerror = function () {
+        reject(reader.error);
+      }
+      reader.readAsDataURL(file);
+    });
   }
 
   handleIndexChange(value) {
@@ -72,7 +99,7 @@ class ShortPost extends React.Component {
   }
 
   setValidFiles(value) {
-    this.setState({ validFiles: value })
+    this.transformImageProp(value);
   }
 
   setUnsupportedFiles(value) {
@@ -139,7 +166,8 @@ class ShortPost extends React.Component {
     const items = Array.from(this.state.validFiles);
     const [reorderedItem] = items.splice(oldIndex, 1);
     items.splice(newIndex, 0, reorderedItem);
-    this.setState({ validFiles: items });
+    this.transformImageProp(items);
+    // this.setState({ validFiles: items });
   }
 
 
@@ -162,6 +190,7 @@ class ShortPost extends React.Component {
             username={this.props.username}
             selectedFiles={this.state.selectedFiles}
             validFiles={this.state.validFiles}
+            imageArray={this.state.imageArray}
             unsupportedFiles={this.state.unsupportedFiles}
             isPaginated={this.state.isPaginated}
             textPageText={this.state.textData}
@@ -182,7 +211,7 @@ class ShortPost extends React.Component {
       );
     }
     else {
-      return (
+       return (
         <ReviewPost
           displayPhoto={this.props.displayPhoto}
           isPaginated={this.state.isPaginated}
@@ -190,7 +219,7 @@ class ShortPost extends React.Component {
           closeModal={this.props.closeModal}
           postType={SHORT}
           onClick={this.handleClick}
-          imageArray={this.state.imageArray}
+          imageArray={this.state.validFiles}
           textData={this.state.textData}
           username={this.props.username}
           preferredPostType={this.props.preferredPostType}

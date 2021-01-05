@@ -200,8 +200,8 @@ class ShortEditor extends React.Component {
                             <div id="shorteditor-image-slider-container">
                                 <ImageSlider
                                     onIndexChange={this.props.onIndexChange}
-                                    fileArray={this.props.validFiles}
-                                    setImageArray={this.props.setImageArray} />
+                                    imageArray={this.props.imageArray}
+                                />
                             </div>
                         </div>
                         <div id="shorteditor-side-container">
