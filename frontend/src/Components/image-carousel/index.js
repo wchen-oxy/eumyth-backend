@@ -34,7 +34,7 @@ class ImageSlider extends React.Component {
   componentDidMount() {
     this._isMounted = true;
     if (this._isMounted) {
-      this.props.setImageArray(this.props.fileArray);
+      // this.props.setImageArray(this.props.fileArray);
       this.transformImageProp();
     }
   }

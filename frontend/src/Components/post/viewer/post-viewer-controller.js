@@ -1,24 +1,19 @@
 import React from 'react';
 import ShortPostViewer from "./short-post";
 import LongPostViewer from "./long-post";
-
-const MAIN = "MAIN";
-const SHORT = "SHORT";
-const LONG = "LONG";
-const LARGE_VIEW_MODE = true;
+import { SHORT, LONG } from "../../constants/flags";
 
 class PostViewerController extends React.Component {
     _isMounted = false;
     constructor(props) {
         super(props);
         this.state = {
-         
+
         }
     }
 
     componentDidMount() {
         this._isMounted = true;
-
     }
 
     componentWillUnmount() {

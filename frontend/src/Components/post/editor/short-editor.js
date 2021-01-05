@@ -21,7 +21,7 @@ class ShortEditor extends React.Component {
 
         this.setErrorMessage = this.setErrorMessage.bind(this);
         this.validateFile = this.validateFile.bind(this);
-
+        this.renderTextContainer = this.renderTextContainer.bind(this);
     }
 
 
@@ -108,6 +108,8 @@ class ShortEditor extends React.Component {
     }
 
     removeFile = (name) => {
+        console.log(name);
+        console.log("asdfadf");
         const index = this.props.validFiles.findIndex(e => e.name === name);
         const index2 = this.props.selectedFiles.findIndex(e => e.name === name);
         const index3 = this.props.unsupportedFiles.findIndex(e => e.name === name);
@@ -150,6 +152,19 @@ class ShortEditor extends React.Component {
         this.modalImageRef.current.style.backgroundImage = 'none';
     }
 
+    renderTextContainer() {
+        return (
+            <TextContainer
+                validFilesLength={this.props.validFiles.length}
+                isPaginated={this.props.isPaginated}
+                onPaginatedChange={this.props.onPaginatedChange}
+                onTextChange={this.props.onTextChange}
+                textPageText={this.props.textPageText}
+                imageIndex={this.props.imageIndex}
+            />
+        )
+    }
+
     render() {
 
         if (!isAdvancedUpload) {
@@ -160,15 +175,8 @@ class ShortEditor extends React.Component {
             return (
                 <>
                     <div id="shorteditor-text-container">
-                        <TextContainer
-                            validFilesLength={this.props.validFiles.length}
-                            isPaginated={this.props.isPaginated}
-                            onCaptionStyleChange={this.props.onCaptionStyleChange}
-                            onTextChange={this.props.onTextChange}
-                            textPageText={this.props.textPageText}
-                            textPageIndex={this.props.textPageIndex}
+                        {this.renderTextContainer()}
 
-                        />
                     </div>
                     {this.props.unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
                     <ImageDrop
@@ -186,26 +194,21 @@ class ShortEditor extends React.Component {
         else {
             return (
                 <>
-                    <div id="shortviewer-main-container">
-                        <div id="shortviewer-hero-container">
+                    <div id="shorteditor-main-container">
+                        <div id="shorteditor-hero-container">
                             {this.props.unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
-                            <div id="shortviewer-image-slider-container">
-                                <ImageSlider onIndexChange={this.props.onIndexChange} fileArray={this.props.validFiles} setImageArray={this.props.setImageArray} />
+                            <div id="shorteditor-image-slider-container">
+                                <ImageSlider
+                                    onIndexChange={this.props.onIndexChange}
+                                    fileArray={this.props.validFiles}
+                                    setImageArray={this.props.setImageArray} />
                             </div>
                         </div>
-                        <div id="shortviewer-side-container">
-                            <TextContainer
-                                validFilesLength={this.props.validFiles.length}
-                                isPaginated={this.props.isPaginated}
-                                onCaptionStyleChange={this.props.onCaptionStyleChange}
-                                onTextChange={this.props.onTextChange}
-                                textPageText={this.props.textPageText}
-                                textPageIndex={this.props.textPageIndex}
-
-                            />
+                        <div id="shorteditor-side-container">
+                            {this.renderTextContainer()}
                         </div>
                     </div>
-                    <div id="shortviewer-file-manager-container">
+                    <div id="shorteditor-file-manager-container">
                         <ImageDrop
                             reference={this.fileInputRef}
                             dragOver={this.dragOver}

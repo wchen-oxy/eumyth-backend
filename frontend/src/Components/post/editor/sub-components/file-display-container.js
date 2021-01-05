@@ -12,7 +12,7 @@ const FileDisplayContainer = (props) => {
                 <span className={`sortableitem-name ${data.invalid ? 'sortableitem-error' : ''}`}>{data.name}</span>
                 <span className="sortableitem-size">({fileSize(data.size)})</span> {data.invalid && <span className='sortableitem-error-message'>({errorMessage})</span>}
             </div>
-            <div className="sortableitem-remove" onClick={() => removeFile(data.name)}>X</div>
+            <button onClick={() => removeFile(data.name)}>X</button>
         </div>
     )
     );

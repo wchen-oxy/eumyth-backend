@@ -1,0 +1,15 @@
+@import "../../../partials";
+
+#newpost-window {
+    @include small-post-window;
+
+    button,
+    input,
+    select {
+        width: fit-content;
+    }
+}
+
+.newpost-button-container{
+    @include centered-vertical-button-container;
+}

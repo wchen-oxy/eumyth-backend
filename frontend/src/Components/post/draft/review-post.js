@@ -3,6 +3,7 @@ import AxiosHelper from '../../../Axios/axios';
 import _ from 'lodash';
 import TextareaAutosize from 'react-textarea-autosize';
 import { PUBLIC_FEED, PERSONAL_PAGE, PRIVATE } from "../../constants/flags";
+import "./review-post.scss";
 
 const INITIAL = "INITIAL";
 const LONG = "LONG";
@@ -89,8 +90,8 @@ const ReviewPost = (props) => {
     const returnToLongButton = (<button value={INITIAL} onClick={e => props.setPostStage(e.target.value, false)}>Return</button>);
 
     return (
-        <div className="postdraft-small-window">
-            <div  >
+        <div id="reviewpost-small-window">
+            <div>
                 <div>
                     {props.postType === SHORT ? <h2>Placeholder for short</h2> : <h2>Placeholder for Long</h2>}
                     <div>
@@ -99,7 +100,7 @@ const ReviewPost = (props) => {
                         </span>
                     </div>
                 </div>
-                <div className="postdraft-button-container">
+                <div className="reviewpost-button-container">
                     <label>Preview Title</label>
                     <TextareaAutosize name="title" placeholder='Create an Optional Preview Title Text' value={title ? title : null} onChange={(e) => setTitle(e.target.value)} maxLength={100} />
                     {props.postType === LONG ? <TextareaAutosize name="subtitle" id='review-post-text' placeholder='Create an Optional Description' onChange={(e) => setSubtitle(e.target.value)} maxLength={140} /> : <></>}
@@ -118,7 +119,7 @@ const ReviewPost = (props) => {
                     <label>Is Milestone</label>
                     <input type="checkbox" value={milestone} onClick={() => setMilestone(!milestone)}></input>
                 </div>
-                <div className="postdraft-button-container">
+                <div className="reviewpost-button-container">
                     <p>Post to:</p>
                     <div  >
                         <select name="posts" id="cars" value={props.preferredPostType ? props.preferredPostType : PUBLIC_FEED} onChange={(e) => setPostPrivacyType(e.target.value)}>

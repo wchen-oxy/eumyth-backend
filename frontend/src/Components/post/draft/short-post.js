@@ -2,7 +2,7 @@ import React from 'react';
 import ShortEditor from '../editor/short-editor';
 import ReviewPost from './review-post';
 import "./short-post.scss";
- 
+
 const NONE = "NONE";
 const INITIAL = "INITIAL";
 const REVIEW = "REVIEW";
@@ -35,7 +35,7 @@ class ShortPost extends React.Component {
     this.handleDisablePost = this.handleDisablePost.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.generateValidFiles = this.generateValidFiles.bind(this);
-    this.handleCaptionStyleChange = this.handleCaptionStyleChange.bind(this);
+    this.handlePaginatedChange = this.handlePaginatedChange.bind(this);
     this.handleSortEnd = this.handleSortEnd.bind(this);
   }
 
@@ -43,7 +43,7 @@ class ShortPost extends React.Component {
     this.setState({ imageIndex: value });
   }
 
-  handleCaptionStyleChange() {
+  handlePaginatedChange() {
     if (this.state.isPaginated === false) {
       let postArray = [];
       const imageCount = this.state.validFiles.length;
@@ -146,8 +146,8 @@ class ShortPost extends React.Component {
   render() {
     if (this.state.window === INITIAL) {
       return (
-        <div id="shortpost-draft-container" className="postdraft-small-window">
-          <div className="postdraft-button-container">
+        <div id="shortpost-window">
+          <div className="shortpost-button-container">
             <h2>Placeholder for short</h2>
             <div>
               <span >
@@ -168,7 +168,7 @@ class ShortPost extends React.Component {
             textPageIndex={this.state.imageIndex}
             onSortEnd={this.handleSortEnd}
             setImageArray={this.setImageArray}
-            onCaptionStyleChange={this.handleCaptionStyleChange}
+            onPaginatedChange={this.handlePaginatedChange}
             onIndexChange={this.handleIndexChange}
             onTextChange={this.handleTextChange}
             onSelectedFileChange={this.handleSelectedFileChange}

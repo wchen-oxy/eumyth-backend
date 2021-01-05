@@ -10,11 +10,24 @@ import { returnUserImageURL } from "../../constants/urls";
 
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import "../../image-carousel/index.scss";
+import "./short-post.scss";
+import ImageSlider from '../../image-carousel';
 
 const INITIAL = "INITIAL";
 const EDIT = "EDIT";
 const REVIEW = "REVIEW";
 const SHORT = "SHORT";
+
+const SETTINGS = {
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    centerPadding: 0,
+    className: '',
+    nextArrow: <Arrow direction="right" />,
+    prevArrow: <Arrow direction="left" />
+};
 
 class ShortPostViewer extends React.Component {
 
@@ -25,7 +38,6 @@ class ShortPostViewer extends React.Component {
             validFiles: [],
             unsupportedFiles: [],
             imageIndex: 0,
-            // postText: '',
             textData: this.props.textData,
             date: this.props.eventData.date,
             min: this.props.eventData.min_duration,
@@ -39,6 +51,7 @@ class ShortPostViewer extends React.Component {
         this.handleIndexChange = this.handleIndexChange.bind(this);
         this.handleTextChange = this.handleTextChange.bind(this);
         this.handlePaginatedChange = this.handlePaginatedChange.bind(this);
+        this.renderImageSlider = this.renderImageSlider.bind(this);
     }
 
     handleWindowChange(newWindow) {
@@ -68,27 +81,40 @@ class ShortPostViewer extends React.Component {
         console.log("unmount");
     }
 
-    render() {
-        const settings = {
-            speed: 500,
-            slidesToShow: 1,
-            slidesToScroll: 1,
-            centerPadding: 0,
-            className: 'abcdef',
-            nextArrow: <Arrow direction="right" />,
-            prevArrow: <Arrow direction="left" />
-        };
+    renderImageSlider() {
+        return (
+            <div className={
+                this.props.largeViewMode ?
+                    "shortpostviewer-large-hero-container"
+                    :
+                    "shortpostviewer-inline-hero-container"
+            }>
 
-         if (this.state.window === INITIAL) {
+                {/* <ImageSlider onIndexChange={this.handleIndexChange}  /> */}
+                <Slider afterChange={index => (this.handleIndexChange(index))} {...SETTINGS}>
+                    {
+                        this.props.eventData.image_data.map((key, i) =>
+                        (
+                            <div className="imageslider-image-container">
+                                <img key={i} src={returnUserImageURL(key)} />
+                            </div>
+                        ))
+                    }
+                </Slider>
+            </div>
+        );
+    }
+    render() {
+        if (this.state.window === INITIAL) {
             if (!this.props.eventData.image_data.length) {
                 if (this.props.largeViewMode) {
                     return (
-                        <div className={this.props.largeViewMode ? "flex-display small-post-window" : "flex-display"}>
-                            <div className="short-viewer-hero-container">
+                        <div id="shortpostviewer-large-main-container" className="shortpostviewer-window">
+                            <div className="shortpostviewer-large-hero-container">
                                 <ShortHeroText
                                     text={this.props.textData} />
                             </div>
-                            <div className="short-viewer-side-container">
+                            <div className="shortpostviewer-large-side-container">
                                 <PostHeader
                                     isOwnProfile={this.props.isOwnProfile}
                                     username={this.props.username}
@@ -112,8 +138,8 @@ class ShortPostViewer extends React.Component {
                 }
                 else {
                     return (
-                        <div className="flex-display flex-direction-column" >
-                            <div className="mini-short-viewer-hero-container">
+                        <div className="shortpostviewer-inline-main-container" >
+                            <div className="shortpostviewer-inline-hero-container">
                                 <PostHeader
                                     isOwnProfile={this.props.isOwnProfile}
                                     username={this.props.username}
@@ -122,7 +148,7 @@ class ShortPostViewer extends React.Component {
                                 <ShortHeroText
                                     text={this.props.textData} />
                             </div>
-                            <div className="mini-short-viewer-side-container">
+                            <div className="shortpostviewer-inline-side-container">
                                 <ShortPostMetaInfo
                                     index={this.state.imageIndex}
                                     isPaginated={this.state.isPaginated}
@@ -139,29 +165,11 @@ class ShortPostViewer extends React.Component {
             }
             //with images
             else {
-                const transformedTextArray = this.state.textData;
-                const container = this.props.eventData.image_data.map((key, i) =>
-                    <div className="image-container">
-                        <img className="preview-image" key={i} src={returnUserImageURL(key)} />
-                    </div>
-                );
-                const imageDisplay =
-                    (
-                        <div className={
-                            this.props.largeViewMode ?
-                                "short-viewer-hero-container flex-display flex-direction-column black-background" :
-                                "mini-short-viewer-hero-container flex-display flex-direction-column black-background"}>
-                            <Slider afterChange={index => (this.handleIndexChange(index))} {...settings}>
-                                {container}
-                            </Slider>
-                        </div>
-                    );
-
                 if (this.props.largeViewMode) {
                     return (
-                        <div className="flex-display small-post-window">
-                            {imageDisplay}
-                            <div className="short-viewer-side-container">
+                        <div id="shortpostviewer-large-main-container" className="shortpostviewer-window">
+                            {this.renderImageSlider()}
+                            <div  >
                                 <PostHeader
                                     isOwnProfile={this.props.isOwnProfile}
                                     username={this.props.username}
@@ -184,15 +192,14 @@ class ShortPostViewer extends React.Component {
                 }
                 else {
                     return (
-                        <div className="flex-display flex-direction-column" >
+                        <div id="shortpostviewer-inline-main-container" >
                             <PostHeader
                                 isOwnProfile={this.props.isOwnProfile}
                                 username={this.props.username}
                                 displayPhoto={this.props.eventData.display_photo_key}
                             />
-                            {imageDisplay}
-                            <div className="mini-short-viewer-side-container">
-
+                            {this.renderImageSlider()}
+                            <div className="shortpostviewer-inline-side-container">
                                 <ShortPostMetaInfo
                                     index={this.state.imageIndex}
                                     isPaginated={this.state.isPaginated}
@@ -210,18 +217,18 @@ class ShortPostViewer extends React.Component {
         }
         else if (this.state.window === EDIT) {
             return (
-                <div className="flex-display flex-direction-column small-post-window" >
-                    <div className="post-button-container">
+                <div className="shortpostviewer-window" >
+                    <div className="shortpostviewer-button-container">
                         <button onClick={() => this.handleWindowChange(INITIAL)}>Return</button>
                         <button onClick={() => this.handleWindowChange(REVIEW)}>Review Post</button>
 
                     </div>
                     <ShortReEditor
-                        onIndexChange={this.handleIndexChange}
                         imageIndex={this.state.imageIndex}
                         eventData={this.props.eventData}
                         textData={this.state.textData}
                         isPaginated={this.state.isPaginated}
+                        onIndexChange={this.handleIndexChange}
                         onTextChange={this.handleTextChange}
                         onPaginatedChange={this.handlePaginatedChange}
                     />

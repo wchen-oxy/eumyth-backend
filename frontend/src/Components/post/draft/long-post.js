@@ -1,6 +1,7 @@
-import React, { useState, useRef, useLayoutEffect, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import LongEditor from '../editor/long-editor';
 import ReviewPost from './review-post';
+import "./long-post.scss";
 
 const INITIAL = "INITIAL";
 const REVIEW = "REVIEW";
@@ -19,6 +20,7 @@ const LongPost = (props) => {
   const editorContainerRef = useRef(null);
   const postHeaderRef = useRef(null);
   const dummyScrollRef = useRef(null);
+
   useEffect(() => {
     if (editorContainerRef.current) {
       if (editorContainerRef.current.offsetHeight && (editorContainerRef.current.offsetHeight !== editorContainerSize &&
@@ -88,24 +90,24 @@ const LongPost = (props) => {
       }
     }
   }
-   if (windowState === INITIAL)
+  if (windowState === INITIAL)
     return (
-      <div className="long-post-window">
+      <div className="longpost-window">
         <div ref={postHeaderRef}>
           <h2>Long Entry</h2>
           {isSavePending ? (<p>Saving</p>) : (<p>Saved</p>)}
-          <div id="button-container">
-            <span id="toggle-button-span">
-              <button id="toggle-button" value={NONE} onClick={e => setPostStage(e.target.value, isSavePending)}>Return</button>
+          <div className="longpost-button-container">
+            <span  >
+              <button value={NONE} onClick={e => setPostStage(e.target.value, isSavePending)}>Return</button>
             </span>
-            <span id="post-button-span">
-              <button id="post-button" value={REVIEW} disabled={!hasContent} onClick={(e) => setPostStage(e.target.value, isSavePending)}>Review Post</button>
+            <span  >
+              <button value={REVIEW} disabled={!hasContent} onClick={(e) => setPostStage(e.target.value, isSavePending)}>Review Post</button>
             </span>
           </div>
         </div>
         {props.onlineDraftRetrieved && !props.loading ?
           (
-            <div className="long-editor-container" ref={editorContainerRef}>
+            <div id="longpost-editor-container" ref={editorContainerRef}>
               <LongEditor
                 username={props.username}
                 isSavePending={isSavePending}
@@ -127,7 +129,7 @@ const LongPost = (props) => {
               <br />
               <br />
               <br />
-              <div id="dummy-scroll" ref={dummyScrollRef}></div>
+              <div ref={dummyScrollRef}></div>
             </div>
 
           )

@@ -6,28 +6,24 @@
     width: 100%;
 }
 
-#shortviewer-main-container {
+#shorteditor-main-container {
     @include flex-display-row;
 }
 
-#shortviewer-file-manager-container {
+#shorteditor-file-manager-container {
     @include flex-display-column;
 }
 
-#shortviewer-hero-container {
-    height: 100%;
-    width: 65%;
-    margin: auto;
-    text-align: center;
-    justify-content: center;
-
-    #shortviewer-image-slider-container {
+#shorteditor-hero-container {
+    @include short-post-hero-container;
+    
+    #shorteditor-image-slider-container {
         height: 30vh;
     }
 }
 
-#shortviewer-side-container {
-    width: 35%;
+#shorteditor-side-container {
+    @include short-post-side-container;
 }
 
 // https://github.com/kenwheeler/slick/issues/982

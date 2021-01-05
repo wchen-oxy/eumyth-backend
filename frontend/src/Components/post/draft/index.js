@@ -5,8 +5,7 @@ import LongPost from './long-post';
 import AxiosHelper from '../../../Axios/axios';
 import { withFirebase } from '../../../Firebase';
 import { NONE, SHORT, LONG, NEW_LONG, OLD_LONG } from "../../constants/flags";
-import "./index.scss";
-
+ 
 class PostDraftController extends React.Component {
   _isMounted = false;
   constructor(props) {

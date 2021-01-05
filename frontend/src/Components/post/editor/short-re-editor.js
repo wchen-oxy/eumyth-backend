@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import TextareaAutosize from 'react-textarea-autosize';
+import TextContainer from "./sub-components/text-container";
 import Arrow from '../../image-carousel/arrow';
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import "./short-re-editor.scss";
 
 const ShortReEditor = (props) => {
     const settings = {
@@ -17,69 +18,34 @@ const ShortReEditor = (props) => {
 
     };
 
-    // const [setPostText, postText] = useState(props.textData);
-    // const [setPaginated, isPaginated] = useState(props.eventData.is_paginated);
+    const renderTextContainer = () => (
+        <TextContainer
+            validFilesLength={props.eventData.image_data.length}
+            isPaginated={props.isPaginated}
+            onPaginatedChange={props.onPaginatedChange}
+            onTextChange={props.onTextChange}
+            textPageText={props.textData}
+            imageIndex={props.imageIndex}
+        />
+    );
 
-    // const onPaginatedChange = () => (setPaginated(!isPaginated));
-    // const onTextChange = (text) => {
-    //     let newText = postText;
-    //     if (isPaginated) {
-    //         newText[props.imageIndex] = text;
-    //     }
-    //     else {
-    //         newText = text;
-    //     }
-    //     setPostText(newText);
-    // }
-
-    console.log(props.textData);
     if (!props.eventData.image_data.length) {
         return (
-            <div className="flex-display" >
-                <div id="text-container flex-display">
-                    <div className=" description-container flex-display flex-direction-column">
-                        <h4>{props.eventData.username}</h4>
-                        <div id="description-input-container">
-                            <TextareaAutosize
-                                id='short-post-text'
-                                placeholder='Write something here.'
-                                onChange={props.onTextChange}
-                                minRows={5}
-                                value={props.textData}
-                            />
-                        </div>
-                    </div>
-                </div>
-            </div>
+            renderTextContainer()
         );
     }
     else {
         const images = props.eventData.image_data.map((url, index) => <img src={url} />);
         return (
-
-            <div className="flex-display">
-                <div className="short-viewer-hero-container flex-display flex-direction-column black-background">
+            <div id="shortreeditor-main-container">
+                <div className="shortreeditor-hero-container">
                     <Slider afterChange={index => (props.onIndexChange(index))} {...settings}>
                         {images}
                     </Slider>
 
                 </div>
-                <div className="short-viewer-side-container">
-                    <h4>{props.eventData.username}</h4>
-                    {props.eventData.image_data.length > 1 && !props.eventData.is_paginated ? <button onClick={props.onPaginatedChange}>Caption Photos Individually</button> : <></>}
-                    {props.eventData.image_data.length > 1 && props.eventData.is_paginated ? <button onClick={props.onPaginatedChange}>Return to Single Caption</button> : <></>}
-
-                    <TextareaAutosize
-                        id='short-post-text'
-                        placeholder='Write something here.'
-                        onChange={props.onTextChange}
-                        minRows={5}
-                        value={
-                            props.isPaginated ?
-                                props.textData[props.imageIndex] :
-                                props.textData
-                        }
-                    />
+                <div className="shortreeditor-side-container">
+                    {renderTextContainer()}
                 </div>
             </div>
 

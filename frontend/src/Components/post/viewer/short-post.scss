@@ -1,0 +1,34 @@
+@import "../../../partials";
+.shortpostviewer-window {
+    @include small-post-window;
+}
+
+#shortpostviewer-large-main-container{
+    @include flex-display-row;
+}
+
+.shortpostviewer-large-hero-container {
+    @include short-post-hero-container;
+}
+
+.shortpostviewer-large-side-container{
+    @include short-post-side-container;
+}
+
+.shortpostviewer-inline-main-container {
+    @include flex-display-column;
+}
+
+.shortpostviewer-inline-hero-container {
+    height: auto;
+}
+
+.shortpostviewer-inline-side-container {
+    width: 100%;
+}
+
+  
+
+.shortpostviewer-button-container {
+    @include centered-vertical-button-container;
+}

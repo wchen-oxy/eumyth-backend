@@ -1,9 +1,10 @@
 @import "../../../partials";
-#shortpost-window {
-    @include flex-display-column;
+#reviewpost-small-window{
     @include small-post-window;
+    @include flex-display-column;
+
 }
 
-.shortpost-button-container {
+.reviewpost-button-container{
     @include centered-vertical-button-container;
 }
