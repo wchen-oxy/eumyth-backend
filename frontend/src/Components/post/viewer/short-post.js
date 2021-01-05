@@ -1,11 +1,9 @@
 import React from 'react';
-import Slider from 'react-slick';
-import PostHeader from './sub-components/post-header';
+ import PostHeader from './sub-components/post-header';
 import ShortHeroText from './sub-components/short-text';
 import ShortPostMetaInfo from './sub-components/short-post-meta';
 import ShortReEditor from '../editor/short-re-editor';
-import Arrow from "../../image-carousel/arrow";
-import ReviewPost from "../draft/review-post";
+ import ReviewPost from "../draft/review-post";
 import { returnUserImageURL } from "../../constants/urls";
 
 import 'slick-carousel/slick/slick.css';
@@ -18,17 +16,7 @@ const INITIAL = "INITIAL";
 const EDIT = "EDIT";
 const REVIEW = "REVIEW";
 const SHORT = "SHORT";
-
-const SETTINGS = {
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    centerPadding: 0,
-    className: '',
-    nextArrow: <Arrow direction="right" />,
-    prevArrow: <Arrow direction="left" />
-};
-
+ 
 class ShortPostViewer extends React.Component {
 
     constructor(props) {
@@ -82,6 +70,9 @@ class ShortPostViewer extends React.Component {
     }
 
     renderImageSlider() {
+        let imageArray = this.props.eventData.image_data.map((key, i) =>
+            returnUserImageURL(key)
+        );
         return (
             <div className={
                 this.props.largeViewMode ?
@@ -89,18 +80,10 @@ class ShortPostViewer extends React.Component {
                     :
                     "shortpostviewer-inline-hero-container"
             }>
-
-                {/* <ImageSlider onIndexChange={this.handleIndexChange}  /> */}
-                <Slider afterChange={index => (this.handleIndexChange(index))} {...SETTINGS}>
-                    {
-                        this.props.eventData.image_data.map((key, i) =>
-                        (
-                            <div className="imageslider-image-container">
-                                <img key={i} src={returnUserImageURL(key)} />
-                            </div>
-                        ))
-                    }
-                </Slider>
+                <ImageSlider
+                    onIndexChange={this.handleIndexChange}
+                    imageArray={imageArray}
+                />
             </div>
         );
     }
@@ -262,12 +245,11 @@ class ShortPostViewer extends React.Component {
                     pursuitNames={this.props.pursuitNames}
                     closeModal={this.props.closeModal}
                     postType={SHORT}
-                    onClick={this.handleWindowChange}
-                    // existingImageArray={this.state.eventData.image_data}
                     textData={this.state.textData}
                     username={this.props.username}
                     preferredPostType={this.props.preferredPostType}
                     handlePreferredPostTypeChange={this.handlePreferredPostTypeChange}
+                    onClick={this.handleWindowChange}
                 />
             );
 
