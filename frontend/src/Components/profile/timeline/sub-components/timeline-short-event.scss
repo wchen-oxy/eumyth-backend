@@ -1,0 +1,18 @@
+@import "../../../../partials";
+@import "./timeline-event.scss";
+
+.shortevent-cover-container {
+    @include cover-container;
+}
+
+.shortevent-no-cover-photo {
+    @include no-cover-photo;
+}
+
+.shortevent-cover-photo{
+    @include cover-photo;
+}
+
+.shortevent-cover{
+
+}

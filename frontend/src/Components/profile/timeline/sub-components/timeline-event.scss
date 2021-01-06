@@ -1,19 +1,25 @@
+@import "../../../../partials";
+
+@mixin cover-photo{
+    height: 120px;
+    width: 200px;
+    object-fit: cover;
+}
+
+@mixin cover-container{
+    height: 120px;
+}
+
+@mixin no-cover-photo{
+    @include flex-display-row;
+}
+
 .event-container {
+    @include no-select;
     text-align: initial;
     width: 200px;
     margin: 5px;
     word-wrap: break-word;
-    -moz-user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    -o-user-select: none;
-
-    // img{
-    //     width: 200px;
-    //     object-fit: cover;
-    //     object-position: center;
-    // }
 
     p {
         margin: 0;
@@ -21,16 +27,9 @@
 }
 
 .event-cover-container {
-    height: 120px;
+    @include cover-container;
 }
 
 .event-cover-photo {
-    height: 120px;
-    width: 200px;
-    object-fit: cover;
-}
-
-.no-cover-photo {
-    display: flex;
-    align-items: center;
+   @include cover-photo;
 }

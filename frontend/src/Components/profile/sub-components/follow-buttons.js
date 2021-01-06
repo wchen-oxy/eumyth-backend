@@ -1,6 +1,16 @@
 import React from 'react';
-import { NOT_A_FOLLOWER_STATE, FOLLOWED_STATE, FOLLOW_REQUESTED_STATE, FOLLOW_ACTION, UNFOLLOW_ACTION } from "../../constants/flags";
-import { FOLLOW_BUTTON_TEXT, FOLLOWED_BUTTON_TEXT, REQUESTED_BUTTON_TEXT } from "../../constants/ui-text";
+import {
+    NOT_A_FOLLOWER_STATE,
+    FOLLOWED_STATE,
+    FOLLOW_REQUESTED_STATE,
+    FOLLOW_ACTION,
+    UNFOLLOW_ACTION
+} from "../../constants/flags";
+import {
+    FOLLOW_BUTTON_TEXT,
+    FOLLOWED_BUTTON_TEXT,
+    REQUESTED_BUTTON_TEXT
+} from "../../constants/ui-text";
 
 const FollowButtons = (props) => {
 

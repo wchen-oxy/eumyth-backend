@@ -3,7 +3,7 @@ import ShortEvent from "./timeline-short-event";
 import LongEvent from "./timeline-long-event";
 import ProjectEvent from "./timeline-project-event";
 import './timeline-event.scss';
-import { POST, PROJECT } from "../../../constants/flags";
+import { POST, PROJECT, LONG, SHORT } from "../../../constants/flags";
 
 
 const Event = (props) => {
@@ -11,10 +11,10 @@ const Event = (props) => {
     let content = null;
     if (props.mediaType === POST) {
         switch (post.post_format) {
-            case ("SHORT"):
+            case (SHORT):
                 content = <ShortEvent post={post} />
                 break;
-            case ("LONG"):
+            case (LONG):
                 content = <LongEvent post={post} />
                 break;
             default:

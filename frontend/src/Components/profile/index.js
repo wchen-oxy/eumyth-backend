@@ -11,18 +11,19 @@ import ProjectController from "../project/index";
 import { returnUserImageURL } from "../constants/urls";
 
 import {
+    ALL,
+    POST,
+    LONG,
+    PROJECT,
+    NEW_PROJECT,
+    PRIVATE,
     NOT_A_FOLLOWER_STATE,
     FOLLOW_ACTION,
     UNFOLLOWED_STATE,
     FOLLOW_REQUESTED_STATE,
     FOLLOWED_STATE
 } from "../constants/flags";
-import { POST, PROJECT, PRIVATE } from "../constants/flags";
 import './index.scss';
-
-const ALL = "ALL";
-const NEW_PROJECT = "NEW PROJECT";
-const LONG =  "LONG";
 
 class ProfilePage extends React.Component {
     _isMounted = false;
@@ -81,49 +82,53 @@ class ProfilePage extends React.Component {
                 (user) => {
                     if (user) {
                         let targetUserInfo = null;
-                        AxiosHelper.returnUser(this.state.targetUsername).then(
-                            response => {
-                                targetUserInfo = response.data;
-                                if (user.displayName !== this.state.targetUsername) {
-                                    return AxiosHelper.returnFollowerStatus(user.displayName, targetUserInfo.user_relation_id)
+                        AxiosHelper
+                            .returnUser(this.state.targetUsername)
+                            .then(
+                                response => {
+                                    targetUserInfo = response.data;
+                                    if (user.displayName !== this.state.targetUsername) {
+                                        return AxiosHelper
+                                            .returnFollowerStatus(
+                                                user.displayName,
+                                                targetUserInfo.user_relation_id
+                                            )
+                                    }
+                                    else return null; //if user owns current profile
                                 }
-                                else return null; //if user owns current profile
-                            }
-                        )
+                            )
                             .then((response) => {
-                                if (response) { this.handleResponseData(user, targetUserInfo, response); }
+                                if (response) {
+                                    this.handleResponseData(user, targetUserInfo, response);
+                                }
                                 else {
                                     this.handleResponseData(user, targetUserInfo, null);
                                 }
-                            }).catch(
-                                err => console.log(err)
-                            );
+                            })
+                            .catch(err => console.log(err));
                     }
                     else {
-                        AxiosHelper.returnUser(this.state.targetUsername).then(
-                            response =>
-                                (this.handleResponseData(user, response.data, null))
-
-                        ).catch(
-                            err => console.log(err)
-                        );
+                        AxiosHelper
+                            .returnUser(this.state.targetUsername)
+                            .then(response => this.handleResponseData(user, response.data, null))
+                            .catch(err => console.log(err));
 
                     }
                 }
             )
         }
         else if (this._isMounted && this.props.match.params.postId) {
-            console.log(this.props.match.params.postId);
-            AxiosHelper.retrievePost(this.props.match.params.postId, false).then(
-                (result => {
-                    console.log(result);
-                    if (this._isMounted) this.setState({
-                        selectedEvent: result.data,
-                        postOnlyView: true,
-                        postType: result.data.post_format
+            AxiosHelper
+                .retrievePost(this.props.match.params.postId, false)
+                .then(
+                    (result => {
+                        if (this._isMounted) this.setState({
+                            selectedEvent: result.data,
+                            postOnlyView: true,
+                            postType: result.data.post_format
+                        })
                     })
-                })
-            );
+                );
         }
     }
 
@@ -262,11 +267,16 @@ class ProfilePage extends React.Component {
     closeModal() {
         this.modalRef.current.style.display = "none";
         document.body.style.overflow = "visible";
-        this.setState({ isModalShowing: false }, this.props.history.replace("/" + this.state.targetUsername));
+        this.setState(
+            {
+                isModalShowing: false
+            }, this.props.history.replace("/" + this.state.targetUsername)
+        );
     }
 
     handleEventClick(selectedEvent) {
-        return AxiosHelper.retrievePost(selectedEvent._id, true)
+        return AxiosHelper
+            .retrievePost(selectedEvent._id, true)
             .then(
                 (result) => {
                     if (this._isMounted) {
@@ -304,7 +314,9 @@ class ProfilePage extends React.Component {
         ).then(
             (result) => {
                 if (result.status === 200) {
-                    if (result.data.success) this.setState({ followerStatus: result.data.success });
+                    if (result.data.success) {
+                        this.setState({ followerStatus: result.data.success });
+                    }
                     else {
                         this.setState({ followerStatus: result.data.error });
                     }
@@ -318,7 +330,8 @@ class ProfilePage extends React.Component {
     handleFollowClick(action) {
         if (action === FOLLOW_ACTION) this.handleFollowerStatusChange(action);
         else {
-            window.confirm("Are you sure you want to unfollow?") && this.handleFollowerStatusChange(action);
+            window.confirm("Are you sure you want to unfollow?") &&
+                this.handleFollowerStatusChange(action);
         }
     }
 
@@ -327,13 +340,24 @@ class ProfilePage extends React.Component {
     }
 
     render() {
-        var pursuitHolderArray = [<PursuitHolder key={ALL} name={ALL} value={-1} onFeedSwitch={this.handleFeedSwitch} />];
+        var pursuitHolderArray = [
+            <PursuitHolder
+                key={ALL}
+                name={ALL}
+                value={-1}
+                onFeedSwitch={this.handleFeedSwitch}
+            />
+        ];
         if (this.state.fail) return NoMatch;
         if (this.state.pursuits) {
             let index = 0;
             for (const pursuit of this.state.pursuits) {
                 pursuitHolderArray.push(
-                    <PursuitHolder name={pursuit.name} numEvents={pursuit.num_posts} key={pursuit.name} value={index++} onFeedSwitch={this.handleFeedSwitch} />
+                    <PursuitHolder
+                        name={pursuit.name}
+                        numEvents={pursuit.num_posts}
+                        key={pursuit.name} value={index++}
+                        onFeedSwitch={this.handleFeedSwitch} />
                 );
             }
         }
@@ -344,12 +368,16 @@ class ProfilePage extends React.Component {
                     isOwnProfile={this.state.visitorUsername === this.state.selectedEvent.username}
                     displayPhoto={this.state.selectedEvent.display_photo_key}
                     preferredPostType={this.state.preferredPostType}
-                    closeModal={this.closeModal}
                     postType={this.state.postType}
                     pursuits={this.state.pursuitsNames}
                     username={this.state.selectedEvent.username}
                     eventData={this.state.selectedEvent}
-                    textData={this.state.selectedEvent.post_format === LONG ? JSON.parse(this.state.selectedEvent.text_data) : this.state.selectedEvent.text_data}
+                    textData={
+                        this.state.selectedEvent.post_format === LONG ?
+                            JSON.parse(this.state.selectedEvent.text_data) :
+                            this.state.selectedEvent.text_data
+                    }
+                    closeModal={this.closeModal}
                     onDeletePost={this.handleDeletePost}
                 />
             )
@@ -357,17 +385,24 @@ class ProfilePage extends React.Component {
         else if (!this.state.postOnlyView)
             return (
                 <div>
-                    <div id="personal-profile-container" className="flex-display flex-direction-column">
-                        <div id="personal-profile-header">
-                            {this.state.coverPhoto ? (<img id="profile-cover-photo" src={returnUserImageURL(this.state.coverPhoto)}></img>) : (<div id="temp-cover"></div>)}
+                    <div id="profile-main-container">
+                        <div id="profile-cover-photo-container">
+                            {
+                                this.state.coverPhoto ?
+                                    (<img src={returnUserImageURL(this.state.coverPhoto)}></img>) :
+                                    (<div id="profile-temp-cover"></div>)
+                            }
                         </div>
-                        <div id="personal-profile-intro-container">
-                            <div id="personal-profile-photo-container">
-                                {this.state.croppedDisplayPhoto ? <img src={returnUserImageURL(this.state.croppedDisplayPhoto)}></img> : <></>}
-                                <div id="personal-profile-name-container">
-                                    <h4 id="personal-profile-name">{this.state.targetUsername}</h4>
+                        <div id="profile-intro-container">
+                            <div id="profile-display-photo-container">
+                                {this.state.croppedDisplayPhoto ?
+                                    <img src={returnUserImageURL(this.state.croppedDisplayPhoto)}></img> :
+                                    <></>
+                                }
+                                <div id="profile-name-container">
+                                    <h4>{this.state.targetUsername}</h4>
                                 </div>
-                                <div id="personal-profile-actions-container">
+                                <div id="profile-follow-actions-container">
                                     <FollowButton
                                         isOwner={this.state.targetUsername === this.state.visitorUsername}
                                         followerStatus={this.state.followerStatus}
@@ -376,37 +411,34 @@ class ProfilePage extends React.Component {
                                     />
                                 </div>
                             </div>
-                            <div id="personal-profile-description">
+                            <div id="profile-biography">
                                 {this.state.bio ? <p>{this.state.bio}</p> : <p></p>}
                             </div>
-                            <div id="pursuit-selection-container">
+                            <div id="profile-pursuits-container">
                                 {pursuitHolderArray}
                             </div>
                         </div>
                     </div>
-                    <div className="personal-profile-content-switch-container">
-                        <div id="personal-profile-buttons-container">
-                            <button disabled={this.state.mediaType === POST ? true : false} onClick={() => this.handleMediaTypeSwitch(POST)}>Posts</button>
-                            <button disabled={this.state.mediaType === PROJECT ? true : false} onClick={() => this.handleMediaTypeSwitch(PROJECT)}>Projects</button>
-                        </div>
+                    <div id="profile-content-switch-container">
+                        <button
+                            disabled={this.state.mediaType === POST ? true : false}
+                            onClick={() => this.handleMediaTypeSwitch(POST)}>
+                            Posts
+                        </button>
+                        <button
+                            disabled={this.state.mediaType === PROJECT ? true : false}
+                            onClick={() => this.handleMediaTypeSwitch(PROJECT)}>
+                            Projects
+                        </button>
                     </div>
-
-                    {console.log(
-                        (this.state.visitorUsername === null && this.state.isPrivate)
-                        ,
-                        this.state.visitorUsername !== this.state.targetUsername && this.state.isPrivate && (this.state.followerStatus !== "FOLLOWING" || this.state.followerStatus !==
-                            "REQUEST_ACCEPTED"
-                        )
-                    )
-                    }
-
                     {
-
-                        this.state.visitorUsername === null && this.state.isPrivate ||
-                            (this.state.visitorUsername !== this.state.targetUsername && this.state.isPrivate) && (this.state.followerStatus !== "FOLLOWING" && this.state.followerStatus !== "REQUEST_ACCEPTED")
-
+                        (this.state.visitorUsername === null && this.state.isPrivate) ||
+                            (this.state.visitorUsername !== this.state.targetUsername && this.state.isPrivate) &&
+                            (
+                                this.state.followerStatus !== "FOLLOWING" &&
+                                this.state.followerStatus !== "REQUEST_ACCEPTED"
+                            )
                             ?
-
                             <p>This profile is private. To see these posts, please request access. </p> :
                             this.state.mediaType === POST ?
                                 < Timeline
@@ -430,32 +462,28 @@ class ProfilePage extends React.Component {
                                     onNewBackProjectClick={this.handleNewBackProjectClick}
                                     pursuitsNames={this.state.pursuitsNames}
                                 />
-
                     }
                     <div className="modal" ref={this.modalRef}>
                         <div className="overlay" onClick={(() => this.closeModal())}></div>
                         <span className="close" onClick={(() => this.closeModal())}>X</span>
                         {
                             this.state.isModalShowing && this.state.selectedEvent ?
-
                                 <PostViewerController
                                     key={this.state.selectedEvent._id}
                                     isOwnProfile={this.state.visitorUsername === this.state.targetUsername}
                                     displayPhoto={this.state.smallCroppedDisplayPhoto}
                                     preferredPostType={this.state.preferredPostType}
-                                    closeModal={this.closeModal}
                                     postType={this.state.postType}
                                     largeViewMode={true}
-                                    // smallProfilePhoto={this.state.smallCroppedDisplayPhoto}
                                     pursuits={this.state.pursuitsNames}
                                     username={this.state.targetUsername}
                                     eventData={this.state.selectedEvent}
                                     textData={this.state.textData}
                                     onDeletePost={this.handleDeletePost}
+                                    closeModal={this.closeModal}
                                 />
                                 :
-                                <>                            {console.log("Disappear")}
-                                </>
+                                <></>
                         }
                     </div>
                     <div className="modal" ref={this.miniModalRef}>

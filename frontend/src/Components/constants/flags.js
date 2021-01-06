@@ -9,8 +9,11 @@ export const ACCEPT_ACTION = "ACCEPT";
 export const DECLINE_ACTION = "DECLINE";
 
 //CONTENT
+export const ALL = "ALL";
 export const POST = "POST";
 export const PROJECT = "PROJECT";
+export const NEW_PROJECT = "NEW PROJECT";
+
 export const DISPLAY = "DISPLAY";
 export const COVER = "COVER";
 export const NONE = "NONE";

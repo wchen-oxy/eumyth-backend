@@ -60,6 +60,27 @@
     justify-content: center;
 }
 
-@mixin short-post-side-container{
+@mixin short-post-side-container {
     width: 35%;
-} 
+}
+
+@mixin long-post-button-container {
+    width: 70%;
+    margin: auto;
+    position: relative;
+}
+
+@mixin long-post-text-container{
+    width: 70%;
+    margin: auto;
+}
+
+@mixin no-select {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently 
+    supported by Chrome, Edge, Opera and Firefox */
+}

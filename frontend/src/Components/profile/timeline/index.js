@@ -26,7 +26,6 @@ class Timeline extends React.Component {
             this.fetchNextPosts(this.props.allPosts);
         }
         else {
-            console.log("ELSE");
             this.setState({ hasMore: false });
         }
     }
@@ -76,7 +75,6 @@ class Timeline extends React.Component {
     }
 
     fetchNextPosts() {
-        console.log("fetch");
         if (this.state.nextOpenPostIndex + this.state.fixedDataLoadLength >= this.props.allPosts.length) {
             console.log("Length of All Posts Exceeded");
             this.setState({ hasMore: false });
@@ -108,12 +106,12 @@ class Timeline extends React.Component {
 
     render() {
         if (!this._isMounted || !this.props.allPosts) return (
-            <div className="personal-profile-timeline-container">
+            <div>
                 <p>Loading</p>
             </div>
         );
         return (
-            <div className="personal-profile-timeline-container">
+            <div >
                 {
                     this.props.allPosts && this.props.allPosts.length > 0 ?
                         (
@@ -132,7 +130,8 @@ class Timeline extends React.Component {
                                     this.state.feedData.map(
                                         (item, index) => {
                                             return (
-                                                <div className="flex-display custom-infinite-scroll-row" key={index}>
+                                                <div className="timeline-infinite-scroll-row"
+                                                    key={index}>
                                                     {item}
                                                 </div>
                                             )

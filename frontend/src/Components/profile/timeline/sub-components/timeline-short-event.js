@@ -1,5 +1,6 @@
 import React from 'react';
 import { returnUserImageURL } from "../../../constants/urls";
+import "./timeline-short-event.scss";
 
 const ShortEvent = (props) => {
     const post = props.post;
@@ -8,10 +9,8 @@ const ShortEvent = (props) => {
         const activityType = post.is_milestone ? "MileStone" : "Progress";
         return (
             <div>
-                <div className="event-cover-container no-cover-photo">
-                    <p className="no-select">
-                        {intitialText}
-                    </p>
+                <div className="shortevent-cover-container shortevent-no-cover-photo">
+                    <p className="shortevent-cover">{intitialText}</p>
                 </div>
                 {post.title ? <h4>{post.title}</h4> : <></>}
                 {post.pursuit_category ? <h4>{post.pursuit_category} {activityType} </h4> : <></>}
@@ -24,8 +23,14 @@ const ShortEvent = (props) => {
             const activityType = post.is_milestone ? "MileStone" : "Progress";
             return (
                 <div>
-                    <div className="event-cover-container">
-                        <img className="event-cover-photo" src={post.cover_photo_key ? returnUserImageURL(post.cover_photo_key) : returnUserImageURL(post.image_data[0])} />
+                    <div className="shortevent-cover-container">
+                        <img
+                            className="shortevent-cover-photo"
+                            src={
+                                post.cover_photo_key ?
+                                    returnUserImageURL(post.cover_photo_key) :
+                                    returnUserImageURL(post.image_data[0])
+                            } />
                     </div>
                     {post.pursuit_category ? <h4>{post.pursuit_category} {activityType} </h4> : <></>}
                 </div>
@@ -34,8 +39,14 @@ const ShortEvent = (props) => {
         else {
             return (
                 <div>
-                    <div className="event-cover-container">
-                        <img className="event-cover-photo" src={post.cover_photo_key ? returnUserImageURL(post.cover_photo_key) : returnUserImageURL(post.image_data[0])} />
+                    <div className="shortevent-cover-container">
+                        <img
+                            className="shortevent-cover-photo"
+                            src={
+                                post.cover_photo_key ?
+                                    returnUserImageURL(post.cover_photo_key) :
+                                    returnUserImageURL(post.image_data[0])
+                            } />
                     </div>
                     {post.title ? <h4>{post.title}</h4> : <></>}
                 </div>

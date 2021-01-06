@@ -5,7 +5,8 @@ import { PlaceholderBlockConfig } from 'Dante2/package/es/components/blocks/plac
 import _ from 'lodash';
 import { IMAGE_BASE_URL, returnUserImageURL } from '../../constants/urls';
 import ReviewPost from "../draft/review-post";
- 
+import "./long-post.scss";
+
 const SAVE_INTERVAL = 1000;
 const INITIAL = "INITIAL";
 const EDIT = "EDIT";
@@ -27,9 +28,6 @@ const LongPostViewer = (props) => {
         }
         setWindow(window);
     }
-    const handleSave = (editorContext, content) => {
-
-    }
 
     if (window === INITIAL) {
 
@@ -37,22 +35,21 @@ const LongPostViewer = (props) => {
             "July", "August", "September", "October", "November", "December"
         ];
         const date = props.eventData.date ? new Date(props.eventData.date) : null;
-      
+
         if (props.largeViewMode) {
             return (
-                <div className="long-post-window">
-                    <div className="long-editor-container" id="long-editor-buttons">
+                <div className="longpostviewer-window">
+                    <div className="longpostviewer-button-container">
                         {props.isOwnProfile ? <button onClick={() => windowSwitch(EDIT)}>Edit</button> : <></>}
                         {props.isOwnProfile ? <button onClick={props.onDeletePost}>Remove</button> : <></>}
                     </div>
-                    <div id="long-post-stats-container">
-
+                    <div className="longpostviewer-stats-container">
                         {props.eventData.is_milestone ? <p>Milestone :)</p> : <></>}
                         {props.eventData.date ? <p>{monthNames[date.getMonth()]} {date.getDate()}, {date.getFullYear()} </p> : <></>}
                         {props.eventData.pursuit_category ? <p>{props.pursuit_category}</p> : <></>}
                         {props.eventData.min_duration ? <p>{props.eventData.min_duration} minutes</p> : <></>}
                     </div>
-                    <div className="long-editor-container">
+                    <div id="longpostviewer-editor-container">
                         < DanteEditor
                             key={key}
                             content={props.textData}
@@ -64,23 +61,23 @@ const LongPostViewer = (props) => {
         }
         else {
             return (
-                <div className="long-post-feed-object-container" onClick={() => props.openLongPostModal(props.eventData)}>
-                    <div id="long-post-intro-container">
+                <div onClick={() => props.openLongPostModal(props.eventData)}>
+                    <div>
                         {props.eventData.title ? <h2>{props.eventData.title}</h2> : <></>}
                         {props.eventData.subtitle ? <h4>{props.eventData.subtitle}</h4> : <></>}
-                        <div className="loading-display-photo">
+                        <div className="">
                             <img src={returnUserImageURL(props.displayPhoto)} />
                         </div>
                         <h4>{props.username}</h4>
                         {props.eventData.cover_photo_key ? <img src={returnUserImageURL(props.eventData.cover_photo_key)} /> : <></>}
                     </div>
-                    <div id="long-post-stats-container">
+                    <div className="longpostviewer-stats-container">
                         {props.eventData.is_milestone ? <p>Milestone :)</p> : <></>}
                         {props.eventData.date ? <p>{monthNames[date.getMonth()]} {date.getDate()}, {date.getFullYear()} </p> : <></>}
                         {props.eventData.pursuit_category ? <p>{props.eventData.pursuit_category}</p> : <></>}
                         {props.eventData.min_duration ? <p>{props.eventData.min_duration} minutes</p> : <></>}
                     </div>
-                    <div className="long-editor-container">
+                    <div className="longpostviewer-editor-container">
                         < DanteEditor
                             key={key}
                             content={props.textData}
@@ -95,12 +92,12 @@ const LongPostViewer = (props) => {
     else if (window === EDIT) {
 
         return (
-            <div className="long-post-window">
-                <div className="long-editor-container" id="long-editor-buttons">
+            <div className="longpostviewer-window">
+                <div className="longpostviewer-button-container">
                     {props.isOwnProfile ? <button onClick={() => windowSwitch(INITIAL)}>Cancel Edit</button> : <></>}
                     {props.isOwnProfile ? <button onClick={() => windowSwitch(REVIEW)}>Review</button> : <></>}
                 </div>
-                <div className="long-editor-container">
+                <div className="longpostviewer-editor-container">
                     < DanteEditor
                         key={key}
                         onChange={

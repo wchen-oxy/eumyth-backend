@@ -107,7 +107,7 @@ const LongPost = (props) => {
         </div>
         {props.onlineDraftRetrieved && !props.loading ?
           (
-            <div id="longpost-editor-container" ref={editorContainerRef}>
+            <div ref={editorContainerRef}>
               <LongEditor
                 username={props.username}
                 isSavePending={isSavePending}

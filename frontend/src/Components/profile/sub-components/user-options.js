@@ -1,9 +1,10 @@
 import React from 'react';
+import "./user-options.scss";
 
 const UserOptions = () => {
     return (
         <div>
-            <div id="user-option-window">
+            <div id="useroption-window">
                 <p>Hello</p>
             </div>
         </div>)

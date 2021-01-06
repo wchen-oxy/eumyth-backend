@@ -22,8 +22,7 @@ const ReviewPost = (props) => {
     const [coverPhoto, setCover] = useState(null);
 
     const handlePostSubmit = () => {
-        setLoading(true);
-        let formData = new FormData();
+         let formData = new FormData();
         formData.append("displayPhoto", props.displayPhoto);
         formData.append("postType", props.postType);
         formData.append("username", props.username);
@@ -131,11 +130,11 @@ const ReviewPost = (props) => {
                     <button onClick={(e) => handlePostSubmit()}>Post!</button>
                 </div>
                 {error ? <p>An Error Occured. Please try again. </p> : <></>}
-                {/* {loading ?
-                    <div className="short-post-container" id="modal-overlay">
+                {loading ?
+                    <div>
                         <p> Loading...</p>
                     </div> :
-                    <></>} */}
+                    <></>}
             </div>
         </div>
     );

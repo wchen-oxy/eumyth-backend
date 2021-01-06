@@ -1,0 +1,16 @@
+@import "../../../partials";
+.longpostviewer-window {
+    @include large-post-window;
+}
+
+.longpostviewer-button-container{
+    @include long-post-button-container;
+}
+
+.longpostviewer-stats-container{
+    @include long-post-button-container;
+}
+
+#longpostviewer-editor-container{
+    @include long-post-text-container;
+}

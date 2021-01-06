@@ -1,6 +1,7 @@
-.custom-infinite-scroll-row{
+@import "../../../partials";
+
+.timeline-infinite-scroll-row{
+    @include flex-display-row;
     margin: auto;
     width: fit-content;
-    // justify-content: space-between;
-    // align-content: center;
 }
