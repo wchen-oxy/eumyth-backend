@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PostHeader from "./sub-components/post-header";
 import DanteEditor from 'Dante2';
 import { ImageBlockConfig } from 'Dante2/package/es/components/blocks/image.js';
 import { PlaceholderBlockConfig } from 'Dante2/package/es/components/blocks/placeholder';
@@ -43,31 +44,41 @@ const LongPostViewer = (props) => {
         if (props.largeViewMode) {
             return (
                 <div className={props.isPostOnlyView ? "" : "longpostviewer-window"}>
-                    <div className="longpostviewer-button-container">
-                        {props.isOwnProfile ? <button onClick={() => windowSwitch(EDIT)}>Edit</button> : <></>}
-                        {props.isOwnProfile ? <button onClick={props.onDeletePost}>Remove</button> : <></>}
-                    </div>
-                    <div>
-                        {props.eventData.title ? <h2>{props.eventData.title}</h2> : <></>}
-                        {props.eventData.subtitle ? <h4>{props.eventData.subtitle}</h4> : <></>}
-                        <div>
-                            <img className="longpostviewer-display-photo"
-                                src={returnUserImageURL(props.displayPhoto)} />
+                    <div className="longpostviewer-meta-info-container">
+                        <div className="longpostviewer-button-container">
+                            {props.isOwnProfile ? <button onClick={() => windowSwitch(EDIT)}>Edit</button> : <></>}
+                            {props.isOwnProfile ? <button onClick={props.onDeletePost}>Remove</button> : <></>}
                         </div>
-                        <h4>{props.username}</h4>
+                        <div>
+                            {props.eventData.title ? <h1>{props.eventData.title}</h1> : <></>}
+                            {props.eventData.subtitle ? <h4>{props.eventData.subtitle}</h4> : <></>}
+                            <div className="longpostviewer-author-info-container">
+                                <div>
+                                    <img className="longpostviewer-display-photo"
+                                        src={returnUserImageURL(props.displayPhoto)} />
+                                    {props.eventData.date ? <p>{monthNames[date.getMonth()]} {date.getDate()}, {date.getFullYear()} </p> : <></>}
+
+                                </div>
+                                <div>
+                                    <h4>{props.username}</h4>
+                                    {props.eventData.pursuit_category ? <h5>For {props.eventData.pursuit_category}</h5> : <></>}
+                                </div>
+                                <div className="longpostviewer-stats-container">
+                                    {props.eventData.is_milestone ? <p>Milestone :)</p> : <></>}
+                                    {props.eventData.min_duration ? <p>{props.eventData.min_duration} minutes</p> : <></>}
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div className="longpostviewer-editor-container">
                         {
                             props.eventData.cover_photo_key ?
-                                <img src={returnUserImageURL(props.eventData.cover_photo_key)} /> :
+                                <img className="longpostviewer-cover-photo" src={returnUserImageURL(props.eventData.cover_photo_key)} /> :
                                 <></>
                         }
-                    </div>
-                    <div className="longpostviewer-stats-container">
-                        {props.eventData.is_milestone ? <p>Milestone :)</p> : <></>}
-                        {props.eventData.date ? <p>{monthNames[date.getMonth()]} {date.getDate()}, {date.getFullYear()} </p> : <></>}
-                        {props.eventData.pursuit_category ? <p>{props.pursuit_category}</p> : <></>}
-                        {props.eventData.min_duration ? <p>{props.eventData.min_duration} minutes</p> : <></>}
-                    </div>
-                    <div id="longpostviewer-editor-container">
                         < DanteEditor
                             key={key}
                             content={props.textData}
@@ -80,16 +91,20 @@ const LongPostViewer = (props) => {
         else {
             return (
                 <div onClick={handleModalLaunch}>
+                    <PostHeader
+                        isOwnProfile={props.isOwnProfile}
+                        username={props.username}
+                        displayPhoto={props.eventData.display_photo_key}
+                    />
                     <div>
                         {props.eventData.title ? <h2>{props.eventData.title}</h2> : <></>}
                         {props.eventData.subtitle ? <h4>{props.eventData.subtitle}</h4> : <></>}
-                        <div className="">
+                        {/* <div className="">
                             <img
                                 className="longpostviewer-display-photo"
                                 src={returnUserImageURL(props.displayPhoto)} />
                         </div>
-                        <h4>{props.username}</h4>
-                        {props.eventData.cover_photo_key ? <img src={returnUserImageURL(props.eventData.cover_photo_key)} /> : <></>}
+                        <h4>{props.username}</h4> */}
                     </div>
                     <div className="longpostviewer-stats-container">
                         {props.eventData.is_milestone ? <p>Milestone :)</p> : <></>}
@@ -97,7 +112,8 @@ const LongPostViewer = (props) => {
                         {props.eventData.pursuit_category ? <p>{props.eventData.pursuit_category}</p> : <></>}
                         {props.eventData.min_duration ? <p>{props.eventData.min_duration} minutes</p> : <></>}
                     </div>
-                    <div className="longpostviewer-editor-container">
+                    <div id="longpostviewer-inline-editor-container" className="longpostviewer-editor-container">
+                        {props.eventData.cover_photo_key ? <img className="longpostviewer-cover-photo" src={returnUserImageURL(props.eventData.cover_photo_key)} /> : <></>}
                         < DanteEditor
                             key={key}
                             content={props.textData}

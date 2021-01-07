@@ -4,7 +4,7 @@ import RelationModal from "./sub-components/relation-modal";
 import { AuthUserContext } from '../../Components/session/'
 import { withFirebase } from '../../Firebase';
 import { Link } from 'react-router-dom';
-import {POST, REQUEST_ACTION}  from "../constants/flags"
+import { POST, REQUEST_ACTION } from "../constants/flags"
 import './index.scss';
 
 const NavBar = () => (
@@ -100,16 +100,20 @@ class NavigationAuth extends React.Component {
     return (
       <>
         <nav>
-          <div>
+          <div id="navbar-left-container">
             <Link to={"/"} className="navbar-navigation-link">interestHub</Link>
-            {this.state.existingUserLoading ?
-              (<></>) :
-              (<button onClick={() => this.openModal(POST)}>New Entry</button>)}
+            {
+              this.state.existingUserLoading ?
+                (<></>) :
+                (
+                  <div>
+                    <button onClick={() => this.openModal(POST)}>New Entry</button>
+                    <button onClick={() => this.openModal(REQUEST_ACTION)}>Requests</button>
+                  </div>
+                )
+            }
           </div>
-          <div className="no-select">
-            <button onClick={() => this.openModal(REQUEST_ACTION)}>Requests</button>
-          </div>
-          <div className="no-select">
+          <div>
             <Link to={"/account"} >Settings</Link>
             <button onClick={this.props.firebase.doSignOut} >SignOut</button>
           </div>

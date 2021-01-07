@@ -2,20 +2,33 @@
 .longpostviewer-window {
     @include large-post-window;
 }
-
-.longpostviewer-display-photo{
-    @include medium-profile-photo;
-    border-radius: 50%;
-}
-
-.longpostviewer-button-container{
-    @include long-post-button-container;
-}
-
-.longpostviewer-stats-container{
-    @include long-post-button-container;
-}
-
-#longpostviewer-editor-container{
+.longpostviewer-meta-info-container {
     @include long-post-text-container;
+    .longpostviewer-author-info-container {
+        @include flex-display-row;
+
+        .longpostviewer-display-photo {
+            @include small-profile-photo;
+            border-radius: 50%;
+        }
+    }
+
+    .longpostviewer-button-container {
+        @include long-post-button-container;
+    }
+
+    .longpostviewer-stats-container {
+        margin-left: auto;
+    }
+}
+#longpostviewer-inline-editor-container {
+    max-height: 500px;
+    overflow: hidden;
+}
+
+.longpostviewer-editor-container {
+    @include long-post-text-container;
+    .longpostviewer-cover-photo {
+        width: 100%;
+    }
 }

@@ -37,13 +37,13 @@ const FollowButtons = (props) => {
         if (isFollowing) return (
             <div>
                 <button onClick={() => props.onFollowClick(UNFOLLOW_ACTION)}>{text}</button>
-                <button onClick={props.onOptionsClick}>...</button>
+                {/* <button onClick={props.onOptionsClick}>...</button> */}
             </div>
         )
         return (
             <div>
                 <button onClick={() => props.onFollowClick(FOLLOW_ACTION)}>{text}</button>
-                <button onClick={props.onOptionsClick}>...</button>
+                {/* <button onClick={props.onOptionsClick}>...</button> */}
             </div>
         )
     }

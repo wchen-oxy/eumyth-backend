@@ -1,17 +1,23 @@
-.loading-display-photo {
-    height: 50px;
-    width: 50px;
+@import "../../../../partials";
+
+.postheader-display-photo-container {
+    @include tiny-profile-photo;
     border-radius: 50%;
-    img{
+    img {
         max-width: 100%;
         max-height: 100%;
         border-radius: 50%;
-
     }
-
 }
 
-.post-header-container {
-    display: flex;
-    flex-direction: row;
+.postheader-main-container {
+    @include flex-display-row;
+    .postheader-author-information{
+        @include flex-display-row;
+        align-items: center;
+        img, h4 {
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+    }
 }

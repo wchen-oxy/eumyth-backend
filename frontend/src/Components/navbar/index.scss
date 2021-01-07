@@ -1,11 +1,16 @@
 @import "../../App.scss";
-
+@import "../../partials";
 nav {
     background-color: $primary-color;
     display: flex;
     justify-content: space-between;
     align-items: center;
     height: 50px;
+
+    #navbar-left-container{
+        @include flex-display-row;
+        align-items: center;
+    }
 
     .navbar-navigation-link {
         font-size: $primary-large-font-size;

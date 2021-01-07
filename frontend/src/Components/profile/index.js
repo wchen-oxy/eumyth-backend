@@ -6,7 +6,6 @@ import AxiosHelper from '../../Axios/axios';
 import NoMatch from '../no-match';
 import PostViewerController from "../post/viewer/post-viewer-controller";
 import FollowButton from "./sub-components/follow-buttons";
-import UserOptions from "./sub-components/user-options";
 import ProjectController from "../project/index";
 import { returnUserImageURL } from "../constants/urls";
 
@@ -336,7 +335,7 @@ class ProfilePage extends React.Component {
     }
 
     handleOptionsClick() {
-        this.openModal(this.miniModalRef);
+        // this.openModal(this.miniModalRef);
     }
 
     render() {
@@ -420,7 +419,7 @@ class ProfilePage extends React.Component {
                                 {pursuitHolderArray}
                             </div>
                         </div>
-                    </div>
+                  
                     <div id="profile-content-switch-container">
                         <button
                             disabled={this.state.mediaType === POST ? true : false}
@@ -465,6 +464,8 @@ class ProfilePage extends React.Component {
                                     pursuitsNames={this.state.pursuitsNames}
                                 />
                     }
+                                        </div>
+
                     <div className="modal" ref={this.modalRef}>
                         <div className="overlay" onClick={(() => this.closeModal())}></div>
                         <span className="close" onClick={(() => this.closeModal())}>X</span>
@@ -488,10 +489,6 @@ class ProfilePage extends React.Component {
                                 :
                                 <></>
                         }
-                    </div>
-                    <div className="modal" ref={this.miniModalRef}>
-                        <div className="overlay" onClick={(() => this.closeModal())}></div>
-                        <UserOptions />
                     </div>
                 </div>
             );

@@ -1,5 +1,6 @@
 @import "../../App.scss";
 @import "../../partials";
+
 #profile-main-container {
     @include flex-display-column;
     max-width: 940px;
@@ -65,22 +66,12 @@
             justify-content: center;
         }
     }
-}
 
-#profile-content-switch-container {
-    @include flex-display-row;
-    justify-content: center;
-    width: 100%;
-    margin: auto;
-    max-width: 940px;
-}
-
-.profile-timeline-container {
-    width: 100%;
-    margin: auto;
-    max-width: 940px;
-
-    #post-window {
-        position: fixed;
+    #profile-content-switch-container {
+        @include flex-display-row;
+        justify-content: center;
+        width: 100%;
+        margin: auto;
+        max-width: 940px;
     }
 }
