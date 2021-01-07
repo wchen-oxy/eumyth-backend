@@ -13,7 +13,7 @@ router.route('/').get((req, res) => {
             if (!user.draft)
                 return res.status(200).send(
                     {
-                        smallDisplayPhoto: user.tiny_cropped_display_photo_key,
+                        smallDisplayPhoto: user.small_cropped_display_photo_key,
                         draft: null
                     }
                 );

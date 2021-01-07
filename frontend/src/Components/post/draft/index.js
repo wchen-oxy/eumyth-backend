@@ -5,7 +5,7 @@ import LongPost from './long-post';
 import AxiosHelper from '../../../Axios/axios';
 import { withFirebase } from '../../../Firebase';
 import { NONE, SHORT, LONG, NEW_LONG, OLD_LONG } from "../../constants/flags";
- 
+
 class PostDraftController extends React.Component {
   _isMounted = false;
   constructor(props) {
@@ -14,7 +14,7 @@ class PostDraftController extends React.Component {
       onlineDraftRetrieved: false,
       onlineDraft: null,
       displayPhoto: null,
-      updatingOnlineDraft: false,
+      updatingOnlineDraft: true,
       postType: NONE,
       pursuitNames: null,
       indexUserData: null,
@@ -37,7 +37,7 @@ class PostDraftController extends React.Component {
     this._isMounted = true;
     if (this._isMounted && this.props.username) {
       this.handleIndexUserDataSet();
-      this.handleDraftRetrieval(true);
+      // this.handleDraftRetrieval(true);
     }
   }
   componentWillUnmount() {
@@ -86,21 +86,32 @@ class PostDraftController extends React.Component {
     AxiosHelper.returnIndexUser(this.props.username)
       .then(
         (result) => {
-          if (result.status === 200) {
-            let pursuitArray = [];
-            for (const pursuit of result.data.pursuits) {
-              pursuitArray.push(pursuit.name);
-            }
-            this.setState({
-              pursuitNames: pursuitArray,
-              indexUserData: result.data
-            });
+          let pursuitArray = [];
+          for (const pursuit of result.data.pursuits) {
+            pursuitArray.push(pursuit.name);
           }
-          else {
-            throw Error("didnt make it");
-          }
+          this.setState({
+            updatingOnlineDraft: false,
+            onlineDraftRetrieved: true,
+            pursuitNames: pursuitArray,
+            indexUserData: result.data,
+            displayPhoto: result.data.small_cropped_display_photo_key,
+            onlineDraft: JSON.parse(result.data.draft.text),
+          });
         }).catch(
-          (result) => { console.log(result) }
+          (result) => {
+            console.log(result);
+            this.setState({
+              onlineDraftRetrieved: true,
+              updatingOnlineDraft: false,
+              errorRetrievingDraft: true
+            });
+            alert(
+              `Something went wrong retrieving your long post draft. 
+              Please do not edit your old draft or you will your saved data. 
+              Refresh your page or contact support for more help.`
+            )
+          }
         );
   }
 

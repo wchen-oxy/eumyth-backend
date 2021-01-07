@@ -78,8 +78,6 @@ const makeTextSnippet = (postType, isPaginated, textData) => {
 
 router.route('/')
   .post(upload.fields([{ name: "images" }, { name: "coverPhoto", maxCount: 1 }]), (req, res) => {
-    console.log("123");
-
     const postType = req.body.postType ? req.body.postType : null;
     const username = req.body.username;
     const displayPhoto = req.body.displayPhoto;

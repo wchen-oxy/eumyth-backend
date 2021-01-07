@@ -260,6 +260,7 @@ class ReturningUserPage extends React.Component {
                     largeViewMode={true}
                     key={this.state.selectedEvent._id}
                     isOwnProfile={true}
+                    isPostOnlyView={false}
                     displayPhoto={this.state.indexUserData.tiny_cropped_display_photo_key}
                     preferredPostType={this.state.indexUserData.preferredPostType}
                     closeModal={this.closeModal}

@@ -4,10 +4,8 @@ import RelationModal from "./sub-components/relation-modal";
 import { AuthUserContext } from '../../Components/session/'
 import { withFirebase } from '../../Firebase';
 import { Link } from 'react-router-dom';
+import {POST, REQUEST_ACTION}  from "../constants/flags"
 import './index.scss';
-
-const POST = "POST";
-const REQUEST = "REQUEST";
 
 const NavBar = () => (
   <AuthUserContext.Consumer>
@@ -59,7 +57,7 @@ class NavigationAuth extends React.Component {
       this.setState({ isPostModalShowing: true });
 
     }
-    else if (postType === REQUEST) {
+    else if (postType === REQUEST_ACTION) {
       this.setState({ isRequestModalShowing: true });
     }
   }
@@ -109,7 +107,7 @@ class NavigationAuth extends React.Component {
               (<button onClick={() => this.openModal(POST)}>New Entry</button>)}
           </div>
           <div className="no-select">
-            <button onClick={() => this.openModal(REQUEST)}>Requests</button>
+            <button onClick={() => this.openModal(REQUEST_ACTION)}>Requests</button>
           </div>
           <div className="no-select">
             <Link to={"/account"} >Settings</Link>

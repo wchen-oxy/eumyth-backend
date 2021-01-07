@@ -33,6 +33,7 @@ class PostViewerController extends React.Component {
                         textData={this.props.textData}
                         largeViewMode={this.props.largeViewMode}
                         isOwnProfile={this.props.isOwnProfile}
+                        isPostOnlyView={this.props.isPostOnlyView}
                         eventData={this.props.eventData}
                         onDeletePost={this.props.onDeletePost}
                         closeModal={this.props.closeModal}
@@ -49,6 +50,7 @@ class PostViewerController extends React.Component {
                         largeViewMode={this.props.largeViewMode}
                         textData={this.props.textData}
                         isOwnProfile={this.props.isOwnProfile}
+                        isPostOnlyView={this.props.isPostOnlyView}
                         eventData={this.props.eventData}
                         onDeletePost={this.props.onDeletePost}
                         closeModal={this.props.closeModal}

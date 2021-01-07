@@ -366,6 +366,8 @@ class ProfilePage extends React.Component {
                 <PostViewerController
                     key={this.state.selectedEvent._id}
                     isOwnProfile={this.state.visitorUsername === this.state.selectedEvent.username}
+                    largeViewMode={true}
+                    isPostOnlyView={true}
                     displayPhoto={this.state.selectedEvent.display_photo_key}
                     preferredPostType={this.state.preferredPostType}
                     postType={this.state.postType}
@@ -471,6 +473,7 @@ class ProfilePage extends React.Component {
                                 <PostViewerController
                                     key={this.state.selectedEvent._id}
                                     isOwnProfile={this.state.visitorUsername === this.state.targetUsername}
+                                    isPostOnlyView={false}
                                     displayPhoto={this.state.smallCroppedDisplayPhoto}
                                     preferredPostType={this.state.preferredPostType}
                                     postType={this.state.postType}

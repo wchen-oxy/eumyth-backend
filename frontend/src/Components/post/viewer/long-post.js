@@ -19,7 +19,6 @@ const LongPostViewer = (props) => {
     const [key, setKey] = useState(0);
     const [window, setWindow] = useState(INITIAL);
     const [localDraft, setLocalDraft] = useState(props.textData);
-    const original = props.textData;
 
     const windowSwitch = (window) => {
         if (window === INITIAL) {
@@ -29,6 +28,11 @@ const LongPostViewer = (props) => {
         setWindow(window);
     }
 
+    const handleModalLaunch = () => {
+        if (!props.isPostOnlyView) {
+            return props.openLongPostModal(props.eventData)
+        }
+    }
     if (window === INITIAL) {
 
         const monthNames = ["January", "February", "March", "April", "May", "June",
@@ -38,10 +42,24 @@ const LongPostViewer = (props) => {
 
         if (props.largeViewMode) {
             return (
-                <div className="longpostviewer-window">
+                <div className={props.isPostOnlyView ? "" : "longpostviewer-window"}>
                     <div className="longpostviewer-button-container">
                         {props.isOwnProfile ? <button onClick={() => windowSwitch(EDIT)}>Edit</button> : <></>}
                         {props.isOwnProfile ? <button onClick={props.onDeletePost}>Remove</button> : <></>}
+                    </div>
+                    <div>
+                        {props.eventData.title ? <h2>{props.eventData.title}</h2> : <></>}
+                        {props.eventData.subtitle ? <h4>{props.eventData.subtitle}</h4> : <></>}
+                        <div>
+                            <img className="longpostviewer-display-photo"
+                                src={returnUserImageURL(props.displayPhoto)} />
+                        </div>
+                        <h4>{props.username}</h4>
+                        {
+                            props.eventData.cover_photo_key ?
+                                <img src={returnUserImageURL(props.eventData.cover_photo_key)} /> :
+                                <></>
+                        }
                     </div>
                     <div className="longpostviewer-stats-container">
                         {props.eventData.is_milestone ? <p>Milestone :)</p> : <></>}
@@ -61,12 +79,14 @@ const LongPostViewer = (props) => {
         }
         else {
             return (
-                <div onClick={() => props.openLongPostModal(props.eventData)}>
+                <div onClick={handleModalLaunch}>
                     <div>
                         {props.eventData.title ? <h2>{props.eventData.title}</h2> : <></>}
                         {props.eventData.subtitle ? <h4>{props.eventData.subtitle}</h4> : <></>}
                         <div className="">
-                            <img src={returnUserImageURL(props.displayPhoto)} />
+                            <img
+                                className="longpostviewer-display-photo"
+                                src={returnUserImageURL(props.displayPhoto)} />
                         </div>
                         <h4>{props.username}</h4>
                         {props.eventData.cover_photo_key ? <img src={returnUserImageURL(props.eventData.cover_photo_key)} /> : <></>}

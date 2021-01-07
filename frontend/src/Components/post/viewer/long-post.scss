@@ -3,6 +3,11 @@
     @include large-post-window;
 }
 
+.longpostviewer-display-photo{
+    @include medium-profile-photo;
+    border-radius: 50%;
+}
+
 .longpostviewer-button-container{
     @include long-post-button-container;
 }
