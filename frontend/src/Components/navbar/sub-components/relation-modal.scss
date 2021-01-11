@@ -11,15 +11,20 @@
     z-index: 22;
     height: 74vh;
     width: 76vw;
-    #relationmodal-info {
-        display: flex;
+    #relationmodal-hero-container {
+        @include flex-display-row;
 
         .relationmodal-column {
             width: 33.32%;
 
             .relationmodal-profile-row {
-                display: flex;
+                @include flex-display-row;
                 align-items: center;
+
+                .relationmodal-profile-info-container {
+                    @include flex-display-row;
+
+                }
 
                 img {
                     @include tiny-profile-photo;

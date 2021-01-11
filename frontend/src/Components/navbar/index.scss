@@ -1,5 +1,11 @@
 @import "../../App.scss";
 @import "../../partials";
+
+%navbar-text {
+    margin: auto;
+    color: white;
+}
+
 nav {
     background-color: $primary-color;
     display: flex;
@@ -7,9 +13,26 @@ nav {
     align-items: center;
     height: 50px;
 
-    #navbar-left-container{
+    #navbar-left-container {
         @include flex-display-row;
         align-items: center;
+
+        h4 {
+            @extend %navbar-text;
+        }
+    }
+
+    #navbar-right-container {
+        @include flex-display-row;
+        h4 {
+            @extend %navbar-text;
+        }
+    }
+    #navbar-logo-container {
+        display: flex;
+        h3 {
+            @extend %navbar-text;
+        }
     }
 
     .navbar-navigation-link {
@@ -19,7 +42,8 @@ nav {
     button,
     a {
         font-size: $primary-medium-font-size;
-        padding: 0.5vh;
+        padding-left: 0.5vh;
+        padding-right: 0.5vh;
     }
 
     button {

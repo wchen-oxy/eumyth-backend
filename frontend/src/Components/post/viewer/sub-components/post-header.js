@@ -13,8 +13,14 @@ const PostHeader = (props) => {
                 </div>
                 <h4>{props.username}</h4>
             </div>
-            {props.isOwnProfile ? <button onClick={props.onDeletePost}>Remove</button> : <></>}
-            {props.isOwnProfile ? <button onClick={() => props.onEditClick(EDIT)}>Edit</button> : <></>}
+            {
+                props.isOwnProfile ?
+                    <button onClick={props.onDeletePost}>Remove</button> : <></>
+            }
+            {
+                props.isOwnProfile ?
+                    <button onClick={() => props.onEditClick(EDIT)}>Edit</button> : <></>
+            }
         </div>
     )
 

@@ -2,6 +2,7 @@ import React from 'react';
 import ShortPostViewer from "./short-post";
 import LongPostViewer from "./long-post";
 import { SHORT, LONG } from "../../constants/flags";
+import { withFirebase } from "../../../Firebase/index";
 
 class PostViewerController extends React.Component {
     _isMounted = false;
@@ -21,6 +22,7 @@ class PostViewerController extends React.Component {
     }
 
     render() {
+        const isOwnProfile = this.props.eventData.username === this.props.firebase.returnUsername();
 
         switch (this.props.eventData.post_format) {
             case (SHORT):
@@ -32,7 +34,7 @@ class PostViewerController extends React.Component {
                         preferredPostType={this.props.preferredPostType}
                         textData={this.props.textData}
                         largeViewMode={this.props.largeViewMode}
-                        isOwnProfile={this.props.isOwnProfile}
+                        isOwnProfile={isOwnProfile}
                         isPostOnlyView={this.props.isPostOnlyView}
                         eventData={this.props.eventData}
                         onDeletePost={this.props.onDeletePost}
@@ -49,7 +51,7 @@ class PostViewerController extends React.Component {
                         preferredPostType={this.props.preferredPostType}
                         largeViewMode={this.props.largeViewMode}
                         textData={this.props.textData}
-                        isOwnProfile={this.props.isOwnProfile}
+                        isOwnProfile={isOwnProfile}
                         isPostOnlyView={this.props.isPostOnlyView}
                         eventData={this.props.eventData}
                         onDeletePost={this.props.onDeletePost}
@@ -65,4 +67,4 @@ class PostViewerController extends React.Component {
     }
 }
 
-export default PostViewerController;
+export default withFirebase(PostViewerController);

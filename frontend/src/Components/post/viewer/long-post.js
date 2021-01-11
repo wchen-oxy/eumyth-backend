@@ -6,6 +6,7 @@ import { PlaceholderBlockConfig } from 'Dante2/package/es/components/blocks/plac
 import _ from 'lodash';
 import { IMAGE_BASE_URL, returnUserImageURL } from '../../constants/urls';
 import ReviewPost from "../draft/review-post";
+import { withFirebase } from "../../../Firebase/index";
 import "./long-post.scss";
 
 const SAVE_INTERVAL = 1000;
@@ -40,23 +41,38 @@ const LongPostViewer = (props) => {
             "July", "August", "September", "October", "November", "December"
         ];
         const date = props.eventData.date ? new Date(props.eventData.date) : null;
-
+        console.log(props.isOwnProfile);
         if (props.largeViewMode) {
             return (
                 <div className={props.isPostOnlyView ? "" : "longpostviewer-window"}>
                     <div className="longpostviewer-meta-info-container">
-                        <div className="longpostviewer-button-container">
-                            {props.isOwnProfile ? <button onClick={() => windowSwitch(EDIT)}>Edit</button> : <></>}
-                            {props.isOwnProfile ? <button onClick={props.onDeletePost}>Remove</button> : <></>}
-                        </div>
                         <div>
-                            {props.eventData.title ? <h1>{props.eventData.title}</h1> : <></>}
+                            {props.eventData.title ?
+                                (
+                                    <div id="longpostviewer-top-title-bar">
+                                        <h1>{props.eventData.title}</h1>
+
+                                        {
+                                            props.isOwnProfile ?
+                                                <div className="longpostviewer-button-container">
+                                                    <button onClick={() => windowSwitch(EDIT)}>Edit</button>
+                                                    <button onClick={props.onDeletePost}>Remove</button>
+                                                </div> : <></>
+                                        }
+
+                                    </div>
+                                )
+                                : <></>}
                             {props.eventData.subtitle ? <h4>{props.eventData.subtitle}</h4> : <></>}
                             <div className="longpostviewer-author-info-container">
                                 <div>
                                     <img className="longpostviewer-display-photo"
                                         src={returnUserImageURL(props.displayPhoto)} />
-                                    {props.eventData.date ? <p>{monthNames[date.getMonth()]} {date.getDate()}, {date.getFullYear()} </p> : <></>}
+                                    {
+                                        props.eventData.date ?
+                                            <p>{monthNames[date.getMonth()]} {date.getDate()}, {date.getFullYear()} </p> :
+                                            <></>
+                                    }
 
                                 </div>
                                 <div>
@@ -221,4 +237,4 @@ const LongPostViewer = (props) => {
 
 }
 
-export default LongPostViewer;
+export default withFirebase(LongPostViewer);

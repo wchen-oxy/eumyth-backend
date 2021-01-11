@@ -61,8 +61,10 @@ class RelationModal extends React.Component {
         for (const user of data) {
             followers.push(
                 <div className="relationmodal-profile-row">
-                    <img src={returnUserImageURL(user.display_photo)} />
-                    <p>{user.username}</p>
+                    <div className="relationmodal-profile-info-container" onClick={() => console.log("THING")}>
+                        <img src={returnUserImageURL(user.display_photo)} />
+                        <p>{user.username}</p>
+                    </div>
                     <button onClick={() => this.handleStatusChange(UNFOLLOW_ACTION, user.username)}>Following</button>
                 </div>
             )
@@ -75,9 +77,11 @@ class RelationModal extends React.Component {
         for (const user of data) {
             following.push(
                 <div className="relationmodal-profile-row">
-                    <img src={returnUserImageURL(user.display_photo)} />
-                    <p>{user.username}</p>
-                    <button onClick={() => this.handleStatusChange(UNFOLLOW_ACTION, user.username)}>Following</button>
+                    <div className="relationmodal-profile-info-container">
+                        <img src={returnUserImageURL(user.display_photo)} />
+                        <p>{user.username}</p>
+                        <button onClick={() => this.handleStatusChange(UNFOLLOW_ACTION, user.username)}>Following</button>
+                    </div>
                 </div>
             )
         }
@@ -89,8 +93,10 @@ class RelationModal extends React.Component {
         for (const user of data) {
             requests.push(
                 <div className="relationmodal-profile-row">
-                    <img src={returnUserImageURL(user.display_photo)} />
-                    <p>{user.username}</p>
+                    <div className="relationmodal-profile-info-container">
+                        <img src={returnUserImageURL(user.display_photo)} />
+                        <p>{user.username}</p>
+                    </div>
                     <button onClick={() => this.handleStatusChange(ACCEPT_ACTION, user.username)}>Accept Request</button>
                     <button onClick={() => this.handleStatusChange(DECLINE_ACTION, user.username)}>Decline Request</button>
                 </div >
@@ -112,7 +118,7 @@ class RelationModal extends React.Component {
         return (
             <div id="relationmodal-window">
                 <span className="close" onClick={(() => this.props.closeModal(REQUEST_ACTION))}>X</span>
-                <div id="relationmodal-info">
+                <div id="relationmodal-hero-container">
                     <div className="relationmodal-column">
                         <h2>Requests</h2>
                         {this.state.requested}

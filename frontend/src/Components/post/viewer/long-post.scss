@@ -4,6 +4,11 @@
 }
 .longpostviewer-meta-info-container {
     @include long-post-text-container;
+
+    #longpostviewer-top-title-bar {
+        @include flex-display-row;
+        width: 100%;
+    }
     .longpostviewer-author-info-container {
         @include flex-display-row;
 
@@ -14,7 +19,9 @@
     }
 
     .longpostviewer-button-container {
-        @include long-post-button-container;
+        @include flex-display-row;
+        align-items: center;
+        margin-left: auto;
     }
 
     .longpostviewer-stats-container {
