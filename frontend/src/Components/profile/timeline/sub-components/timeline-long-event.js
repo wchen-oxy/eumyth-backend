@@ -14,7 +14,7 @@ const LongEvent = (props) => {
                 {post.cover_photo_key ? coverImage : <p className="longevent-preview-text">{previewText}</p>}
             </div>
             <h4 className="longevent-title-container">{post.title ? post.title : post.pursuit_category}</h4>
-            {post.subtitle ? <h6 className="longevent-subtitle-container">{post.subtitle}</h6> : <></>}
+            {post.subtitle ? <p className="longevent-subtitle-container">{post.subtitle}</p> : <></>}
         </div>
     );
 }

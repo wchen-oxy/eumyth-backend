@@ -50,7 +50,7 @@ const LongPostViewer = (props) => {
                             {props.eventData.title ?
                                 (
                                     <div id="longpostviewer-top-title-bar">
-                                        <h1>{props.eventData.title}</h1>
+                                        <h1 id="longpostviewer-title">{props.eventData.title}</h1>
 
                                         {
                                             props.isOwnProfile ?
@@ -63,7 +63,7 @@ const LongPostViewer = (props) => {
                                     </div>
                                 )
                                 : <></>}
-                            {props.eventData.subtitle ? <h4>{props.eventData.subtitle}</h4> : <></>}
+                            {props.eventData.subtitle ? <h4 id="longpostviewer-subtitle">{props.eventData.subtitle}</h4> : <></>}
                             <div className="longpostviewer-author-info-container">
                                 <div>
                                     <img className="longpostviewer-display-photo"
@@ -75,26 +75,31 @@ const LongPostViewer = (props) => {
                                     }
 
                                 </div>
-                                <div>
+                                <div className="longpostviewer-author-info">
                                     <h4>{props.username}</h4>
-                                    {props.eventData.pursuit_category ? <h5>For {props.eventData.pursuit_category}</h5> : <></>}
+                                    {props.eventData.pursuit_category ? <p>For {props.eventData.pursuit_category}</p> : <></>}
                                 </div>
                                 <div className="longpostviewer-stats-container">
                                     {props.eventData.is_milestone ? <p>Milestone :)</p> : <></>}
                                     {props.eventData.min_duration ? <p>{props.eventData.min_duration} minutes</p> : <></>}
                                 </div>
                             </div>
+                            <div className="longpostviewer-cover-photo-container">
+                                {
+                                    props.eventData.cover_photo_key ?
+                                        <img className="longpostviewer-cover-photo" src={returnUserImageURL(props.eventData.cover_photo_key)} /> :
+                                        <></>
+                                }
+                            </div>
+
 
                         </div>
+
 
                     </div>
 
                     <div className="longpostviewer-editor-container">
-                        {
-                            props.eventData.cover_photo_key ?
-                                <img className="longpostviewer-cover-photo" src={returnUserImageURL(props.eventData.cover_photo_key)} /> :
-                                <></>
-                        }
+
                         < DanteEditor
                             key={key}
                             content={props.textData}

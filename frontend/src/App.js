@@ -1,14 +1,11 @@
 import React from 'react';
-// import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import './App.scss';
 import HomePage from './Components/home/index';
 import AccountPage from './Components/account';
 import { withAuthentication } from './Components/session';
 import Navbar from './Components/navbar/index';
 import ProfilePage from './Components/profile';
-// import DetailedPursuit from './Components/profile/detailed-pursuit';
-
+import './App.scss';
 
 const App = () => (
       <Router>
