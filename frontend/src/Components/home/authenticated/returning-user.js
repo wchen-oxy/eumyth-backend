@@ -1,5 +1,6 @@
 import React from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { Link } from "react-router-dom";
 import { withAuthorization } from '../../session';
 import { withFirebase } from '../../../Firebase';
 import AxiosHelper from '../../../Axios/axios';
@@ -318,15 +319,15 @@ class ReturningUserPage extends React.Component {
                 </div>
                 <div id="returninguser-recent-work-container" className="returninguser-main-row">
                     <div className="returninguser-row">
-                        <h4>Recent Work</h4>
-                        <button onClick={this.handlePursuitClick}>Pursuits</button>
+                        <Link id="returninguser-recent-work-title" className="returninguser-title" to={"/" + this.state.username}>Your Recent Work</Link>
+                        {/* <button id="returninguser-recent-work-button" onClick={this.handlePursuitClick}><h4>Your Recent Work</h4></button> */}
                     </div>
-                    <div className="returninguser-row">
+                    <div id="returninguser-recent-posts-container" className="returninguser-row">
                         {this.state.recentPosts}
                     </div>
                 </div>
                 <div id="returninguser-feed-container" className="returninguser-main-row">
-                    <h4>Your Feed</h4>
+                    <h4 className="returninguser-title">Your Feed</h4>
                     <div id="returninguser-infinite-scroll-container" >
                         <InfiniteScroll
                             dataLength={this.state.nextOpenPostIndex}

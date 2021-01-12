@@ -1,3 +1,12 @@
+//Sizes
+// Colors
+$primary-color: #ed4071;
+$primary-text-color: black;
+$primary-calc-medium-font-size: calc(10px + 2vmin);
+$primary-extra-large-font-size: 30px;
+$primary-large-font-size: 22.5px;
+$primary-medium-font-size: 15px;
+
 @mixin flex-display-row {
     display: flex;
     flex-direction: row;

@@ -1,11 +1,37 @@
 @import "../../../partials";
 
+%title-texts {
+    font-size: $primary-large-font-size;
+    font-weight: 200;
+}
+
 #returninguser-profile-container,
 #returninguser-feed-container {
     @include flex-display-row;
 }
 
+#returninguser-recent-posts-container {
+    margin-top: 2.5%;
+    margin-bottom: 2.5%;
+}
+
+#returninguser-recent-work-button {
+    border: none;
+    outline: none;
+    background-color: transparent;
+}
+
+#returninguser-recent-work-title{
+    text-decoration: none;
+    color: black;
+}
+.returninguser-title {
+    @extend %title-texts;
+}
+
 .returninguser-main-row {
+    margin-top: 2.5%;
+    margin-bottom: 2.5%;
     padding: 2vh;
 
     #returninguser-recent-work-container {
