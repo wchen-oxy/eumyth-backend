@@ -70,7 +70,7 @@ const LongPostViewer = (props) => {
                                         src={returnUserImageURL(props.displayPhoto)} />
                                     {
                                         props.eventData.date ?
-                                            <p>{monthNames[date.getMonth()]} {date.getDate()}, {date.getFullYear()} </p> :
+                                            <p>{monthNames[date.getMonth()]} {date.getDate() + 1}, {date.getFullYear()} </p> :
                                             <></>
                                     }
 
@@ -129,7 +129,7 @@ const LongPostViewer = (props) => {
                     </div>
                     <div className="longpostviewer-stats-container">
                         {props.eventData.is_milestone ? <p>Milestone :)</p> : <></>}
-                        {props.eventData.date ? <p>{monthNames[date.getMonth()]} {date.getDate()}, {date.getFullYear()} </p> : <></>}
+                        {props.eventData.date ? <p>{monthNames[date.getMonth()]} {date.getDate() + 1}, {date.getFullYear()} </p> : <></>}
                         {props.eventData.pursuit_category ? <p>{props.eventData.pursuit_category}</p> : <></>}
                         {props.eventData.min_duration ? <p>{props.eventData.min_duration} minutes</p> : <></>}
                     </div>

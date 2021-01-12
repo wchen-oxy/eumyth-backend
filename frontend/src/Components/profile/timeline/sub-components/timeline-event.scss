@@ -1,24 +1,24 @@
 @import "../../../../partials";
 
-@mixin cover-photo{
+@mixin cover-photo {
     height: 120px;
     width: 200px;
     object-fit: cover;
 }
 
-@mixin cover-container{
+@mixin cover-container {
     height: 120px;
 }
 
-@mixin no-cover-photo{
+@mixin no-cover-photo {
     @include flex-display-row;
 }
 
-.event-container {
+%event-container {
     @include no-select;
     text-align: initial;
     width: 200px;
-    margin: 5px;
+    // margin: 5px;
     word-wrap: break-word;
 
     p {
@@ -31,5 +31,20 @@
 }
 
 .event-cover-photo {
-   @include cover-photo;
+    @include cover-photo;
+}
+
+.event-first-container {
+    @extend %event-container;
+    margin-right: 2.7%;
+}
+
+.event-middle-container {
+    @extend %event-container;
+    margin: 0 2.7%;
+}
+
+.event-last-container {
+    @extend %event-container;
+    margin-left: 2.7%;
 }

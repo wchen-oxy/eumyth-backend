@@ -4,7 +4,7 @@ import Event from './sub-components/timeline-event';
 import AxiosHelper from '../../../Axios/axios';
 import { PROJECT } from "../../constants/flags";
 import './index.scss';
-
+ 
 class Timeline extends React.Component {
     _isMounted = false;
     constructor(props) {
@@ -50,6 +50,7 @@ class Timeline extends React.Component {
                 }
                 masterArray[index].push(
                     <Event
+                        index={k}
                         mediaType={mediaType}
                         isSelected={isSelected}
                         newProjectView={this.props.newProjectView}

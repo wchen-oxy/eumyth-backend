@@ -1,15 +1,14 @@
 import React from "react";
+import { returnFormattedDate } from "../../../constants/ui-text";
 
 const ShortPostMetaInfo = (props) => {
-    const monthNames = ["January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"
-    ];
-    const date = new Date(props.date);
+    const date = props.date ? returnFormattedDate(props.date) : null;
+
     return (
         <div>
             <div>
                 {props.isMilestone ? <p>Milestone :)</p> : <></>}
-                {props.date ? <p>{monthNames[date.getMonth()]} {date.getDate()}, {date.getFullYear()} </p> : <></>}
+                {date ? <p>{date.month}, {date.day}, {date.year} </p> : <></>}
                 {props.pursuit ? <p>{props.pursuit}</p> : <></>}
                 {props.min ? <p>{props.min} minutes</p> : <></>}
             </div>

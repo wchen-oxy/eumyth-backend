@@ -5,6 +5,22 @@ import ProjectEvent from "./timeline-project-event";
 import './timeline-event.scss';
 import { POST, PROJECT, LONG, SHORT } from "../../../constants/flags";
 
+const selectClassStyle = (num) => {
+    console.log(num);
+    switch (num) {
+        case (0):
+            return "event-first-container";
+        case (1):
+            return "event-middle-container";
+        case (2):
+            return "event-middle-container";
+        case (3):
+            return "event-last-container";
+        default:
+            throw new Error("Element Index in Timeline Event is incorrect:" + num);
+    }
+}
+
 
 const Event = (props) => {
     const post = props.eventData;
@@ -21,7 +37,7 @@ const Event = (props) => {
                 throw Error("No matching post type: " + post.post_format);
         }
         return (
-            <div className="event-container">
+            <div className={props.index ? selectClassStyle(props.index) : "event-middle-container"}>
                 <div onClick={props.disableModalPreview ? () => console.log("Selected") : () => props.onEventClick(post)}>
                     {content}
                 </div>
@@ -32,7 +48,7 @@ const Event = (props) => {
     else if (props.mediaType === PROJECT) {
         content = <ProjectEvent post={post} />;
         return (
-            <div className="event-container">
+            <div className={props.index ? selectClassStyle(props.index) : "event-middle-container"}>
                 <div onClick={props.disableModalPreview ? () => console.log("Selected") : () => props.onProjectClick(post)}>
                     {content}
                 </div>
