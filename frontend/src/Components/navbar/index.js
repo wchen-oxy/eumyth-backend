@@ -105,7 +105,7 @@ class NavigationAuth extends React.Component {
               to={"/"}
               className="navbar-navigation-link">
               <div id="navbar-logo-container">
-                <h3>EverFire</h3>
+                <h3>Everfire</h3>
               </div>
             </Link>
             {

@@ -105,6 +105,7 @@ class ReturningUserPage extends React.Component {
                         for (const value of result[0].data) {
                             recentPosts.push(
                                 <Event
+                                    index={null}
                                     mediaType={POST}
                                     key={index++}
                                     eventData={value}
