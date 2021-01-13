@@ -19,11 +19,19 @@
     width: 100%;
 }
 
+@mixin lower-text-container{
+    padding: 5px;
+    height: 110px;
+    overflow: hidden;
+    margin: 0;
+}
+
 %event-container {
     @include no-select;
     text-align: initial;
     width: 220px;
     max-width: 220px;
+    max-height: 240px;
     background-color: white;
     word-wrap: break-word;
     border-radius: 5px;

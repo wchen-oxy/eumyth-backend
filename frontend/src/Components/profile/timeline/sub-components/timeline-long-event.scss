@@ -1,4 +1,4 @@
- @import "./timeline-event.scss";
+@import "./timeline-event.scss";
 
 .longevent-with-cover-photo-container {
     @include with-cover-photo-container-size;
@@ -13,11 +13,10 @@
 }
 
 .longevent-subtitle-container {
-    height: 88px;
     overflow: hidden;
     margin: 0;
 }
 
 .longevent-text-container {
-    padding: 5px;
+    @include lower-text-container;
 }
