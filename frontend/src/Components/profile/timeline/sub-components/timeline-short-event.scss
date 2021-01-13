@@ -1,22 +1,21 @@
-@import "../../../../partials";
-@import "./timeline-event.scss";
-h4,
-p {
-    margin: 0;
+ @import "./timeline-event.scss";
+
+.shortevent-with-cover-photo-container {
+    @include with-cover-photo-container-size;
 }
 
-.shortevent-cover-container {
-    @include cover-container;
-}
-
-.shortevent-no-cover-photo {
-    @include no-cover-photo;
-    overflow: hidden;
+.shortevent-no-cover-photo-container {
+    @include flex-display-row;
+    @include no-cover-photo-container-size;
+  
 }
 
 .shortevent-cover-photo {
-    @include cover-photo;
+    @include cover-photo-size;
 }
-
-.shortevent-cover {
+.shortevent-text-container {
+    padding: 5px;
+    height: 88px;
+    overflow: hidden;
+    margin: 0;
 }

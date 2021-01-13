@@ -1,50 +1,56 @@
 @import "../../../../partials";
 
-@mixin cover-photo {
+@mixin with-cover-photo-container-size {
     height: 120px;
-    width: 200px;
-    object-fit: cover;
+    overflow: hidden;
 }
 
-@mixin cover-container {
-    height: 120px;
+@mixin no-cover-photo-container-size {
+    height: 110px;
+    padding: 5px;
+    overflow: hidden;
+    p {
+        height: fit-content;
+    }
 }
 
-@mixin no-cover-photo {
-    @include flex-display-row;
+@mixin cover-photo-size {
+    height: auto;
+    width: 100%;
 }
 
 %event-container {
     @include no-select;
     text-align: initial;
-    width: 200px;
-    // margin: 5px;
+    width: 220px;
+    max-width: 220px;
+    background-color: white;
     word-wrap: break-word;
+    border-radius: 5px;
 
+    h4,
     p {
         margin: 0;
     }
-}
 
-.event-cover-container {
-    @include cover-container;
-}
-
-.event-cover-photo {
-    @include cover-photo;
+    h4{ 
+        font-size: 18px;
+    }
 }
 
 .event-first-container {
     @extend %event-container;
-    margin-right: 2.7%;
+    margin-right: 10px;
 }
 
 .event-middle-container {
     @extend %event-container;
-    margin: 0 2.7%;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 10px;
 }
 
 .event-last-container {
     @extend %event-container;
-    margin-left: 2.7%;
+    margin-left: 10px;
 }

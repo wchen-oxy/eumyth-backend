@@ -320,7 +320,6 @@ class ReturningUserPage extends React.Component {
                 <div id="returninguser-recent-work-container" className="returninguser-main-row">
                     <div className="returninguser-row">
                         <Link id="returninguser-recent-work-title" className="returninguser-title" to={"/" + this.state.username}>Your Recent Work</Link>
-                        {/* <button id="returninguser-recent-work-button" onClick={this.handlePursuitClick}><h4>Your Recent Work</h4></button> */}
                     </div>
                     <div id="returninguser-recent-posts-container" className="returninguser-row">
                         {this.state.recentPosts}

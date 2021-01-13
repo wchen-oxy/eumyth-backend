@@ -419,52 +419,52 @@ class ProfilePage extends React.Component {
                                 {pursuitHolderArray}
                             </div>
                         </div>
-                  
-                    <div id="profile-content-switch-container">
-                        <button
-                            disabled={this.state.mediaType === POST ? true : false}
-                            onClick={() => this.handleMediaTypeSwitch(POST)}>
-                            Posts
-                        </button>
-                        <button
-                            disabled={this.state.mediaType === PROJECT ? true : false}
-                            onClick={() => this.handleMediaTypeSwitch(PROJECT)}>
-                            Projects
-                        </button>
-                    </div>
-                    {
-                        (this.state.visitorUsername === null && this.state.isPrivate) ||
-                            (this.state.visitorUsername !== this.state.targetUsername && this.state.isPrivate) &&
-                            (
-                                this.state.followerStatus !== "FOLLOWING" &&
-                                this.state.followerStatus !== "REQUEST_ACCEPTED"
-                            )
-                            ?
-                            <p>This profile is private. To see these posts, please request access. </p> :
-                            this.state.mediaType === POST ?
-                                < Timeline
-                                    mediaType={this.state.mediaType}
-                                    key={this.state.feedId}
-                                    allPosts={this.state.feedData}
-                                    onEventClick={this.handleEventClick}
-                                    targetProfileId={this.state.targetProfileId} />
-                                :
 
-                                <ProjectController
-                                    username={this.state.targetUsername}
-                                    displayPhoto={this.state.smallCroppedDisplayPhoto}
-                                    targetProfileId={this.state.targetProfileId}
-                                    targetIndexUserId={this.state.targetIndexUserId}
-                                    mediaType={this.state.mediaType}
-                                    newProject={this.state.newProject}
-                                    key={this.state.feedId}
-                                    allPosts={this.state.feedData}
-                                    onEventClick={this.handleEventClick}
-                                    onNewBackProjectClick={this.handleNewBackProjectClick}
-                                    pursuitsNames={this.state.pursuitsNames}
-                                />
-                    }
-                                        </div>
+                        <div id="profile-content-switch-container">
+                            <button
+                                disabled={this.state.mediaType === POST ? true : false}
+                                onClick={() => this.handleMediaTypeSwitch(POST)}>
+                                Posts
+                        </button>
+                            <button
+                                disabled={this.state.mediaType === PROJECT ? true : false}
+                                onClick={() => this.handleMediaTypeSwitch(PROJECT)}>
+                                Projects
+                        </button>
+                        </div>
+                        {
+                            (this.state.visitorUsername === null && this.state.isPrivate) ||
+                                (this.state.visitorUsername !== this.state.targetUsername && this.state.isPrivate) &&
+                                (
+                                    this.state.followerStatus !== "FOLLOWING" &&
+                                    this.state.followerStatus !== "REQUEST_ACCEPTED"
+                                )
+                                ?
+                                <p>This profile is private. To see these posts, please request access. </p> :
+                                this.state.mediaType === POST ?
+                                    < Timeline
+                                        mediaType={this.state.mediaType}
+                                        key={this.state.feedId}
+                                        allPosts={this.state.feedData}
+                                        onEventClick={this.handleEventClick}
+                                        targetProfileId={this.state.targetProfileId} />
+                                    :
+
+                                    <ProjectController
+                                        username={this.state.targetUsername}
+                                        displayPhoto={this.state.smallCroppedDisplayPhoto}
+                                        targetProfileId={this.state.targetProfileId}
+                                        targetIndexUserId={this.state.targetIndexUserId}
+                                        mediaType={this.state.mediaType}
+                                        newProject={this.state.newProject}
+                                        key={this.state.feedId}
+                                        allPosts={this.state.feedData}
+                                        onEventClick={this.handleEventClick}
+                                        onNewBackProjectClick={this.handleNewBackProjectClick}
+                                        pursuitsNames={this.state.pursuitsNames}
+                                    />
+                        }
+                    </div>
 
                     <div className="modal" ref={this.modalRef}>
                         <div className="overlay" onClick={(() => this.closeModal())}></div>

@@ -1,7 +1,7 @@
 import React from 'react';
 import "./timeline-long-event.scss";
 import { returnUserImageURL } from "../../../constants/urls";
-import {returnFormattedDate} from "../../../constants/ui-text";
+import { returnFormattedDate } from "../../../constants/ui-text";
 
 const LongEvent = (props) => {
     if (props.post.text_data === undefined) return (<></>);
@@ -12,12 +12,14 @@ const LongEvent = (props) => {
 
     return (
         <div>
-            <div className="longevent-cover-container">
-                {post.cover_photo_key ? coverImage : <p className="longevent-preview-text">{previewText}</p>}
+            <div className={post.cover_photo_key ? "longevent-with-cover-photo-container" : "longevent-no-cover-photo-container"}>
+                {post.cover_photo_key ? coverImage : <p>{previewText}</p>}
             </div>
-            <h4 className="longevent-title-container">{post.title ? post.title : post.pursuit_category}</h4>
-            {post.subtitle ? <p className="longevent-subtitle-container">{post.subtitle}</p> : <></>}
-            {date ? <p>{date.month}, {date.day}, {date.year} </p> : <></>}
+            <div className="longevent-text-container">
+                <h4 className="longevent-title-container">{post.title ? post.title : post.pursuit_category}</h4>
+                {post.subtitle ? <p className="longevent-subtitle-container">{post.subtitle}</p> : <></>}
+                {date ? <p>{date.month}, {date.day}, {date.year} </p> : <></>}
+            </div>
         </div>
     );
 }
