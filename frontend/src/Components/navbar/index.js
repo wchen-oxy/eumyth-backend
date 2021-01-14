@@ -1,10 +1,13 @@
 import React from 'react';
 import PostDraftController from '../post/draft/index';
 import RelationModal from "./sub-components/relation-modal";
+import OptionsMenu from "./sub-components/options-menu";
 import { AuthUserContext } from '../../Components/session/'
 import { withFirebase } from '../../Firebase';
 import { Link } from 'react-router-dom';
-import { POST, REQUEST_ACTION } from "../constants/flags"
+import { POST, REQUEST_ACTION } from "../constants/flags";
+import { returnUserImageURL } from "../constants/urls";
+import AxiosHelper from '../../Axios/axios';
 import './index.scss';
 
 const NavBar = () => (
@@ -28,9 +31,11 @@ class NavigationAuth extends React.Component {
     super(props);
     this.state = {
       username: this.props.firebase.returnUsername(),
+      tinyDisplayPhoto: null,
       previousLongDraft: null,
       isInitialUser: true,
       existingUserLoading: true,
+
       isPostModalShowing: false,
       isRequestModalShowing: false,
     };
@@ -41,13 +46,24 @@ class NavigationAuth extends React.Component {
 
   }
   componentDidMount() {
+    console.log("MOUNTED");
+    let isUserStillLoading = true;
     this.props.firebase.checkIsExistingUser().then(
       (result) => {
         if (result) {
-          this.setState({ existingUserLoading: false })
+          isUserStillLoading = false;
         }
+        console.log(this.state.username);
+        return AxiosHelper.returnTinyDisplayPhoto(this.state.username);
       }
-    );
+    )
+      .then((result) => {
+        this.setState({
+          existingUserLoading: isUserStillLoading,
+          tinyDisplayPhoto: returnUserImageURL(result.data)
+        });
+      })
+      ;
   }
 
   openModal(postType) {
@@ -108,20 +124,28 @@ class NavigationAuth extends React.Component {
                 <h3>Everfire</h3>
               </div>
             </Link>
-            {
+            <button onClick={() => this.openModal(POST)}><h4>New Entry</h4></button>
+          </div>
+          <div id="navbar-right-container">
+          {
               this.state.existingUserLoading ?
                 (<></>) :
                 (
-                  <div>
-                    <button onClick={() => this.openModal(POST)}><h4>New Entry</h4></button>
-                    <button onClick={() => this.openModal(REQUEST_ACTION)}><h4>Friends</h4></button>
-                  </div>
+                  <>
+                    <div id="navbar-profile-home">
+                      <div id="navbar-display-photo-container">
+                        <img src={this.state.tinyDisplayPhoto} />
+                      </div>
+                      <p>{this.state.username}</p>
+                    </div>
+                    <div id="navbar-main-action-buttons-container">
+                
+                      <button onClick={() => this.openModal(REQUEST_ACTION)}><h4>Friends</h4></button>
+                    </div>
+                  </>
                 )
             }
-          </div>
-          <div id="navbar-right-container">
-            <Link to={"/account"}><h4>Settings</h4></Link>
-            <button onClick={this.props.firebase.doSignOut} ><h4>Sign Out</h4></button>
+            <OptionsMenu />
           </div>
         </nav>
         {this.state.existingUserLoading ? <></> : this.renderModal()}

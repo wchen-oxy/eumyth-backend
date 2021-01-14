@@ -5,6 +5,19 @@
     color: white;
 }
 
+#navbar-profile-home {
+    @include flex-display-row;
+}
+
+#navbar-display-photo-container {
+   @include flex-display-row;
+   align-items: center;
+    img {
+        @include tiny-profile-photo;
+        border-radius: 50%;
+    }
+}
+
 nav {
     background-color: $primary-color;
     display: flex;
@@ -23,7 +36,13 @@ nav {
 
     #navbar-right-container {
         @include flex-display-row;
-        h4 {
+
+        #navbar-main-action-buttons-container{
+            @include flex-display-row;
+            align-items: center;
+        }
+
+        p, h4 {
             @extend %navbar-text;
         }
     }

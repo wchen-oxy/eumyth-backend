@@ -23,6 +23,14 @@ export default class AxiosHelper {
         });
     }
 
+    static returnTinyDisplayPhoto(username) {
+        return axios.get(urls.TINY_DISPLAY_PHOTO_URL, {
+            params: {
+                username: username
+            }
+        })
+    }
+
     static setProfilePrivacy(username, isPrivate) {
         return axios.put(urls.USER_PRIVACY, {
             username: username,
@@ -103,7 +111,7 @@ export default class AxiosHelper {
         return axios.get(urls.SINGLE_POST_TEXT_DATA_URL, {
             params: {
                 postId: postId,
-                textOnly: textOnly 
+                textOnly: textOnly
             }
         })
     }

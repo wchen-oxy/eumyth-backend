@@ -1,0 +1,24 @@
+@import "../../../partials";
+
+#optionsmenu-main-container {
+    padding: 10px;
+    h4, a {
+        color: white;
+    }
+}
+#optionsmenu-inner-menu-container {
+    @include flex-display-column;
+    position: absolute;
+    background-color: #ed4071;
+    border-radius: 5px;
+    top: 50px;
+    right: 0;
+}
+
+.optionsmenu-button-container {
+    height: 20px;
+    width: 200px;
+    padding: 5px;
+
+
+}

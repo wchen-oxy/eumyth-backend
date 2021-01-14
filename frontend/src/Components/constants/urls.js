@@ -8,12 +8,13 @@ const returnUserImageURL = (key) => ("http://" + BUCKET_NAME + ".s3." + REGION +
 const TEMP_PROFILE_PHOTO_URL = "https://i.redd.it/73j1cgr028u21.jpg";
 
 const ROOT_URL = "http://localhost:5000";
+const DRAFT_BASE_URL = ROOT_URL + "/draft";
 
 //image
 const IMAGE_BASE_URL = ROOT_URL + "/image";
 const DISPLAY_PHOTO_URL = IMAGE_BASE_URL + "/display-photo";
 const COVER_PHOTO_URL = IMAGE_BASE_URL + "/cover";
-const DRAFT_BASE_URL = ROOT_URL + "/draft";
+const TINY_DISPLAY_PHOTO_URL = IMAGE_BASE_URL + "/navbar-display-photo";
 
 //user
 const USER_BASE_URL = ROOT_URL + "/user";
@@ -33,7 +34,7 @@ const RELATION_SET_FOLLOWER_URL = RELATION_BASE_URL + "/set";
 const POST_BASE_URL = ROOT_URL + "/post";
 // const UPDATE_POST_URL = POST_BASE_URL + "/update";
 
-const MULTIPLE_POSTS_URL =  POST_BASE_URL + "/multiple";
+const MULTIPLE_POSTS_URL = POST_BASE_URL + "/multiple";
 
 const WITH_IMAGE_POST_URL = POST_BASE_URL + "/with-image";
 const NO_IMAGE_POST_URL = POST_BASE_URL + "/no-image";
@@ -43,7 +44,7 @@ const SINGLE_POST_TEXT_DATA_URL = POST_BASE_URL + "/single"
 
 //project
 const PROJECT_BASE_URL = ROOT_URL + "/project";
-const MULTIPLE_PROJECTS_URL =  PROJECT_BASE_URL + "/multiple";
+const MULTIPLE_PROJECTS_URL = PROJECT_BASE_URL + "/multiple";
 
 //index
 const INDEX_BASE_URL = ROOT_URL + "/index";
@@ -58,6 +59,7 @@ module.exports = {
     DISPLAY_PHOTO_URL,
     COVER_PHOTO_URL,
     DRAFT_BASE_URL,
+    TINY_DISPLAY_PHOTO_URL,
     USER_BASE_URL,
     USER_BIO_URL,
     USER_ACCOUNT_SETTINGS_INFO,
