@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const PostFeedback = require("./post.feedback.model");
+const Comment = require("./comment.model");
 const Schema = mongoose.Schema;
 
 const postSchema = new Schema({
@@ -86,8 +86,9 @@ const postSchema = new Schema({
     required: false
   },
 
-  feedback: {
-    type: PostFeedback.Schema
+  comments: {
+    type: [Comment.Schema],
+    default: []
   }
 
 }, {

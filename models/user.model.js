@@ -13,6 +13,11 @@ const userSchema = new Schema({
     trim: true,
   },
 
+  private: {
+    type: Boolean,
+    required: true,
+  },
+
   cropped_display_photo_key: {
     type: String,
     required: false
@@ -36,12 +41,7 @@ const userSchema = new Schema({
     type: String,
     trim: true
   },
-
-  private: {
-    type: Boolean,
-    required: true,
-  },
-
+ 
   index_user_id: {
     type: mongoose.Types.ObjectId,
   },

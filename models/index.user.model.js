@@ -18,14 +18,6 @@ const indexUserSchema = new Schema(
             required: true,
         },
 
-        followers: {
-            type: Number
-        },
-
-        following: {
-            type: Number
-        },
-
         cropped_display_photo_key: {
             type: String,
             required: false
@@ -48,6 +40,14 @@ const indexUserSchema = new Schema(
             trim: true
         },
 
+        followers: {
+            type: Number
+        },
+
+        following: {
+            type: Number
+        },
+       
         preferred_post_type: {
             type: String,
             required: false,
