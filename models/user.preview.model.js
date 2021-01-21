@@ -18,7 +18,18 @@ const userPreviewSchema = new Schema({
 
     name: {
         type: String
-    }
+    },
+
+    small_cropped_display_photo_key: {
+        type: String,
+        required: false
+    },
+
+    tiny_cropped_display_photo_key: {
+        type: String,
+        required: false
+    },
+    
 });
 
 const userPreviewModel = mongoose.model('user_preview', userPreviewSchema);
