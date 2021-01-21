@@ -10,23 +10,29 @@ const NOT_A_FOLLOWER_STATE = "NOT_A_FOLLOWER";
 
 router.route('/').get((req, res) => {
   const visitorUsername = req.query.visitorUsername;
+  console.log(visitorUsername);
   const followerArrayId = req.query.userRelationArrayId;
-  return UserRelation.Model.findById(followerArrayId).then(
-    (userRelationInfo) => {
-      if (!userRelationInfo) return res.status(204).send();
-      else {
-        if (userRelationInfo.followers.length !== 0) {
-          for (const user of userRelationInfo.followers) {
-            if (visitorUsername === user.username) {
-              return res.status(200).json({ success: user.status });
+  let resolvedVistorPreviewId = UserPreview.Model.findOne({ username: visitorUsername });
+  return resolvedVistorPreviewId.then((visitorUserPreview) => {
+    console.log("result", visitorUserPreview._id);
+    return UserRelation.Model.findById(followerArrayId).then(
+      (userRelationInfo) => {
+        if (!userRelationInfo) return res.status(204).send();
+        else {
+          if (userRelationInfo.followers.length !== 0) {
+            for (const user of userRelationInfo.followers) {
+              console.log(user);
+              if (visitorUserPreview._id.toString() === user.user_preview_id.toString()) {
+                 return res.status(200).json({ success: user.status });
+              }
             }
+            return res.status(200).json({ error: NOT_A_FOLLOWER_STATE });
           }
           return res.status(200).json({ error: NOT_A_FOLLOWER_STATE });
         }
-        return res.status(200).json({ error: NOT_A_FOLLOWER_STATE });
       }
-    }
-  )
+    )
+  })
     .catch(err => {
       console.log(err);
       res.status(500).send();

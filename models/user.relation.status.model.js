@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const userRelationStatusSchema = new Schema({
     _id: false,
 
-    user_preview_id: [mongoose.Types.ObjectId],
+    user_preview_id: mongoose.Types.ObjectId,
 
     status: { type: String },
 })

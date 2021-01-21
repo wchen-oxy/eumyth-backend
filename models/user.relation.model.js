@@ -1,15 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const UserRelationStatus = require("./user.relation.status.model");
-
-const userStatusSchema = new Schema({
-    _id: false,
-
-    user_preview_id: [mongoose.Types.ObjectId],
-
-    status: { type: String },
-})
-
 const userRelationSchema = new Schema({
     parent_index_user_id: {
         type: mongoose.Types.ObjectId,
