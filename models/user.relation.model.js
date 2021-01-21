@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const UserRelationStatus = require("./user.relation.status.model");
 
 const userStatusSchema = new Schema({
     _id: false,
@@ -15,9 +16,9 @@ const userRelationSchema = new Schema({
         required: true
     },
 
-    following: [userStatusSchema],
+    following: [UserRelationStatus.Schema],
 
-    followers: [userStatusSchema]
+    followers: [UserRelationStatus.Schema]
 });
 
 

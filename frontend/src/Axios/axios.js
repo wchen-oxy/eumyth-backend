@@ -38,14 +38,8 @@ export default class AxiosHelper {
         });
     }
 
-    static setFollowerStatus(visitorUsername, targetUsername, targetUserRelationId, isPrivate, action) {
-        return axios.put(urls.RELATION_STATUS_URL, {
-            visitorUsername: visitorUsername,
-            targetUsername: targetUsername,
-            targetUserRelationId: targetUserRelationId,
-            isPrivate: isPrivate,
-            action: action
-        });
+    static setFollowerStatus(payload) {
+        return axios.put(urls.RELATION_STATUS_URL, payload);
     }
 
     static setDraftPreviewTitle(previewTitle) {

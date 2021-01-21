@@ -31,6 +31,7 @@ class ProfilePage extends React.Component {
         this.state = {
             visitorUsername: null,
             targetProfileId: null,
+            targetProfilePreviewId: null,
             targetUsername: this.props.match.params.username,
             isPrivate: true,
             croppedDisplayPhoto: null,
@@ -236,6 +237,7 @@ class ProfilePage extends React.Component {
             targetUsername: targetUserInfo.username,
             targetProfileId: targetUserInfo._id,
             targetIndexUserId: targetUserInfo.index_user_id,
+            targetProfilePreviewId: targetUserInfo.user_preview_id,
             isPrivate: targetUserInfo.private,
             coverPhoto: targetUserInfo.cover_photo_key,
             croppedDisplayPhoto: targetUserInfo.cropped_display_photo_key,
@@ -305,11 +307,13 @@ class ProfilePage extends React.Component {
     }
     handleFollowerStatusChange(action) {
         AxiosHelper.setFollowerStatus(
-            this.state.visitorUsername,
-            this.state.targetUsername,
-            this.state.userRelationId,
-            this.state.isPrivate,
-            action
+            {
+                visitorUsername: this.state.visitorUsername,
+                targetUserRelationId: this.state.userRelationId,
+                targetProfilePreviewId: this.state.targetProfilePreviewId,
+                isPrivate: this.state.isPrivate,
+                action: action
+            }
         ).then(
             (result) => {
                 if (result.status === 200) {

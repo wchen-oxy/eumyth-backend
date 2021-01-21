@@ -2,6 +2,7 @@
 var express = require('express');
 var router = express.Router();
 const UserPreview = require('../../models/user.preview.model');
+const UserRelationStatus = require("../../models/user.relation.status.model");
 const User = require('../../models/user.model');
 const IndexUser = require('../../models/index.user.model');
 const UserRelation = require('../../models/user.relation.model');
@@ -100,11 +101,12 @@ router.route('/info').get((req, res) => {
 
 router.route('/status').put((req, res) => {
   const visitorUsername = req.body.visitorUsername;
-  const targetUsername = req.body.targetUsername;
   const targetUserRelationId = req.body.targetUserRelationId;
+  const targetUserPreviewId = req.body.targetProfilePreviewId;
+  let visitorUserPreview = null;
+
   const isPrivate = req.body.isPrivate;
   const action = req.body.action;
-  let visitingIndexUser = null;
   let resultStatus = "";
 
   const FOLLOW = "FOLLOW";
@@ -115,11 +117,11 @@ router.route('/status').put((req, res) => {
   const REQUEST_ACCEPTED = "REQUEST_ACCEPTED";
   const UNFOLLOWED = "UNFOLLOWED";
 
-  const resolvedVisitor = IndexUser.Model.findOne({ username: visitorUsername });
+  const resolvedVisitor = UserPreview.Model.findOne({ username: visitorUsername });
   const resolvedUserRelation = resolvedVisitor.then(
     (result) => {
-      visitingIndexUser = result;
-      const userRelationArray = [targetUserRelationId, visitingIndexUser.user_relation_id];
+      visitorUserPreview = result;
+      const userRelationArray = [targetUserRelationId, visitorUserPreview.user_relation_id];
       return UserRelation.Model.find({
         '_id': { $in: userRelationArray }, function(err, docs) {
           if (err) console.log(err);
@@ -133,52 +135,49 @@ router.route('/status').put((req, res) => {
   const resolvedUpdate = resolvedUserRelation
     .then(
       (userRelation) => {
-        const targetUser = userRelation[0]._id.toString() === targetUserRelationId.toString() ? userRelation[0] : userRelation[1];
-        const visitorUser = userRelation[1]._id.toString() === visitingIndexUser.user_relation_id.toString() ? userRelation[1] : userRelation[0];
-        let targetFollowersArray = targetUser.followers;
-        let visitorFollowingArray = visitorUser.following;
+        const targetUserRelation = userRelation[0]._id.toString() === targetUserRelationId.toString() ? userRelation[0] : userRelation[1];
+        const visitorUserRelation = userRelation[1]._id.toString() === visitorUserPreview.user_relation_id.toString() ? userRelation[1] : userRelation[0];
+        let targetFollowersArray = targetUserRelation.followers;
+        let visitorFollowingArray = visitorUserRelation.following;
         let user = null;
         switch (action) {
           case (FOLLOW):
             for (const follower of targetFollowersArray) {
-              if (follower.id.toString() === visitingIndexUser._id.toString()) {
+              if (follower.user_preview_id.toString() === visitorUserPreview._id.toString()) {
                 return Promise.reject("Already Following User");
               }
             }
             if (isPrivate === true) {
-              targetFollowersArray.push(new UserPreview.Model({
+
+              targetFollowersArray.push(new UserRelationStatus.Model({
                 status: FOLLOW_REQUESTED,
-                id: visitorUser.parent_index_user_id,
-                user_relation_id: visitingIndexUser.user_relation_id,
-                username: visitorUsername,
+                user_preview_id: visitorUserPreview._id,
               }));
-              visitorFollowingArray.push(new UserPreview.Model({
+
+              visitorFollowingArray.push(new UserRelationStatus.Model({
                 status: FOLLOW_REQUESTED,
-                id: targetUser.parent_index_user_id,
-                user_relation_id: targetUserRelationId,
-                username: targetUsername,
+                user_preview_id: targetUserPreviewId,
               }));
+
               resultStatus = FOLLOW_REQUESTED;
             }
             else {
-              targetFollowersArray.push(new UserPreview.Model({
+              targetFollowersArray.push(new UserRelationStatus.Model({
                 status: FOLLOWING,
-                id: visitorUser.parent_index_user_id,
-                user_relation_id: visitingIndexUser.user_relation_id,
-                username: visitorUsername,
+                user_preview_id: visitorUserPreview._id,
               }));
-              visitorFollowingArray.push(new UserPreview.Model({
+
+              visitorFollowingArray.push(new UserRelationStatus.Model({
                 status: FOLLOWING,
-                id: targetUser.parent_index_user_id,
-                user_relation_id: targetUserRelationId,
-                username: targetUsername,
+                user_preview_id: targetUserPreviewId,
               }));
+
               resultStatus = FOLLOWING;
             }
             break;
           case (ACCEPT_REQUEST):
             for (const follower of targetFollowersArray) {
-              if (follower.id.toString() === visitorUser.parent_index_user_id.toString()) {
+              if (follower.user_preview_id.toString() === visitorUserPreview._id.toString()) {
                 user = follower;
                 break;
               }
@@ -190,26 +189,25 @@ router.route('/status').put((req, res) => {
             let updatedTargetFollowers = [];
             let updatedVisitorFollowing = [];
             for (const follower of targetFollowersArray) {
-
-              if (follower.id.toString() !== visitorUser.parent_index_user_id.toString()) {
+              if (follower.user_preview_id.toString() !== visitorUserPreview._id.toString()) {
                 updatedTargetFollowers.push(follower);
               }
             }
 
             for (const followingPerson of visitorFollowingArray) {
-              if (followingPerson.id.toString() !== targetUser.parent_index_user_id.toString()) {
+              if (followingPerson.user_preview_id.toString() !== targetUserPreviewId.toString()) {
                 updatedVisitorFollowing.push(followingPerson);
               }
             }
-            targetUser.followers = updatedTargetFollowers;
-            visitorUser.following = updatedVisitorFollowing;
+            targetUserRelation.followers = updatedTargetFollowers;
+            visitorUserRelation.following = updatedVisitorFollowing;
             resultStatus = UNFOLLOWED;
             break;
           default:
             break;
         }
-        const savedTargetFollowers = targetUser.save();
-        const savedVisitorFollowing = visitorUser.save();
+        const savedTargetFollowers = targetUserRelation.save();
+        const savedVisitorFollowing = visitorUserRelation.save();
 
         return (Promise.all([savedTargetFollowers, savedVisitorFollowing]));
       }
