@@ -6,6 +6,7 @@ const multerS3 = require('multer-s3')
 const uuid = require('uuid');
 const User = require('../../models/user.model');
 const IndexUser = require('../../models/index.user.model');
+const UserPreview = require('../../models/user.preview.model');
 
 var upload = multer({
   storage: multerS3({
@@ -59,19 +60,20 @@ router.route('/multiple').post(upload.array('files'), (req, res, err) => {
 
 router.route('/navbar-display-photo')
   .get(
-    (req, res) =>{
-      
+    (req, res) => {
+
       console.log(req.query);
       return (
-      IndexUser.Model.findOne({ username: req.query.username })
-        .then((result) => {
-          if (result) return res.status(200).send(result.tiny_cropped_display_photo_key);
-        })
-        .catch((err) => {
-          console.log(err);
-          res.status(500).send();
-        })
-    )}
+        IndexUser.Model.findOne({ username: req.query.username })
+          .then((result) => {
+            if (result) return res.status(200).send(result.tiny_cropped_display_photo_key);
+          })
+          .catch((err) => {
+            console.log(err);
+            res.status(500).send();
+          })
+      )
+    }
 
   )
 
@@ -93,13 +95,18 @@ router.route('/display-photo')
           returnedIndexUser.cropped_display_photo_key = croppedImage;
           returnedIndexUser.small_cropped_display_photo_key = smallCroppedImage;
           returnedIndexUser.tiny_cropped_display_photo_key = tinyCroppedImage;
-          return User.Model.findById(result.user_profile_id)
+          return Promise.all([
+            User.Model.findById(result.user_profile_id),
+            UserPreview.Model.findById(UserPreview.Model.findById(returnedIndexUser.user_preview_id)
+            )]);
         })
         .then((result) => {
-          result.cropped_display_photo_key = croppedImage;
-          result.small_cropped_display_photo_key = smallCroppedImage;
-          result.tiny_cropped_display_photo_key = tinyCroppedImage;
-          return Promise.all([returnedIndexUser.save(), result.save()]);
+          result[0].cropped_display_photo_key = croppedImage;
+          result[0].small_cropped_display_photo_key = smallCroppedImage;
+          result[0].tiny_cropped_display_photo_key = tinyCroppedImage;
+          result[1].small_cropped_display_photo_key = smallCroppedImage;
+          result[1].tiny_cropped_display_photo_key = tinyCroppedImage;
+          return Promise.all([returnedIndexUser.save(), result[0].save(), result[1].save()]);
         })
         .then(
           () =>
@@ -139,7 +146,7 @@ router.route('/display-photo')
               throw new Error(err);
             }
             else { console.log("Success", data); }
-          }).promise()])
+          }).promise(), UserPreview.Model.findById(returnedIndexUser.user_preview_id)])
         })
         .then((results) => {
           results[0].cropped_display_photo_key = "";
@@ -148,7 +155,9 @@ router.route('/display-photo')
           returnedIndexUser.cropped_display_photo_key = "";
           returnedIndexUser.small_cropped_display_photo_key = "";
           returnedIndexUser.tiny_cropped_display_photo_key = "";
-          return Promise.all([results[0].save(), returnedIndexUser.save()]);
+          results[2].small_cropped_display_photo_key = "";
+          results[2].tiny_cropped_display_photo_key = "";
+          return Promise.all([results[0].save(), returnedIndexUser.save(), results[2].save()]);
         })
         .then(
           () =>

@@ -16,7 +16,7 @@ const userRelationSchema = new Schema({
     },
 
     following: [userStatusSchema],
-    
+
     followers: [userStatusSchema]
 });
 

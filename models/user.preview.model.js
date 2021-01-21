@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const userPreviewSchema = new Schema({
-    _id: false,
 
     parent_index_user_id: {
         type: mongoose.Types.ObjectId,
@@ -16,8 +15,14 @@ const userPreviewSchema = new Schema({
         type: String,
     },
 
-    name: {
-        type: String
+    first_name: {
+        type: String,
+        required: false
+    },
+    
+    first_name: {
+        type: String,
+        required: false
     },
 
     small_cropped_display_photo_key: {
@@ -29,7 +34,7 @@ const userPreviewSchema = new Schema({
         type: String,
         required: false
     },
-    
+
 });
 
 const userPreviewModel = mongoose.model('user_preview', userPreviewSchema);

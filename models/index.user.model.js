@@ -40,6 +40,13 @@ const indexUserSchema = new Schema(
             trim: true
         },
 
+        user_preview_id: {
+            type: mongoose.Types.ObjectId,
+            required: true,
+            unique: true,
+            trim: true
+        },
+
         followers: {
             type: Number
         },
@@ -47,7 +54,7 @@ const indexUserSchema = new Schema(
         following: {
             type: Number
         },
-       
+
         preferred_post_type: {
             type: String,
             required: false,

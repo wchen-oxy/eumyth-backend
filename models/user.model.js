@@ -41,13 +41,26 @@ const userSchema = new Schema({
     type: String,
     trim: true
   },
- 
+
   index_user_id: {
     type: mongoose.Types.ObjectId,
+    required: true,
+    unique: true,
+    trim: true
   },
 
   user_relation_id: {
     type: mongoose.Types.ObjectId,
+    required: true,
+    unique: true,
+    trim: true
+  },
+
+  user_preview_id: {
+    type: mongoose.Types.ObjectId,
+    required: true,
+    unique: true,
+    trim: true
   },
 
   requests: [userPreview.Schema],
@@ -59,7 +72,7 @@ const userSchema = new Schema({
   pursuits: [Pursuits.Schema],
 
   all_posts: [mongoose.Types.ObjectId], //all posts including the most recent posts. ID only
-  
+
   dated_posts: {
     type: [PostPreview.Schema]
   },

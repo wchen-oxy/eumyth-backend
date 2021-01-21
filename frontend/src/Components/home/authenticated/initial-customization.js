@@ -147,6 +147,8 @@ class InitialCustomizationPage extends React.Component {
                     (results) => {
                         let formData = new FormData();
                         formData.append("username", this.state.username);
+                        formData.append("firstName", this.state.firstName);
+                        formData.append("lastName", this.state.lastName);
                         formData.append("pursuits", JSON.stringify(this.state.pursuits));
                         return AxiosHelper.createUserProfile(formData);
                     }

@@ -7,6 +7,7 @@ let IndexPursuit = require('../../models/index.pursuit.model');
 const UserRelation = require('../../models/user.relation.model');
 const Draft = require("../../models/draft.model");
 const upload = require('../../constants/multer').profileImageUpload;
+const UserPreview = require('../../models/user.preview.model');
 
 router.route('/')
   .get((req, res) => {
@@ -28,10 +29,11 @@ router.route('/')
   )
   .post(upload.fields([{ name: "croppedImage" }, { name: "smallCroppedImage" }, { name: "tinyCroppedImage" }]),
     (req, res) => {
-      console.log("start");
       console.log(req.files);
       console.log(req.body);
       const username = req.body.username;
+      const firstName = req.body.firstName;
+      const lastName = req.body.lastName;
       const pursuitsArray = JSON.parse(req.body.pursuits);
       const croppedImage = req.files.croppedImage ? req.files.croppedImage[0].key : null;
       const smallCroppedImage = req.files.smallCroppedImage ? req.files.smallCroppedImage[0].key : null;
@@ -39,7 +41,6 @@ router.route('/')
 
       let mainPursuitsHolder = [];
       let indexPursuitsHolder = [];
-      console.log("Inner");
       for (const pursuit of pursuitsArray) {
         console.log(pursuit);
         console.log(pursuit.name);
@@ -76,7 +77,6 @@ router.route('/')
           pursuits: mainPursuitsHolder,
           private: false
         });
-      console.log("33");
 
       const newIndexUser = new IndexUser.Model({
         username: username,
@@ -93,18 +93,32 @@ router.route('/')
         pursuits: indexPursuitsHolder
       });
 
-      console.log("123123");
       const newUserRelation = new UserRelation.Model({
         parent_index_user_id: newIndexUser._id,
       });
 
+      const newUserPreview = new UserPreview.Model({
+        parent_index_user_id: newIndexUser._id,
+        user_relation_id: newUserRelation._id,
+        username: username,
+        first_name: firstName,
+        last_name: lastName,
+        small_cropped_display_photo_key: smallCroppedImage,
+        tiny_cropped_display_photo_key: tinyCroppedImage,
+      })
+
+      newUser.user_preview_id = newUserPreview._id;
       newUser.user_relation_id = newUserRelation._id;
+      newIndexUser.user_preview_id = newUserPreview._id;
       newIndexUser.user_relation_id = newUserRelation._id;
       newUser.index_user_id = newIndexUser._id;
+
       const savedUser = newUser.save();
       const savedIndexUser = newIndexUser.save();
       const savedUserRelation = newUserRelation.save();
-      return Promise.all([savedIndexUser, savedUser, savedUserRelation])
+      const savedUserPreview = newUserPreview.save();
+
+      return Promise.all([savedIndexUser, savedUser, savedUserRelation, savedUserPreview])
         .then(() => res.status(201).json("Success!"))
         .catch(err => {
           console.log(err);
@@ -162,7 +176,7 @@ router.route('/private').put((req, res) => {
   const isPrivate = req.body.private;
   return User.Model.findOne({ username: username })
     .then((result) => {
-      if (result === null ) throw 204;
+      if (result === null) throw 204;
       result.private = isPrivate;
       return result.save()
     })
