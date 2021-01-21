@@ -4,9 +4,7 @@ const Schema = mongoose.Schema;
 const userPreviewSchema = new Schema({
     _id: false,
 
-    status: { type: String },
-
-    id: {
+    parent_index_user_id: {
         type: mongoose.Types.ObjectId,
     },
 
