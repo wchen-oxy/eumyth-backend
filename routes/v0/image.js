@@ -57,7 +57,23 @@ router.route('/multiple').post(upload.array('files'), (req, res, err) => {
   return res.status(200).json({ 'imageUrls': imageArray });
 });
 
+router.route('/navbar-display-photo')
+  .get(
+    (req, res) =>{
+      
+      console.log(req.query);
+      return (
+      IndexUser.Model.findOne({ username: req.query.username })
+        .then((result) => {
+          if (result) return res.status(200).send(result.tiny_cropped_display_photo_key);
+        })
+        .catch((err) => {
+          console.log(err);
+          res.status(500).send();
+        })
+    )}
 
+  )
 
 router.route('/display-photo')
   .post(upload.fields([{ name: "croppedImage" }, { name: "smallCroppedImage" }, { name: "tinyCroppedImage" }]),
