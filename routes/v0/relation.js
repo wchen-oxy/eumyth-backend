@@ -35,7 +35,7 @@ router.route('/').get((req, res) => {
 router.route('/info').get((req, res) => {
   const username = req.query.username;
   let id = null;
-  return User.Model.findOne({ username: username })
+  return UserPreview.Model.findOne({ username: username })
     .then((user) => {
       return UserRelation.Model.findById(user.user_relation_id)
     })
@@ -45,27 +45,27 @@ router.route('/info').get((req, res) => {
       let followers = [];
       let requested = [];
       for (const profile of result.following) {
-        following.push(profile.id);
+        following.push(profile.user_preview_id);
       }
       for (const profile of result.followers) {
         if (profile.status === "FOLLOW_REQUESTED") {
-          requested.push(profile.id);
+          requested.push(profile.user_preview_id);
         }
         else if (profile.status === "FOLLOWING") {
-          followers.push(profile.id);
+          followers.push(profile.user_preview_id);
         }
       }
-      const resolvedFollowing = IndexUser.Model.find({
+      const resolvedFollowing = UserPreview.Model.find({
         '_id': { $in: following }
       }, function (err, docs) {
         console.log(docs);
       });
-      const resolvedFollowers = IndexUser.Model.find({
+      const resolvedFollowers = UserPreview.Model.find({
         '_id': { $in: followers }
       }, function (err, docs) {
         console.log(docs);
       });
-      const resolvedRequested = IndexUser.Model.find({
+      const resolvedRequested = UserPreview.Model.find({
         '_id': { $in: requested }
       }, function (err, docs) {
         console.log(docs);
@@ -238,7 +238,7 @@ router.route('/set').put((req, res) => {
   const action = req.body.action;
   let userRelation = null;
 
-  
+
   if (action === "UNFOLLOW") {
     return UserRelation.Model.findById(id)
       .then(result => {
