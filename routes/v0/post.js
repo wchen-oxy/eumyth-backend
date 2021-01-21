@@ -4,6 +4,8 @@ const User = require('../../models/user.model');
 const IndexUser = require('../../models/index.user.model');
 const Post = require("../../models/post.model");
 const PostPreview = require("../../models/post.preview.model");
+const UserPreview = require("../../models/user.preview.model");
+
 const multer = require('multer');
 const AwsConstants = require('../../constants/aws');
 const multerS3 = require('multer-s3');
@@ -101,78 +103,81 @@ router.route('/')
       textSnippet = makeTextSnippet(postType, isPaginated, textData)
     }
     console.log("1");
-    let resolvedNewPost = IndexUser.Model.findOne({ username: username }).then(resolvedIndexUser => {
-      indexUser = resolvedIndexUser;
-      switch (postType) {
-        case (SHORT):
-          post = new Post.Model({
-            username: username,
-            title: title,
-            post_privacy_type: postPrivacyType,
-            date: date,
-            author_id: resolvedIndexUser.user_profile_id,
-            pursuit_category: pursuitCategory,
-            display_photo_key: displayPhoto,
-            cover_photo_key: coverPhotoKey,
-            post_format: postType,
-            is_paginated: isPaginated,
-            is_milestone: isMilestone,
-            image_data: imageData,
-            text_snippet: textSnippet,
-            text_data: textData,
-            min_duration: minDuration
-          });
-          break;
-        case (LONG):
-          post = new Post.Model({
-            username: username,
-            title: title,
-            subtitle: subtitle,
-            post_privacy_type: postPrivacyType,
-            author_id: resolvedIndexUser.user_profile_id,
-            pursuit_category: pursuitCategory,
-            display_photo_key: displayPhoto,
-            cover_photo_key: coverPhotoKey,
-            post_format: postType,
-            is_paginated: isPaginated,
-            is_milestone: isMilestone,
-            text_snippet: textSnippet,
-            text_data: textData,
-            min_duration: minDuration
-          });
-          break;
-        default:
-          res.status(500).send();
-      }
-      followerArrayID = indexUser.user_relation_id;
-      if (indexUser.preferred_post_type !== postPrivacyType) {
-        indexUser.preferred_post_type = postPrivacyType;
-      }
-
-      if (minDuration) {
-        for (const pursuit of indexUser.pursuits) {
-          if (pursuit.name === pursuitCategory) {
-            setPursuitAttributes(isMilestone, pursuit, minDuration);
+    let resolvedUserPreview = UserPreview.Model.findOne({ username: username });
+    let resolvedNewPost = resolvedUserPreview
+      .then((resolvedUserPrevew) => IndexUser.Model.findById(resolvedUserPrevew.parent_index_user_id))
+      .then(resolvedIndexUser => {
+        indexUser = resolvedIndexUser;
+        switch (postType) {
+          case (SHORT):
+            post = new Post.Model({
+              username: username,
+              title: title,
+              post_privacy_type: postPrivacyType,
+              date: date,
+              author_id: resolvedIndexUser.user_profile_id,
+              pursuit_category: pursuitCategory,
+              display_photo_key: displayPhoto,
+              cover_photo_key: coverPhotoKey,
+              post_format: postType,
+              is_paginated: isPaginated,
+              is_milestone: isMilestone,
+              image_data: imageData,
+              text_snippet: textSnippet,
+              text_data: textData,
+              min_duration: minDuration
+            });
             break;
+          case (LONG):
+            post = new Post.Model({
+              username: username,
+              title: title,
+              subtitle: subtitle,
+              post_privacy_type: postPrivacyType,
+              author_id: resolvedIndexUser.user_profile_id,
+              pursuit_category: pursuitCategory,
+              display_photo_key: displayPhoto,
+              cover_photo_key: coverPhotoKey,
+              post_format: postType,
+              is_paginated: isPaginated,
+              is_milestone: isMilestone,
+              text_snippet: textSnippet,
+              text_data: textData,
+              min_duration: minDuration
+            });
+            break;
+          default:
+            res.status(500).send();
+        }
+        followerArrayID = indexUser.user_relation_id;
+        if (indexUser.preferred_post_type !== postPrivacyType) {
+          indexUser.preferred_post_type = postPrivacyType;
+        }
+
+        if (minDuration) {
+          for (const pursuit of indexUser.pursuits) {
+            if (pursuit.name === pursuitCategory) {
+              setPursuitAttributes(isMilestone, pursuit, minDuration);
+              break;
+            }
           }
         }
+        let newRecentPosts = resolvedIndexUser.recent_posts;
+        console.log(newRecentPosts, "BEFORE");
+        newRecentPosts.unshift(post);
+        if (newRecentPosts.length > RECENT_POSTS_LIMIT) {
+          newRecentPosts.pop();
+        }
+        indexUser.recent_posts = newRecentPosts;
+        return indexUser.user_profile_id;
       }
-      let newRecentPosts = resolvedIndexUser.recent_posts;
-      console.log(newRecentPosts, "BEFORE");
-      newRecentPosts.unshift(post);
-      if (newRecentPosts.length > RECENT_POSTS_LIMIT) {
-        newRecentPosts.pop();
-      }
-      indexUser.recent_posts = newRecentPosts;
-      return indexUser.user_profile_id;
-    }
-    )      
-    .catch(
-      (err) => {
-        console.log(err);
-        res.status(500).json(err);
-      }
-    );;
+      )
+      .catch(
+        (err) => {
+          console.log(err);
+          res.status(500).json(err);
+        }
+      );;
 
     console.log("2");
 
@@ -233,13 +238,13 @@ router.route('/')
       )
       .then(
         (userRelationResult) => {
-
           if (userRelationResult) {
             let followersIdArray = [];
             for (const user of userRelationResult.followers) {
-              followersIdArray.unshift(user.id);
+              followersIdArray.push(user.user_preview_id);
+              console.log(user.user_preview_id);
             }
-            return IndexUser.Model.find({
+            return UserPreview.Model.find({
               '_id': { $in: followersIdArray }, function(err, docs) {
                 if (err) console.log(err);
                 else {
@@ -253,6 +258,25 @@ router.route('/')
           }
         }
       )
+      .then((result) => {
+        if (result) {
+          let indexUserIdArray = []
+          for (const previewedUser of result) {
+            indexUserIdArray.push(previewedUser.parent_index_user_id);
+          }
+          return IndexUser.Model.find({
+            '_id': { $in: indexUserIdArray }, function(err, docs) {
+              if (err) console.log(err);
+              else {
+                console.log(docs);
+              }
+            }
+          });
+        }
+        else{
+           throw new Error(500);
+        }
+      })
       .then(
         (userArray) => {
           const promisedUpdatedFollowerArray = userArray.map(
@@ -274,6 +298,7 @@ router.route('/')
       ).
       catch(
         (err) => {
+          if (err.code === 500) console.log("error when pushing new entries to followers")
           console.log(err);
           res.status(500).json(err);
         }

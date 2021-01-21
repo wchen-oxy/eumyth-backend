@@ -25,7 +25,7 @@ class RelationModal extends React.Component {
         this._isMounted = true;
         AxiosHelper.returnUserRelationInfo(this.props.username)
             .then((result) => {
-                if (this._isMounted) {
+                 if (this._isMounted) {
                     this.setState({
                         userRelationId: result.data._id,
                         following: this.handleRenderRelation(this.renderFollow, result.data.following),
