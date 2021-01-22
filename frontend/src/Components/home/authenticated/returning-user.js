@@ -152,6 +152,7 @@ class ReturningUserPage extends React.Component {
             masterArray.push(
                 <PostViewerController
                     key={nextOpenPostIndex++}
+                    visitorUsername={this.state.username}
                     isOwnProfile={feedItem.username === this.state.username}
                     displayPhoto={feedItem.display_photo_key}
                     preferredPostType={feedItem.username === this.state.username ? this.state.indexUserData.preferredPostType : null}
@@ -260,6 +261,7 @@ class ReturningUserPage extends React.Component {
             return (
                 <PostViewerController
                     largeViewMode={true}
+                    visitorUsername={this.state.username}
                     key={this.state.selectedEvent._id}
                     isOwnProfile={true}
                     isPostOnlyView={false}

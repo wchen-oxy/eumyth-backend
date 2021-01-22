@@ -7,6 +7,8 @@ $primary-extra-large-font-size: 30px;
 $primary-large-font-size: 22.5px;
 $primary-medium-font-size: 15px;
 
+$small-post-height: 74vh;
+
 @mixin flex-display-row {
     display: flex;
     flex-direction: row;
@@ -45,7 +47,7 @@ $primary-medium-font-size: 15px;
     top: 50%;
     left: 50%;
     z-index: 22;
-    height: 74vh;
+    height: $small-post-height;
     width: 76vw;
     overflow: scroll;
 }
@@ -84,7 +86,7 @@ $primary-medium-font-size: 15px;
     position: relative;
 }
 
-@mixin long-post-text-container{
+@mixin long-post-text-container {
     width: 70%;
     margin: auto;
 }

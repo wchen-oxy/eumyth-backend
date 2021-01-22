@@ -1,10 +1,13 @@
 import React from 'react';
- import PostHeader from './sub-components/post-header';
+import PostHeader from './sub-components/post-header';
 import ShortHeroText from './sub-components/short-text';
+import Comments from "./sub-components/comments";
 import ShortPostMetaInfo from './sub-components/short-post-meta';
 import ShortReEditor from '../editor/short-re-editor';
- import ReviewPost from "../draft/review-post";
+import ReviewPost from "../draft/review-post";
 import { returnUserImageURL } from "../../constants/urls";
+import { EXPANDED, COLLAPSED } from "../../constants/flags";
+
 
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
@@ -16,7 +19,7 @@ const INITIAL = "INITIAL";
 const EDIT = "EDIT";
 const REVIEW = "REVIEW";
 const SHORT = "SHORT";
- 
+
 class ShortPostViewer extends React.Component {
 
     constructor(props) {
@@ -92,56 +95,64 @@ class ShortPostViewer extends React.Component {
             if (!this.props.eventData.image_data.length) {
                 if (this.props.largeViewMode) {
                     return (
-                        <div id="shortpostviewer-large-main-container" className="shortpostviewer-window">
-                            <div className="shortpostviewer-large-hero-container">
-                                <ShortHeroText
-                                    text={this.props.textData} />
+                        <div className="shortpostviewer-window">
+                            <div id="shortpostviewer-large-main-container" >
+                                <div className="shortpostviewer-large-hero-container">
+                                    <ShortHeroText
+                                        text={this.props.textData} />
+                                </div>
+                                <div className="shortpostviewer-large-side-container">
+                                    <PostHeader
+                                        isOwnProfile={this.props.isOwnProfile}
+                                        username={this.props.username}
+                                        displayPhoto={this.props.eventData.display_photo_key}
+                                        onEditClick={this.handleWindowChange}
+                                        onDeletePost={this.props.onDeletePost}
+                                    />
+                                    <ShortPostMetaInfo
+                                        index={this.state.imageIndex}
+                                        isPaginated={this.state.isPaginated}
+                                        isMilestone={this.state.isMilestone}
+                                        date={this.state.date}
+                                        pursuit={this.state.pursuitCategory}
+                                        min={this.state.min}
+                                        textData={null}
+                                    />
+                                </div>
                             </div>
-                            <div className="shortpostviewer-large-side-container">
-                                <PostHeader
-                                    isOwnProfile={this.props.isOwnProfile}
-                                    username={this.props.username}
-                                    displayPhoto={this.props.eventData.display_photo_key}
-                                    onEditClick={this.handleWindowChange}
-                                    onDeletePost={this.props.onDeletePost}
-                                />
-                                <ShortPostMetaInfo
-                                    index={this.state.imageIndex}
-                                    isPaginated={this.state.isPaginated}
-                                    isMilestone={this.state.isMilestone}
-                                    date={this.state.date}
-                                    pursuit={this.state.pursuitCategory}
-                                    min={this.state.min}
-                                    textData={null}
-                                />
-                            </div>
+                            <Comments windowType={EXPANDED} visitorUsername={this.props.visitorUsername}/>
                         </div>
+
 
                     )
                 }
                 else {
                     return (
-                        <div className="shortpostviewer-inline-main-container" >
-                            <div className="shortpostviewer-inline-hero-container">
-                                <PostHeader
-                                    isOwnProfile={this.props.isOwnProfile}
-                                    username={this.props.username}
-                                    displayPhoto={this.props.eventData.display_photo_key}
-                                />
-                                <ShortHeroText
-                                    text={this.props.textData} />
+                        <div>
+
+                            <div className="shortpostviewer-inline-main-container" >
+                                <div className="shortpostviewer-inline-hero-container">
+                                    <PostHeader
+                                        isOwnProfile={this.props.isOwnProfile}
+                                        username={this.props.username}
+                                        displayPhoto={this.props.eventData.display_photo_key}
+                                    />
+                                    <ShortHeroText
+                                        text={this.props.textData} />
+                                </div>
+                                <div className="shortpostviewer-inline-side-container">
+                                    <ShortPostMetaInfo
+                                        index={this.state.imageIndex}
+                                        isPaginated={this.state.isPaginated}
+                                        isMilestone={this.state.isMilestone}
+                                        date={this.state.date}
+                                        pursuit={this.state.pursuitCategory}
+                                        min={this.state.min}
+                                        textData={null}
+                                    />
+                                </div>
                             </div>
-                            <div className="shortpostviewer-inline-side-container">
-                                <ShortPostMetaInfo
-                                    index={this.state.imageIndex}
-                                    isPaginated={this.state.isPaginated}
-                                    isMilestone={this.state.isMilestone}
-                                    date={this.state.date}
-                                    pursuit={this.state.pursuitCategory}
-                                    min={this.state.min}
-                                    textData={null}
-                                />
-                            </div>
+                            <Comments windowType={COLLAPSED} visitorUsername={this.props.visitorUsername}/>
                         </div>
                     )
                 }
@@ -150,50 +161,58 @@ class ShortPostViewer extends React.Component {
             else {
                 if (this.props.largeViewMode) {
                     return (
-                        <div id="shortpostviewer-large-main-container" className="shortpostviewer-window">
-                            {this.renderImageSlider()}
-                            <div  >
-                                <PostHeader
-                                    isOwnProfile={this.props.isOwnProfile}
-                                    username={this.props.username}
-                                    displayPhoto={this.props.eventData.display_photo_key}
-                                    onEditClick={this.handleWindowChange}
-                                    onDeletePost={this.props.onDeletePost}
-                                />
-                                <ShortPostMetaInfo
-                                    index={this.state.imageIndex}
-                                    isPaginated={this.state.isPaginated}
-                                    isMilestone={this.state.isMilestone}
-                                    date={this.state.date}
-                                    pursuit={this.state.pursuitCategory}
-                                    min={this.state.min}
-                                    textData={this.state.textData}
-                                />
+                        <div className="shortpostviewer-window">
+
+                            <div id="shortpostviewer-large-main-container">
+                                {this.renderImageSlider()}
+                                <div  >
+                                    <PostHeader
+                                        isOwnProfile={this.props.isOwnProfile}
+                                        username={this.props.username}
+                                        displayPhoto={this.props.eventData.display_photo_key}
+                                        onEditClick={this.handleWindowChange}
+                                        onDeletePost={this.props.onDeletePost}
+                                    />
+                                    <ShortPostMetaInfo
+                                        index={this.state.imageIndex}
+                                        isPaginated={this.state.isPaginated}
+                                        isMilestone={this.state.isMilestone}
+                                        date={this.state.date}
+                                        pursuit={this.state.pursuitCategory}
+                                        min={this.state.min}
+                                        textData={this.state.textData}
+                                    />
+                                </div>
                             </div>
+                            <Comments windowType={EXPANDED} visitorUsername={this.props.visitorUsername}/>
                         </div>
                     )
                 }
                 else {
                     return (
-                        <div id="shortpostviewer-inline-main-container" >
-                            <PostHeader
-                                isOwnProfile={this.props.isOwnProfile}
-                                username={this.props.username}
-                                displayPhoto={this.props.eventData.display_photo_key}
-                            />
-                            {this.renderImageSlider()}
-                            <div className="shortpostviewer-inline-side-container">
-                                <ShortPostMetaInfo
-                                    index={this.state.imageIndex}
-                                    isPaginated={this.state.isPaginated}
-                                    isMilestone={this.state.isMilestone}
-                                    date={this.state.date}
-                                    pursuit={this.state.pursuitCategory}
-                                    min={this.state.min}
-                                    textData={this.state.textData}
+                        <>
+                            <div id="shortpostviewer-inline-main-container" >
+                                <PostHeader
+                                    isOwnProfile={this.props.isOwnProfile}
+                                    username={this.props.username}
+                                    displayPhoto={this.props.eventData.display_photo_key}
                                 />
+                                {this.renderImageSlider()}
+                                <div className="shortpostviewer-inline-side-container">
+                                    <ShortPostMetaInfo
+                                        index={this.state.imageIndex}
+                                        isPaginated={this.state.isPaginated}
+                                        isMilestone={this.state.isMilestone}
+                                        date={this.state.date}
+                                        pursuit={this.state.pursuitCategory}
+                                        min={this.state.min}
+                                        textData={this.state.textData}
+                                    />
+                                </div>
                             </div>
-                        </div>
+                            <Comments windowType={COLLAPSED} visitorUsername={this.props.visitorUsername}/>
+                        </>
+
                     );
                 }
             }

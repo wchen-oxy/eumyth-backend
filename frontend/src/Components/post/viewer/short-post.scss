@@ -5,6 +5,7 @@
 
 #shortpostviewer-large-main-container{
     @include flex-display-row;
+    height: $small-post-height;
 }
 
 .shortpostviewer-large-hero-container {

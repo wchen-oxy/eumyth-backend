@@ -242,7 +242,6 @@ router.route('/')
             let followersIdArray = [];
             for (const user of userRelationResult.followers) {
               followersIdArray.push(user.user_preview_id);
-              console.log(user.user_preview_id);
             }
             return UserPreview.Model.find({
               '_id': { $in: followersIdArray }, function(err, docs) {

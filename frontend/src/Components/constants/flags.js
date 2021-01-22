@@ -25,3 +25,6 @@ export const PUBLIC = "PUBLIC";
 export const PRIVATE = "PRIVATE";
 export const PERSONAL_PAGE = "PERSONAL_PAGE";
 export const PUBLIC_FEED = "PUBLIC_FEED";
+
+export const COLLAPSED = "COLLAPSED";
+export const EXPANDED = "EXPANDED";

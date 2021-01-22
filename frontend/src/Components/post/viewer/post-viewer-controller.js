@@ -23,6 +23,7 @@ class PostViewerController extends React.Component {
 
     render() {
         const isOwnProfile = this.props.eventData.username === this.props.firebase.returnUsername();
+        console.log(this.props.visitorUsername);
 
         switch (this.props.eventData.post_format) {
             case (SHORT):
@@ -30,6 +31,7 @@ class PostViewerController extends React.Component {
                     <ShortPostViewer
                         displayPhoto={this.props.displayPhoto}
                         username={this.props.username}
+                        visitorUsername={this.props.visitorUsername}
                         pursuitNames={this.props.pursuitNames}
                         preferredPostType={this.props.preferredPostType}
                         textData={this.props.textData}
@@ -47,6 +49,7 @@ class PostViewerController extends React.Component {
                     <LongPostViewer
                         displayPhoto={this.props.displayPhoto}
                         username={this.props.username}
+                        visitorUsername={this.props.visitorUsername}
                         pursuitNames={this.props.pursuitNames}
                         preferredPostType={this.props.preferredPostType}
                         largeViewMode={this.props.largeViewMode}

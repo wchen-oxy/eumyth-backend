@@ -369,6 +369,7 @@ class ProfilePage extends React.Component {
                 <PostViewerController
                     key={this.state.selectedEvent._id}
                     isOwnProfile={this.state.visitorUsername === this.state.selectedEvent.username}
+                    visitorUsername={this.state.visitorUsername}
                     largeViewMode={true}
                     isPostOnlyView={true}
                     displayPhoto={this.state.selectedEvent.display_photo_key}
