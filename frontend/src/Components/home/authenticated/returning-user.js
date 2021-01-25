@@ -149,9 +149,11 @@ class ReturningUserPage extends React.Component {
         let masterArray = this.state.feedData;
         let nextOpenPostIndex = this.state.nextOpenPostIndex;
         for (const feedItem of inputArray) {
+            console.log(feedItem);
             masterArray.push(
                 <PostViewerController
                     key={nextOpenPostIndex++}
+                    postId={feedItem._id}
                     visitorUsername={this.state.username}
                     isOwnProfile={feedItem.username === this.state.username}
                     displayPhoto={feedItem.display_photo_key}

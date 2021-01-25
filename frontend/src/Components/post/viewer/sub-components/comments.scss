@@ -1,15 +1,30 @@
-.comments-input-container {
-    width: 100%;
-
-    button{
-        width: 200px;
+@import "../../../../partials";
+.comments-main-container {
+    .comments-collapsed-input-container,
+    .comments-expanded-input-container {
+        @include flex-display-column;
     }
-}
 
-.comments-collapsed-input {
-    width: 75%;
-}
+    .comments-expanded-input-container {
+        width: 60%;
+        align-items: center;
+        margin: auto;
+        button {
+            width: fit-content;
+        }
 
-.comments-expanded-input {
-    width: 60%;
+        .comments-expanded-input {
+            width: 96%;
+        }
+
+    }
+    .comments-collapsed-input-container {
+        width: 96%;
+        padding: 2%;
+        button {
+            margin-left: auto;
+            margin-right: 0;
+        }
+    }
+
 }

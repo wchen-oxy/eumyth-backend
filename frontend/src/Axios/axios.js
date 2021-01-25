@@ -188,5 +188,10 @@ export default class AxiosHelper {
             id: id
         })
     }
+
+    static postComment(payload){
+        return axios.post(urls.COMMENT_BASE_URL, payload);
+    }
+
 }
 

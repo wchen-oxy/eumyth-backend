@@ -29,6 +29,7 @@ class PostViewerController extends React.Component {
             case (SHORT):
                 return (
                     <ShortPostViewer
+                        postId={this.props.postId}
                         displayPhoto={this.props.displayPhoto}
                         username={this.props.username}
                         visitorUsername={this.props.visitorUsername}
@@ -47,6 +48,7 @@ class PostViewerController extends React.Component {
             case (LONG):
                 return (
                     <LongPostViewer
+                        postId={this.props.postId}
                         displayPhoto={this.props.displayPhoto}
                         username={this.props.username}
                         visitorUsername={this.props.visitorUsername}

@@ -87,7 +87,7 @@ const postSchema = new Schema({
   },
 
   comments: {
-    type: [Comment.Schema],
+    type: [mongoose.Types.ObjectId],
     default: []
   }
 
