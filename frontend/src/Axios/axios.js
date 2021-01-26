@@ -189,8 +189,11 @@ export default class AxiosHelper {
         })
     }
 
+    static getComments(query){
+        return axios.get(urls.COMMENT_BASE_URL, query)
+    }
     static postComment(payload){
-        return axios.post(urls.COMMENT_BASE_URL, payload);
+        return axios.post(urls.ROOT_COMMENT_URL, payload);
     }
 
 }

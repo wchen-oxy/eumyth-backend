@@ -53,6 +53,7 @@ const INDEX_USER_PURSUITS_URL = INDEX_BASE_URL + '/pursuits';
 
 //comment
 const COMMENT_BASE_URL = ROOT_URL + "/comment";
+const ROOT_COMMENT_URL = COMMENT_BASE_URL + "/root";
 
 module.exports = {
     TEMP_PROFILE_PHOTO_URL: TEMP_PROFILE_PHOTO_URL,
@@ -83,4 +84,5 @@ module.exports = {
     CHECK_USERNAME_URL,
     INDEX_USER_PURSUITS_URL,
     COMMENT_BASE_URL,
+    ROOT_COMMENT_URL
 }

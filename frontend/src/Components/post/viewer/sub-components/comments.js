@@ -20,7 +20,14 @@ class Comments extends React.Component {
     }
 
     componentDidMount() {
-
+        if (this.props.comments.length > 0) {
+            AxiosHelper.getComments({
+                params: {
+                    commentIdArray: JSON.stringify(this.props.comments),
+                    viewingMode: this.state.windowType
+                }
+            })
+        }
     }
 
     handleCommentTextChange(e) {
@@ -29,7 +36,7 @@ class Comments extends React.Component {
 
     handleCommentPost() {
         let payload = {
-            commenter: this.props.visitorUsername,
+            commenterUsername: this.props.visitorUsername,
             comment: this.state.commentText,
             postId: this.props.postId,
 
@@ -51,10 +58,9 @@ class Comments extends React.Component {
             .postComment(payload)
             .then(
                 (result) => {
-                    this.setState({
-                        preview: result.data
-                    })
+
                 })
+
     }
 
     //top comment

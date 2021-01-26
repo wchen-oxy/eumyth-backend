@@ -13,7 +13,6 @@ const annotationSchema = new Schema({
     geometry_width: Number,
     geometry_height: Number,
 },
-    { timestamps: true }
 );
 
 const annotationModel = mongoose.model('annotation', annotationSchema);

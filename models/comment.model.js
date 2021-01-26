@@ -49,7 +49,10 @@ const commentSchema = new Schema({
 );
 
 commentSchema.add({
-    children: [commentSchema]
+    children: {
+        type: [commentSchema],
+        default: []
+    }
 })
 
 const commentModel = mongoose.model('comment', commentSchema);
