@@ -5,13 +5,13 @@ const Schema = mongoose.Schema;
 
 const annotationSchema = new Schema({
     _id: false,
-    annotation_id: Number,
-    annotation_type: String,
-    x_coordinate: Number,
-    y_coordinate: Number,
-    width: Number,
-    height: Number,
-    text: String,
+    data_annotation_id: Number,
+    data_annotation_text: String,
+    geometry_annotation_type: String,
+    geometry_x_coordinate: Number,
+    geometry_y_coordinate: Number,
+    geometry_width: Number,
+    geometry_height: Number,
 },
     { timestamps: true }
 );

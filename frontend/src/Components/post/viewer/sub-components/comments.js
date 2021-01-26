@@ -10,7 +10,8 @@ class Comments extends React.Component {
         this.state = {
             windowType: this.props.windowType,
             previousComments: null,
-            commentText: ""
+            commentText: "",
+
         }
         this.renderComments = this.renderComments.bind(this);
         this.renderCommentInput = this.renderCommentInput.bind(this);
@@ -27,24 +28,40 @@ class Comments extends React.Component {
     }
 
     handleCommentPost() {
+        let payload = {
+            commenter: this.props.visitorUsername,
+            comment: this.state.commentText,
+            postId: this.props.postId,
+
+        };
+
+        const annotationPayload = {
+            dataAnnotationId: this.state.data_annotation_id,
+            dataAnnotationText: this.state.data_annotation_text,
+            geometryAnnotationType: this.state.geometry_annotation_type,
+            geometryXCoordinate: this.state.geometry_x_coordinate,
+            geometryYCoordinate: this.state.geometry_y_coordinate,
+            geometryWidth: this.state.geometry_width,
+            geometryHeight: this.state.geometry_height
+        };
+
+        if (this.state.data_annotation_id) Object.assign(payload, ...annotationPayload);
+
         AxiosHelper
-            .postComment({
-                commenter: this.props.visitorUsername,
-                comment: this.state.commentText,
-                postId: this.props.postId,
-            })
-            .then((result) => {
-                this.setState({
-                    preview: result.data
+            .postComment(payload)
+            .then(
+                (result) => {
+                    this.setState({
+                        preview: result.data
+                    })
                 })
-            })
     }
 
     //top comment
     //most recent 3
     //see more
 
-    
+
     renderComments(viewingMode) {
         if (viewingMode === COLLAPSED) {
             return (
@@ -52,6 +69,16 @@ class Comments extends React.Component {
 
                 </div>
             )
+        }
+        else if (viewingMode === EXPANDED) {
+            return (
+                <div>
+
+                </div>
+            )
+        }
+        else {
+            throw new Error("No viewing modes matched");
         }
     }
 
