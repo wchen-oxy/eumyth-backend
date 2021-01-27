@@ -12,8 +12,8 @@ const commentSchema = new Schema({
         type: mongoose.Types.ObjectId,
         required: true
     },
-
-    parent_comment_id: {
+    
+    commenter_user_id: {
         type: mongoose.Types.ObjectId,
         required: true
     },
@@ -22,10 +22,6 @@ const commentSchema = new Schema({
         type: [mongoose.Types.ObjectId]
     },
 
-    commenter_user_id: {
-        type: mongoose.Types.ObjectId,
-        required: true
-    },
 
     comment: {
         type: String,
@@ -48,7 +44,7 @@ const commentSchema = new Schema({
     { timestamps: true }
 );
 
- 
+
 
 const commentModel = mongoose.model('comment', commentSchema);
 

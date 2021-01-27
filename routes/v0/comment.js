@@ -83,8 +83,16 @@ const returnExpandedComments = (commentIdArray) => {
                             }
                         }
                     },
-                    { $group: { _id: '$_id', count: { $sum: 1 } } },
-                    { $sort: { countt: 1 } }
+
+                    {
+                        $group: {
+                            _id: '$_id',
+
+                        }
+
+                    },
+
+
                 ]);
             })
         .then((ancestorRoots) => {
@@ -109,8 +117,53 @@ router.route('/')
             return res.status(500).send(error);
         }
 
-    })
+    });
 
+
+router.route('/reply')
+    .post((req, res) => {
+        const commenter = req.body.commenterUsername;
+        const ancestors = JSON.parse(req.body.ancestors);
+        const comment = req.body.comment;
+        const dataAnnotationId = req.body.dataAnnotationId;
+        const dataAnnotationText = req.body.dataAnnotationText;
+        const geometryAnnotationType = req.body.geometryAnnotationType;
+        const geometryXCoordinate = req.body.geometryXCoordinate;
+        const geometryYCoordinate = req.body.geometryYCoordinate;
+        const geometryWidth = req.body.geometryWidth;
+        const geometryHeight = req.body.geometryHeight;
+
+        return UserPreview.Model.findOne({ username: commenter })
+            .then((result) => {
+                if (!result) throw new Error(204);
+                const annotationPayload = dataAnnotationId ?
+                    {
+                        data_annotation_id: dataAnnotationId,
+                        data_annotation_text: dataAnnotationText,
+                        geometry_annotation_type: geometryAnnotationType,
+                        geometry_x_coordinate: geometryXCoordinate,
+                        geometry_y_coordinate: geometryYCoordinate,
+                        geometry_width: geometryWidth,
+                        geometry_height: geometryHeight
+                    } : null;
+                const newReply = new Comment.Model({
+                    parent_post_id: postId,
+                    ancestor_post_ids: ancestors,
+                    commenter_user_id: result[1]._id,
+                    comment: comment,
+                    annotation: annotationPayload
+                });
+                newReply.ancestor_post_ids.push(newReply._id);
+                return newReply.save();
+
+            })
+            .then((result) => res.status(200).send())
+            .catch((err) => {
+                if (err.status === 204) console.log("No parent comment or commenter user profile found");
+                console.log(err);
+                res.status(500).send();
+            });
+    })
 router.route('/root')
     .post((req, res) => {
         const postId = req.body.postId;
@@ -140,18 +193,17 @@ router.route('/root')
                             geometry_width: geometryWidth,
                             geometry_height: geometryHeight
                         } : null;
-
+                    const newRootComment = new Comment.Model({
+                        parent_post_id: postId,
+                        ancestor_post_ids: [],
+                        commenter_user_id: result[1]._id,
+                        comment: comment,
+                        annotation: annotationPayload
+                    })
                     result[0].comments.unshift(
-                        new Comment.Model({
-                            parent_post_id: postId,
-                            parent_comment_id: null,
-                            ancestor_post_ids: [],
-                            commenter_user_id: result[1]._id,
-                            comment: comment,
-                            annotation: annotationPayload
-                        })
+                        newRootComment._id
                     );
-                    return result[0].save();
+                    return Promise.all([result[0].save(), newRootComment.save()]);
                 }
             )
             .then((res) => {
