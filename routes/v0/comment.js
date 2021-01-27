@@ -20,27 +20,42 @@ const returnComments = (commentIdArray) =>
         })
 );
 
+const processRootAndTopComments = (rootComments) => {
+    let topComment = null;
+    let topLikes = 0;
+    let commentArray = [];
+    for (const comment of rootComments) {
+        if (comment.likes.length - comment.dislikes.length >
+            topLikes && comment.likes !== 0) {
+            topComment = comment;
+        }
+        else {
+            commentArray.push(comment);
+        }
+    }
+    return {
+        topComment: topComment,
+        commentArray: commentArray
+    }
+}
+
 
 const returnCollapsedComments = (commentIdArray) => {
+    let topComment = null;
     return returnComments(commentIdArray)
-        .then((rootComments) => {
-            let topComment = null;
-            let topLikes = 0;
-            let commentArray = [];
-            for (const comment of rootComments) {
-                if (comment.likes > topLikes && comment.likes !== 0) {
-                    topComment = comment;
-                }
-            }
+        .then((rawComments) => {
+            const processedRootComments = processRootAndTopComments(rawComments);
+            const commentArray = processedRootComments.commentArray;
+            topComment = processedRootComments.topComment;
             if (commentArray.length < 3) {
-                return rootComments;
+                return commentArray;
             }
             else {
-                return rootComments.slice(rootComments.length - 4, rootComments.length - 1);
+                return commentArray.slice(0, 4);
             }
         })
         .then(
-            (result) => res.status(200).json({ comments: result })
+            (result) => res.status(200).json({ comments: result, topComment: topComment })
         )
         .catch((err) => {
             console.log(err);
@@ -49,21 +64,34 @@ const returnCollapsedComments = (commentIdArray) => {
 };
 
 const returnExpandedComments = (commentIdArray) => {
+    let topComment = null;
+    let rootCommentArray = null;
+
     return returnComments(commentIdArray)
         .then(
-            (rootComments) => {
-                let topComment = null;
-                let topLikes = 0;
-                let commentArray = [];
-                for (const comment of rootComments) {
-                    if (comment.likes > topLikes && comment.likes !== 0) {
-                        topComment = comment;
-                    }
-                }
-            }
-        )
-
+            (rawComments) => {
+                const processedRootComments = processRootAndTopComments(rawComments);
+                rootCommentArray = processedRootComments.commentArray;
+                topComment = processedRootComments.topComment;
+                //get all the comments that have the root comment id inside of it
+                return Comment.Model.aggregate([
+                    {
+                        $unwind: '$ancestor_post_ids',
+                        $match: {
+                            $or: {
+                                $in: [processedRootComments]
+                            }
+                        }
+                    },
+                    { $group: { _id: '$_id', count: { $sum: 1 } } },
+                    { $sort: { countt: 1 } }
+                ]);
+            })
+        .then((ancestorRoots) => {
+            res.status(200).send(ancestorRoots);
+        })
 }
+
 
 router.route('/')
     .get((req, res) => {
@@ -113,7 +141,7 @@ router.route('/root')
                             geometry_height: geometryHeight
                         } : null;
 
-                    result[0].comments.push(
+                    result[0].comments.unshift(
                         new Comment.Model({
                             parent_post_id: postId,
                             parent_comment_id: null,

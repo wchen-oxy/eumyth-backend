@@ -48,12 +48,7 @@ const commentSchema = new Schema({
     { timestamps: true }
 );
 
-commentSchema.add({
-    children: {
-        type: [commentSchema],
-        default: []
-    }
-})
+ 
 
 const commentModel = mongoose.model('comment', commentSchema);
 
