@@ -12,7 +12,7 @@ const commentSchema = new Schema({
         type: mongoose.Types.ObjectId,
         required: true
     },
-    
+
     commenter_user_id: {
         type: mongoose.Types.ObjectId,
         required: true
@@ -21,7 +21,6 @@ const commentSchema = new Schema({
     ancestor_post_ids: {
         type: [mongoose.Types.ObjectId]
     },
-
 
     comment: {
         type: String,

@@ -78,21 +78,15 @@ const returnExpandedComments = (commentIdArray) => {
                     {
                         $unwind: '$ancestor_post_ids',
                         $match: {
-                            $or: {
-                                $in: [processedRootComments]
-                            }
+                            $in: [{ $first: '$ancestor_post_ids' }, processedRootComments],
+                            $and : { "ancestor_post_ids.3": { "$exists": false } }
                         }
                     },
-
                     {
                         $group: {
                             _id: '$_id',
-
                         }
-
                     },
-
-
                 ]);
             })
         .then((ancestorRoots) => {
@@ -122,6 +116,7 @@ router.route('/')
 
 router.route('/reply')
     .post((req, res) => {
+        const postId = req.body.postId;
         const commenter = req.body.commenterUsername;
         const ancestors = JSON.parse(req.body.ancestors);
         const comment = req.body.comment;
@@ -132,6 +127,7 @@ router.route('/reply')
         const geometryYCoordinate = req.body.geometryYCoordinate;
         const geometryWidth = req.body.geometryWidth;
         const geometryHeight = req.body.geometryHeight;
+        const imagePageNumber = req.body.imagePageNumber;
 
         return UserPreview.Model.findOne({ username: commenter })
             .then((result) => {
@@ -144,18 +140,19 @@ router.route('/reply')
                         geometry_x_coordinate: geometryXCoordinate,
                         geometry_y_coordinate: geometryYCoordinate,
                         geometry_width: geometryWidth,
-                        geometry_height: geometryHeight
+                        geometry_height: geometryHeight,
+                        image_page_number: imagePageNumber
                     } : null;
                 const newReply = new Comment.Model({
                     parent_post_id: postId,
                     ancestor_post_ids: ancestors,
-                    commenter_user_id: result[1]._id,
+
+                    commenter_user_id: result._id,
                     comment: comment,
                     annotation: annotationPayload
                 });
                 newReply.ancestor_post_ids.push(newReply._id);
                 return newReply.save();
-
             })
             .then((result) => res.status(200).send())
             .catch((err) => {
@@ -176,6 +173,7 @@ router.route('/root')
         const geometryYCoordinate = req.body.geometryYCoordinate;
         const geometryWidth = req.body.geometryWidth;
         const geometryHeight = req.body.geometryHeight;
+        const imagePageNumber = req.body.imagePageNumber;
 
         const resolvedPost = Post.Model.findById(postId);
         const resolvedUser = UserPreview.findOne({ username: commenter });
@@ -191,11 +189,13 @@ router.route('/root')
                             geometry_x_coordinate: geometryXCoordinate,
                             geometry_y_coordinate: geometryYCoordinate,
                             geometry_width: geometryWidth,
-                            geometry_height: geometryHeight
+                            geometry_height: geometryHeight,
+                            image_page_number: imagePageNumber
                         } : null;
                     const newRootComment = new Comment.Model({
                         parent_post_id: postId,
                         ancestor_post_ids: [],
+
                         commenter_user_id: result[1]._id,
                         comment: comment,
                         annotation: annotationPayload
