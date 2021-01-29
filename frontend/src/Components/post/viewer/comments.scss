@@ -1,4 +1,5 @@
-@import "../../../../partials";
+@import "../../../partials";
+
 .comments-main-container {
     .comments-collapsed-input-container,
     .comments-expanded-input-container {
@@ -16,7 +17,6 @@
         .comments-expanded-input {
             width: 96%;
         }
-
     }
     .comments-collapsed-input-container {
         width: 96%;
@@ -26,5 +26,4 @@
             margin-right: 0;
         }
     }
-
 }

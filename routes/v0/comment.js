@@ -1,6 +1,8 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
 const Comment = require("../../models/comment.model");
+const ImageAnnotation = require('../../models/image.annotation.model');
 const Post = require("../../models/post.model");
 const UserPreview = require('../../models/user.preview.model');
 
@@ -17,32 +19,34 @@ const returnComments = (commentIdArray) =>
                     console.log(docs);
                 }
             }
-        })
+        }).lean()
 );
 
 const processRootAndTopComments = (rootComments) => {
     let topComment = null;
     let topLikes = 0;
     let commentArray = [];
+    let commentUserProfileIdArray = [];
     for (const comment of rootComments) {
         if (comment.likes.length - comment.dislikes.length >
             topLikes && comment.likes !== 0) {
             topComment = comment;
+            topLikes = comment.likes.length - comment.dislikes.length;
         }
-        else {
-            commentArray.push(comment);
-        }
+        commentArray.push(comment);
+        commentUserProfileIdArray.push(comment.commenter_user_id);
     }
     return {
         topComment: topComment,
+        commentUserProfileIdArray: commentUserProfileIdArray,
         commentArray: commentArray
     }
 }
 
 
-const returnCollapsedComments = (commentIdArray) => {
+const returnCollapsedComments = (rootCommentIdArray) => {
     let topComment = null;
-    return returnComments(commentIdArray)
+    return returnComments(rootCommentIdArray)
         .then((rawComments) => {
             const processedRootComments = processRootAndTopComments(rawComments);
             const commentArray = processedRootComments.commentArray;
@@ -63,53 +67,141 @@ const returnCollapsedComments = (commentIdArray) => {
         });
 };
 
-const returnExpandedComments = (commentIdArray) => {
+const returnExpandedComments = (rootCommentIdArray) => {
+    console.log(rootCommentIdArray);
+
     let topComment = null;
     let rootCommentArray = null;
+    let commentUserProfileIdArray = null;
 
-    return returnComments(commentIdArray)
+    return returnComments(rootCommentIdArray)
         .then(
             (rawComments) => {
                 const processedRootComments = processRootAndTopComments(rawComments);
+                commentUserProfileIdArray = processedRootComments.commentUserProfileIdArray;
                 rootCommentArray = processedRootComments.commentArray;
                 topComment = processedRootComments.topComment;
                 //get all the comments that have the root comment id inside of it
-                return Comment.Model.aggregate([
-                    {
-                        $unwind: '$ancestor_post_ids',
-                        $match: {
-                            $in: [{ $first: '$ancestor_post_ids' }, processedRootComments],
-                            $and : { "ancestor_post_ids.3": { "$exists": false } }
+                return Comment.Model
+                    .aggregate([
+                        {
+                            $unwind: '$ancestor_post_ids',
+                        },
+                        {
+                            $match: {
+                                "ancestor_post_ids": { $in: rootCommentIdArray },
+                                //exclude root posts from ancestor post ids
+                                // $and: { "ancestor_post_ids.3": { "$exists": false } }
+                            }
+                        },
+                        // {
+                        //     $group: {
+                        //         _id: '$_id',
+                        //     }
+                        // }
+                    ])
+                    //begin insertion of userdata
+                    .then((replies) => {
+                        if (replies.length > 0) {
+                            let replyUserProfileIdArray = [];
+                            for (const reply of replies) {
+                                replyUserProfileIdArray.push(reply.commenter_user_id);
+                            }
+
+                            return Promise.all([
+                                UserPreview.Model.find({
+                                    '_id': { $in: commentUserProfileIdArray }, function(err, docs) {
+                                        if (err) console.log(err);
+                                        else {
+                                            console.log(docs);
+                                        }
+                                    }
+                                }),
+                                UserPreview.Model.find({
+                                    '_id': { $in: replyUserProfileIdArray }, function(err, docs) {
+                                        if (err) console.log(err);
+                                        else {
+                                            console.log(docs);
+                                        }
+                                    }
+                                })
+                            ])
+                                .then(
+                                    (results) => {
+                                        const combinedUserProfileInfoArray = results[0].concat(results[1]);
+                                        return nestCompleteComments(
+                                            rootCommentArray,
+                                            combinedUserProfileInfoArray,
+                                            replies);
+                                    }
+                                )
                         }
-                    },
-                    {
-                        $group: {
-                            _id: '$_id',
+                        else {
+                            return UserPreview.Model.find({
+                                '_id': { $in: commentUserProfileIdArray }, function(err, docs) {
+                                    if (err) console.log(err);
+                                    else {
+                                        console.log(docs);
+                                    }
+                                }
+                            })
+                                .then(
+                                    (results) => {
+                                        console.log("no replies");
+                                        return nestCompleteComments(
+                                            rootCommentArray,
+                                            results,
+                                            null);
+                                    }
+                                );
                         }
-                    },
-                ]);
-            })
-        .then((ancestorRoots) => {
-            res.status(200).send(ancestorRoots);
-        })
+                    });
+            });
+
 }
+
+const nestCompleteComments = (rootCommentArray, userProfileDataArray, repliesArray) => {
+
+    if (!repliesArray) {
+        for (let comment of rootCommentArray) {
+            const userData = userProfileDataArray.find(
+                (item) => item._id.toString() === comment.commenter_user_id.toString()
+            );
+            comment.username = userData.username;
+            comment.displayPhotoKey = userData.tiny_cropped_display_photo_key;
+        }
+        return rootCommentArray;
+
+    }
+    else {
+
+    }
+}
+
 
 
 router.route('/')
     .get((req, res) => {
-        const commentIdArray = JSON.parse(req.query.commentIdArray);
+        const rootCommentIdArray = JSON.parse(req.query.rootCommentIdArray);
         const viewingMode = req.query.viewingMode;
         if (viewingMode === COLLAPSED) {
-            return returnCollapsedComments(commentIdArray);
+            return returnCollapsedComments(rootCommentIdArray)
+                .then((ancestorRoots) => {
+                    res.status(200).send(ancestorRoots);
+                });
         }
         else if (viewingMode === EXPANDED) {
-            return returnExpandedComments(commentIdArray);
+            return returnExpandedComments(rootCommentIdArray)
+                .then((ancestorRoots) => {
+                    res.status(200).send(ancestorRoots);
+                });
         }
         else {
             const error = "No comment viewing modes matched";
             console.log(error)
             return res.status(500).send(error);
         }
+
 
     });
 
@@ -133,7 +225,7 @@ router.route('/reply')
             .then((result) => {
                 if (!result) throw new Error(204);
                 const annotationPayload = dataAnnotationId ?
-                    {
+                    new ImageAnnotation.Model({
                         data_annotation_id: dataAnnotationId,
                         data_annotation_text: dataAnnotationText,
                         geometry_annotation_type: geometryAnnotationType,
@@ -142,7 +234,8 @@ router.route('/reply')
                         geometry_width: geometryWidth,
                         geometry_height: geometryHeight,
                         image_page_number: imagePageNumber
-                    } : null;
+                    })
+                    : null;
                 const newReply = new Comment.Model({
                     parent_post_id: postId,
                     ancestor_post_ids: ancestors,
@@ -163,26 +256,36 @@ router.route('/reply')
     })
 router.route('/root')
     .post((req, res) => {
+        console.log(req.body);
         const postId = req.body.postId;
         const commenter = req.body.commenterUsername;
         const comment = req.body.comment;
+        console.log(3);
+
         const dataAnnotationId = req.body.dataAnnotationId;
+        console.log(4);
         const dataAnnotationText = req.body.dataAnnotationText;
         const geometryAnnotationType = req.body.geometryAnnotationType;
         const geometryXCoordinate = req.body.geometryXCoordinate;
+        console.log(5);
+
         const geometryYCoordinate = req.body.geometryYCoordinate;
         const geometryWidth = req.body.geometryWidth;
         const geometryHeight = req.body.geometryHeight;
+        console.log(6);
+
         const imagePageNumber = req.body.imagePageNumber;
 
         const resolvedPost = Post.Model.findById(postId);
-        const resolvedUser = UserPreview.findOne({ username: commenter });
+        const resolvedUser = UserPreview.Model.findOne({ username: commenter });
         return Promise.all([resolvedPost, resolvedUser])
             .then(
                 (result) => {
+                    console.log(3);
+
                     if (!result[0] || !result[1]) throw new Error(204)
                     const annotationPayload = dataAnnotationId ?
-                        {
+                        new ImageAnnotation.Model({
                             data_annotation_id: dataAnnotationId,
                             data_annotation_text: dataAnnotationText,
                             geometry_annotation_type: geometryAnnotationType,
@@ -191,7 +294,7 @@ router.route('/root')
                             geometry_width: geometryWidth,
                             geometry_height: geometryHeight,
                             image_page_number: imagePageNumber
-                        } : null;
+                        }) : null;
                     const newRootComment = new Comment.Model({
                         parent_post_id: postId,
                         ancestor_post_ids: [],
@@ -200,13 +303,14 @@ router.route('/root')
                         comment: comment,
                         annotation: annotationPayload
                     })
+                    console.log(2);
                     result[0].comments.unshift(
                         newRootComment._id
                     );
                     return Promise.all([result[0].save(), newRootComment.save()]);
                 }
             )
-            .then((res) => {
+            .then((result) => {
                 res.status(200).send();
             })
             .catch((err) => {

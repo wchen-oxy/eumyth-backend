@@ -1,7 +1,7 @@
 import React from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
-import AxiosHelper from '../../../../Axios/axios';
-import { EXPANDED, COLLAPSED } from "../../../constants/flags";
+import AxiosHelper from '../../../Axios/axios';
+import { EXPANDED, COLLAPSED } from "../../constants/flags";
 import "./comments.scss";
 
 class Comments extends React.Component {
@@ -13,20 +13,34 @@ class Comments extends React.Component {
             commentText: "",
 
         }
-        this.renderComments = this.renderComments.bind(this);
+        this.renderCommentSectionType = this.renderCommentSectionType.bind(this);
         this.renderCommentInput = this.renderCommentInput.bind(this);
+        this.renderCommentThreads = this.renderCommentThreads.bind(this);
+        this.renderSingleComment = this.renderSingleComment.bind(this);
         this.handleCommentTextChange = this.handleCommentTextChange.bind(this);
         this.handleCommentPost = this.handleCommentPost.bind(this);
     }
 
     componentDidMount() {
+        console.log(this.props.comments.length);
         if (this.props.comments.length > 0) {
             AxiosHelper.getComments({
                 params: {
-                    commentIdArray: JSON.stringify(this.props.comments),
+                    rootCommentIdArray: JSON.stringify(this.props.comments),
                     viewingMode: this.state.windowType
                 }
             })
+                .then(
+                    (result) => {
+                        console.log(result);
+                        if (result.data) {
+                            this.setState({ previousComments: this.renderCommentThreads(result.data) });
+                        }
+                        else {
+                            this.setState({ previousComments: [] });
+                        }
+                    }
+                )
         }
     }
 
@@ -39,7 +53,7 @@ class Comments extends React.Component {
             commenterUsername: this.props.visitorUsername,
             comment: this.state.commentText,
             postId: this.props.postId,
-
+            imagePageNumber: 0
         };
 
         const annotationPayload = {
@@ -58,7 +72,7 @@ class Comments extends React.Component {
             .postComment(payload)
             .then(
                 (result) => {
-
+                    console.log(result);
                 })
 
     }
@@ -66,9 +80,7 @@ class Comments extends React.Component {
     //top comment
     //most recent 3
     //see more
-
-
-    renderComments(viewingMode) {
+    renderCommentSectionType(viewingMode) {
         if (viewingMode === COLLAPSED) {
             return (
                 <div>
@@ -85,6 +97,30 @@ class Comments extends React.Component {
         }
         else {
             throw new Error("No viewing modes matched");
+        }
+    }
+
+    renderSingleComment(comment) {
+        let renderedComment = (
+            <div className="comments-single-contaner">
+                <div className="comments-single-header-container">
+                    <div className="comments-display-photo-container">
+                        {/* <img src={comment.}/> */}
+                    </div>
+                    <div className="comments-username">
+
+                    </div>
+                </div>
+
+            </div>
+        )
+    }
+
+    renderCommentThreads(rawComments) {
+        //take 
+        let commentArray = [];
+        for (const rootComment of commentArray) {
+            commentArray.push(this.renderSingleComment(rootComment));
         }
     }
 
@@ -117,7 +153,7 @@ class Comments extends React.Component {
         if (this.state.windowType === COLLAPSED) {
             return (
                 <div className="comments-main-container">
-                    {this.renderComments(COLLAPSED)}
+                    {this.renderCommentSectionType(COLLAPSED)}
                     {this.renderCommentInput(COLLAPSED)}
                 </div>
             );
@@ -126,7 +162,7 @@ class Comments extends React.Component {
             return (
                 <div className="comments-main-container">
                     {this.renderCommentInput(EXPANDED)}
-                    {this.renderComments(EXPANDED)}
+                    {this.renderCommentSectionType(EXPANDED)}
                 </div>
             )
         }

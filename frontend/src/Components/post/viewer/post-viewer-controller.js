@@ -29,7 +29,7 @@ class PostViewerController extends React.Component {
             case (SHORT):
                 return (
                     <ShortPostViewer
-                        postId={this.props.postId}
+                        postId={this.props.eventData._id}
                         displayPhoto={this.props.displayPhoto}
                         username={this.props.username}
                         visitorUsername={this.props.visitorUsername}
