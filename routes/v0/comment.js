@@ -1,5 +1,4 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const router = express.Router();
 const Comment = require("../../models/comment.model");
 const ImageAnnotation = require('../../models/image.annotation.model');
@@ -91,7 +90,7 @@ const returnExpandedComments = (rootCommentIdArray) => {
                             $match: {
                                 "ancestor_post_ids": { $in: rootCommentIdArray },
                                 //exclude root posts from ancestor post ids
-                                // $and: { "ancestor_post_ids.3": { "$exists": false } }
+                                $and: [{ "ancestor_post_ids.3": { "$exists": false } }]
                             }
                         },
                         // {
@@ -168,7 +167,7 @@ const nestCompleteComments = (rootCommentArray, userProfileDataArray, repliesArr
                 (item) => item._id.toString() === comment.commenter_user_id.toString()
             );
             comment.username = userData.username;
-            comment.displayPhotoKey = userData.tiny_cropped_display_photo_key;
+            comment.display_photo_key = userData.tiny_cropped_display_photo_key;
         }
         return rootCommentArray;
 

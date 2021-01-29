@@ -20,8 +20,11 @@ class ReturningUserPage extends React.Component {
             lastName: null,
             pursuits: null,
             pursuitNames: null,
-            displayPhoto: null,
-            indexUserData: null,
+            croppedDisplayPhoto: null,
+            smallCroppedDisplayPhoto: null,
+            indexUserDataId: null,
+            fullUserDataId: null,
+            preferredPostType: null,
 
             allPosts: [],
             hasMore: true,
@@ -60,8 +63,11 @@ class ReturningUserPage extends React.Component {
 
         if (this._isMounted && this.state.username) {
             let allPosts = null;
-            let indexUserData = null;
-            let displayPhoto = "";
+            let preferredPostType = null;
+            let croppedDisplayPhoto = "";
+            let smallCroppedDisplayPhoto = "";
+            let indexUserDataId = null;
+            let fullUserDataId = null;
             let pursuits = null;
             let pursuitNames = [];
             let recentPosts = [];
@@ -73,8 +79,11 @@ class ReturningUserPage extends React.Component {
                 .then(
                     (result) => {
                         allPosts = result.data.following_feed;
-                        indexUserData = result.data;
-                        displayPhoto = result.data.cropped_display_photo_key;
+                        preferredPostType = result.data.preferred_post_type
+                        croppedDisplayPhoto = result.data.cropped_display_photo_key;
+                        smallCroppedDisplayPhoto = result.data.small_cropped_display_photo_key;
+                        indexUserDataId = result.data._id;
+                        fullUserDataId = result.data.user_profile_id;
                         pursuits = result.data.pursuits;
                         if (!allPosts || allPosts.length === 0) hasMore = false;
                         const slicedFeed = allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength);
@@ -121,8 +130,11 @@ class ReturningUserPage extends React.Component {
                         this.setState(
                             {
                                 allPosts: allPosts ? allPosts : null,
-                                indexUserData: indexUserData,
-                                displayPhoto: displayPhoto,
+                                preferredPostType: preferredPostType,
+                                indexUserDataId : indexUserDataId,
+                                fullUserDataId: fullUserDataId,
+                                croppedDisplayPhoto: croppedDisplayPhoto,
+                                smallCroppedDisplayPhoto: smallCroppedDisplayPhoto,
                                 pursuits: pursuits,
                                 pursuitNames: pursuitNames,
                                 pursuitInfoArray: pursuitInfoArray,
@@ -157,7 +169,7 @@ class ReturningUserPage extends React.Component {
                     visitorUsername={this.state.username}
                     isOwnProfile={feedItem.username === this.state.username}
                     displayPhoto={feedItem.display_photo_key}
-                    preferredPostType={feedItem.username === this.state.username ? this.state.indexUserData.preferredPostType : null}
+                    preferredPostType={feedItem.username === this.state.username ? this.state.preferredPostType : null}
                     closeModal={null}
                     pursuitNames={this.state.pursuitNames}
                     username={feedItem.username}
@@ -204,8 +216,8 @@ class ReturningUserPage extends React.Component {
 
     handleDeletePost() {
         return AxiosHelper.deletePost(
-            this.state.indexUserData.user_profile_id,
-            this.state.indexUserData._id,
+            this.state.fullUserDataId,
+            this.state.indexUserDataId,
             this.state.selectedEvent._id
         ).then(
             (result) => console.log(result)
@@ -267,8 +279,8 @@ class ReturningUserPage extends React.Component {
                     key={this.state.selectedEvent._id}
                     isOwnProfile={true}
                     isPostOnlyView={false}
-                    displayPhoto={this.state.indexUserData.tiny_cropped_display_photo_key}
-                    preferredPostType={this.state.indexUserData.preferredPostType}
+                    displayPhoto={this.state.smallCroppedDisplayPhoto}
+                    preferredPostType={this.state.preferredPostType}
                     closeModal={this.closeModal}
                     pursuitNames={this.state.pursuitNames}
                     username={this.state.selectedEvent.username}
@@ -291,7 +303,7 @@ class ReturningUserPage extends React.Component {
                         <img
                             alt=""
                             id="returninguser-profile-photo"
-                            src={this.state.displayPhoto ? returnUserImageURL(this.state.displayPhoto) : TEMP_PROFILE_PHOTO_URL}>
+                            src={this.state.croppedDisplayPhoto ? returnUserImageURL(this.state.croppedDisplayPhoto) : TEMP_PROFILE_PHOTO_URL}>
                         </img>
                         <div className="returninguser-profile-text-container">
                             <p>{this.state.username}</p>

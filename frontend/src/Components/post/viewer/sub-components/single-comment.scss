@@ -1,0 +1,21 @@
+@import "../../../../partials";
+
+    .singlecomment-main-contaner {
+        @include flex-display-column;
+        width: 80%;
+        .singlecomment-header-container {
+            @include flex-display-row;
+            align-items: center;
+            .singlecomment-display-photo-container {
+                @include flex-display-row;
+                img {
+                    @include tiny-profile-photo;
+                    border-radius: 50%;
+                }
+            }
+        }
+
+        .singlecomment-content-container{
+            
+        }
+    }

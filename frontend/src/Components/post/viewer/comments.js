@@ -1,7 +1,10 @@
-import React from 'react';
+import React  from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import AxiosHelper from '../../../Axios/axios';
+import SingleComment from "./sub-components/single-comment";
+import CommentInput from "./sub-components/comment-input";
 import { EXPANDED, COLLAPSED } from "../../constants/flags";
+
 import "./comments.scss";
 
 class Comments extends React.Component {
@@ -9,14 +12,15 @@ class Comments extends React.Component {
         super(props);
         this.state = {
             windowType: this.props.windowType,
-            previousComments: null,
+            currentComments: null,
             commentText: "",
+
 
         }
         this.renderCommentSectionType = this.renderCommentSectionType.bind(this);
         this.renderCommentInput = this.renderCommentInput.bind(this);
         this.renderCommentThreads = this.renderCommentThreads.bind(this);
-        this.renderSingleComment = this.renderSingleComment.bind(this);
+
         this.handleCommentTextChange = this.handleCommentTextChange.bind(this);
         this.handleCommentPost = this.handleCommentPost.bind(this);
     }
@@ -34,18 +38,18 @@ class Comments extends React.Component {
                     (result) => {
                         console.log(result);
                         if (result.data) {
-                            this.setState({ previousComments: this.renderCommentThreads(result.data) });
+                            this.setState({ currentComments: this.renderCommentThreads(result.data) });
                         }
                         else {
-                            this.setState({ previousComments: [] });
+                            this.setState({ currentComments: [] });
                         }
                     }
                 )
         }
     }
 
-    handleCommentTextChange(e) {
-        this.setState({ commentText: e.target.value })
+    handleCommentTextChange(text) {
+        this.setState({ commentText: text })
     }
 
     handleCommentPost() {
@@ -77,9 +81,6 @@ class Comments extends React.Component {
 
     }
 
-    //top comment
-    //most recent 3
-    //see more
     renderCommentSectionType(viewingMode) {
         if (viewingMode === COLLAPSED) {
             return (
@@ -100,28 +101,18 @@ class Comments extends React.Component {
         }
     }
 
-    renderSingleComment(comment) {
-        let renderedComment = (
-            <div className="comments-single-contaner">
-                <div className="comments-single-header-container">
-                    <div className="comments-display-photo-container">
-                        {/* <img src={comment.}/> */}
-                    </div>
-                    <div className="comments-username">
 
-                    </div>
-                </div>
-
-            </div>
-        )
-    }
 
     renderCommentThreads(rawComments) {
-        //take 
-        let commentArray = [];
-        for (const rootComment of commentArray) {
-            commentArray.push(this.renderSingleComment(rootComment));
+        let renderedCommentArray = [];
+        for (const rootComment of rawComments) {
+            renderedCommentArray.push(
+                <SingleComment
+                    username={rootComment.username}
+                    commentText={rootComment.comment}
+                    displayPhoto={rootComment.display_photo_key} />);
         }
+        return renderedCommentArray;
     }
 
     renderCommentInput(viewingMode) {
@@ -129,13 +120,14 @@ class Comments extends React.Component {
             return (
                 <div className={viewingMode === COLLAPSED ?
                     "comments-collapsed-input-container" : "comments-expanded-input-container"}>
-                    <TextareaAutosize
-                        className={viewingMode === COLLAPSED ?
-                            "comments-collapsed-input" : "comments-expanded-input"}
-                        minRows={2}
-                        onChange={(e) => this.handleCommentTextChange(e)}
-                        value={this.state.commentText}
-                    />
+                        <CommentInput 
+                            classStyle={viewingMode === COLLAPSED ?
+                                "comments-collapsed-input" : "comments-expanded-input"}
+                                minRows={4}
+                                handleTextChange={this.handleCommentTextChange}
+                                commentText={this.state.commentText}
+                        />
+                  
                     <button onClick={this.handleCommentPost}>Add Comment</button>
                 </div>
             );
@@ -155,6 +147,7 @@ class Comments extends React.Component {
                 <div className="comments-main-container">
                     {this.renderCommentSectionType(COLLAPSED)}
                     {this.renderCommentInput(COLLAPSED)}
+                    {this.state.currentComments}
                 </div>
             );
         }
@@ -163,6 +156,8 @@ class Comments extends React.Component {
                 <div className="comments-main-container">
                     {this.renderCommentInput(EXPANDED)}
                     {this.renderCommentSectionType(EXPANDED)}
+                    {this.state.currentComments}
+
                 </div>
             )
         }
