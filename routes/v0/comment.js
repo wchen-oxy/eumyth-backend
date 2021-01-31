@@ -4,7 +4,7 @@ const Comment = require("../../models/comment.model");
 const ImageAnnotation = require('../../models/image.annotation.model');
 const Post = require("../../models/post.model");
 const UserPreview = require('../../models/user.preview.model');
-
+const mongoose = require('mongoose');
 const COLLAPSED = "COLLAPSED";
 const EXPANDED = "EXPANDED";
 
@@ -26,6 +26,7 @@ const processRootAndTopComments = (rootComments) => {
     let topLikes = 0;
     let commentArray = [];
     let commentUserProfileIdArray = [];
+    let transformedRootCommentIdArray = [];
     for (const comment of rootComments) {
         if (comment.likes.length - comment.dislikes.length >
             topLikes && comment.likes !== 0) {
@@ -34,11 +35,13 @@ const processRootAndTopComments = (rootComments) => {
         }
         commentArray.push(comment);
         commentUserProfileIdArray.push(comment.commenter_user_id);
+        transformedRootCommentIdArray.push(mongoose.Types.ObjectId(comment._id))
     }
     return {
         topComment: topComment,
         commentUserProfileIdArray: commentUserProfileIdArray,
-        commentArray: commentArray
+        commentArray: commentArray,
+        transformedRootCommentIdArray: transformedRootCommentIdArray
     }
 }
 
@@ -67,11 +70,10 @@ const returnCollapsedComments = (rootCommentIdArray) => {
 };
 
 const returnExpandedComments = (rootCommentIdArray) => {
-    console.log(rootCommentIdArray);
-
     let topComment = null;
     let rootCommentArray = null;
     let commentUserProfileIdArray = null;
+    let transformedRootCommentIdArray = null;
 
     return returnComments(rootCommentIdArray)
         .then(
@@ -80,7 +82,9 @@ const returnExpandedComments = (rootCommentIdArray) => {
                 commentUserProfileIdArray = processedRootComments.commentUserProfileIdArray;
                 rootCommentArray = processedRootComments.commentArray;
                 topComment = processedRootComments.topComment;
-                //get all the comments that have the root comment id inside of it
+                transformedRootCommentIdArray = processedRootComments.transformedRootCommentIdArray,
+                    //get all the comments that have the root comment id inside of it
+                    console.log(transformedRootCommentIdArray);
                 return Comment.Model
                     .aggregate([
                         {
@@ -88,19 +92,17 @@ const returnExpandedComments = (rootCommentIdArray) => {
                         },
                         {
                             $match: {
-                                "ancestor_post_ids": { $in: rootCommentIdArray },
+                                // _id: mongoose.Types.ObjectId('601728c2b2a30831410d0265'),
+                                "ancestor_post_ids": { $in: transformedRootCommentIdArray },
                                 //exclude root posts from ancestor post ids
                                 $and: [{ "ancestor_post_ids.3": { "$exists": false } }]
                             }
                         },
-                        // {
-                        //     $group: {
-                        //         _id: '$_id',
-                        //     }
-                        // }
+
                     ])
                     //begin insertion of userdata
                     .then((replies) => {
+                        console.log("REPLIES", replies);
                         if (replies.length > 0) {
                             let replyUserProfileIdArray = [];
                             for (const reply of replies) {
@@ -173,7 +175,7 @@ const nestCompleteComments = (rootCommentArray, userProfileDataArray, repliesArr
 
     }
     else {
-
+        console.log(userProfileDataArray);
     }
 }
 
@@ -207,6 +209,9 @@ router.route('/')
 
 router.route('/reply')
     .post((req, res) => {
+        console.log("lbadsf");
+        console.log(req.body);
+
         const postId = req.body.postId;
         const commenter = req.body.commenterUsername;
         const ancestors = JSON.parse(req.body.ancestors);
@@ -220,6 +225,7 @@ router.route('/reply')
         const geometryHeight = req.body.geometryHeight;
         const imagePageNumber = req.body.imagePageNumber;
 
+        console.log(req.body);
         return UserPreview.Model.findOne({ username: commenter })
             .then((result) => {
                 if (!result) throw new Error(204);
@@ -243,7 +249,6 @@ router.route('/reply')
                     comment: comment,
                     annotation: annotationPayload
                 });
-                newReply.ancestor_post_ids.push(newReply._id);
                 return newReply.save();
             })
             .then((result) => res.status(200).send())

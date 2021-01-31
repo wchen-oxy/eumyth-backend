@@ -1,4 +1,4 @@
-import React  from 'react';
+import React from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import AxiosHelper from '../../../Axios/axios';
 import SingleComment from "./sub-components/single-comment";
@@ -106,8 +106,13 @@ class Comments extends React.Component {
     renderCommentThreads(rawComments) {
         let renderedCommentArray = [];
         for (const rootComment of rawComments) {
+            console.log(rootComment);
             renderedCommentArray.push(
                 <SingleComment
+                    postId={this.props.postId}
+                    visitorUsername={this.props.visitorUsername}
+                    commentId = {rootComment._id}
+                    ancestors={rootComment.ancestor_post_ids}
                     username={rootComment.username}
                     commentText={rootComment.comment}
                     displayPhoto={rootComment.display_photo_key} />);
@@ -120,14 +125,14 @@ class Comments extends React.Component {
             return (
                 <div className={viewingMode === COLLAPSED ?
                     "comments-collapsed-input-container" : "comments-expanded-input-container"}>
-                        <CommentInput 
-                            classStyle={viewingMode === COLLAPSED ?
-                                "comments-collapsed-input" : "comments-expanded-input"}
-                                minRows={4}
-                                handleTextChange={this.handleCommentTextChange}
-                                commentText={this.state.commentText}
-                        />
-                  
+                    <CommentInput
+                        classStyle={viewingMode === COLLAPSED ?
+                            "comments-collapsed-input" : "comments-expanded-input"}
+                        minRows={4}
+                        handleTextChange={this.handleCommentTextChange}
+                        commentText={this.state.commentText}
+                    />
+
                     <button onClick={this.handleCommentPost}>Add Comment</button>
                 </div>
             );

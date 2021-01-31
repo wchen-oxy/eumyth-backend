@@ -196,5 +196,9 @@ export default class AxiosHelper {
         return axios.post(urls.ROOT_COMMENT_URL, payload);
     }
 
+    static postReply(payload){
+        return axios.post(urls.REPLY_COMMENT_URL, payload);
+    }
+
 }
 

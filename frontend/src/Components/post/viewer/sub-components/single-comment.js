@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { returnUserImageURL } from "../../../constants/urls";
 import CommentInput from "./comment-input";
+import AxiosHelper from "../../../../Axios/axios";
 import "./single-comment.scss";
 
 const SingleComment = (props) => {
@@ -15,7 +16,23 @@ const SingleComment = (props) => {
             alert("You need to write something");
         }
         else {
-            toggleReplyBox(false);
+
+            let ancestorArray = props.ancestors;
+            ancestorArray.push(props.commentId);
+            return AxiosHelper.postReply(
+                {
+                    postId: props.postId,
+                    commenterUsername: props.visitorUsername,
+                    ancestors: JSON.stringify(ancestorArray),
+                    comment: replyText
+
+                }
+            )
+                .then((result) => {
+                    console.log(result);
+                    alert(result);
+                    toggleReplyBox(false);
+                })
         }
     }
 

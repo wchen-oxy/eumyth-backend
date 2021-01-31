@@ -43,6 +43,7 @@ class ShortPostViewer extends React.Component {
         this.handleTextChange = this.handleTextChange.bind(this);
         this.handlePaginatedChange = this.handlePaginatedChange.bind(this);
         this.renderImageSlider = this.renderImageSlider.bind(this);
+        this.renderComments = this.renderComments.bind(this);
     }
 
     handleWindowChange(newWindow) {
@@ -90,6 +91,17 @@ class ShortPostViewer extends React.Component {
             </div>
         );
     }
+
+    renderComments(windowType) {
+        return (
+            <Comments
+                comments={this.props.eventData.comments}
+                windowType={windowType}
+                visitorUsername={this.props.visitorUsername}
+                postId={this.props.postId}
+            />
+        )
+    }
     render() {
         if (this.state.window === INITIAL) {
             if (!this.props.eventData.image_data.length) {
@@ -120,12 +132,7 @@ class ShortPostViewer extends React.Component {
                                     />
                                 </div>
                             </div>
-                            <Comments
-                                comments={this.props.eventData.comments}
-                                windowType={EXPANDED}
-                                visitorUsername={this.props.visitorUsername}
-                                postId={this.props.postId}
-                            />
+                            {this.renderComments(EXPANDED)}
                         </div>
 
 
@@ -157,12 +164,7 @@ class ShortPostViewer extends React.Component {
                                     />
                                 </div>
                             </div>
-                            <Comments
-                                comments={this.props.eventData.comments}
-                                windowType={COLLAPSED}
-                                visitorUsername={this.props.visitorUsername}
-                                postId={this.props.postId}
-                            />
+                            { this.renderComments(COLLAPSED)}
                         </div>
                     )
                 }
@@ -194,12 +196,7 @@ class ShortPostViewer extends React.Component {
                                     />
                                 </div>
                             </div>
-                            <Comments
-                                comments={this.props.eventData.comments}
-                                windowType={EXPANDED}
-                                visitorUsername={this.props.visitorUsername}
-                                postId={this.props.postId}
-                            />
+                            {this.renderComments(EXPANDED)}
                         </div>
                     )
                 }
@@ -225,12 +222,7 @@ class ShortPostViewer extends React.Component {
                                     />
                                 </div>
                             </div>
-                            <Comments
-                                comments={this.props.eventData.comments}
-                                windowType={COLLAPSED}
-                                visitorUsername={this.props.visitorUsername}
-                                postId={this.props.postId}
-                            />
+                            {this.renderComments(COLLAPSED)}
                         </>
 
                     );
