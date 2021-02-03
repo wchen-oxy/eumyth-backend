@@ -143,6 +143,7 @@ class Comments extends React.Component {
 
     renderCommentThreads(rawComments) {
         let renderedCommentArray = [];
+        console.log(rawComments);
         for (const rootComment of rawComments) {
             renderedCommentArray.push(
                 this.recursiveRenderComments(rootComment)

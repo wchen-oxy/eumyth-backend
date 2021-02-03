@@ -123,7 +123,7 @@ const returnExpandedComments = (rootCommentIdArray) => {
                             }
                             commentUserProfileIdArray.concat(replyingUserProfileIdArray);
                             commentUserProfileIdArray = [... new Set(commentUserProfileIdArray)];
-                         }
+                        }
                         //     // replyUserProfileIdArray = [... new Set(replyUserProfileIdArray)];
                         //     // commentUserProfileIdArray = [... new Set(commentUserProfileIdArray)];
 
@@ -181,7 +181,7 @@ const returnExpandedComments = (rootCommentIdArray) => {
                         })
                             .then(
                                 (results) => {
-                                     let userProfileHashTable = {}
+                                    let userProfileHashTable = {}
                                     results.forEach(
                                         (value) => userProfileHashTable[value._id.toString()] = value
                                     )
@@ -206,7 +206,7 @@ const recursiveCommentFinder = () => {
 const nestCompleteComments = (rootCommentArray, userProfileHashTable, repliesArray,) => {
 
     if (!repliesArray) {
-         for (let comment of rootCommentArray) {
+        for (let comment of rootCommentArray) {
             const userData = userProfileHashTable[comment.commenter_user_id.toString()];
             comment.username = userData.username;
             comment.display_photo_key = userData.tiny_cropped_display_photo_key;
@@ -217,41 +217,52 @@ const nestCompleteComments = (rootCommentArray, userProfileHashTable, repliesArr
     else {
         repliesArray.sort((a, b) => {
             if (a.ancestor_post_ids.length < b.ancestor_post_ids) {
-                return -1;
+                return 1;
             }
             if (a.ancestor_post_ids > b.ancestor_post_ids) {
-                return 1;
+                return -1;
             }
             return 0;
         });
+        console.log(repliesArray);
         let nearRootCommentsIndex = 0;
 
         for (let i = 0; i < repliesArray.length; i++) {
             let nextValueIndex = i + 1;
-            //FIXME ACCOUNT FOR SINGLE REPLY VALUES
+            let reply = repliesArray[i];
+            //get the nearRootCommentsIndex for Slicing Later
             if (i > 0 &&
                 repliesArray[i - 1].ancestor_post_ids.length !== repliesArray[i].ancestor_post_ids.length) {
                 nearRootCommentsIndex = i;
             }
 
             //send second pointer out to search for matching value
-            while (nextValueIndex < repliesArray.length &&
+            while (
+                nextValueIndex < repliesArray.length &&
+                repliesArray[i].ancestor_post_ids.length - repliesArray[nextValueIndex].length < 2 &&
                 repliesArray[i].ancestor_post_ids[repliesArray[i].ancestor_post_ids.length - 1].toString() !==
-                repliesArray[nextValueIndex].ancestor_post_ids[repliesArray[nextValueIndex].ancestor_post_ids.length - 1].toString()) {
+                repliesArray[nextValueIndex]._id.toString()) {
                 nextValueIndex++;
             }
-            if (nextValueIndex < repliesArray.length && repliesArray[i].ancestor_post_ids[repliesArray[i].ancestor_post_ids.length - 1].toString() ===
-                repliesArray[nextValueIndex].ancestor_post_ids[repliesArray[nextValueIndex].ancestor_post_ids.length - 1].toString()) {
+            //you can have a reply that doesnt match any other replies
+            console.log("index", nextValueIndex)
+            if (nextValueIndex < repliesArray.length
+                // &&
+                // repliesArray[i].ancestor_post_ids[repliesArray[i].ancestor_post_ids.length - 1].toString() ===
+                // repliesArray[nextValueIndex].ancestor_post_ids[repliesArray[nextValueIndex].ancestor_post_ids.length - 1].toString()
+            ) {
+                console.log("PARENT", repliesArray[nextValueIndex]);
                 if (!repliesArray[nextValueIndex].replies) {
+                    console.log("No Replies array");
                     repliesArray[nextValueIndex].replies = [];
                 }
-              
                 repliesArray[nextValueIndex].replies.push(reply)
             }
-            let reply = repliesArray[i];
+
             const userData = userProfileHashTable[reply.commenter_user_id.toString()]
             reply.username = userData.username;
             reply.display_photo_key = userData.tiny_cropped_display_photo_key;
+            console.log(repliesArray[nextValueIndex]);
         }
 
         let slicedReplies = repliesArray.slice(nearRootCommentsIndex, repliesArray.length);
