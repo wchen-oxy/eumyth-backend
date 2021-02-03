@@ -120,6 +120,16 @@ class Comments extends React.Component {
         }
         else {
             let replies = [];
+            commentData.replies.sort(
+                (a, b) => {
+                    if (a.createdAt < b.createdAt) {
+                        return -1;
+                    }
+                    if (a.createdAt > b.createdAt) {
+                        return 1;
+                    }
+                    return 0;
+                });
             for (const reply of commentData.replies) {
                 replies.push(this.recursiveRenderComments(reply, currentLevel));
             }
