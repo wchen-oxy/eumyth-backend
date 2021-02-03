@@ -20,6 +20,7 @@ class Comments extends React.Component {
         this.renderCommentSectionType = this.renderCommentSectionType.bind(this);
         this.renderCommentInput = this.renderCommentInput.bind(this);
         this.renderCommentThreads = this.renderCommentThreads.bind(this);
+        this.recursiveRenderComments = this.recursiveRenderComments.bind(this);
 
         this.handleCommentTextChange = this.handleCommentTextChange.bind(this);
         this.handleCommentPost = this.handleCommentPost.bind(this);
@@ -101,21 +102,51 @@ class Comments extends React.Component {
         }
     }
 
+    recursiveRenderComments(commentData) {
+        if (!commentData.replies) {
+            return (
+                <SingleComment
+                    postId={this.props.postId}
+                    visitorUsername={this.props.visitorUsername}
+                    commentId={commentData._id}
+                    ancestors={commentData.ancestor_post_ids}
+                    username={commentData.username}
+                    commentText={commentData.comment}
+                    displayPhoto={commentData.display_photo_key}
+                />
+            );
+        }
+        else {
+            let replies = [];
+            for (const reply of commentData.replies) {
+                replies.push(this.recursiveRenderComments(reply));
+            }
+            return (
+                <div>
+                    <SingleComment
+                        postId={this.props.postId}
+                        visitorUsername={this.props.visitorUsername}
+                        commentId={commentData._id}
+                        ancestors={commentData.ancestor_post_ids}
+                        username={commentData.username}
+                        commentText={commentData.comment}
+                        displayPhoto={commentData.display_photo_key}
+                    />
+                    <div className="comments-reply-container">
+                        {replies}
+                    </div>
+                </div>
+            )
+        }
+    }
 
 
     renderCommentThreads(rawComments) {
         let renderedCommentArray = [];
         for (const rootComment of rawComments) {
-            console.log(rootComment);
             renderedCommentArray.push(
-                <SingleComment
-                    postId={this.props.postId}
-                    visitorUsername={this.props.visitorUsername}
-                    commentId = {rootComment._id}
-                    ancestors={rootComment.ancestor_post_ids}
-                    username={rootComment.username}
-                    commentText={rootComment.comment}
-                    displayPhoto={rootComment.display_photo_key} />);
+                this.recursiveRenderComments(rootComment)
+            );
         }
         return renderedCommentArray;
     }
