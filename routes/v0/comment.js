@@ -108,7 +108,8 @@ const returnExpandedComments = (rootCommentIdArray) => {
                                 "comment": { $first: "$comment" },
                                 "annotation": { $first: "$annotation" },
                                 "likes": { $first: "$likes" },
-                                "dislikes": { $first: "$dislikes" }
+                                "dislikes": { $first: "$dislikes" },
+                                "createdAt": { $first: "$createdAt" }
                             }
 
                         }
@@ -215,71 +216,83 @@ const nestCompleteComments = (rootCommentArray, userProfileHashTable, repliesArr
 
     }
     else {
-        repliesArray.sort((a, b) => {
-            if (a.ancestor_post_ids.length < b.ancestor_post_ids) {
+        let allCommentsArray = rootCommentArray.concat(repliesArray);
+        allCommentsArray.sort((a, b) => {
+            // console.log("a", a.ancestor_post_ids.length);
+            // console.log(a);
+            // console.log("b", b.ancestor_post_ids.length);
+            // console.log(b);
+            if (a.ancestor_post_ids.length < b.ancestor_post_ids.length) {
                 return 1;
             }
-            if (a.ancestor_post_ids > b.ancestor_post_ids) {
+            if (a.ancestor_post_ids.length > b.ancestor_post_ids.length) {
                 return -1;
             }
             return 0;
         });
-        console.log(repliesArray);
+        console.log(allCommentsArray);
         let nearRootCommentsIndex = 0;
 
-        for (let i = 0; i < repliesArray.length; i++) {
+        for (let i = 0; i < allCommentsArray.length; i++) {
             let nextValueIndex = i + 1;
-            let reply = repliesArray[i];
+            let reply = allCommentsArray[i];
+            const userData = userProfileHashTable[reply.commenter_user_id.toString()]
+            reply.username = userData.username;
+            reply.display_photo_key = userData.tiny_cropped_display_photo_key;
+
             //get the nearRootCommentsIndex for Slicing Later
             if (i > 0 &&
-                repliesArray[i - 1].ancestor_post_ids.length !== repliesArray[i].ancestor_post_ids.length) {
+                allCommentsArray[i - 1].ancestor_post_ids.length !== allCommentsArray[i].ancestor_post_ids.length) {
                 nearRootCommentsIndex = i;
             }
 
             //send second pointer out to search for matching value
+            console.log(allCommentsArray[i].ancestor_post_ids);
+
             while (
-                nextValueIndex < repliesArray.length &&
-                repliesArray[i].ancestor_post_ids.length - repliesArray[nextValueIndex].length < 2 &&
-                repliesArray[i].ancestor_post_ids[repliesArray[i].ancestor_post_ids.length - 1].toString() !==
-                repliesArray[nextValueIndex]._id.toString()) {
+                nextValueIndex < allCommentsArray.length &&
+                allCommentsArray[i].ancestor_post_ids.length > 0 &&
+                allCommentsArray[i].ancestor_post_ids[allCommentsArray[i].ancestor_post_ids.length - 1].toString() !==
+                allCommentsArray[nextValueIndex]._id.toString()) {
+                console.log("index", i);
                 nextValueIndex++;
             }
-            //you can have a reply that doesnt match any other replies
             console.log("index", nextValueIndex)
-            if (nextValueIndex < repliesArray.length
-                // &&
-                // repliesArray[i].ancestor_post_ids[repliesArray[i].ancestor_post_ids.length - 1].toString() ===
-                // repliesArray[nextValueIndex].ancestor_post_ids[repliesArray[nextValueIndex].ancestor_post_ids.length - 1].toString()
+            if (
+                allCommentsArray[i].ancestor_post_ids.length > 0 &&
+                nextValueIndex < allCommentsArray.length
+                &&
+                allCommentsArray[i].ancestor_post_ids[allCommentsArray[i].ancestor_post_ids.length - 1].toString() ===
+                allCommentsArray[nextValueIndex]._id.toString()
             ) {
-                console.log("PARENT", repliesArray[nextValueIndex]);
-                if (!repliesArray[nextValueIndex].replies) {
+                if (!allCommentsArray[nextValueIndex].replies) {
                     console.log("No Replies array");
-                    repliesArray[nextValueIndex].replies = [];
+                    allCommentsArray[nextValueIndex].replies = [];
                 }
-                repliesArray[nextValueIndex].replies.push(reply)
+                allCommentsArray[nextValueIndex].replies.push(reply)
             }
+            else {
+                console.log("Orphaned Comment : (");
+            }
+         }
 
-            const userData = userProfileHashTable[reply.commenter_user_id.toString()]
-            reply.username = userData.username;
-            reply.display_photo_key = userData.tiny_cropped_display_photo_key;
-            console.log(repliesArray[nextValueIndex]);
-        }
 
-        let slicedReplies = repliesArray.slice(nearRootCommentsIndex, repliesArray.length);
         // //TODO MATCH PROFILE DATA TO ROOT COMMENTS AND REPLIED COMMENTS
-        for (let comment of rootCommentArray) {
-            const userData = userProfileHashTable[comment.commenter_user_id.toString()];
-            comment.username = userData.username;
-            comment.display_photo_key = userData.tiny_cropped_display_photo_key;
-            for (const reply of slicedReplies) {
-                if (reply.ancestor_post_ids[0].toString() === comment._id.toString()) {
-                    if (!comment.replies) { comment.replies = [] }
-                    comment.replies.push(reply);
-                }
-            }
-        }
-        console.log("finalCommnets", rootCommentArray)
-        return rootCommentArray
+        // for (let comment of rootCommentArray) {
+        //     const userData = userProfileHashTable[comment.commenter_user_id.toString()];
+        //     comment.username = userData.username;
+        //     comment.display_photo_key = userData.tiny_cropped_display_photo_key;
+        //     for (const reply of slicedReplies) {
+        //         if (reply.ancestor_post_ids[0].toString() === comment._id.toString()) {
+        //             if (!comment.replies) { comment.replies = [] }
+        //             comment.replies.push(reply);
+        //         }
+        //     }
+        // }
+        //FIXME JUST GET THE FINAL ROOT COMMENTS
+        let slicedComments = allCommentsArray.slice(nearRootCommentsIndex, allCommentsArray.length);
+        console.log("finalCommnets",slicedComments )
+        return slicedComments;
     }
 }
 

@@ -46,40 +46,64 @@ const SingleComment = (props) => {
         }
     }
 
+    const renderThreadIndicators = (levels) => {
+        let threadIndicatorArray = [];
+        for (let i = 0; i < levels; i++)
+            threadIndicatorArray.push(
+                <div className="singlecomment-thread-indicator"></div>
+            )
+        // console.log(threadIndicatorArray);
+        return threadIndicatorArray;
+    }
+
 
     return (
-        <div className="singlecomment-main-contaner">
-            <div className="singlecomment-header-container">
-                <div className="singlecomment-display-photo-container">
-                    <img src={returnUserImageURL(props.displayPhoto)} />
+        <div className={props.level > 1 ? "singlecomment-multiple-thread-style": ""}>
+            {props.level > 1 ? (
+                <div className="singlecomment-thread-indicator-container">
+                    {renderThreadIndicators(props.level - 1)}
                 </div>
-                <div className="singlecomment-username-container">
-                    <p>{props.username}</p>
+            ) : null}
+            <div className="singlecomment-main-container">
+                <div className="singlecomment-header-container">
+                    <div className="singlecomment-display-photo-container">
+                        <img src={returnUserImageURL(props.displayPhoto)} />
+                    </div>
+                    <div className="singlecomment-username-container">
+                        <p>{props.username}</p>
+                    </div>
                 </div>
-            </div>
-            <div className="singlecomment-content-container">
-                <p>{props.commentText}</p>
-            </div>
-            <div className="singlecomment-management-container">
-                <button>Upvote</button>
-                <button>Downvote</button>
-                <button onClick={() => toggleReplyBox(!isReplyBoxToggled)}>Reply</button>
-            </div>
-            <div>
-                {isReplyBoxToggled ?
-                    <>
-                        <CommentInput
-                            classStyle={""}
-                            minRows={4}
-                            handleTextChange={setReplyText}
-                            commentText={replyText}
-                        />
-                        <button onClick={cancelTextInput}>Cancel</button>
-                        <button onClick={postReply}>Reply</button>
-                    </>
-                    :
-                    <></>
-                }
+                <div className="singlecomment-body-container">
+                    <div className="singlecomment-thread-indicator-container">
+                        {renderThreadIndicators(1)}
+                    </div>
+                    <div className={"singlecomment-main-content-container"}>
+                        <div className="singlecomment-comment-container">
+                            <p>{props.commentText}</p>
+                        </div>
+                        <div className="singlecomment-management-container">
+                            <button>Upvote</button>
+                            <button>Downvote</button>
+                            <button onClick={() => toggleReplyBox(!isReplyBoxToggled)}>Reply</button>
+                        </div>
+                        <div>
+                            {isReplyBoxToggled ?
+                                <>
+                                    <CommentInput
+                                        classStyle={""}
+                                        minRows={4}
+                                        handleTextChange={setReplyText}
+                                        commentText={replyText}
+                                    />
+                                    <button onClick={cancelTextInput}>Cancel</button>
+                                    <button onClick={postReply}>Reply</button>
+                                </>
+                                :
+                                <></>
+                            }
+                        </div>
+                    </div>
+                </div>
 
             </div>
         </div>

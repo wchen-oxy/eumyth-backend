@@ -102,10 +102,12 @@ class Comments extends React.Component {
         }
     }
 
-    recursiveRenderComments(commentData) {
+    recursiveRenderComments(commentData, level) {
+        const currentLevel = level + 1;
         if (!commentData.replies) {
             return (
                 <SingleComment
+                    level={currentLevel}
                     postId={this.props.postId}
                     visitorUsername={this.props.visitorUsername}
                     commentId={commentData._id}
@@ -119,11 +121,12 @@ class Comments extends React.Component {
         else {
             let replies = [];
             for (const reply of commentData.replies) {
-                replies.push(this.recursiveRenderComments(reply));
+                replies.push(this.recursiveRenderComments(reply, currentLevel));
             }
             return (
                 <div>
                     <SingleComment
+                        level={currentLevel}
                         postId={this.props.postId}
                         visitorUsername={this.props.visitorUsername}
                         commentId={commentData._id}
@@ -144,9 +147,13 @@ class Comments extends React.Component {
     renderCommentThreads(rawComments) {
         let renderedCommentArray = [];
         console.log(rawComments);
+
+        // renderedCommentArray.push(
+        //     this.recursiveRenderComments(rawComments, 1)
+        // );
         for (const rootComment of rawComments) {
             renderedCommentArray.push(
-                this.recursiveRenderComments(rootComment)
+                this.recursiveRenderComments(rootComment, 0)
             );
         }
         return renderedCommentArray;
