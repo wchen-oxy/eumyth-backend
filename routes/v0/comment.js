@@ -185,10 +185,6 @@ const nestCompleteComments = (rootCommentArray, userProfileHashTable, repliesArr
     else {
         let allCommentsArray = rootCommentArray.concat(repliesArray);
         allCommentsArray.sort((a, b) => {
-            // console.log("a", a.ancestor_post_ids.length);
-            // console.log(a);
-            // console.log("b", b.ancestor_post_ids.length);
-            // console.log(b);
             if (a.ancestor_post_ids.length < b.ancestor_post_ids.length) {
                 return 1;
             }
@@ -206,6 +202,7 @@ const nestCompleteComments = (rootCommentArray, userProfileHashTable, repliesArr
             const userData = userProfileHashTable[reply.commenter_user_id.toString()]
             reply.username = userData.username;
             reply.display_photo_key = userData.tiny_cropped_display_photo_key;
+            reply.score = reply.likes.length - reply.dislikes.length;
 
             //get the nearRootCommentsIndex for Slicing Later
             if (i > 0 &&
@@ -253,6 +250,7 @@ const nestCompleteComments = (rootCommentArray, userProfileHashTable, repliesArr
 
 router.route('/')
     .get((req, res) => {
+        const visitorUsername = req.query.visitorUsername;
         const rootCommentIdArray = JSON.parse(req.query.rootCommentIdArray);
         const viewingMode = req.query.viewingMode;
         if (viewingMode === COLLAPSED) {
@@ -267,9 +265,13 @@ router.route('/')
 
         }
         else if (viewingMode === EXPANDED) {
-            return returnExpandedComments(rootCommentIdArray)
-                .then((ancestorRoots) => {
-                    res.status(200).send(ancestorRoots);
+            return Promise.all([
+                UserPreview.Model.findOne({ username: visitorUsername }),
+                returnExpandedComments(rootCommentIdArray)
+            ])
+                .then((results) => {
+                    console.log(results);
+                    res.status(200).json({ userPreviewId: results[0], rootComments: results[1] });
                 });
         }
         else {
@@ -284,11 +286,8 @@ router.route('/')
 
 router.route('/reply')
     .post((req, res) => {
-        console.log("lbadsf");
-        console.log(req.body);
-
         const postId = req.body.postId;
-        const commenter = req.body.commenterUsername;
+        const commenterId = req.body.visitorProfilePreviewId;
         const ancestors = JSON.parse(req.body.ancestors);
         const comment = req.body.comment;
         const dataAnnotationId = req.body.dataAnnotationId;
@@ -299,33 +298,29 @@ router.route('/reply')
         const geometryWidth = req.body.geometryWidth;
         const geometryHeight = req.body.geometryHeight;
         const imagePageNumber = req.body.imagePageNumber;
-
         console.log(req.body);
-        return UserPreview.Model.findOne({ username: commenter })
-            .then((result) => {
-                if (!result) throw new Error(204);
-                const annotationPayload = dataAnnotationId ?
-                    new ImageAnnotation.Model({
-                        data_annotation_id: dataAnnotationId,
-                        data_annotation_text: dataAnnotationText,
-                        geometry_annotation_type: geometryAnnotationType,
-                        geometry_x_coordinate: geometryXCoordinate,
-                        geometry_y_coordinate: geometryYCoordinate,
-                        geometry_width: geometryWidth,
-                        geometry_height: geometryHeight,
-                        image_page_number: imagePageNumber
-                    })
-                    : null;
-                const newReply = new Comment.Model({
-                    parent_post_id: postId,
-                    ancestor_post_ids: ancestors,
-
-                    commenter_user_id: result._id,
-                    comment: comment,
-                    annotation: annotationPayload
-                });
-                return newReply.save();
+        if (!result) throw new Error(204);
+        const annotationPayload = dataAnnotationId ?
+            new ImageAnnotation.Model({
+                data_annotation_id: dataAnnotationId,
+                data_annotation_text: dataAnnotationText,
+                geometry_annotation_type: geometryAnnotationType,
+                geometry_x_coordinate: geometryXCoordinate,
+                geometry_y_coordinate: geometryYCoordinate,
+                geometry_width: geometryWidth,
+                geometry_height: geometryHeight,
+                image_page_number: imagePageNumber
             })
+            : null;
+        const newReply = new Comment.Model({
+            parent_post_id: postId,
+            ancestor_post_ids: ancestors,
+            commenter_user_id: commenterId,
+            comment: comment,
+            annotation: annotationPayload
+        });
+        return newReply
+            .save()
             .then((result) => res.status(200).send())
             .catch((err) => {
                 if (err.status === 204) console.log("No parent comment or commenter user profile found");
@@ -333,30 +328,24 @@ router.route('/reply')
                 res.status(500).send();
             });
     })
+
 router.route('/root')
     .post((req, res) => {
         console.log(req.body);
         const postId = req.body.postId;
-        const commenter = req.body.commenterUsername;
+        const commenterId = req.body.visitorProfilePreviewId;
         const comment = req.body.comment;
-        console.log(3);
-
         const dataAnnotationId = req.body.dataAnnotationId;
-        console.log(4);
         const dataAnnotationText = req.body.dataAnnotationText;
         const geometryAnnotationType = req.body.geometryAnnotationType;
         const geometryXCoordinate = req.body.geometryXCoordinate;
-        console.log(5);
-
         const geometryYCoordinate = req.body.geometryYCoordinate;
         const geometryWidth = req.body.geometryWidth;
         const geometryHeight = req.body.geometryHeight;
-        console.log(6);
-
         const imagePageNumber = req.body.imagePageNumber;
-
         const resolvedPost = Post.Model.findById(postId);
-        const resolvedUser = UserPreview.Model.findOne({ username: commenter });
+        const resolvedUser = UserPreview.Model.findById(commenterId);
+
         return Promise.all([resolvedPost, resolvedUser])
             .then(
                 (result) => {
@@ -401,7 +390,7 @@ router.route('/root')
 
 router.route('/vote').put((req, res) => {
     const commentId = req.body.commentId;
-    const commentPoint = req.body.commentPoint;
+    const voteValue = req.body.voteValue;
     const visitorUsername = req.body.visitorUsername;
     return Promise.all([
         UserPreview.Model.findOne({ username: visitorUsername }),
@@ -409,7 +398,7 @@ router.route('/vote').put((req, res) => {
     ])
         .then((results) => {
             if (!results[0] || !results[1]) throw new Error(204)
-            if (commentPoint === -1) {
+            if (voteValue === -1) {
                 results[1].likes.push(results[0]);
             }
             else if (commentPont === 1) {

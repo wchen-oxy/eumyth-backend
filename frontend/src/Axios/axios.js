@@ -200,5 +200,8 @@ export default class AxiosHelper {
         return axios.post(urls.REPLY_COMMENT_URL, payload);
     }
 
+    static getUserPreviewId(query){
+        return axios.get(urls.USER_PREVIEW_ID_URL, query);
+    }
 }
 

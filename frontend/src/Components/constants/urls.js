@@ -22,6 +22,10 @@ const USER_BIO_URL = USER_BASE_URL + "/bio";
 const USER_ACCOUNT_SETTINGS_INFO = USER_BASE_URL + "/account-settings-info";
 const USER_PRIVACY = USER_BASE_URL + "/private";
 
+//UserPreview
+const USER_PREVIEW_BASE_URL = ROOT_URL + "/user-preview";
+const USER_PREVIEW_ID_URL = USER_PREVIEW_BASE_URL + "/id";
+
 
 //relation
 const RELATION_BASE_URL = ROOT_URL + "/relation";
@@ -69,6 +73,8 @@ module.exports = {
     USER_BIO_URL,
     USER_ACCOUNT_SETTINGS_INFO,
     USER_PRIVACY,
+    USER_PREVIEW_BASE_URL,
+    USER_PREVIEW_ID_URL,
     RELATION_BASE_URL,
     RELATION_STATUS_URL,
     RELATION_INFO_URL,

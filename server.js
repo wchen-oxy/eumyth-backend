@@ -25,6 +25,7 @@ var draftRouter = require('./routes/v0/draft');
 var relationRouter = require('./routes/v0/relation');
 var projectRouter = require('./routes/v0/project');
 var commentRouter = require('./routes/v0/comment');
+var UserPreviewRouter = require('./routes/v0/userPreview');
 
 var app = express();
 
@@ -57,24 +58,6 @@ connection.once('open', () => {
   console.log("GFS image connection succesful");
 })
 
-// app.use('/image', function (req, res, next) {
-//   console.log('the response will be sent by the next function ...');
-//   req.image_config = {
-//     gfs: gfs,
-
-//   };
-//   next();
-// }, imageRouter);
-
-// app.use('/draft', function (req, res, next) {
-//   console.log('the response will be sent by the next function ...');
-//   req.draft_config = {
-//     gfs: gfs,
-//     db: db
-//   };
-//   next();
-// }, draftRouter);
-
 app.use('/pursuit', pursuitsRouter);
 app.use('/index', indexUserRouter);
 app.use('/user', usersRouter);
@@ -85,6 +68,7 @@ app.use('/project', projectRouter);
 app.use('/image', imageRouter);
 app.use('/draft', draftRouter);
 app.use('/comment', commentRouter);
+app.use('/user-preview', UserPreviewRouter);
 // console.log that your server is up and running
 app.listen(port, () => console.log(`Listening on port ${port}`));
 

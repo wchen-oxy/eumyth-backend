@@ -33,15 +33,18 @@ class Comments extends React.Component {
 
             AxiosHelper.getComments({
                 params: {
+                    visitorUsername: this.props.visitorUsername,
                     rootCommentIdArray: JSON.stringify(this.props.comments),
                     viewingMode: this.state.windowType
                 }
             })
                 .then(
                     (result) => {
+                        console.log(result);
                         this.setState({
+                            visitorProfilePreviewId: result.data.userPreviewId,
                             loadingComments: false,
-                            currentComments: result.data
+                            currentComments: result.data.rootComments
                         });
 
 
@@ -49,10 +52,15 @@ class Comments extends React.Component {
                 )
         }
         else {
-            this.setState({
-                loadingComments: false,
-                currentComments: []
-            });
+            AxiosHelper.getUserPreviewId({ params: {username: this.props.visitorUsername } })
+                .then((result) => {
+                    console.log(result);
+                    this.setState({
+                        visitorProfilePreviewId: result.data.userPreviewId,
+                        loadingComments: false,
+                        currentComments: []
+                    });
+                })
         }
     }
 
@@ -62,7 +70,7 @@ class Comments extends React.Component {
 
     handleCommentPost() {
         let payload = {
-            commenterUsername: this.props.visitorUsername,
+            visitorProfilePreviewId: this.state.visitorProfilePreviewId,
             comment: this.state.commentText,
             postId: this.props.postId,
             imagePageNumber: 0
@@ -102,7 +110,7 @@ class Comments extends React.Component {
             )
         }
         else if (viewingMode === EXPANDED) {
-             return (
+            return (
                 this.renderCommentThreads(this.state.currentComments)
             )
         }
@@ -118,7 +126,7 @@ class Comments extends React.Component {
                 <SingleComment
                     level={currentLevel}
                     postId={this.props.postId}
-                    visitorUsername={this.props.visitorUsername}
+                    visitorProfilePreviewId={this.state.visitorProfilePreviewId}
                     commentId={commentData._id}
                     ancestors={commentData.ancestor_post_ids}
                     username={commentData.username}
@@ -147,11 +155,15 @@ class Comments extends React.Component {
                     <SingleComment
                         level={currentLevel}
                         postId={this.props.postId}
+                        visitorProfilePreviewId={this.state.visitorProfilePreviewId}
                         visitorUsername={this.props.visitorUsername}
                         commentId={commentData._id}
                         ancestors={commentData.ancestor_post_ids}
                         username={commentData.username}
                         commentText={commentData.comment}
+                        score={commentData.score}
+                        likes={commentData.likes}
+                        dislikes={commentData.dislikes}
                         displayPhoto={commentData.display_photo_key}
                     />
                     <div className="comments-reply-container">

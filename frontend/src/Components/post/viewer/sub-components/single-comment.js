@@ -1,12 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { returnUserImageURL } from "../../../constants/urls";
 import CommentInput from "./comment-input";
 import AxiosHelper from "../../../../Axios/axios";
 import "./single-comment.scss";
 
 const SingleComment = (props) => {
+    const [voteValue, setVoteValue] = useState(0);
     const [isReplyBoxToggled, toggleReplyBox] = useState(false);
     const [replyText, setReplyText] = useState("");
+
+    useEffect(() => {
+        
+        
+      });
 
     const isReplyTextInvalid = () =>
         replyText.replaceAll("\\s+", "").length === 0 || replyText.length === 0;
@@ -22,7 +28,7 @@ const SingleComment = (props) => {
             return AxiosHelper.postReply(
                 {
                     postId: props.postId,
-                    commenterUsername: props.visitorUsername,
+                    visitorProfilePreviewId: props.visitorProfilePreviewId,
                     ancestors: JSON.stringify(ancestorArray),
                     comment: replyText
 
@@ -82,6 +88,7 @@ const SingleComment = (props) => {
                         </div>
                         <div className="singlecomment-management-container">
                             <button>Upvote</button>
+                            <p>{props.score}</p>
                             <button>Downvote</button>
                             <button onClick={() => toggleReplyBox(!isReplyBoxToggled)}>Reply</button>
                         </div>
