@@ -6,19 +6,13 @@ import ShortPostMetaInfo from './sub-components/short-post-meta';
 import ShortReEditor from '../editor/short-re-editor';
 import ReviewPost from "../draft/review-post";
 import { returnUserImageURL } from "../../constants/urls";
-import { EXPANDED, COLLAPSED } from "../../constants/flags";
-
+import { EXPANDED, COLLAPSED, SHORT, INITIAL_STATE, EDIT_STATE, REVIEW_STATE } from "../../constants/flags";
 
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import "../../image-carousel/index.scss";
 import "./short-post.scss";
 import ImageSlider from '../../image-carousel';
-
-const INITIAL = "INITIAL";
-const EDIT = "EDIT";
-const REVIEW = "REVIEW";
-const SHORT = "SHORT";
 
 class ShortPostViewer extends React.Component {
 
@@ -36,12 +30,13 @@ class ShortPostViewer extends React.Component {
             isPaginated: this.props.eventData.is_paginated,
             isMilestone: this.props.eventData.is_milestone,
             postDisabled: true,
-            window: INITIAL,
+            window: INITIAL_STATE,
         };
         this.handleWindowChange = this.handleWindowChange.bind(this);
         this.handleIndexChange = this.handleIndexChange.bind(this);
         this.handleTextChange = this.handleTextChange.bind(this);
         this.handlePaginatedChange = this.handlePaginatedChange.bind(this);
+        this.handleModalLaunch = this.handleModalLaunch.bind(this);
         this.renderImageSlider = this.renderImageSlider.bind(this);
         this.renderComments = this.renderComments.bind(this);
     }
@@ -92,6 +87,12 @@ class ShortPostViewer extends React.Component {
         );
     }
 
+    handleModalLaunch() {
+        if (!this.props.isPostOnlyView) {
+            return this.props.passDataToModal(this.props.eventData, SHORT)
+        }
+    }
+
     renderComments(windowType) {
         return (
             <Comments
@@ -103,7 +104,7 @@ class ShortPostViewer extends React.Component {
         )
     }
     render() {
-        if (this.state.window === INITIAL) {
+        if (this.state.window === INITIAL_STATE) {
             if (!this.props.eventData.image_data.length) {
                 if (this.props.largeViewMode) {
                     return (
@@ -140,7 +141,7 @@ class ShortPostViewer extends React.Component {
                 }
                 else {
                     return (
-                        <div>
+                        <div onClick={this.handleModalLaunch}>
 
                             <div className="shortpostviewer-inline-main-container" >
                                 <div className="shortpostviewer-inline-hero-container">
@@ -229,12 +230,12 @@ class ShortPostViewer extends React.Component {
                 }
             }
         }
-        else if (this.state.window === EDIT) {
+        else if (this.state.window === EDIT_STATE) {
             return (
                 <div className="shortpostviewer-window" >
                     <div className="shortpostviewer-button-container">
-                        <button onClick={() => this.handleWindowChange(INITIAL)}>Return</button>
-                        <button onClick={() => this.handleWindowChange(REVIEW)}>Review Post</button>
+                        <button onClick={() => this.handleWindowChange(INITIAL_STATE)}>Return</button>
+                        <button onClick={() => this.handleWindowChange(REVIEW_STATE)}>Review Post</button>
 
                     </div>
                     <ShortReEditor

@@ -21,39 +21,42 @@ const MINUTES = "MINUTES";
 const COVER_PHOTO = "COVER_PHOTO";
 
 
-const SortableItem = SortableElement(({ mediaType, data }) =>
-    (
-        <div className="sortable-project-post">
-            <Event
-                mediaType={mediaType}
-                eventData={data}
-                newProjectView={false}
-                key={data._id}
-                disableModalPreview={true}
-            />
-        </div>
+const SortableItem = SortableElement(({ mediaType, data, indexValue }) => (
+    <div className="sortable-project-post">
+        <Event
+            index={indexValue}
+            mediaType={mediaType}
+            eventData={data}
+            newProjectView={false}
+            key={data._id}
+            disableModalPreview={true}
+        />
+    </div>
 
-    )
+)
+
 );
 
-const SortableList = SortableContainer(({ mediaType, items, onSortEnd }) => {
-    return (
-        <ul>
-            {
-                items.map((value, index) => (
+const SortableList = SortableContainer(({ mediaType, items, onSortEnd }) => (
+    <ul>
+        {
+            items.map((value, index) => {
+                console.log(index);
+                return (
                     <SortableItem
                         key={`item-${index}`}
-                        index={index}
+                        indexValue={index}
                         data={value}
                         mediaType={mediaType}
                         onSortEnd={onSortEnd}
 
                     />
-                ))
-            }
-        </ul>
-    );
-});
+                )
+            })
+        }
+    </ul>
+)
+);
 
 class ProjectController extends React.Component {
     constructor(props) {
@@ -229,6 +232,7 @@ class ProjectController extends React.Component {
                     </>
                 );
             case (EDIT):
+
                 return (
                     <div >
                         <div className="personal-profile-content-switch-container">

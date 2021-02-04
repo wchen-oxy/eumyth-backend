@@ -42,6 +42,7 @@ class PostViewerController extends React.Component {
                         eventData={this.props.eventData}
                         onDeletePost={this.props.onDeletePost}
                         closeModal={this.props.closeModal}
+                        passDataToModal={this.props.passDataToModal}
 
                     />);
 
@@ -61,7 +62,7 @@ class PostViewerController extends React.Component {
                         eventData={this.props.eventData}
                         onDeletePost={this.props.onDeletePost}
                         closeModal={this.props.closeModal}
-                        openLongPostModal={this.props.openLongPostModal}
+                        passDataToModal={this.props.passDataToModal}
                     />
                 );
 

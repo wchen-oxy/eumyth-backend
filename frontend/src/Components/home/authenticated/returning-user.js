@@ -7,7 +7,7 @@ import AxiosHelper from '../../../Axios/axios';
 import PostViewerController from "../../post/viewer/post-viewer-controller";
 import Event from "../../profile/timeline/sub-components/timeline-event";
 import { returnUserImageURL, TEMP_PROFILE_PHOTO_URL } from "../../constants/urls";
-import { POST, LONG } from "../../constants/flags";
+import { POST, LONG, SHORT } from "../../constants/flags";
 import './returning-user.scss';
 
 class ReturningUserPage extends React.Component {
@@ -43,7 +43,7 @@ class ReturningUserPage extends React.Component {
         this.handleRecentWorkClick = this.handleRecentWorkClick.bind(this);
         this.handleEventClick = this.handleEventClick.bind(this);
         this.openModal = this.openModal.bind(this);
-        this.openLongPostModal = this.openLongPostModal.bind(this);
+        this.passDataToModal = this.passDataToModal.bind(this);
         this.closeModal = this.closeModal.bind(this);
         this.handleDeletePost = this.handleDeletePost.bind(this);
         this.fetchNextPosts = this.fetchNextPosts.bind(this);
@@ -174,9 +174,9 @@ class ReturningUserPage extends React.Component {
                     pursuitNames={this.state.pursuitNames}
                     username={feedItem.username}
                     eventData={feedItem}
-                    textData={feedItem.post_format === LONG ? JSON.parse(feedItem.text_data) : feedItem.text_data}
+                    textData={feedItem.post_format === SHORT ? feedItem.text_data : JSON.parse(feedItem.text_data) }
                     onDeletePost={feedItem.username === this.state.username ? this.handleDeletePost : null}
-                    openLongPostModal={this.openLongPostModal}
+                    passDataToModal={this.passDataToModal}
                     largeViewMode={false}
                 />);
         }
@@ -223,11 +223,11 @@ class ReturningUserPage extends React.Component {
             (result) => console.log(result)
         );
     }
-
-    openLongPostModal(data) {
+ 
+    passDataToModal(data, type) {
         this.setState({
             selectedEvent: data,
-            textData: JSON.parse(data.text_data),
+            textData: type === SHORT ? data.text_data : JSON.parse(data.text_data),
         }, this.openModal())
     }
 

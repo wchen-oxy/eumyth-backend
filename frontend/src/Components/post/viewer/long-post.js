@@ -7,25 +7,24 @@ import { ImageBlockConfig } from 'Dante2/package/es/components/blocks/image.js';
 import { PlaceholderBlockConfig } from 'Dante2/package/es/components/blocks/placeholder';
 import _ from 'lodash';
 import { IMAGE_BASE_URL, returnUserImageURL } from '../../constants/urls';
+import { LONG, INITIAL_STATE, EDIT_STATE, REVIEW_STATE } from '../../constants/flags';
+
 import ReviewPost from "../draft/review-post";
 import { withFirebase } from "../../../Firebase/index";
 import "./long-post.scss";
 
 const SAVE_INTERVAL = 1000;
-const INITIAL = "INITIAL";
-const EDIT = "EDIT";
-const REVIEW = "REVIEW";
-const LONG = "LONG";
+
 const temp = { "blocks": [{ "key": "ck5ad", "text": "hit enter", "type": "header-one", "depth": 0, "inlineStyleRanges": [], "entityRanges": [], "data": {} }], "entityMap": {} };
 
 
 const LongPostViewer = (props) => {
     const [key, setKey] = useState(0);
-    const [window, setWindow] = useState(INITIAL);
+    const [window, setWindow] = useState(INITIAL_STATE);
     const [localDraft, setLocalDraft] = useState(props.textData);
 
     const windowSwitch = (window) => {
-        if (window === INITIAL) {
+        if (window === INITIAL_STATE) {
             setLocalDraft(props.textData);
             setKey(key + 1);
         }
@@ -34,7 +33,7 @@ const LongPostViewer = (props) => {
 
     const handleModalLaunch = () => {
         if (!props.isPostOnlyView) {
-            return props.openLongPostModal(props.eventData)
+            return props.passDataToModal(props.eventData, LONG)
         }
     }
     const renderComments = (windowType) => {
@@ -48,7 +47,7 @@ const LongPostViewer = (props) => {
         )
     }
 
-    if (window === INITIAL) {
+    if (window === INITIAL_STATE) {
 
         const monthNames = ["January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"
@@ -68,7 +67,7 @@ const LongPostViewer = (props) => {
                                         {
                                             props.isOwnProfile ?
                                                 <div className="longpostviewer-button-container">
-                                                    <button onClick={() => windowSwitch(EDIT)}>Edit</button>
+                                                    <button onClick={() => windowSwitch(EDIT_STATE)}>Edit</button>
                                                     <button onClick={props.onDeletePost}>Remove</button>
                                                 </div> : <></>
                                         }
@@ -160,13 +159,13 @@ const LongPostViewer = (props) => {
         }
     }
 
-    else if (window === EDIT) {
+    else if (window === EDIT_STATE) {
 
         return (
             <div className="longpostviewer-window">
                 <div className="longpostviewer-button-container">
-                    {props.isOwnProfile ? <button onClick={() => windowSwitch(INITIAL)}>Cancel Edit</button> : <></>}
-                    {props.isOwnProfile ? <button onClick={() => windowSwitch(REVIEW)}>Review</button> : <></>}
+                    {props.isOwnProfile ? <button onClick={() => windowSwitch(INITIAL_STATE)}>Cancel Edit</button> : <></>}
+                    {props.isOwnProfile ? <button onClick={() => windowSwitch(REVIEW_STATE)}>Review</button> : <></>}
                 </div>
                 <div className="longpostviewer-editor-container">
                     < DanteEditor
