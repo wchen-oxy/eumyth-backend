@@ -164,7 +164,7 @@ class ShortPostViewer extends React.Component {
                                     />
                                 </div>
                             </div>
-                            { this.renderComments(COLLAPSED)}
+                            {/* { this.renderComments(COLLAPSED)} */}
                         </div>
                     )
                 }

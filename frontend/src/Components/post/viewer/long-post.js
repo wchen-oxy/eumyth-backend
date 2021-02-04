@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import PostHeader from "./sub-components/post-header";
+import Comments from "./comments";
+
 import DanteEditor from 'Dante2';
 import { ImageBlockConfig } from 'Dante2/package/es/components/blocks/image.js';
 import { PlaceholderBlockConfig } from 'Dante2/package/es/components/blocks/placeholder';
@@ -35,6 +37,17 @@ const LongPostViewer = (props) => {
             return props.openLongPostModal(props.eventData)
         }
     }
+    const renderComments = (windowType) => {
+        return (
+            <Comments
+                comments={props.eventData.comments}
+                windowType={windowType}
+                visitorUsername={props.visitorUsername}
+                postId={props.postId}
+            />
+        )
+    }
+
     if (window === INITIAL) {
 
         const monthNames = ["January", "February", "March", "April", "May", "June",
@@ -106,6 +119,7 @@ const LongPostViewer = (props) => {
                             read_only={true}
                         />
                     </div>
+                    {renderComments("EXPANDED")}
                 </div>
             );
         }

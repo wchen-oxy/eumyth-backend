@@ -48,7 +48,7 @@ class PostViewerController extends React.Component {
             case (LONG):
                 return (
                     <LongPostViewer
-                        postId={this.props.postId}
+                        postId={this.props.eventData._id}
                         displayPhoto={this.props.displayPhoto}
                         username={this.props.username}
                         visitorUsername={this.props.visitorUsername}
