@@ -14,6 +14,7 @@ class Comments extends React.Component {
             windowType: this.props.windowType,
             currentComments: null,
             commentText: "",
+            loadingComments: true,
 
 
         }
@@ -29,6 +30,7 @@ class Comments extends React.Component {
     componentDidMount() {
         console.log(this.props.comments.length);
         if (this.props.comments.length > 0) {
+
             AxiosHelper.getComments({
                 params: {
                     rootCommentIdArray: JSON.stringify(this.props.comments),
@@ -37,15 +39,20 @@ class Comments extends React.Component {
             })
                 .then(
                     (result) => {
-                        console.log(result);
-                        if (result.data) {
-                            this.setState({ currentComments: this.renderCommentThreads(result.data) });
-                        }
-                        else {
-                            this.setState({ currentComments: [] });
-                        }
+                        this.setState({
+                            loadingComments: false,
+                            currentComments: result.data
+                        });
+
+
                     }
                 )
+        }
+        else {
+            this.setState({
+                loadingComments: false,
+                currentComments: []
+            });
         }
     }
 
@@ -83,18 +90,21 @@ class Comments extends React.Component {
     }
 
     renderCommentSectionType(viewingMode) {
+        if (this.state.loadingComments) {
+            return <div>
+                Loading...
+            </div>
+        }
+
         if (viewingMode === COLLAPSED) {
             return (
-                <div>
-
-                </div>
+                this.renderCommentThreads(this.state.currentComments)
             )
         }
         else if (viewingMode === EXPANDED) {
+            console.log(this.state.currentComments);
             return (
-                <div>
-
-                </div>
+                this.renderCommentThreads(this.state.currentComments)
             )
         }
         else {
@@ -157,10 +167,6 @@ class Comments extends React.Component {
     renderCommentThreads(rawComments) {
         let renderedCommentArray = [];
         console.log(rawComments);
-
-        // renderedCommentArray.push(
-        //     this.recursiveRenderComments(rawComments, 1)
-        // );
         for (const rootComment of rawComments) {
             renderedCommentArray.push(
                 this.recursiveRenderComments(rootComment, 0)
@@ -201,7 +207,7 @@ class Comments extends React.Component {
                 <div className="comments-main-container">
                     {this.renderCommentSectionType(COLLAPSED)}
                     {this.renderCommentInput(COLLAPSED)}
-                    {this.state.currentComments}
+                    {/* {this.state.currentComments} */}
                 </div>
             );
         }
@@ -210,7 +216,7 @@ class Comments extends React.Component {
                 <div className="comments-main-container">
                     {this.renderCommentInput(EXPANDED)}
                     {this.renderCommentSectionType(EXPANDED)}
-                    {this.state.currentComments}
+                    {/* {this.state.currentComments} */}
 
                 </div>
             )
