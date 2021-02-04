@@ -298,7 +298,6 @@ router.route('/reply')
         const geometryWidth = req.body.geometryWidth;
         const geometryHeight = req.body.geometryHeight;
         const imagePageNumber = req.body.imagePageNumber;
-        console.log(req.body);
         if (!result) throw new Error(204);
         const annotationPayload = dataAnnotationId ?
             new ImageAnnotation.Model({
@@ -375,11 +374,12 @@ router.route('/root')
                     result[0].comments.unshift(
                         newRootComment._id
                     );
-                    return Promise.all([result[0].save(), newRootComment.save()]);
+
+                    return Promise.all([result[0].save(), newRootComment.save(), result[0].comments]);
                 }
             )
-            .then((result) => {
-                res.status(200).send();
+            .then((results) => {
+                res.status(200).json({ rootCommentIdArray: results[2] });
             })
             .catch((err) => {
                 if (err.status === 204) console.log("No user or original post found");
@@ -387,6 +387,15 @@ router.route('/root')
                 res.status(500).send();
             });
     });
+
+router.route('/refresh').get((req, res) => {
+    const rootCommentIdArray = JSON.parse(req.query.rootCommentIdArray);
+    return returnExpandedComments(rootCommentIdArray)
+        .then((results) => {
+            console.log(results);
+            res.status(200).json({ rootComments: results });
+        });
+})
 
 router.route('/vote').put((req, res) => {
     const commentId = req.body.commentId;

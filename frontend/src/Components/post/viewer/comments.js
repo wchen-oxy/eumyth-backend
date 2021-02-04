@@ -28,7 +28,6 @@ class Comments extends React.Component {
     }
 
     componentDidMount() {
-        console.log(this.props.comments.length);
         if (this.props.comments.length > 0) {
 
             AxiosHelper.getComments({
@@ -40,7 +39,6 @@ class Comments extends React.Component {
             })
                 .then(
                     (result) => {
-                        console.log(result);
                         this.setState({
                             visitorProfilePreviewId: result.data.userPreviewId,
                             loadingComments: false,
@@ -52,9 +50,8 @@ class Comments extends React.Component {
                 )
         }
         else {
-            AxiosHelper.getUserPreviewId({ params: {username: this.props.visitorUsername } })
+            AxiosHelper.getUserPreviewId({ params: { username: this.props.visitorUsername } })
                 .then((result) => {
-                    console.log(result);
                     this.setState({
                         visitorProfilePreviewId: result.data.userPreviewId,
                         loadingComments: false,
@@ -88,12 +85,15 @@ class Comments extends React.Component {
 
         if (this.state.data_annotation_id) Object.assign(payload, ...annotationPayload);
 
-        AxiosHelper
+        return AxiosHelper
             .postComment(payload)
             .then(
                 (result) => {
-                    console.log(result);
+                    return AxiosHelper
+                        .refreshComments({ params: { rootCommentIdArray: JSON.stringify(result.data.rootCommentIdArray) } })
+                        .then((result) => this.setState({ currentComments: result.data.rootComments }))
                 })
+            .then(() => alert("Success!"))
 
     }
 
@@ -177,7 +177,6 @@ class Comments extends React.Component {
 
     renderCommentThreads(rawComments) {
         let renderedCommentArray = [];
-        console.log(rawComments);
         for (const rootComment of rawComments) {
             renderedCommentArray.push(
                 this.recursiveRenderComments(rootComment, 0)

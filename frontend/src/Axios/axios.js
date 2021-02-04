@@ -203,5 +203,10 @@ export default class AxiosHelper {
     static getUserPreviewId(query){
         return axios.get(urls.USER_PREVIEW_ID_URL, query);
     }
+
+    static refreshComments(query){
+        return axios.get(urls.REFRESH_COMMENTS_URL, query);
+    }
+
 }
 
