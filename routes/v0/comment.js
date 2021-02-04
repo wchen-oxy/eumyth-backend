@@ -399,6 +399,35 @@ router.route('/root')
             });
     });
 
+router.route('/vote').put((req, res) => {
+    const commentId = req.body.commentId;
+    const commentPoint = req.body.commentPoint;
+    const visitorUsername = req.body.visitorUsername;
+    return Promise.all([
+        UserPreview.Model.findOne({ username: visitorUsername }),
+        Comment.Model.findById(commentId)
+    ])
+        .then((results) => {
+            if (!results[0] || !results[1]) throw new Error(204)
+            if (commentPoint === -1) {
+                results[1].likes.push(results[0]);
+            }
+            else if (commentPont === 1) {
+                results[1].dislikes.push(results[0]);
+            }
+            return results[1].save();
+        })
+        .catch((err) => {
+            if (err.status === 204) {
+                console.log("No user or no comment found");
+                return res.status(204).send(err);
+            }
+            console.log(err);
+            return res.status(500).send();
+        })
+
+})
+
 
 
 

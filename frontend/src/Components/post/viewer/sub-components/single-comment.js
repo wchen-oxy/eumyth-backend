@@ -52,13 +52,12 @@ const SingleComment = (props) => {
             threadIndicatorArray.push(
                 <div className="singlecomment-thread-indicator"></div>
             )
-        // console.log(threadIndicatorArray);
         return threadIndicatorArray;
     }
 
 
     return (
-        <div className={props.level > 1 ? "singlecomment-multiple-thread-style": ""}>
+        <div className={props.level > 1 ? "singlecomment-multiple-thread-style" : ""}>
             {props.level > 1 ? (
                 <div className="singlecomment-thread-indicator-container">
                     {renderThreadIndicators(props.level - 1)}

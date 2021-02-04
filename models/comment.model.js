@@ -2,10 +2,6 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const ImageAnnotation = require("./image.annotation.model");
 
-const user = new Schema({
-    user_id: mongoose.Types.ObjectId,
-})
-
 const commentSchema = new Schema({
 
     parent_post_id: {
@@ -31,12 +27,12 @@ const commentSchema = new Schema({
     },
 
     likes: {
-        type: [user],
+        type: [mongoose.Types.ObjectId,],
         required: false,
     },
 
     dislikes: {
-        type: [user]
+        type: [mongoose.Types.ObjectId,]
     }
 
 },

@@ -102,8 +102,7 @@ class Comments extends React.Component {
             )
         }
         else if (viewingMode === EXPANDED) {
-            console.log(this.state.currentComments);
-            return (
+             return (
                 this.renderCommentThreads(this.state.currentComments)
             )
         }
