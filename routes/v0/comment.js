@@ -395,19 +395,15 @@ router.route('/refresh').get((req, res) => {
 })
 
 const removeVote = (array, voteId) => {
-    console.log(array);
     let index = array.indexOf(voteId);
-     if (index > -1) {
+    if (index > -1) {
         array.splice(index, 1);
     }
-    console.log(array);
     return array;
 }
 router.route('/vote').put((req, res) => {
-    console.log(req.body);
     const commentId = req.body.commentId;
     const voteValue = req.body.voteValue;
-    console.log(typeof voteValue);
     const visitorProfilePreviewId = req.body.visitorProfilePreviewId;
     return Promise.all([
         UserPreview.Model.findById(visitorProfilePreviewId),
@@ -417,15 +413,14 @@ router.route('/vote').put((req, res) => {
             if (!results[0] || !results[1]) throw new Error(204);
             switch (voteValue) {
                 case (-1):
-                     results[1].dislikes.push(results[0]._id);
-                     results[1].likes = removeVote(results[1].likes, visitorProfilePreviewId);
+                    results[1].dislikes.push(results[0]._id);
+                    results[1].likes = removeVote(results[1].likes, visitorProfilePreviewId);
                     break;
                 case (1):
                     results[1].likes.push(results[0]._id);
                     results[1].dislikes = removeVote(results[1].dislikes, visitorProfilePreviewId);
                     break;
                 case (-2):
-                    console.log("less than")
                     results[1].dislikes = removeVote(results[1].dislikes, visitorProfilePreviewId);
                     break;
                 case (2):
@@ -433,9 +428,8 @@ router.route('/vote').put((req, res) => {
                     break;
                 default:
                     console.log("Nothing matched?");
+                    throw new Error("Nothing matched for vote value");
             }
-            console.log("likess", results[1].likes);
-            console.log("dislkes", results[1].dislikes)
 
             return results[1].save();
         })
@@ -446,7 +440,7 @@ router.route('/vote').put((req, res) => {
                 return res.status(204).send(err);
             }
             console.log(err);
-            return res.status(500).send();
+            return res.status(500).send(err);
         })
 
 })
