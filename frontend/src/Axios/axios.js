@@ -208,5 +208,9 @@ export default class AxiosHelper {
         return axios.get(urls.REFRESH_COMMENTS_URL, query);
     }
 
+    static voteOnComment(payload){
+        return axios.put(urls.VOTE_ON_COMMENT_URL, payload);
+    }
+
 }
 

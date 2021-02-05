@@ -131,7 +131,10 @@ class Comments extends React.Component {
                     ancestors={commentData.ancestor_post_ids}
                     username={commentData.username}
                     commentText={commentData.comment}
+                    likes={commentData.likes}
+                    dislikes={commentData.dislikes}
                     displayPhoto={commentData.display_photo_key}
+                    score={commentData.score}
                 />
             );
         }

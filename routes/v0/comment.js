@@ -178,6 +178,7 @@ const nestCompleteComments = (rootCommentArray, userProfileHashTable, repliesArr
             const userData = userProfileHashTable[comment.commenter_user_id.toString()];
             comment.username = userData.username;
             comment.display_photo_key = userData.tiny_cropped_display_photo_key;
+            comment.score = comment.likes.length - comment.dislikes.length;
         }
         return rootCommentArray;
 
@@ -271,7 +272,7 @@ router.route('/')
             ])
                 .then((results) => {
                     console.log(results);
-                    res.status(200).json({ userPreviewId: results[0], rootComments: results[1] });
+                    res.status(200).json({ userPreviewId: results[0]._id, rootComments: results[1] });
                 });
         }
         else {
@@ -330,7 +331,6 @@ router.route('/reply')
 
 router.route('/root')
     .post((req, res) => {
-        console.log(req.body);
         const postId = req.body.postId;
         const commenterId = req.body.visitorProfilePreviewId;
         const comment = req.body.comment;
@@ -348,8 +348,6 @@ router.route('/root')
         return Promise.all([resolvedPost, resolvedUser])
             .then(
                 (result) => {
-                    console.log(3);
-
                     if (!result[0] || !result[1]) throw new Error(204)
                     const annotationPayload = dataAnnotationId ?
                         new ImageAnnotation.Model({
@@ -365,7 +363,6 @@ router.route('/root')
                     const newRootComment = new Comment.Model({
                         parent_post_id: postId,
                         ancestor_post_ids: [],
-
                         commenter_user_id: result[1]._id,
                         comment: comment,
                         annotation: annotationPayload
@@ -397,24 +394,52 @@ router.route('/refresh').get((req, res) => {
         });
 })
 
+const removeVote = (array, voteId) => {
+    console.log(array);
+    let index = array.indexOf(voteId);
+     if (index > -1) {
+        array.splice(index, 1);
+    }
+    console.log(array);
+    return array;
+}
 router.route('/vote').put((req, res) => {
+    console.log(req.body);
     const commentId = req.body.commentId;
     const voteValue = req.body.voteValue;
-    const visitorUsername = req.body.visitorUsername;
+    console.log(typeof voteValue);
+    const visitorProfilePreviewId = req.body.visitorProfilePreviewId;
     return Promise.all([
-        UserPreview.Model.findOne({ username: visitorUsername }),
+        UserPreview.Model.findById(visitorProfilePreviewId),
         Comment.Model.findById(commentId)
     ])
         .then((results) => {
-            if (!results[0] || !results[1]) throw new Error(204)
-            if (voteValue === -1) {
-                results[1].likes.push(results[0]);
+            if (!results[0] || !results[1]) throw new Error(204);
+            switch (voteValue) {
+                case (-1):
+                     results[1].dislikes.push(results[0]._id);
+                     results[1].likes = removeVote(results[1].likes, visitorProfilePreviewId);
+                    break;
+                case (1):
+                    results[1].likes.push(results[0]._id);
+                    results[1].dislikes = removeVote(results[1].dislikes, visitorProfilePreviewId);
+                    break;
+                case (-2):
+                    console.log("less than")
+                    results[1].dislikes = removeVote(results[1].dislikes, visitorProfilePreviewId);
+                    break;
+                case (2):
+                    results[1].likes = removeVote(results[1].likes, visitorProfilePreviewId);
+                    break;
+                default:
+                    console.log("Nothing matched?");
             }
-            else if (commentPont === 1) {
-                results[1].dislikes.push(results[0]);
-            }
+            console.log("likess", results[1].likes);
+            console.log("dislkes", results[1].dislikes)
+
             return results[1].save();
         })
+        .then(() => res.status(200).send("Success!"))
         .catch((err) => {
             if (err.status === 204) {
                 console.log("No user or no comment found");

@@ -4,55 +4,136 @@ import CommentInput from "./comment-input";
 import AxiosHelper from "../../../../Axios/axios";
 import "./single-comment.scss";
 
-const SingleComment = (props) => {
-    const [voteValue, setVoteValue] = useState(0);
-    const [isReplyBoxToggled, toggleReplyBox] = useState(false);
-    const [replyText, setReplyText] = useState("");
+class SingleComment extends React.Component {
 
-    useEffect(() => {
-        
-        
-      });
+    constructor(props) {
+        super(props);
+        this.state = {
+            overallVoteScore: this.props.score,
+            previousVote: 0,
+            isReplyBoxToggled: false,
+            replyText: ""
+        }
 
-    const isReplyTextInvalid = () =>
-        replyText.replaceAll("\\s+", "").length === 0 || replyText.length === 0;
+        this.toggleReplyBox = this.toggleReplyBox.bind(this);
+        this.setReplyText = this.setReplyText.bind(this);
+        this.handleVote = this.handleVote.bind(this);
+        this.isReplyTextInvalid = this.isReplyTextInvalid.bind(this);
+        this.renderThreadIndicators = this.renderThreadIndicators.bind(this);
+        this.cancelTextInput = this.cancelTextInput.bind(this);
 
-    const postReply = () => {
-        if (isReplyTextInvalid()) {
+
+    }
+    componentDidMount() {
+        if (this.props.likes.includes(this.props.visitorProfilePreviewId)) {
+            this.setState({ previousVote: 1 })
+        }
+        else if (this.props.dislikes.includes(this.props.visitorProfilePreviewId)) {
+            this.setState({ previousVote: -1 })
+        }
+    }
+
+    setReplyText(text) {
+        this.setState({
+            replyText: text
+        })
+    }
+
+    toggleReplyBox() {
+        this.setState((state) => ({ isReplyBoxToggled: !state.isReplyBoxToggled }))
+    }
+
+    handleVote(currentVote) {
+        const temporaryOverallVoteScore = this.state.overallVoteScore;
+        const temporaryPreviousVoteValue = this.state.previousVote;
+
+        const combinedVote = temporaryPreviousVoteValue + currentVote;
+        let newCurrentVote = currentVote;
+        let overallVoteScoreModifier = currentVote;
+
+        if (combinedVote < -1 || combinedVote > 1) {
+            newCurrentVote = 0;
+        }
+        if (combinedVote < -1) {
+            overallVoteScoreModifier = 1;
+        }
+        if (combinedVote > 1) {
+            overallVoteScoreModifier = -1;
+        }
+
+        else if (combinedVote === 0) {
+            if (temporaryPreviousVoteValue === -1) overallVoteScoreModifier = 2;
+            else if (temporaryPreviousVoteValue === 1) overallVoteScoreModifier = -2;
+        }
+
+        this.setState({
+            overallVoteScore: temporaryOverallVoteScore + overallVoteScoreModifier,
+            previousVote: newCurrentVote
+        })
+
+        return AxiosHelper
+            .voteOnComment({
+                visitorProfilePreviewId: this.props.visitorProfilePreviewId,
+                commentId: this.props.commentId,
+                voteValue: combinedVote > -1 && combinedVote < 1 ? currentVote : combinedVote,
+            })
+            .then((result) => {
+                console.log(result);
+                console.log(this.state.overallVoteScore);
+            })
+            .catch((err) => {
+                console.log(err);
+                console.log("Something went wrong with the server.");
+                this.setState({
+                    overallVoteScore: temporaryOverallVoteScore,
+                    previousVote: temporaryPreviousVoteValue
+                })
+            })
+    }
+
+    isReplyTextInvalid() {
+        return (
+            this.state.replyText.replaceAll("\\s+", "").length === 0 ||
+            this.state.replyText.length === 0
+        );
+    }
+
+    postReply() {
+        if (this.isReplyTextInvalid()) {
             alert("You need to write something");
         }
         else {
 
-            let ancestorArray = props.ancestors;
-            ancestorArray.push(props.commentId);
+            let ancestorArray = this.props.ancestors;
+            ancestorArray.push(this.props.commentId);
             return AxiosHelper.postReply(
                 {
-                    postId: props.postId,
-                    visitorProfilePreviewId: props.visitorProfilePreviewId,
+                    postId: this.props.postId,
+                    visitorProfilePreviewId: this.props.visitorProfilePreviewId,
                     ancestors: JSON.stringify(ancestorArray),
-                    comment: replyText
+                    comment: this.state.replyText
 
                 }
             )
                 .then((result) => {
                     console.log(result);
                     alert(result);
-                    toggleReplyBox(false);
+                    this.toggleReplyBox(false);
                 })
         }
     }
 
-    const cancelTextInput = () => {
-        if (isReplyTextInvalid()) {
-            setReplyText("");
-            return toggleReplyBox(false);
+    cancelTextInput() {
+        if (this.isReplyTextInvalid()) {
+            this.setState({ replyText: '', isReplyBoxToggled: false })
+            return;
         }
         if (window.confirm("Are you sure you want discard your comment?")) {
-            toggleReplyBox(false);
+            this.setState({ isReplyBoxToggled: false });
         }
     }
 
-    const renderThreadIndicators = (levels) => {
+    renderThreadIndicators(levels) {
         let threadIndicatorArray = [];
         for (let i = 0; i < levels; i++)
             threadIndicatorArray.push(
@@ -61,59 +142,62 @@ const SingleComment = (props) => {
         return threadIndicatorArray;
     }
 
-
-    return (
-        <div className={props.level > 1 ? "singlecomment-multiple-thread-style" : ""}>
-            {props.level > 1 ? (
-                <div className="singlecomment-thread-indicator-container">
-                    {renderThreadIndicators(props.level - 1)}
-                </div>
-            ) : null}
-            <div className="singlecomment-main-container">
-                <div className="singlecomment-header-container">
-                    <div className="singlecomment-display-photo-container">
-                        <img src={returnUserImageURL(props.displayPhoto)} />
-                    </div>
-                    <div className="singlecomment-username-container">
-                        <p>{props.username}</p>
-                    </div>
-                </div>
-                <div className="singlecomment-body-container">
+    render() {
+        console.log(this.state.previousVote);
+        return (
+            <div className={this.props.level > 1 ? "singlecomment-multiple-thread-style" : ""}>
+                {this.props.level > 1 ? (
                     <div className="singlecomment-thread-indicator-container">
-                        {renderThreadIndicators(1)}
+                        {this.renderThreadIndicators(this.props.level - 1)}
                     </div>
-                    <div className={"singlecomment-main-content-container"}>
-                        <div className="singlecomment-comment-container">
-                            <p>{props.commentText}</p>
+                ) : null}
+                <div className="singlecomment-main-container">
+                    <div className="singlecomment-header-container">
+                        <div className="singlecomment-display-photo-container">
+                            <img src={returnUserImageURL(this.props.displayPhoto)} />
                         </div>
-                        <div className="singlecomment-management-container">
-                            <button>Upvote</button>
-                            <p>{props.score}</p>
-                            <button>Downvote</button>
-                            <button onClick={() => toggleReplyBox(!isReplyBoxToggled)}>Reply</button>
-                        </div>
-                        <div>
-                            {isReplyBoxToggled ?
-                                <>
-                                    <CommentInput
-                                        classStyle={""}
-                                        minRows={4}
-                                        handleTextChange={setReplyText}
-                                        commentText={replyText}
-                                    />
-                                    <button onClick={cancelTextInput}>Cancel</button>
-                                    <button onClick={postReply}>Reply</button>
-                                </>
-                                :
-                                <></>
-                            }
+                        <div className="singlecomment-username-container">
+                            <p>{this.props.username}</p>
                         </div>
                     </div>
-                </div>
+                    <div className="singlecomment-body-container">
+                        <div className="singlecomment-thread-indicator-container">
+                            {this.renderThreadIndicators(1)}
+                        </div>
+                        <div className={"singlecomment-main-content-container"}>
+                            <div className="singlecomment-comment-container">
+                                <p>{this.props.commentText}</p>
+                            </div>
+                            <div className="singlecomment-management-container">
+                                <button onClick={() => this.handleVote(1)}>Upvote</button>
+                                <p>{this.state.overallVoteScore}</p>
+                                <button onClick={() => this.handleVote(-1)}>Downvote</button>
+                                <button onClick={() => this.toggleReplyBox()}>Reply</button>
+                            </div>
+                            <div>
+                                {this.state.isReplyBoxToggled ?
+                                    <>
+                                        <CommentInput
+                                            classStyle={""}
+                                            minRows={4}
+                                            handleTextChange={this.setReplyText}
+                                            commentText={this.state.replyText}
+                                        />
+                                        <button onClick={this.cancelTextInput}>Cancel</button>
+                                        <button onClick={this.postReply}>Reply</button>
+                                    </>
+                                    :
+                                    <></>
+                                }
+                            </div>
+                        </div>
+                    </div>
 
+                </div>
             </div>
-        </div>
-    );
+        );
+    }
 }
+
 
 export default SingleComment;
