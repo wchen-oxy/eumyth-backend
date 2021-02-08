@@ -189,7 +189,9 @@ class ReturningUserPage extends React.Component {
             this.setState({ recentPosts: recentPosts });
         }
         else if (feedType === FRIEND_POSTS) {
-            // let friendPosts = this.state.
+            let friendPosts = this.state.feedData;
+            friendPosts[postIndex].comments = rootCommentsArray;
+            this.setState({ feedData : friendPosts})
         }
     }
 
