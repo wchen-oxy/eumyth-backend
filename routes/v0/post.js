@@ -272,8 +272,8 @@ router.route('/')
             }
           });
         }
-        else{
-           throw new Error(500);
+        else {
+          throw new Error(500);
         }
       })
       .then(
@@ -413,7 +413,7 @@ router.route('/multiple').get((req, res) => {
   }).sort({ createdAt: -1 }).then(
     (results) => {
       let coverInfoArray = results;
-      console.log(coverInfoArray);
+      // console.log(coverInfoArray);
       if (!includePostText) {
         for (result of coverInfoArray) {
           result.text_data = "";
@@ -421,8 +421,12 @@ router.route('/multiple').get((req, res) => {
         }
       }
       console.log(coverInfoArray);
-      console.log("This way");
-      return res.send(coverInfoArray);
+      // console.log("This way");
+      return res.status(200).json(coverInfoArray);
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.status(500).send();
     })
 });
 

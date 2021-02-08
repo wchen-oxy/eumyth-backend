@@ -21,6 +21,8 @@ export const PROJECT = "PROJECT";
 export const NEW_PROJECT = "NEW PROJECT";
 export const COLLAPSED = "COLLAPSED";
 export const EXPANDED = "EXPANDED";
+export const RECENT_POSTS = "RECENT_POSTS";
+export const FRIEND_POSTS = "FRIEND_POSTS";
 
 // POST TYPE
 export const DISPLAY = "DISPLAY";

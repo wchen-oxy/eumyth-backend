@@ -33,7 +33,7 @@ const LongPostViewer = (props) => {
 
     const handleModalLaunch = () => {
         if (!props.isPostOnlyView) {
-            return props.passDataToModal(props.eventData, LONG)
+            return props.passDataToModal(props.eventData, LONG, props.postIndex)
         }
     }
     const renderComments = (windowType) => {
@@ -43,6 +43,9 @@ const LongPostViewer = (props) => {
                 windowType={windowType}
                 visitorUsername={props.visitorUsername}
                 postId={props.postId}
+                postIndex={props.postIndex}
+                handleCommentInjection={props.handleCommentInjection}
+                selectedPostFeedType={props.selectedPostFeedType}
             />
         )
     }

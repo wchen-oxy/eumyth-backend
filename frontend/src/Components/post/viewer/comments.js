@@ -3,7 +3,7 @@ import TextareaAutosize from 'react-textarea-autosize';
 import AxiosHelper from '../../../Axios/axios';
 import SingleComment from "./sub-components/single-comment";
 import CommentInput from "./sub-components/comment-input";
-import { EXPANDED, COLLAPSED } from "../../constants/flags";
+import { EXPANDED, COLLAPSED, RECENT_POSTS } from "../../constants/flags";
 
 import "./comments.scss";
 
@@ -91,7 +91,11 @@ class Comments extends React.Component {
                 (result) => {
                     return AxiosHelper
                         .refreshComments({ params: { rootCommentIdArray: JSON.stringify(result.data.rootCommentIdArray) } })
-                        .then((result) => this.setState({ currentComments: result.data.rootComments }))
+                        .then((result) => {
+                            this.props.handleCommentInjection(this.props.postIndex, result.data.rootComments, this.props.selectedPostFeedType);
+                            this.setState({ currentComments: result.data.rootComments });
+                        }
+                        )
                 })
             .then(() => alert("Success!"))
 

@@ -89,7 +89,7 @@ class ShortPostViewer extends React.Component {
 
     handleModalLaunch() {
         if (!this.props.isPostOnlyView) {
-            return this.props.passDataToModal(this.props.eventData, SHORT)
+            return this.props.passDataToModal(this.props.eventData, SHORT, this.props.postIndex)
         }
     }
 
@@ -100,6 +100,11 @@ class ShortPostViewer extends React.Component {
                 windowType={windowType}
                 visitorUsername={this.props.visitorUsername}
                 postId={this.props.postId}
+                postIndex={this.props.postIndex}
+                handleCommentInjection={this.props.handleCommentInjection}
+                selectedPostFeedType={this.props.selectedPostFeedType}
+
+
             />
         )
     }

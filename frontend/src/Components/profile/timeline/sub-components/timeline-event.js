@@ -36,19 +36,31 @@ const Event = (props) => {
             default:
                 throw Error("No matching post type: " + post.post_format);
         }
-        return (
-            <div className={props.index !== null ? selectClassStyle(props.index) : "event-middle-container"}>
-                <div onClick={props.disableModalPreview ? () => console.log("Selected") : () => props.onEventClick(post)}>
-                    {content}
+        if (props.isRecentEvents) {
+            return (
+                <div className={"event-middle-container"}>
+                    <div onClick={props.disableModalPreview ? () => console.log("Selected") : () => props.onEventClick(post, props.index)}>
+                        {content}
+                    </div>
+                    {props.newProjectView ? <input type="checkbox" defaultChecked={props.isSelected} onClick={(e) => props.onProjectEventSelect(post, e.target.value)} /> : <></>}
                 </div>
-                {props.newProjectView ? <input type="checkbox" defaultChecked={props.isSelected} onClick={(e) => props.onProjectEventSelect(post, e.target.value)} /> : <></>}
-            </div>
-        );
+            );
+        }
+        else {
+            return (
+                <div className={props.index !== null ? selectClassStyle(props.index) : "event-middle-container"}>
+                    <div onClick={props.disableModalPreview ? () => console.log("Selected") : () => props.onEventClick(post, props.index)}>
+                        {content}
+                    </div>
+                    {props.newProjectView ? <input type="checkbox" defaultChecked={props.isSelected} onClick={(e) => props.onProjectEventSelect(post, e.target.value)} /> : <></>}
+                </div>
+            );
+        }
     }
     else if (props.mediaType === PROJECT) {
         content = <ProjectEvent post={post} />;
         return (
-            <div className={props.index !== null? selectClassStyle(props.index) : "event-middle-container"}>
+            <div className={props.index !== null ? selectClassStyle(props.index) : "event-middle-container"}>
                 <div onClick={props.disableModalPreview ? () => console.log("Selected") : () => props.onProjectClick(post)}>
                     {content}
                 </div>

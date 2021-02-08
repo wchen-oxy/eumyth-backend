@@ -23,13 +23,12 @@ class PostViewerController extends React.Component {
 
     render() {
         const isOwnProfile = this.props.eventData.username === this.props.firebase.returnUsername();
-        console.log(this.props.visitorUsername);
-
         switch (this.props.eventData.post_format) {
             case (SHORT):
                 return (
                     <ShortPostViewer
                         postId={this.props.eventData._id}
+                        postIndex={this.props.postIndex}
                         displayPhoto={this.props.displayPhoto}
                         username={this.props.username}
                         visitorUsername={this.props.visitorUsername}
@@ -43,13 +42,15 @@ class PostViewerController extends React.Component {
                         onDeletePost={this.props.onDeletePost}
                         closeModal={this.props.closeModal}
                         passDataToModal={this.props.passDataToModal}
-
+                        handleCommentInjection={this.props.handleCommentInjection}
+                        selectedPostFeedType={this.props.selectedPostFeedType}
                     />);
 
             case (LONG):
                 return (
                     <LongPostViewer
                         postId={this.props.eventData._id}
+                        postIndex={this.props.postIndex}
                         displayPhoto={this.props.displayPhoto}
                         username={this.props.username}
                         visitorUsername={this.props.visitorUsername}
@@ -63,6 +64,9 @@ class PostViewerController extends React.Component {
                         onDeletePost={this.props.onDeletePost}
                         closeModal={this.props.closeModal}
                         passDataToModal={this.props.passDataToModal}
+                        handleCommentInjection={this.props.handleCommentInjection}
+                        selectedPostFeedType={this.props.selectedPostFeedType}
+
                     />
                 );
 

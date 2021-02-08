@@ -116,7 +116,6 @@ class SingleComment extends React.Component {
                 }
             )
                 .then((result) => {
-                    console.log(result);
                     alert(result);
                     this.toggleReplyBox(false);
                 })
@@ -143,7 +142,6 @@ class SingleComment extends React.Component {
     }
 
     render() {
-        console.log(this.state.previousVote);
         return (
             <div className={this.props.level > 1 ? "singlecomment-multiple-thread-style" : ""}>
                 {this.props.level > 1 ? (
