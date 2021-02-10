@@ -99,7 +99,6 @@ class ReturningUserPage extends React.Component {
                         if (hasMore === false) {
                             return AxiosHelper.returnMultiplePosts(result.data.recent_posts, false)
                                 .then((result) => {
-                                    console.log(result);
                                     return {
                                         isRecentPostsOnly: true,
                                         recentPosts: result.data
@@ -112,9 +111,6 @@ class ReturningUserPage extends React.Component {
                                 AxiosHelper.returnMultiplePosts(slicedFeed, true)
                             ])
                                 .then((results) => {
-                                    console.log(results[0].data);
-
-                                    console.log(results[1].data);
                                     return {
                                         isRecentPostsOnly: false,
                                         recentPosts: results[0].data,
@@ -191,7 +187,7 @@ class ReturningUserPage extends React.Component {
         else if (feedType === FRIEND_POSTS) {
             let friendPosts = this.state.feedData;
             friendPosts[postIndex].comments = rootCommentsArray;
-            this.setState({ feedData : friendPosts})
+            this.setState({ feedData: friendPosts })
         }
     }
 
@@ -237,7 +233,6 @@ class ReturningUserPage extends React.Component {
 
             .then((result) => {
                 if (result.data) {
-                    console.log(result.data);
                     this.setState((state) => ({
                         feedData: state.feedData.concat(result.data),
                         nextOpenPostIndex: state.nextOpenPostIndex + state.fixedDataLoadLength,
@@ -364,7 +359,6 @@ class ReturningUserPage extends React.Component {
     }
 
     render() {
-        console.log("FEED", this.state.feedData.length > 0);
         const renderedFeed = this.state.feedData.length > 0 ? this.createFeed(this.state.feedData) : null;
         return (
             <div>

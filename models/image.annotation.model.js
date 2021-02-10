@@ -5,13 +5,17 @@ const Schema = mongoose.Schema;
 
 const annotationSchema = new Schema({
     _id: false,
-    data_annotation_id: Number,
-    data_annotation_text: String,
-    geometry_annotation_type: String,
-    geometry_x_coordinate: Number,
-    geometry_y_coordinate: Number,
-    geometry_width: Number,
-    geometry_height: Number,
+    // data_annotation_id: Number,
+    // data_annotation_text: String,
+    // geometry_annotation_type: String,
+    // geometry_x_coordinate: Number,
+    // geometry_y_coordinate: Number,
+    // geometry_width: Number,
+    // geometry_height: Number,
+    image_page_number: { type: Number },
+    data: { type: String },
+    geometry: { type: String },
+
 },
 );
 

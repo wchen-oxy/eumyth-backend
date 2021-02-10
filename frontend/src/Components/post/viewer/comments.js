@@ -3,7 +3,7 @@ import TextareaAutosize from 'react-textarea-autosize';
 import AxiosHelper from '../../../Axios/axios';
 import SingleComment from "./sub-components/single-comment";
 import CommentInput from "./sub-components/comment-input";
-import { EXPANDED, COLLAPSED, RECENT_POSTS } from "../../constants/flags";
+import {SHORT, EXPANDED, COLLAPSED, RECENT_POSTS } from "../../constants/flags";
 
 import "./comments.scss";
 
@@ -25,6 +25,7 @@ class Comments extends React.Component {
 
         this.handleCommentTextChange = this.handleCommentTextChange.bind(this);
         this.handleCommentPost = this.handleCommentPost.bind(this);
+        this.handleAnnotation = this.handleAnnotation.bind(this);
     }
 
     componentDidMount() {
@@ -43,6 +44,8 @@ class Comments extends React.Component {
                             visitorProfilePreviewId: result.data.userPreviewId,
                             loadingComments: false,
                             currentComments: result.data.rootComments
+                        }, () => {
+                            if (this.props.postType === SHORT) this.props.onGeneratedAnnotations(result.data.rootComments)
                         });
 
 
@@ -72,18 +75,6 @@ class Comments extends React.Component {
             postId: this.props.postId,
             imagePageNumber: 0
         };
-
-        const annotationPayload = {
-            dataAnnotationId: this.state.data_annotation_id,
-            dataAnnotationText: this.state.data_annotation_text,
-            geometryAnnotationType: this.state.geometry_annotation_type,
-            geometryXCoordinate: this.state.geometry_x_coordinate,
-            geometryYCoordinate: this.state.geometry_y_coordinate,
-            geometryWidth: this.state.geometry_width,
-            geometryHeight: this.state.geometry_height
-        };
-
-        if (this.state.data_annotation_id) Object.assign(payload, ...annotationPayload);
 
         return AxiosHelper
             .postComment(payload)
@@ -125,6 +116,7 @@ class Comments extends React.Component {
 
     recursiveRenderComments(commentData, level) {
         const currentLevel = level + 1;
+        const annotation = commentData.annotation ? JSON.parse(commentData.annotation) : null;
         if (!commentData.replies) {
             return (
                 <SingleComment
@@ -139,6 +131,10 @@ class Comments extends React.Component {
                     dislikes={commentData.dislikes}
                     displayPhoto={commentData.display_photo_key}
                     score={commentData.score}
+
+                    annotation={annotation}
+                    onMouseOver={this.props.onMouseOver}
+                    onMouseOut={this.props.onMouseOut}
                 />
             );
         }
@@ -172,6 +168,10 @@ class Comments extends React.Component {
                         likes={commentData.likes}
                         dislikes={commentData.dislikes}
                         displayPhoto={commentData.display_photo_key}
+
+                        annotation={annotation}
+                        onMouseOver={this.props.onMouseOver}
+                        onMouseOut={this.props.onMouseOut}
                     />
                     <div className="comments-reply-container">
                         {replies}
@@ -204,8 +204,11 @@ class Comments extends React.Component {
                         handleTextChange={this.handleCommentTextChange}
                         commentText={this.state.commentText}
                     />
+                    <div>
+                        <button onClick={this.handleCommentPost}>Add Comment</button>
+                        <button onClick={this.handleAnnotation}>Annotate</button>
+                    </div>
 
-                    <button onClick={this.handleCommentPost}>Add Comment</button>
                 </div>
             );
         }
@@ -216,6 +219,10 @@ class Comments extends React.Component {
                 </div>
             )
         }
+    }
+
+    handleAnnotation() {
+
     }
 
     render() {

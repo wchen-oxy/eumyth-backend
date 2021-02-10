@@ -5,6 +5,7 @@ import Comments from "./comments";
 import ShortPostMetaInfo from './sub-components/short-post-meta';
 import ShortReEditor from '../editor/short-re-editor';
 import ReviewPost from "../draft/review-post";
+import AxiosHelper from "../../../Axios/axios";
 import { returnUserImageURL } from "../../constants/urls";
 import { EXPANDED, COLLAPSED, SHORT, INITIAL_STATE, EDIT_STATE, REVIEW_STATE } from "../../constants/flags";
 
@@ -12,13 +13,18 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import "../../image-carousel/index.scss";
 import "./short-post.scss";
-import ImageSlider from '../../image-carousel';
+import ImageSlider from '../../image-carousel/index';
+import Annotater from "../../image-carousel/sub-components/annotator";
 
 class ShortPostViewer extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
+            annotations: [], //finished annotation
+            // annotation: {}, //current annotation
+            activeAnnotations: [],
+
             selectedFiles: [],
             validFiles: [],
             unsupportedFiles: [],
@@ -32,6 +38,11 @@ class ShortPostViewer extends React.Component {
             postDisabled: true,
             window: INITIAL_STATE,
         };
+
+        this.onMouseOver = this.onMouseOver.bind(this);
+        this.onMouseOut = this.onMouseOut.bind(this);
+        this.handleGeneratedAnnotations = this.handleGeneratedAnnotations.bind(this);
+        this.handleAnnotationSubmit = this.handleAnnotationSubmit.bind(this);
         this.handleWindowChange = this.handleWindowChange.bind(this);
         this.handleIndexChange = this.handleIndexChange.bind(this);
         this.handleTextChange = this.handleTextChange.bind(this);
@@ -39,6 +50,61 @@ class ShortPostViewer extends React.Component {
         this.handleModalLaunch = this.handleModalLaunch.bind(this);
         this.renderImageSlider = this.renderImageSlider.bind(this);
         this.renderComments = this.renderComments.bind(this);
+    }
+
+    handleGeneratedAnnotations(rawComments) {
+        let annotations = [];
+        for (const comment of rawComments) {
+            if (comment.annotation) annotations.push(JSON.parse(comment.annotation));
+        }
+        this.setState({ annotations: annotations })
+    }
+
+    handleAnnotationSubmit(annotation) {
+        const { geometry, data } = annotation;
+        // console.log(annotation);
+        const id = Math.random();
+        this.setState({
+            annotations: this.state.annotations.concat({
+                geometry,
+                data: {
+                    ...data,
+                    id: id
+                }
+            })
+        })
+
+        const annotationPayload = {
+            imagePageNumber: this.state.imageIndex,
+            annotationData: JSON.stringify(data),
+            annotationGeometry: JSON.stringify(geometry),
+        };
+
+        AxiosHelper
+            .postComment(annotationPayload)
+            .then((result) => {
+
+            })
+
+    }
+
+    onMouseOver(id) {
+        this.setState({
+            activeAnnotations: [
+                ...this.state.activeAnnotations,
+                id
+            ]
+        })
+    }
+
+    onMouseOut(id) {
+        const index = this.state.activeAnnotations.indexOf(id)
+        this.setState({
+            activeAnnotations: [
+                ...this.state.activeAnnotations.slice(0, index),
+                ...this.state.activeAnnotations.slice(index + 1)
+            ]
+        })
     }
 
     handleWindowChange(newWindow) {
@@ -80,6 +146,10 @@ class ShortPostViewer extends React.Component {
                     "shortpostviewer-inline-hero-container"
             }>
                 <ImageSlider
+                    annotations={this.state.annotations}
+                    activeAnnotations={this.state.activeAnnotations}
+                    onAnnotationSubmit={this.handleAnnotationSubmit}
+
                     onIndexChange={this.handleIndexChange}
                     imageArray={imageArray}
                 />
@@ -96,6 +166,7 @@ class ShortPostViewer extends React.Component {
     renderComments(windowType) {
         return (
             <Comments
+                postType={SHORT}
                 comments={this.props.eventData.comments}
                 windowType={windowType}
                 visitorUsername={this.props.visitorUsername}
@@ -104,7 +175,9 @@ class ShortPostViewer extends React.Component {
                 handleCommentInjection={this.props.handleCommentInjection}
                 selectedPostFeedType={this.props.selectedPostFeedType}
 
-
+                onGeneratedAnnotations={this.handleGeneratedAnnotations}
+                onMouseOver={this.onMouseOver}
+                onMouseOut={this.onMouseOut}
             />
         )
     }

@@ -39,6 +39,7 @@ const LongPostViewer = (props) => {
     const renderComments = (windowType) => {
         return (
             <Comments
+                postType={LONG}
                 comments={props.eventData.comments}
                 windowType={windowType}
                 visitorUsername={props.visitorUsername}
@@ -56,7 +57,6 @@ const LongPostViewer = (props) => {
             "July", "August", "September", "October", "November", "December"
         ];
         const date = props.eventData.date ? new Date(props.eventData.date) : null;
-        console.log(props.isOwnProfile);
         if (props.largeViewMode) {
             return (
                 <div className={props.isPostOnlyView ? "" : "longpostviewer-window"}>
@@ -241,7 +241,6 @@ const LongPostViewer = (props) => {
                 preferredPostType={props.preferredPostType}
                 pursuitNames={props.pursuitNames}
                 handlePreferredPostTypeChange={props.handlePreferredPostTypeChange}
-
                 isUpdateToPost={true}
                 postId={props.eventData._id}
                 isMilestone={props.eventData.is_milestone}

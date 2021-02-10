@@ -334,32 +334,25 @@ router.route('/root')
         const postId = req.body.postId;
         const commenterId = req.body.visitorProfilePreviewId;
         const comment = req.body.comment;
-        const dataAnnotationId = req.body.dataAnnotationId;
-        const dataAnnotationText = req.body.dataAnnotationText;
-        const geometryAnnotationType = req.body.geometryAnnotationType;
-        const geometryXCoordinate = req.body.geometryXCoordinate;
-        const geometryYCoordinate = req.body.geometryYCoordinate;
-        const geometryWidth = req.body.geometryWidth;
-        const geometryHeight = req.body.geometryHeight;
+        const annotationData = req.body.annotationData;
+        const annotationGeometry = req.body.annotationGeometry;
         const imagePageNumber = req.body.imagePageNumber;
         const resolvedPost = Post.Model.findById(postId);
         const resolvedUser = UserPreview.Model.findById(commenterId);
-
+        console.log(req.body);
+        let rootCommentArray = null;
         return Promise.all([resolvedPost, resolvedUser])
             .then(
                 (result) => {
-                    if (!result[0] || !result[1]) throw new Error(204)
-                    const annotationPayload = dataAnnotationId ?
+                    if (!result[0] || !result[1]) throw new Error(204);
+
+                    const annotationPayload = data ?
                         new ImageAnnotation.Model({
-                            data_annotation_id: dataAnnotationId,
-                            data_annotation_text: dataAnnotationText,
-                            geometry_annotation_type: geometryAnnotationType,
-                            geometry_x_coordinate: geometryXCoordinate,
-                            geometry_y_coordinate: geometryYCoordinate,
-                            geometry_width: geometryWidth,
-                            geometry_height: geometryHeight,
-                            image_page_number: imagePageNumber
+                            image_page_number: imagePageNumber,
+                            data: annotationData,
+                            geometry: annotationGeometry
                         }) : null;
+
                     const newRootComment = new Comment.Model({
                         parent_post_id: postId,
                         ancestor_post_ids: [],
@@ -367,16 +360,18 @@ router.route('/root')
                         comment: comment,
                         annotation: annotationPayload
                     })
-                    console.log(2);
+
                     result[0].comments.unshift(
                         newRootComment._id
                     );
 
-                    return Promise.all([result[0].save(), newRootComment.save(), result[0].comments]);
+                    rootCommentArray = result[0].comments;
+
+                    return Promise.all([result[0].save(), newRootComment.save()]);
                 }
             )
-            .then((results) => {
-                res.status(200).json({ rootCommentIdArray: results[2] });
+            .then(() => {
+                res.status(200).json({ rootCommentIdArray: rootCommentArray });
             })
             .catch((err) => {
                 if (err.status === 204) console.log("No user or original post found");

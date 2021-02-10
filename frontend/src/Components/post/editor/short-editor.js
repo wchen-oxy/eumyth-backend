@@ -192,6 +192,7 @@ class ShortEditor extends React.Component {
             );
         }
         else {
+            console.log("short-editor")
             return (
                 <>
                     <div id="shorteditor-main-container">
@@ -199,6 +200,7 @@ class ShortEditor extends React.Component {
                             {this.props.unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
                             <div id="shorteditor-image-slider-container">
                                 <ImageSlider
+                                    disableAnnotations={true}
                                     onIndexChange={this.props.onIndexChange}
                                     imageArray={this.props.imageArray}
                                 />

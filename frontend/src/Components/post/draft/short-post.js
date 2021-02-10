@@ -163,6 +163,7 @@ class ShortPost extends React.Component {
 
 
   handleSortEnd({ oldIndex, newIndex }) {
+    
     const items = Array.from(this.state.validFiles);
     const [reorderedItem] = items.splice(oldIndex, 1);
     items.splice(newIndex, 0, reorderedItem);

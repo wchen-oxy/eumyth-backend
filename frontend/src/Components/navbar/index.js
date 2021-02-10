@@ -46,14 +46,12 @@ class NavigationAuth extends React.Component {
 
   }
   componentDidMount() {
-    console.log("MOUNTED");
     let isUserStillLoading = true;
     this.props.firebase.checkIsExistingUser().then(
       (result) => {
         if (result) {
           isUserStillLoading = false;
         }
-        console.log(this.state.username);
         return AxiosHelper.returnTinyDisplayPhoto(this.state.username);
       }
     )
@@ -127,7 +125,7 @@ class NavigationAuth extends React.Component {
             <button onClick={() => this.openModal(POST)}><h4>New Entry</h4></button>
           </div>
           <div id="navbar-right-container">
-          {
+            {
               this.state.existingUserLoading ?
                 (<></>) :
                 (
@@ -139,7 +137,7 @@ class NavigationAuth extends React.Component {
                       <p>{this.state.username}</p>
                     </div>
                     <div id="navbar-main-action-buttons-container">
-                
+
                       <button onClick={() => this.openModal(REQUEST_ACTION)}><h4>Friends</h4></button>
                     </div>
                   </>

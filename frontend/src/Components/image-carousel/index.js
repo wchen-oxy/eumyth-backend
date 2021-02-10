@@ -1,6 +1,7 @@
 import React from "react";
 import Slider from "react-slick";
-import Arrow from "./arrow";
+import Arrow from "./sub-components/arrow";
+import Annotator from "./sub-components/annotator";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "./index.scss";
@@ -54,9 +55,23 @@ class ImageSlider extends React.Component {
   renderImageContainers(isLoaded) {
     let count = 0;
     if (isLoaded) {
+      console.log(this.state.imageArray);
       return (this.state.imageArray.map(item =>
-        <div className="imageslider-image-container">
-          <img alt="" key={count++} src={item} />
+        <div className="imageslider-image-container" key={count++}>
+          {
+            this.props.disableAnnotations ?
+              <img alt="" key={count++} src={item} /> :
+              (
+                <Annotator
+                  imageSource={item}
+                  annotations={this.props.annotations}
+                  activeAnnotations={this.props.activeAnnotations}
+                  onAnnotationSubmit={this.props.onAnnotationSubmit}
+                />
+              )
+          }
+
+
         </div>
       ))
     }
@@ -69,8 +84,7 @@ class ImageSlider extends React.Component {
 
     return (
       <Slider afterChange={index => (this.props.onIndexChange(index))} {...settings}>
-        {this.renderImageContainers(!!this.state.imageArray)
-        }
+        {this.renderImageContainers(!!this.state.imageArray)}
       </Slider>
     );
   }

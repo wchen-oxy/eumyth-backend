@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import TextContainer from "./sub-components/text-container";
-import Arrow from '../../image-carousel/arrow';
+import Arrow from '../../image-carousel/sub-components/arrow';
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
