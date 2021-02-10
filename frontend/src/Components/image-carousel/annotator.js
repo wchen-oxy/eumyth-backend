@@ -1,5 +1,6 @@
 import React from 'react';
 import Annotation from 'react-image-annotation';
+import TextareaAutosize from "react-textarea-autosize";
 
 class Annotator extends React.Component {
 
@@ -43,7 +44,7 @@ class Annotator extends React.Component {
   renderEditor(props) {
     const { geometry } = props.annotation
     if (!geometry) return null
-
+    console.log(geometry);
     return (
       <div
         style={{
@@ -56,7 +57,7 @@ class Annotator extends React.Component {
         }}
       >
         <div>Custom Editor</div>
-        <input
+        <TextareaAutosize
           onChange={e => props.onChange({
             ...props.annotation,
             data: {
@@ -80,13 +81,13 @@ class Annotator extends React.Component {
     console.log(this.state.annotation);
     console.log(this.state.annotations);
     return (
-      <div style={{ zIndex: 999 }}>
-        <Annotation
+      <div style={{ display: 'flex' }}>
+         <Annotation
           src={
             // "https://pics.dmm.co.jp/mono/movie/adult/venx004/venx004pl.jpg"
             this.props.imageSource
           }
-          alt='Two pebbles anthropomorphized holding hands'
+          // alt='Two pebbles anthropomorphized holding hands'
           annotations={this.props.annotations}
           activeAnnotationComparator={this.activeAnnotationComparator}
           activeAnnotations={this.props.activeAnnotations}
@@ -95,20 +96,9 @@ class Annotator extends React.Component {
           onChange={this.onChange}
           onSubmit={this.onSubmit}
           renderEditor={this.renderEditor}
-
         />
       </div>
-      //   <Comments>
-      //   {this.state.annotations.map(annotation => (
-      //     <Comment
-      //       onMouseOver={this.onMouseOver(annotation.data.id)}
-      //       onMouseOut={this.onMouseOut(annotation.data.id)}
-      //       key={annotation.data.id}
-      //     >
-      //       {annotation.data.text}
-      //     </Comment>
-      //   ))}
-      // </Comments>
+
 
     )
   }

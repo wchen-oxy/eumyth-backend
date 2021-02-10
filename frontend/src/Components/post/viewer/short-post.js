@@ -7,6 +7,7 @@ import ShortReEditor from '../editor/short-re-editor';
 import ReviewPost from "../draft/review-post";
 import AxiosHelper from "../../../Axios/axios";
 import { returnUserImageURL } from "../../constants/urls";
+// import Annotator from "../../image-carousel";
 import { EXPANDED, COLLAPSED, SHORT, INITIAL_STATE, EDIT_STATE, REVIEW_STATE } from "../../constants/flags";
 
 import 'slick-carousel/slick/slick.css';
@@ -14,7 +15,8 @@ import 'slick-carousel/slick/slick-theme.css';
 import "../../image-carousel/index.scss";
 import "./short-post.scss";
 import ImageSlider from '../../image-carousel/index';
-import Annotater from "../../image-carousel/sub-components/annotator";
+import Annotator from "../../image-carousel/annotator";
+import CustomImageSlider from '../../image-carousel/custom-image-slider';
 
 class ShortPostViewer extends React.Component {
 
@@ -60,7 +62,7 @@ class ShortPostViewer extends React.Component {
         this.setState({ annotations: annotations })
     }
 
-    handleAnnotationSubmit(annotation) {
+    handleAnnotationSubmit(annotation, imageIndex) {
         const { geometry, data } = annotation;
         // console.log(annotation);
         const id = Math.random();
@@ -75,7 +77,7 @@ class ShortPostViewer extends React.Component {
         })
 
         const annotationPayload = {
-            imagePageNumber: this.state.imageIndex,
+            imagePageNumber: imageIndex,
             annotationData: JSON.stringify(data),
             annotationGeometry: JSON.stringify(geometry),
         };
@@ -138,6 +140,8 @@ class ShortPostViewer extends React.Component {
         let imageArray = this.props.eventData.image_data.map((key, i) =>
             returnUserImageURL(key)
         );
+        // if (imageArray.length === 1) {
+        console.log(imageArray[0]);
         return (
             <div className={
                 this.props.largeViewMode ?
@@ -145,16 +149,33 @@ class ShortPostViewer extends React.Component {
                     :
                     "shortpostviewer-inline-hero-container"
             }>
-                <ImageSlider
+                <CustomImageSlider
+                    imageArray={imageArray}
                     annotations={this.state.annotations}
                     activeAnnotations={this.state.activeAnnotations}
-                    onAnnotationSubmit={this.handleAnnotationSubmit}
+                    onAnnotationSubmit={this.handleAnnotationSubmit} />
+            </div>)
+        // }
+        // else {
+        //     return (
+        //         <div className={
+        //             this.props.largeViewMode ?
+        //                 "shortpostviewer-large-hero-container"
+        //                 :
+        //                 "shortpostviewer-inline-hero-container"
+        //         }>
 
-                    onIndexChange={this.handleIndexChange}
-                    imageArray={imageArray}
-                />
-            </div>
-        );
+        //             <ImageSlider
+        //                 annotations={this.state.annotations}
+        //                 activeAnnotations={this.state.activeAnnotations}
+        //                 onAnnotationSubmit={this.handleAnnotationSubmit}
+
+        //                 onIndexChange={this.handleIndexChange}
+        //                 imageArray={imageArray}
+        //             />
+        //         </div>
+        //     );
+        // }
     }
 
     handleModalLaunch() {
