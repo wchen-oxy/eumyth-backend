@@ -23,10 +23,11 @@ class ShortPostViewer extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            annotations: [], //finished annotation
+            annotations: null, //finished annotation
             // annotation: {}, //current annotation
             activeAnnotations: [],
-
+            visitorProfilePreviewId: '',
+            areAnnotationsHidden: true,
             selectedFiles: [],
             validFiles: [],
             unsupportedFiles: [],
@@ -40,10 +41,12 @@ class ShortPostViewer extends React.Component {
             postDisabled: true,
             window: INITIAL_STATE,
         };
-
+        this.heroRef = React.createRef();
+        this.toggleAnnotations = this.toggleAnnotations.bind(this);
         this.onMouseOver = this.onMouseOver.bind(this);
         this.onMouseOut = this.onMouseOut.bind(this);
-        this.handleGeneratedAnnotations = this.handleGeneratedAnnotations.bind(this);
+        this.onMouseClick = this.onMouseClick.bind(this);
+        this.passAnnotationData = this.passAnnotationData.bind(this);
         this.handleAnnotationSubmit = this.handleAnnotationSubmit.bind(this);
         this.handleWindowChange = this.handleWindowChange.bind(this);
         this.handleIndexChange = this.handleIndexChange.bind(this);
@@ -53,18 +56,43 @@ class ShortPostViewer extends React.Component {
         this.renderImageSlider = this.renderImageSlider.bind(this);
         this.renderComments = this.renderComments.bind(this);
     }
-
-    handleGeneratedAnnotations(rawComments) {
-        let annotations = [];
-        for (const comment of rawComments) {
-            if (comment.annotation) annotations.push(JSON.parse(comment.annotation));
+    componentDidMount() {
+        let annotationArray = [];
+        for (let i = 0; i < this.props.eventData.image_data.length; i++) {
+            annotationArray.push([]);
         }
-        this.setState({ annotations: annotations })
+        this.setState({ annotations: annotationArray });
+    }
+
+    toggleAnnotations() {
+        console.log("Clicked");
+        this.setState((state) => ({ areAnnotationsHidden: !state.areAnnotationsHidden }))
+    }
+
+    passAnnotationData(rawComments, visitorProfilePreviewId) {
+        let annotations = this.state.annotations;
+        if (rawComments) {
+            for (const comment of rawComments) {
+                if (comment.annotation) {
+                    const data = JSON.parse(comment.annotation.data);
+                    const geometry = JSON.parse(comment.annotation.geometry);
+                    annotations[comment.annotation.image_page_number].push({
+                        geometry, data: {
+                            ...data,
+                            id: comment._id
+                        }
+                    });
+                }
+            }
+        }
+        this.setState({
+            annotations: annotations,
+            visitorProfilePreviewId: visitorProfilePreviewId
+        })
     }
 
     handleAnnotationSubmit(annotation, imageIndex) {
         const { geometry, data } = annotation;
-        // console.log(annotation);
         const id = Math.random();
         this.setState({
             annotations: this.state.annotations.concat({
@@ -77,6 +105,8 @@ class ShortPostViewer extends React.Component {
         })
 
         const annotationPayload = {
+            postId: this.props.eventData._id,
+            visitorProfilePreviewId: this.state.visitorProfilePreviewId,
             imagePageNumber: imageIndex,
             annotationData: JSON.stringify(data),
             annotationGeometry: JSON.stringify(geometry),
@@ -107,6 +137,11 @@ class ShortPostViewer extends React.Component {
                 ...this.state.activeAnnotations.slice(index + 1)
             ]
         })
+    }
+
+    onMouseClick() {
+        console.log("Clicked");
+        this.heroRef.current.scrollIntoView({ block: "center" });
     }
 
     handleWindowChange(newWindow) {
@@ -140,18 +175,22 @@ class ShortPostViewer extends React.Component {
         let imageArray = this.props.eventData.image_data.map((key, i) =>
             returnUserImageURL(key)
         );
-        // if (imageArray.length === 1) {
-        console.log(imageArray[0]);
+
+        if (!this.state.annotations) return (<></>);
         return (
             <div className={
                 this.props.largeViewMode ?
                     "shortpostviewer-large-hero-container"
                     :
                     "shortpostviewer-inline-hero-container"
-            }>
+            }
+                ref={this.heroRef}
+            >
                 <CustomImageSlider
+                    hideAnnotations={this.state.areAnnotationsHidden}
                     imageArray={imageArray}
                     annotations={this.state.annotations}
+                    toggleAnnotations={this.toggleAnnotations}
                     activeAnnotations={this.state.activeAnnotations}
                     onAnnotationSubmit={this.handleAnnotationSubmit} />
             </div>)
@@ -196,7 +235,8 @@ class ShortPostViewer extends React.Component {
                 handleCommentInjection={this.props.handleCommentInjection}
                 selectedPostFeedType={this.props.selectedPostFeedType}
 
-                onGeneratedAnnotations={this.handleGeneratedAnnotations}
+                passAnnotationData={this.passAnnotationData}
+                onMouseClick={this.onMouseClick}
                 onMouseOver={this.onMouseOver}
                 onMouseOut={this.onMouseOut}
             />

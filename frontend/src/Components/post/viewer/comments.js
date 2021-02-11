@@ -3,7 +3,7 @@ import TextareaAutosize from 'react-textarea-autosize';
 import AxiosHelper from '../../../Axios/axios';
 import SingleComment from "./sub-components/single-comment";
 import CommentInput from "./sub-components/comment-input";
-import {SHORT, EXPANDED, COLLAPSED, RECENT_POSTS } from "../../constants/flags";
+import { SHORT, EXPANDED, COLLAPSED, RECENT_POSTS } from "../../constants/flags";
 
 import "./comments.scss";
 
@@ -45,7 +45,7 @@ class Comments extends React.Component {
                             loadingComments: false,
                             currentComments: result.data.rootComments
                         }, () => {
-                            if (this.props.postType === SHORT) this.props.onGeneratedAnnotations(result.data.rootComments)
+                            if (this.props.postType === SHORT) this.props.passAnnotationData(result.data.rootComments, result.data.userPreviewId)
                         });
 
 
@@ -59,6 +59,8 @@ class Comments extends React.Component {
                         visitorProfilePreviewId: result.data.userPreviewId,
                         loadingComments: false,
                         currentComments: []
+                    }, () => {
+                        if (this.props.postType === SHORT) this.props.passAnnotationData(null, result.data.userPreviewId)
                     });
                 })
         }
@@ -116,7 +118,8 @@ class Comments extends React.Component {
 
     recursiveRenderComments(commentData, level) {
         const currentLevel = level + 1;
-        const annotation = commentData.annotation ? JSON.parse(commentData.annotation) : null;
+        const annotation = commentData.annotation ? JSON.parse(commentData.annotation.data) : null;
+        const text = commentData.comment ? commentData.comment : annotation.text;
         if (!commentData.replies) {
             return (
                 <SingleComment
@@ -126,7 +129,7 @@ class Comments extends React.Component {
                     commentId={commentData._id}
                     ancestors={commentData.ancestor_post_ids}
                     username={commentData.username}
-                    commentText={commentData.comment}
+                    commentText={text}
                     likes={commentData.likes}
                     dislikes={commentData.dislikes}
                     displayPhoto={commentData.display_photo_key}
@@ -135,6 +138,7 @@ class Comments extends React.Component {
                     annotation={annotation}
                     onMouseOver={this.props.onMouseOver}
                     onMouseOut={this.props.onMouseOut}
+                    onMouseClick={this.props.onMouseClick}
                 />
             );
         }
@@ -163,7 +167,7 @@ class Comments extends React.Component {
                         commentId={commentData._id}
                         ancestors={commentData.ancestor_post_ids}
                         username={commentData.username}
-                        commentText={commentData.comment}
+                        commentText={text}
                         score={commentData.score}
                         likes={commentData.likes}
                         dislikes={commentData.dislikes}
@@ -172,6 +176,7 @@ class Comments extends React.Component {
                         annotation={annotation}
                         onMouseOver={this.props.onMouseOver}
                         onMouseOut={this.props.onMouseOut}
+                        onMouseClick={this.props.onMouseClick}
                     />
                     <div className="comments-reply-container">
                         {replies}
@@ -231,7 +236,6 @@ class Comments extends React.Component {
                 <div className="comments-main-container">
                     {this.renderCommentSectionType(COLLAPSED)}
                     {this.renderCommentInput(COLLAPSED)}
-                    {/* {this.state.currentComments} */}
                 </div>
             );
         }
@@ -240,8 +244,6 @@ class Comments extends React.Component {
                 <div className="comments-main-container">
                     {this.renderCommentInput(EXPANDED)}
                     {this.renderCommentSectionType(EXPANDED)}
-                    {/* {this.state.currentComments} */}
-
                 </div>
             )
         }

@@ -346,7 +346,7 @@ router.route('/root')
                 (result) => {
                     if (!result[0] || !result[1]) throw new Error(204);
 
-                    const annotationPayload = data ?
+                    const annotationPayload = annotationData ?
                         new ImageAnnotation.Model({
                             image_page_number: imagePageNumber,
                             data: annotationData,

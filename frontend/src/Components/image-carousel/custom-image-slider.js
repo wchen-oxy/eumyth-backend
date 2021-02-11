@@ -89,14 +89,15 @@ class CustomImageSlider extends React.Component {
     render() {
         return (
             <>
-                <div style={{ display: 'flex' }}>
+                <div style={{ display: 'flex' }}  >
                     <Annotation
                         src={
                             // "https://pics.dmm.co.jp/mono/movie/adult/venx004/venx004pl.jpg"
                             this.props.imageArray[this.state.imageIndex]
                         }
                         // alt='Two pebbles anthropomorphized holding hands'
-                        annotations={this.props.annotations}
+                        disableOverlay={this.props.hideAnnotations}
+                        annotations={!this.props.hideAnnotations ? this.props.annotations[this.state.imageIndex] : []}
                         activeAnnotationComparator={this.activeAnnotationComparator}
                         activeAnnotations={this.props.activeAnnotations}
                         type={this.state.type}
@@ -108,6 +109,7 @@ class CustomImageSlider extends React.Component {
                 </div>
                 <button onClick={() => this.handleArrowPress(-1)}>Previous</button>
                 <button onClick={() => this.handleArrowPress(1)}>Next</button>
+                <button onClick={this.props.toggleAnnotations}>Show/Hide All Annotations</button>
             </>
         )
     }

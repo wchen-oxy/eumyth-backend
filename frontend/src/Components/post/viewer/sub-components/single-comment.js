@@ -79,7 +79,6 @@ class SingleComment extends React.Component {
             })
             .then((result) => {
                 console.log(result);
-                console.log(this.state.overallVoteScore);
             })
             .catch((err) => {
                 console.log(err);
@@ -165,8 +164,9 @@ class SingleComment extends React.Component {
                         <div className={"singlecomment-main-content-container"}>
                             <div className="singlecomment-comment-container"
                                 key={this.props.commentId}
-                                onMouseOver={() => this.props.onMouseOver(this.props.annotation.data.id)}
-                                onMouseOut={() => this.props.onMouseOut(this.props.annotation.data.id)}
+                                onMouseOver={() => this.props.onMouseOver(this.props.commentId)}
+                                onMouseOut={() => this.props.onMouseOut(this.props.commentId)}
+                                onClick={this.props.onMouseClick}
                             >
                                 <p>{this.props.commentText}</p>
                             </div>
