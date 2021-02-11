@@ -24,14 +24,15 @@ class ShortPostViewer extends React.Component {
         super(props);
         this.state = {
             annotations: null, //finished annotation
-            // annotation: {}, //current annotation
             activeAnnotations: [],
             visitorProfilePreviewId: '',
             areAnnotationsHidden: true,
+            selectedAnnotationIndex: null,
+            imageIndex: 0,
             selectedFiles: [],
             validFiles: [],
             unsupportedFiles: [],
-            imageIndex: 0,
+
             textData: this.props.textData,
             date: this.props.eventData.date,
             min: this.props.eventData.min_duration,
@@ -42,6 +43,8 @@ class ShortPostViewer extends React.Component {
             window: INITIAL_STATE,
         };
         this.heroRef = React.createRef();
+        this.handleArrowPress = this.handleArrowPress.bind(this);
+
         this.toggleAnnotations = this.toggleAnnotations.bind(this);
         this.onMouseOver = this.onMouseOver.bind(this);
         this.onMouseOut = this.onMouseOut.bind(this);
@@ -56,6 +59,15 @@ class ShortPostViewer extends React.Component {
         this.renderImageSlider = this.renderImageSlider.bind(this);
         this.renderComments = this.renderComments.bind(this);
     }
+    handleArrowPress(value) {
+
+        if (this.state.imageIndex + value === this.state.annotations.length) return this.setState({ imageIndex: 0 });
+        else if (this.state.imageIndex + value === -1) return this.setState({ imageIndex: this.state.annotations.length - 1 });
+        else {
+            return this.setState((state) => ({ imageIndex: state.imageIndex + value }));
+        }
+    }
+
     componentDidMount() {
         let annotationArray = [];
         for (let i = 0; i < this.props.eventData.image_data.length; i++) {
@@ -139,9 +151,24 @@ class ShortPostViewer extends React.Component {
         })
     }
 
-    onMouseClick() {
+    onMouseClick(id) {
         console.log("Clicked");
-        this.heroRef.current.scrollIntoView({ block: "center" });
+        for (let array of this.state.annotations) {
+            if (array.length > 0) {
+                let index = 0;
+                for (let annotation of array) {
+                    console.log(annotation);
+                    if (annotation.data.id === id) {
+                        console.log("Found");
+                        // return this.heroRef.current.scrollIntoView({ block: "center" });
+                        return this.setState({ selectedAnnotationIndex: index },
+                            this.heroRef.current.scrollIntoView({ block: "center" }))
+                    }
+                    index++;
+                }
+            }
+        }
+
     }
 
     handleWindowChange(newWindow) {
@@ -176,7 +203,10 @@ class ShortPostViewer extends React.Component {
             returnUserImageURL(key)
         );
 
-        if (!this.state.annotations) return (<></>);
+        if (!this.state.annotations) {
+            console.log("SHIT");
+            return (<></>);
+        }
         return (
             <div className={
                 this.props.largeViewMode ?
@@ -184,15 +214,18 @@ class ShortPostViewer extends React.Component {
                     :
                     "shortpostviewer-inline-hero-container"
             }
-                ref={this.heroRef}
+
             >
                 <CustomImageSlider
                     hideAnnotations={this.state.areAnnotationsHidden}
                     imageArray={imageArray}
-                    annotations={this.state.annotations}
-                    toggleAnnotations={this.toggleAnnotations}
+                    annotations={this.state.selectedAnnotationIndex ? this.state.annotations[this.state.imageIndex][this.state.selectedAnnotationIndex] : this.state.annotations[this.state.imageIndex]}
                     activeAnnotations={this.state.activeAnnotations}
-                    onAnnotationSubmit={this.handleAnnotationSubmit} />
+                    imageIndex={this.state.imageIndex}
+                    onAnnotationSubmit={this.handleAnnotationSubmit}
+                    toggleAnnotations={this.toggleAnnotations}
+                    handleArrowPress={this.handleArrowPress}
+                />
             </div>)
         // }
         // else {
@@ -243,6 +276,7 @@ class ShortPostViewer extends React.Component {
         )
     }
     render() {
+
         if (this.state.window === INITIAL_STATE) {
             if (!this.props.eventData.image_data.length) {
                 if (this.props.largeViewMode) {
@@ -311,13 +345,15 @@ class ShortPostViewer extends React.Component {
             }
             //with images
             else {
+                console.log(this.state.selectedAnnotationIndex);
+
                 if (this.props.largeViewMode) {
                     return (
                         <div className="shortpostviewer-window">
 
                             <div id="shortpostviewer-large-main-container">
                                 {this.renderImageSlider()}
-                                <div  >
+                                <div ref={this.heroRef}>
                                     <PostHeader
                                         isOwnProfile={this.props.isOwnProfile}
                                         username={this.props.username}

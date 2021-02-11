@@ -7,7 +7,6 @@ class CustomImageSlider extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            imageIndex: 0,
             // annotations: [], //finished annotation
             annotation: {}, //current annotation
             // activeAnnotations: []
@@ -18,16 +17,12 @@ class CustomImageSlider extends React.Component {
         this.onSubmit = this.onSubmit.bind(this);
         this.renderEditor = this.renderEditor.bind(this);
         this.activeAnnotationComparator = this.activeAnnotationComparator.bind(this);
-        this.handleArrowPress = this.handleArrowPress.bind(this);
     }
 
-    handleArrowPress(value) {
-        if (this.state.imageIndex + value === this.props.imageArray.length) return this.setState({ imageIndex: 0 });
-        else if (this.state.imageIndex + value === -1) return this.setState({ imageIndex: this.props.imageArray.length - 1 });
-        else {
-            return this.setState((state) => ({ imageIndex: state.imageIndex + value }));
-        }
+    componentWillUnmount() {
+        console.log("Unmount...");
     }
+
 
     onChange(annotation) {
         // console.log(annotation);
@@ -87,17 +82,19 @@ class CustomImageSlider extends React.Component {
     }
 
     render() {
+        console.log(this.props.annotations);
+
         return (
             <>
                 <div style={{ display: 'flex' }}  >
                     <Annotation
                         src={
                             // "https://pics.dmm.co.jp/mono/movie/adult/venx004/venx004pl.jpg"
-                            this.props.imageArray[this.state.imageIndex]
+                            this.props.imageArray[this.props.imageIndex]
                         }
                         // alt='Two pebbles anthropomorphized holding hands'
                         disableOverlay={this.props.hideAnnotations}
-                        annotations={!this.props.hideAnnotations ? this.props.annotations[this.state.imageIndex] : []}
+                        annotations={!this.props.hideAnnotations ? this.props.annotations : []}
                         activeAnnotationComparator={this.activeAnnotationComparator}
                         activeAnnotations={this.props.activeAnnotations}
                         type={this.state.type}
@@ -107,8 +104,8 @@ class CustomImageSlider extends React.Component {
                         renderEditor={this.renderEditor}
                     />
                 </div>
-                <button onClick={() => this.handleArrowPress(-1)}>Previous</button>
-                <button onClick={() => this.handleArrowPress(1)}>Next</button>
+                <button onClick={() => this.props.handleArrowPress(-1)}>Previous</button>
+                <button onClick={() => this.props.handleArrowPress(1)}>Next</button>
                 <button onClick={this.props.toggleAnnotations}>Show/Hide All Annotations</button>
             </>
         )

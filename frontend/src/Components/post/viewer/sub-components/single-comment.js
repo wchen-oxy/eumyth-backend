@@ -166,7 +166,7 @@ class SingleComment extends React.Component {
                                 key={this.props.commentId}
                                 onMouseOver={() => this.props.onMouseOver(this.props.commentId)}
                                 onMouseOut={() => this.props.onMouseOut(this.props.commentId)}
-                                onClick={this.props.onMouseClick}
+                                onClick={() => this.props.onMouseClick(this.props.commentId)}
                             >
                                 <p>{this.props.commentText}</p>
                             </div>
