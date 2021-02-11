@@ -59,6 +59,7 @@ class ShortPostViewer extends React.Component {
         this.renderImageSlider = this.renderImageSlider.bind(this);
         this.renderComments = this.renderComments.bind(this);
     }
+
     handleArrowPress(value) {
 
         if (this.state.imageIndex + value === this.state.annotations.length) return this.setState({ imageIndex: 0 });
@@ -78,7 +79,18 @@ class ShortPostViewer extends React.Component {
 
     toggleAnnotations() {
         console.log("Clicked");
-        this.setState((state) => ({ areAnnotationsHidden: !state.areAnnotationsHidden }))
+        if (this.state.areAnnotationsHidden) {
+            this.setState(({
+                areAnnotationsHidden: false
+            }));
+        }
+        else {
+            this.setState(({
+                areAnnotationsHidden: true,
+                selectedAnnotationIndex: null
+            }));
+        }
+
     }
 
     passAnnotationData(rawComments, visitorProfilePreviewId) {
@@ -153,20 +165,26 @@ class ShortPostViewer extends React.Component {
 
     onMouseClick(id) {
         console.log("Clicked");
+        let imageIndex = 0;
         for (let array of this.state.annotations) {
             if (array.length > 0) {
-                let index = 0;
+                let annotationIndex = 0;
                 for (let annotation of array) {
                     console.log(annotation);
                     if (annotation.data.id === id) {
                         console.log("Found");
                         // return this.heroRef.current.scrollIntoView({ block: "center" });
-                        return this.setState({ selectedAnnotationIndex: index },
+                        return this.setState({
+                            imageIndex: imageIndex,
+                            selectedAnnotationIndex: annotationIndex,
+                            areAnnotationsHidden: false,
+                        },
                             this.heroRef.current.scrollIntoView({ block: "center" }))
                     }
-                    index++;
+                    annotationIndex++;
                 }
             }
+            imageIndex++;
         }
 
     }
@@ -219,6 +237,7 @@ class ShortPostViewer extends React.Component {
                 <CustomImageSlider
                     hideAnnotations={this.state.areAnnotationsHidden}
                     imageArray={imageArray}
+                    // annotations={this.state.annotations}
                     annotations={this.state.selectedAnnotationIndex ? this.state.annotations[this.state.imageIndex][this.state.selectedAnnotationIndex] : this.state.annotations[this.state.imageIndex]}
                     activeAnnotations={this.state.activeAnnotations}
                     imageIndex={this.state.imageIndex}
