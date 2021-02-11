@@ -31,7 +31,7 @@ class CustomImageSlider extends React.Component {
 
     onSubmit(annotation) {
         this.setState({ annotation: {} },
-            this.props.onAnnotationSubmit(annotation, this.state.imageIndex));
+            this.props.onAnnotationSubmit(annotation));
         // const { geometry, data } = annotation
         //  this.setState({
         //   annotation: {},
@@ -82,8 +82,6 @@ class CustomImageSlider extends React.Component {
     }
 
     render() {
-        console.log(this.props.annotations);
-
         return (
             <>
                 <div style={{ display: 'flex' }}  >

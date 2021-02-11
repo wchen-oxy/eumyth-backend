@@ -115,15 +115,13 @@ class ShortPostViewer extends React.Component {
         })
     }
 
-    handleAnnotationSubmit(annotation, imageIndex) {
+    handleAnnotationSubmit(annotation) {
         const { geometry, data } = annotation;
-        const id = Math.random();
         this.setState({
             annotations: this.state.annotations.concat({
                 geometry,
                 data: {
                     ...data,
-                    id: id
                 }
             })
         })
@@ -131,7 +129,7 @@ class ShortPostViewer extends React.Component {
         const annotationPayload = {
             postId: this.props.eventData._id,
             visitorProfilePreviewId: this.state.visitorProfilePreviewId,
-            imagePageNumber: imageIndex,
+            imagePageNumber: this.state.imageIndex,
             annotationData: JSON.stringify(data),
             annotationGeometry: JSON.stringify(geometry),
         };
@@ -139,7 +137,8 @@ class ShortPostViewer extends React.Component {
         AxiosHelper
             .postComment(annotationPayload)
             .then((result) => {
-
+                console.log(result.data);
+                console.log("SUCCESS");
             })
 
     }
@@ -173,6 +172,7 @@ class ShortPostViewer extends React.Component {
                     console.log(annotation);
                     if (annotation.data.id === id) {
                         console.log("Found");
+                        console.log(annotationIndex);
                         // return this.heroRef.current.scrollIntoView({ block: "center" });
                         return this.setState({
                             imageIndex: imageIndex,
@@ -225,6 +225,9 @@ class ShortPostViewer extends React.Component {
             console.log("SHIT");
             return (<></>);
         }
+        
+        console.log(this.state.selectedAnnotationIndex !== null ? this.state.annotations[this.state.imageIndex][this.state.selectedAnnotationIndex] : "doesnt");
+
         return (
             <div className={
                 this.props.largeViewMode ?
@@ -232,13 +235,12 @@ class ShortPostViewer extends React.Component {
                     :
                     "shortpostviewer-inline-hero-container"
             }
-
             >
                 <CustomImageSlider
                     hideAnnotations={this.state.areAnnotationsHidden}
                     imageArray={imageArray}
                     // annotations={this.state.annotations}
-                    annotations={this.state.selectedAnnotationIndex ? this.state.annotations[this.state.imageIndex][this.state.selectedAnnotationIndex] : this.state.annotations[this.state.imageIndex]}
+                    annotations={this.state.selectedAnnotationIndex !== null  ? [this.state.annotations[this.state.imageIndex][this.state.selectedAnnotationIndex]] : this.state.annotations[this.state.imageIndex]}
                     activeAnnotations={this.state.activeAnnotations}
                     imageIndex={this.state.imageIndex}
                     onAnnotationSubmit={this.handleAnnotationSubmit}
