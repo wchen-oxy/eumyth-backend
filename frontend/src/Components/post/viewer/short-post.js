@@ -62,10 +62,10 @@ class ShortPostViewer extends React.Component {
 
     handleArrowPress(value) {
 
-        if (this.state.imageIndex + value === this.state.annotations.length) return this.setState({ imageIndex: 0 });
-        else if (this.state.imageIndex + value === -1) return this.setState({ imageIndex: this.state.annotations.length - 1 });
+        if (this.state.imageIndex + value === this.state.annotations.length) return this.setState({ imageIndex: 0, selectedAnnotationIndex: null });
+        else if (this.state.imageIndex + value === -1) return this.setState({ imageIndex: this.state.annotations.length - 1, selectedAnnotationIndex: null });
         else {
-            return this.setState((state) => ({ imageIndex: state.imageIndex + value }));
+            return this.setState((state) => ({ imageIndex: state.imageIndex + value, selectedAnnotationIndex: null }));
         }
     }
 
@@ -225,7 +225,7 @@ class ShortPostViewer extends React.Component {
             console.log("SHIT");
             return (<></>);
         }
-        
+
         console.log(this.state.selectedAnnotationIndex !== null ? this.state.annotations[this.state.imageIndex][this.state.selectedAnnotationIndex] : "doesnt");
 
         return (
@@ -240,7 +240,7 @@ class ShortPostViewer extends React.Component {
                     hideAnnotations={this.state.areAnnotationsHidden}
                     imageArray={imageArray}
                     // annotations={this.state.annotations}
-                    annotations={this.state.selectedAnnotationIndex !== null  ? [this.state.annotations[this.state.imageIndex][this.state.selectedAnnotationIndex]] : this.state.annotations[this.state.imageIndex]}
+                    annotations={this.state.selectedAnnotationIndex !== null ? [this.state.annotations[this.state.imageIndex][this.state.selectedAnnotationIndex]] : this.state.annotations[this.state.imageIndex]}
                     activeAnnotations={this.state.activeAnnotations}
                     imageIndex={this.state.imageIndex}
                     onAnnotationSubmit={this.handleAnnotationSubmit}
