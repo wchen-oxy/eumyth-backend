@@ -19,30 +19,14 @@ class CustomImageSlider extends React.Component {
         this.activeAnnotationComparator = this.activeAnnotationComparator.bind(this);
     }
 
-    componentWillUnmount() {
-        console.log("Unmount...");
-    }
-
-
     onChange(annotation) {
-        // console.log(annotation);
         this.setState({ annotation })
     }
 
     onSubmit(annotation) {
         this.setState({ annotation: {} },
             this.props.onAnnotationSubmit(annotation));
-        // const { geometry, data } = annotation
-        //  this.setState({
-        //   annotation: {},
-        //   annotations: this.state.annotations.concat({
-        //     geometry,
-        //     data: {
-        //       ...data,
-        //       id: Math.random()
-        //     }
-        //   })
-        // })
+
     }
 
     renderEditor(props) {
@@ -90,7 +74,7 @@ class CustomImageSlider extends React.Component {
                             // "https://pics.dmm.co.jp/mono/movie/adult/venx004/venx004pl.jpg"
                             this.props.imageArray[this.props.imageIndex]
                         }
-                        // alt='Two pebbles anthropomorphized holding hands'
+                        alt='Image Display Goes Here'
                         disableOverlay={this.props.hideAnnotations}
                         annotations={!this.props.hideAnnotations ? this.props.annotations : []}
                         activeAnnotationComparator={this.activeAnnotationComparator}

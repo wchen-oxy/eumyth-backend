@@ -6,24 +6,20 @@ import ShortPostMetaInfo from './sub-components/short-post-meta';
 import ShortReEditor from '../editor/short-re-editor';
 import ReviewPost from "../draft/review-post";
 import AxiosHelper from "../../../Axios/axios";
+import CustomImageSlider from '../../image-carousel/custom-image-slider';
 import { returnUserImageURL } from "../../constants/urls";
-// import Annotator from "../../image-carousel";
 import { EXPANDED, COLLAPSED, SHORT, INITIAL_STATE, EDIT_STATE, REVIEW_STATE } from "../../constants/flags";
-
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import "../../image-carousel/index.scss";
 import "./short-post.scss";
-import ImageSlider from '../../image-carousel/index';
-import Annotator from "../../image-carousel/annotator";
-import CustomImageSlider from '../../image-carousel/custom-image-slider';
 
 class ShortPostViewer extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            annotations: null, //finished annotation
+            annotations: null,
             activeAnnotations: [],
             visitorProfilePreviewId: '',
             areAnnotationsHidden: true,
@@ -60,15 +56,6 @@ class ShortPostViewer extends React.Component {
         this.renderComments = this.renderComments.bind(this);
     }
 
-    handleArrowPress(value) {
-
-        if (this.state.imageIndex + value === this.state.annotations.length) return this.setState({ imageIndex: 0, selectedAnnotationIndex: null });
-        else if (this.state.imageIndex + value === -1) return this.setState({ imageIndex: this.state.annotations.length - 1, selectedAnnotationIndex: null });
-        else {
-            return this.setState((state) => ({ imageIndex: state.imageIndex + value, selectedAnnotationIndex: null }));
-        }
-    }
-
     componentDidMount() {
         let annotationArray = [];
         for (let i = 0; i < this.props.eventData.image_data.length; i++) {
@@ -77,8 +64,19 @@ class ShortPostViewer extends React.Component {
         this.setState({ annotations: annotationArray });
     }
 
+    handleArrowPress(value) {
+        if (this.state.imageIndex + value === this.state.annotations.length) {
+            return this.setState({ imageIndex: 0, selectedAnnotationIndex: null });
+        }
+        else if (this.state.imageIndex + value === -1) {
+            return this.setState({ imageIndex: this.state.annotations.length - 1, selectedAnnotationIndex: null });
+        }
+        else {
+            return this.setState((state) => ({ imageIndex: state.imageIndex + value, selectedAnnotationIndex: null }));
+        }
+    }
+
     toggleAnnotations() {
-        console.log("Clicked");
         if (this.state.areAnnotationsHidden) {
             this.setState(({
                 areAnnotationsHidden: false
@@ -90,7 +88,6 @@ class ShortPostViewer extends React.Component {
                 selectedAnnotationIndex: null
             }));
         }
-
     }
 
     passAnnotationData(rawComments, visitorProfilePreviewId) {
@@ -138,9 +135,7 @@ class ShortPostViewer extends React.Component {
             .postComment(annotationPayload)
             .then((result) => {
                 console.log(result.data);
-                console.log("SUCCESS");
             })
-
     }
 
     onMouseOver(id) {
@@ -163,17 +158,12 @@ class ShortPostViewer extends React.Component {
     }
 
     onMouseClick(id) {
-        console.log("Clicked");
         let imageIndex = 0;
         for (let array of this.state.annotations) {
             if (array.length > 0) {
                 let annotationIndex = 0;
                 for (let annotation of array) {
-                    console.log(annotation);
                     if (annotation.data.id === id) {
-                        console.log("Found");
-                        console.log(annotationIndex);
-                        // return this.heroRef.current.scrollIntoView({ block: "center" });
                         return this.setState({
                             imageIndex: imageIndex,
                             selectedAnnotationIndex: annotationIndex,
@@ -212,8 +202,12 @@ class ShortPostViewer extends React.Component {
         this.setState((state) => ({ isPaginated: !state.isPaginated }));
     }
 
-    componentWillUnmount() {
-        console.log("unmount");
+   
+
+    handleModalLaunch() {
+        if (!this.props.isPostOnlyView) {
+            return this.props.passDataToModal(this.props.eventData, SHORT, this.props.postIndex)
+        }
     }
 
     renderImageSlider() {
@@ -222,11 +216,8 @@ class ShortPostViewer extends React.Component {
         );
 
         if (!this.state.annotations) {
-            console.log("SHIT");
             return (<></>);
         }
-
-        console.log(this.state.selectedAnnotationIndex !== null ? this.state.annotations[this.state.imageIndex][this.state.selectedAnnotationIndex] : "doesnt");
 
         return (
             <div className={
@@ -239,7 +230,6 @@ class ShortPostViewer extends React.Component {
                 <CustomImageSlider
                     hideAnnotations={this.state.areAnnotationsHidden}
                     imageArray={imageArray}
-                    // annotations={this.state.annotations}
                     annotations={this.state.selectedAnnotationIndex !== null ? [this.state.annotations[this.state.imageIndex][this.state.selectedAnnotationIndex]] : this.state.annotations[this.state.imageIndex]}
                     activeAnnotations={this.state.activeAnnotations}
                     imageIndex={this.state.imageIndex}
@@ -248,35 +238,8 @@ class ShortPostViewer extends React.Component {
                     handleArrowPress={this.handleArrowPress}
                 />
             </div>)
-        // }
-        // else {
-        //     return (
-        //         <div className={
-        //             this.props.largeViewMode ?
-        //                 "shortpostviewer-large-hero-container"
-        //                 :
-        //                 "shortpostviewer-inline-hero-container"
-        //         }>
-
-        //             <ImageSlider
-        //                 annotations={this.state.annotations}
-        //                 activeAnnotations={this.state.activeAnnotations}
-        //                 onAnnotationSubmit={this.handleAnnotationSubmit}
-
-        //                 onIndexChange={this.handleIndexChange}
-        //                 imageArray={imageArray}
-        //             />
-        //         </div>
-        //     );
-        // }
     }
-
-    handleModalLaunch() {
-        if (!this.props.isPostOnlyView) {
-            return this.props.passDataToModal(this.props.eventData, SHORT, this.props.postIndex)
-        }
-    }
-
+    
     renderComments(windowType) {
         return (
             <Comments
@@ -288,7 +251,6 @@ class ShortPostViewer extends React.Component {
                 postIndex={this.props.postIndex}
                 handleCommentInjection={this.props.handleCommentInjection}
                 selectedPostFeedType={this.props.selectedPostFeedType}
-
                 passAnnotationData={this.passAnnotationData}
                 onMouseClick={this.onMouseClick}
                 onMouseOver={this.onMouseOver}
@@ -366,8 +328,6 @@ class ShortPostViewer extends React.Component {
             }
             //with images
             else {
-                console.log(this.state.selectedAnnotationIndex);
-
                 if (this.props.largeViewMode) {
                     return (
                         <div className="shortpostviewer-window">
