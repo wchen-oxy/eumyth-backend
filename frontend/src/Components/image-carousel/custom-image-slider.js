@@ -81,6 +81,8 @@ class CustomImageSlider extends React.Component {
     }
 
     render() {
+        // console.log(this.props.imageArray[this.props.imageIndex]);
+        // console.log(this.props.annotations);
         return (
             <>
                 <div className="customimageslider-hero-container"  >

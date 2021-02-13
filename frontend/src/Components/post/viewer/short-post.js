@@ -123,14 +123,7 @@ class ShortPostViewer extends React.Component {
 
     handleAnnotationSubmit(annotation) {
         const { geometry, data } = annotation;
-        this.setState({
-            annotations: this.state.annotations.concat({
-                geometry,
-                data: {
-                    ...data,
-                }
-            })
-        })
+
 
         const annotationPayload = {
             postId: this.props.eventData._id,
@@ -143,7 +136,33 @@ class ShortPostViewer extends React.Component {
         AxiosHelper
             .postComment(annotationPayload)
             .then((result) => {
-                console.log(result.data);
+                const rootCommentIdArray = result.data.rootCommentIdArray;
+                const fullAnnotationArray = this.state.annotations;
+                const currentAnnotationArray = this.state.annotations[this.state.imageIndex].concat({
+                    geometry,
+                    data: {
+                        ...data,
+                        id: rootCommentIdArray[0]
+                    }
+                });
+                fullAnnotationArray[this.state.imageIndex] = currentAnnotationArray;
+                // console.log(
+                //     result.data.rootCommentIdArray
+                // );
+                // console.log("Before, ", this.state.annotations[this.state.imageIndex]);
+                // console.log("AFTER", this.state.annotations[this.state.imageIndex].concat({
+                //     geometry,
+                //     data: {
+                //         ...data,
+                //         id: rootCommentIdArray[0]
+                //     },
+                // }));
+
+                this.setState({ annotations: fullAnnotationArray })
+            })
+            .catch((err) => {
+                console.log(err);
+                alert("Sorry, your annotation could not be added.");
             })
     }
 
@@ -211,8 +230,6 @@ class ShortPostViewer extends React.Component {
         this.setState((state) => ({ isPaginated: !state.isPaginated }));
     }
 
-
-
     handleModalLaunch() {
         if (!this.props.isPostOnlyView) {
             return this.props.passDataToModal(this.props.eventData, SHORT, this.props.postIndex)
@@ -227,7 +244,9 @@ class ShortPostViewer extends React.Component {
         if (!this.state.annotations) {
             return (<></>);
         }
-
+        console.log(this.state.annotations[this.state.imageIndex]);
+        console.log(this.state.imageIndex);
+        console.log(this.state.selectedAnnotationIndex !== null ? "bla" : this.state.annotations[this.state.imageIndex].length);
         return (
             <div className={
                 this.props.largeViewMode ?
@@ -271,7 +290,6 @@ class ShortPostViewer extends React.Component {
         )
     }
     render() {
-
         if (this.state.window === INITIAL_STATE) {
             if (!this.props.eventData.image_data.length) {
                 if (this.props.largeViewMode) {
