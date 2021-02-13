@@ -3,7 +3,7 @@
     @include small-post-window;
 }
 
-#shortpostviewer-large-main-container{
+#shortpostviewer-large-main-container {
     @include flex-display-row;
     height: $small-post-height;
 }
@@ -13,7 +13,7 @@
     height: auto;
 }
 
-.shortpostviewer-large-side-container{
+.shortpostviewer-large-side-container {
     @include short-post-side-container;
 }
 

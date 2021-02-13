@@ -28,6 +28,7 @@ class ShortPostViewer extends React.Component {
             selectedFiles: [],
             validFiles: [],
             unsupportedFiles: [],
+            showPromptOverlay: false,
 
             textData: this.props.textData,
             date: this.props.eventData.date,
@@ -40,7 +41,7 @@ class ShortPostViewer extends React.Component {
         };
         this.heroRef = React.createRef();
         this.handleArrowPress = this.handleArrowPress.bind(this);
-
+        this.handlePromptAnnotation = this.handlePromptAnnotation.bind(this);
         this.toggleAnnotations = this.toggleAnnotations.bind(this);
         this.onMouseOver = this.onMouseOver.bind(this);
         this.onMouseOut = this.onMouseOut.bind(this);
@@ -56,6 +57,14 @@ class ShortPostViewer extends React.Component {
         this.renderComments = this.renderComments.bind(this);
     }
 
+    handlePromptAnnotation() {
+        this.heroRef.current.scrollIntoView({ block: "center" });
+        this.setState({ showPromptOverlay: true });
+        setTimeout(() => {
+            console.log('Hello, World!');
+            this.setState({ showPromptOverlay: false });
+        }, 3000);
+    }
     componentDidMount() {
         let annotationArray = [];
         for (let i = 0; i < this.props.eventData.image_data.length; i++) {
@@ -202,7 +211,7 @@ class ShortPostViewer extends React.Component {
         this.setState((state) => ({ isPaginated: !state.isPaginated }));
     }
 
-   
+
 
     handleModalLaunch() {
         if (!this.props.isPostOnlyView) {
@@ -236,10 +245,12 @@ class ShortPostViewer extends React.Component {
                     onAnnotationSubmit={this.handleAnnotationSubmit}
                     toggleAnnotations={this.toggleAnnotations}
                     handleArrowPress={this.handleArrowPress}
+                    showPromptOverlay={this.state.showPromptOverlay}
+                    areAnnotationsHidden={this.state.areAnnotationsHidden}
                 />
             </div>)
     }
-    
+
     renderComments(windowType) {
         return (
             <Comments
@@ -251,6 +262,7 @@ class ShortPostViewer extends React.Component {
                 postIndex={this.props.postIndex}
                 handleCommentInjection={this.props.handleCommentInjection}
                 selectedPostFeedType={this.props.selectedPostFeedType}
+                onPromptAnnotation={this.handlePromptAnnotation}
                 passAnnotationData={this.passAnnotationData}
                 onMouseClick={this.onMouseClick}
                 onMouseOver={this.onMouseOver}
@@ -321,7 +333,6 @@ class ShortPostViewer extends React.Component {
                                     />
                                 </div>
                             </div>
-                            {/* { this.renderComments(COLLAPSED)} */}
                         </div>
                     )
                 }

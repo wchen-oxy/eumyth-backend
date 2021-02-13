@@ -1,21 +1,20 @@
 import React from 'react';
 import Annotation from 'react-image-annotation';
 import TextareaAutosize from "react-textarea-autosize";
+import "./custom-image-slider.scss";
 
 class CustomImageSlider extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            // annotations: [], //finished annotation
             annotation: {}, //current annotation
-            // activeAnnotations: []
-
         }
 
         this.onChange = this.onChange.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         this.renderEditor = this.renderEditor.bind(this);
+        this.renderPromptOverlay = this.renderPromptOverlay.bind(this);
         this.activeAnnotationComparator = this.activeAnnotationComparator.bind(this);
     }
 
@@ -59,7 +58,23 @@ class CustomImageSlider extends React.Component {
         )
     }
 
-
+    renderPromptOverlay() {
+        return (
+            <div
+                style={{
+                    background: 'rgba(0, 0, 0, 0.3)',
+                    color: 'white',
+                    padding: 5,
+                    pointerEvents: 'none',
+                    position: 'absolute',
+                    top: 5,
+                    left: 5
+                }}
+            >
+                Click and Drag to create an annotation!
+            </div>
+        )
+    }
 
     activeAnnotationComparator(a, b) {
         return a.data.id === b
@@ -68,12 +83,9 @@ class CustomImageSlider extends React.Component {
     render() {
         return (
             <>
-                <div style={{ display: 'flex' }}  >
+                <div className="customimageslider-hero-container"  >
                     <Annotation
-                        src={
-                            // "https://pics.dmm.co.jp/mono/movie/adult/venx004/venx004pl.jpg"
-                            this.props.imageArray[this.props.imageIndex]
-                        }
+                        src={this.props.imageArray[this.props.imageIndex]}
                         alt='Image Display Goes Here'
                         disableOverlay={this.props.hideAnnotations}
                         annotations={!this.props.hideAnnotations ? this.props.annotations : []}
@@ -84,11 +96,24 @@ class CustomImageSlider extends React.Component {
                         onChange={this.onChange}
                         onSubmit={this.onSubmit}
                         renderEditor={this.renderEditor}
+                    // renderOverlay={  this.renderPromptOverlay   }
                     />
                 </div>
-                <button onClick={() => this.props.handleArrowPress(-1)}>Previous</button>
-                <button onClick={() => this.props.handleArrowPress(1)}>Next</button>
-                <button onClick={this.props.toggleAnnotations}>Show/Hide All Annotations</button>
+                {this.props.showPromptOverlay ? <p>Click on a point in the image and drag!</p> : null}
+                <div>
+                    {
+                        this.props.imageArray.length > 1 ?
+                            (<>
+                                <button onClick={() => this.props.handleArrowPress(-1)}>Previous</button>
+                                <button onClick={() => this.props.handleArrowPress(1)}>Next</button>
+                            </>
+                            )
+                            : null
+                    }
+
+                    <button onClick={this.props.toggleAnnotations}>{this.props.areAnnotationsHidden ? "Show Annotations" : "Hide Annotations"}</button>
+                </div>
+
             </>
         )
     }

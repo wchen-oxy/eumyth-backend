@@ -25,7 +25,6 @@ class Comments extends React.Component {
 
         this.handleCommentTextChange = this.handleCommentTextChange.bind(this);
         this.handleCommentPost = this.handleCommentPost.bind(this);
-        this.handleAnnotation = this.handleAnnotation.bind(this);
     }
 
     componentDidMount() {
@@ -211,7 +210,7 @@ class Comments extends React.Component {
                     />
                     <div>
                         <button onClick={this.handleCommentPost}>Add Comment</button>
-                        <button onClick={this.handleAnnotation}>Annotate</button>
+                        <button onClick={this.props.onPromptAnnotation}>Annotate</button>
                     </div>
 
                 </div>
@@ -226,9 +225,7 @@ class Comments extends React.Component {
         }
     }
 
-    handleAnnotation() {
-
-    }
+   
 
     render() {
         if (this.state.windowType === COLLAPSED) {
