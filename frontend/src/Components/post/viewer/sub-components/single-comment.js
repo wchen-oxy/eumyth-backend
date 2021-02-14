@@ -18,6 +18,7 @@ class SingleComment extends React.Component {
         this.toggleReplyBox = this.toggleReplyBox.bind(this);
         this.setReplyText = this.setReplyText.bind(this);
         this.handleVote = this.handleVote.bind(this);
+        this.postReply = this.postReply.bind(this);
         this.isReplyTextInvalid = this.isReplyTextInvalid.bind(this);
         this.renderThreadIndicators = this.renderThreadIndicators.bind(this);
         this.cancelTextInput = this.cancelTextInput.bind(this);
@@ -98,6 +99,7 @@ class SingleComment extends React.Component {
     }
 
     postReply() {
+
         if (this.isReplyTextInvalid()) {
             alert("You need to write something");
         }
@@ -141,7 +143,7 @@ class SingleComment extends React.Component {
     }
 
     render() {
-        return (
+         return (
             <div className={this.props.level > 1 ? "singlecomment-multiple-thread-style" : ""}>
                 {this.props.level > 1 ? (
                     <div className="singlecomment-thread-indicator-container">
