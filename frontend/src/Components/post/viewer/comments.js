@@ -119,6 +119,7 @@ class Comments extends React.Component {
         const currentLevel = level + 1;
         const annotation = commentData.annotation ? JSON.parse(commentData.annotation.data) : null;
         const text = commentData.comment ? commentData.comment : annotation.text;
+        console.log(commentData);
         if (!commentData.replies) {
             return (
                 <SingleComment

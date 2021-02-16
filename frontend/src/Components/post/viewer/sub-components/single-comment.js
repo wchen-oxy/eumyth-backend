@@ -26,6 +26,8 @@ class SingleComment extends React.Component {
 
     }
     componentDidMount() {
+        console.log(this.props.commentId);
+        console.log(this.props.ancestors);
         if (this.props.likes.includes(this.props.visitorProfilePreviewId)) {
             this.setState({ previousVote: 1 })
         }
@@ -107,6 +109,7 @@ class SingleComment extends React.Component {
 
             let ancestorArray = this.props.ancestors;
             ancestorArray.push(this.props.commentId);
+            // console.log(ancestorArray);
             return AxiosHelper.postReply(
                 {
                     postId: this.props.postId,

@@ -104,23 +104,28 @@ const returnExpandedComments = (rootCommentIdArray) => {
 
                 return Comment.Model
                     .aggregate([
-                        {
-                            $unwind: '$ancestor_post_ids',
-                        },
+                        // {
+                        //     $unwind: '$ancestor_post_ids',
+                        // },
                         {
                             $match: {
                                 // _id: mongoose.Types.ObjectId('601728c2b2a30831410d0265'),
                                 "ancestor_post_ids": { $in: transformedRootCommentIdArray },
                                 //exclude root posts from ancestor post ids
-                                $and: [{ "ancestor_post_ids.3": { "$exists": false } }]
+                                // $and: [{ "ancestor_post_ids.3": { "$exists": false } }]
                             }
                         },
+                        // {
+                        //     $project: {
+                        //         "ancestor_post_ids" : 1,
+                        //     }
+                        // }
                         {
                             $group: {
                                 "_id": "$_id",
                                 "parent_post_id": { $first: "$parent_post_id" },
                                 "commenter_user_id": { $first: "$commenter_user_id" },
-                                "ancestor_post_ids": { $push: "$ancestor_post_ids" },
+                                "ancestor_post_ids": { $first: "$ancestor_post_ids" },
                                 "comment": { $first: "$comment" },
                                 "annotation": { $first: "$annotation" },
                                 "likes": { $first: "$likes" },
@@ -136,6 +141,7 @@ const returnExpandedComments = (rootCommentIdArray) => {
                         if (replies.length > 0) {
                             let replyingUserProfileIdArray = [];
                             for (const reply of replies) {
+                                // console.log(reply.ancestor_post_ids);
                                 replyingUserProfileIdArray.push(reply.commenter_user_id.toString());
                             }
                             commentUserProfileIdArray.concat(replyingUserProfileIdArray);
@@ -172,6 +178,7 @@ const returnExpandedComments = (rootCommentIdArray) => {
 
 
 const nestCompleteComments = (rootCommentArray, userProfileHashTable, repliesArray,) => {
+    console.log(repliesArray);
 
     if (!repliesArray) {
         for (let comment of rootCommentArray) {
@@ -194,7 +201,7 @@ const nestCompleteComments = (rootCommentArray, userProfileHashTable, repliesArr
             }
             return 0;
         });
-        console.log(allCommentsArray);
+        console.log("sorted", allCommentsArray);
         let nearRootCommentsIndex = 0;
 
         for (let i = 0; i < allCommentsArray.length; i++) {
@@ -212,17 +219,17 @@ const nestCompleteComments = (rootCommentArray, userProfileHashTable, repliesArr
             }
 
             //send second pointer out to search for matching value
-            console.log(allCommentsArray[i].ancestor_post_ids);
+            // console.log(allCommentsArray[i].ancestor_post_ids);
 
             while (
                 nextValueIndex < allCommentsArray.length &&
                 allCommentsArray[i].ancestor_post_ids.length > 0 &&
                 allCommentsArray[i].ancestor_post_ids[allCommentsArray[i].ancestor_post_ids.length - 1].toString() !==
                 allCommentsArray[nextValueIndex]._id.toString()) {
-                console.log("index", i);
+                // console.log("index", i);
                 nextValueIndex++;
             }
-            console.log("index", nextValueIndex)
+            // console.log("index", nextValueIndex)
             if (
                 allCommentsArray[i].ancestor_post_ids.length > 0 &&
                 nextValueIndex < allCommentsArray.length
@@ -231,18 +238,18 @@ const nestCompleteComments = (rootCommentArray, userProfileHashTable, repliesArr
                 allCommentsArray[nextValueIndex]._id.toString()
             ) {
                 if (!allCommentsArray[nextValueIndex].replies) {
-                    console.log("No Replies array");
+                    // console.log("No Replies array");
                     allCommentsArray[nextValueIndex].replies = [];
                 }
                 allCommentsArray[nextValueIndex].replies.push(reply)
             }
             else {
-                console.log("Orphaned Comment : (");
+                // console.log("Orphaned Comment : (");
             }
         }
 
         let slicedComments = allCommentsArray.slice(nearRootCommentsIndex, allCommentsArray.length);
-        console.log("finalCommnets", slicedComments)
+        // console.log("finalCommnets", slicedComments)
         return slicedComments;
     }
 }
@@ -271,7 +278,7 @@ router.route('/')
                 returnExpandedComments(rootCommentIdArray)
             ])
                 .then((results) => {
-                    console.log(results);
+                    // console.log(results);
                     res.status(200).json({ userPreviewId: results[0]._id, rootComments: results[1] });
                 });
         }
@@ -287,38 +294,19 @@ router.route('/')
 
 router.route('/reply')
     .post((req, res) => {
+        // console.log(JSON.parse(req.body.ancestors));
         const postId = req.body.postId;
         const commenterId = req.body.visitorProfilePreviewId;
         const ancestors = JSON.parse(req.body.ancestors);
         const comment = req.body.comment;
-        const dataAnnotationId = req.body.dataAnnotationId;
-        const dataAnnotationText = req.body.dataAnnotationText;
-        const geometryAnnotationType = req.body.geometryAnnotationType;
-        const geometryXCoordinate = req.body.geometryXCoordinate;
-        const geometryYCoordinate = req.body.geometryYCoordinate;
-        const geometryWidth = req.body.geometryWidth;
-        const geometryHeight = req.body.geometryHeight;
-        const imagePageNumber = req.body.imagePageNumber;
-        if (!result) throw new Error(204);
-        const annotationPayload = dataAnnotationId ?
-            new ImageAnnotation.Model({
-                data_annotation_id: dataAnnotationId,
-                data_annotation_text: dataAnnotationText,
-                geometry_annotation_type: geometryAnnotationType,
-                geometry_x_coordinate: geometryXCoordinate,
-                geometry_y_coordinate: geometryYCoordinate,
-                geometry_width: geometryWidth,
-                geometry_height: geometryHeight,
-                image_page_number: imagePageNumber
-            })
-            : null;
+
         const newReply = new Comment.Model({
             parent_post_id: postId,
             ancestor_post_ids: ancestors,
             commenter_user_id: commenterId,
-            comment: comment,
-            annotation: annotationPayload
+            comment: comment
         });
+
         return newReply
             .save()
             .then((result) => res.status(200).send())
@@ -339,7 +327,7 @@ router.route('/root')
         const imagePageNumber = req.body.imagePageNumber;
         const resolvedPost = Post.Model.findById(postId);
         const resolvedUser = UserPreview.Model.findById(commenterId);
-        console.log(req.body);
+        // console.log(req.body);
         let rootCommentArray = null;
         return Promise.all([resolvedPost, resolvedUser])
             .then(
@@ -384,7 +372,7 @@ router.route('/refresh').get((req, res) => {
     const rootCommentIdArray = JSON.parse(req.query.rootCommentIdArray);
     return returnExpandedComments(rootCommentIdArray)
         .then((results) => {
-            console.log(results);
+            // console.log(results);
             res.status(200).json({ rootComments: results });
         });
 })
