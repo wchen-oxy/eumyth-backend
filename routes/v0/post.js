@@ -402,7 +402,6 @@ router.route('/')
   });
 
 const findPosts = (postIdList, includePostText) => {
-  console.log("finding");
   return Post.Model.find({
     '_id': { $in: postIdList }, function(err, docs) {
       if (err) console.log(err);
@@ -412,42 +411,32 @@ const findPosts = (postIdList, includePostText) => {
     }
   }).sort({ createdAt: -1 }).lean().then(
     (results) => {
-      console.log("found posts");
       let coverInfoArray = results;
-      // console.log(coverInfoArray);
-      for (const result of results) {
-        console.log(result._id);
-      }
       if (!includePostText) {
         for (result of coverInfoArray) {
           result.text_data = "";
           result.feedback = "";
         }
       }
-      // console.log("cover", coverInfoArray);
-      // console.log("This way");
       return coverInfoArray;
     })
 
 }
 
 const countComments = (postIdList) => {
-  console.log("Counting", postIdList);
+  // console.log("Counting", postIdList);
   // console.log("posts", postIdList);
   let transformedPostIdArray = [];
   for (let postId of postIdList) {
     transformedPostIdArray.push(mongoose.Types.ObjectId(postId));
   }
+  console.log("Counting", transformedPostIdArray);
   return Comment.Model.aggregate([
     {
       $match: {
-        // _id: mongoose.Types.ObjectId('601728c2b2a30831410d0265'),
         "parent_post_id": { $in: transformedPostIdArray },
-        //exclude root posts from ancestor post ids
-        // $and: [{ "ancestor_post_ids.3": { "$exists": false } }]
       }
     },
-
     {
       $group: {
         "_id": "$parent_post_id",
@@ -464,7 +453,6 @@ const countComments = (postIdList) => {
         }
       }
     },
-    /** Replace `data` field as a root of the document */
     {
       $replaceRoot: { newRoot: "$data" }
     }
@@ -474,23 +462,23 @@ const countComments = (postIdList) => {
 router.route('/multiple').get((req, res) => {
   const postIdList = req.query.postIdList;
   const includePostText = req.query.includePostText;
-  console.log("ALL", postIdList);
   return Promise.all([findPosts(postIdList, includePostText), countComments(postIdList)])
     .then((results) => {
-      console.log("Made it!");
-      // console.log(results[0]);
-      // console.log("count result", results[1]);
       let posts = results[0];
-      let commentData = results[1][0];
-
-      for (let post of posts) {
-
-        console.log(commentData[post._id]);
-        post.comment_count = commentData[post._id] ? commentData[post._id] : 0;
+      if (results[1].length > 0) {
+        let commentData = results[1][0];
+        for (let post of posts) {
+          post.comment_count = commentData[post._id.toString()] ? commentData[post._id.toString()] : 0;
+        }
+        
       }
+      else {
+        for (let post of posts) {
+          post.comment_count = 0;
+        }
+      }
+      return res.status(200).json({ posts: posts });
 
-      console.log(posts);
-      return res.status(200).json({ posts: results[0] });
     }
     ).catch((err) => {
       console.log(err);
@@ -501,7 +489,6 @@ router.route('/multiple').get((req, res) => {
 router.route('/single').get((req, res) => {
   const textOnly = req.query.textOnly.toUpperCase();
   const postId = req.query.postId;
-  console.log(textOnly);
   return Post.Model.findById(postId)
     .then(result => {
       if (textOnly === "TRUE") {

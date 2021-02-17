@@ -291,7 +291,7 @@ class ShortPostViewer extends React.Component {
         else if (windowType === COLLAPSED) {
             console.log("Commentcount", this.props.eventData.comments);
             return (
-                <p>{this.props.eventData.comments.length} Comments</p>
+                <p>{this.props.eventData.comment_count} Comments</p>
             )
         }
     }

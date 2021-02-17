@@ -53,7 +53,7 @@ const LongPostViewer = (props) => {
         }
         else if (windowType === COLLAPSED) {
             return (
-                <p>{props.eventData.comments.length} Comments</p>
+                <p>{props.eventData.comment_count} Comments</p>
             )
         }
     }
