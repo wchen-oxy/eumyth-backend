@@ -178,8 +178,7 @@ const returnExpandedComments = (rootCommentIdArray) => {
 
 
 const nestCompleteComments = (rootCommentArray, userProfileHashTable, repliesArray,) => {
-    console.log(repliesArray);
-
+    
     if (!repliesArray) {
         for (let comment of rootCommentArray) {
             const userData = userProfileHashTable[comment.commenter_user_id.toString()];

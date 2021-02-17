@@ -97,11 +97,13 @@ class ReturningUserPage extends React.Component {
                             totalMin = pursuitObjects.totalMin;
                         }
                         if (hasMore === false) {
+                            console.log(result.data.recent_posts);
                             return AxiosHelper.returnMultiplePosts(result.data.recent_posts, false)
                                 .then((result) => {
+                                    console.log(result);
                                     return {
                                         isRecentPostsOnly: true,
-                                        recentPosts: result.data
+                                        recentPosts: result.data.posts
                                     }
                                 });
                         }
@@ -111,10 +113,11 @@ class ReturningUserPage extends React.Component {
                                 AxiosHelper.returnMultiplePosts(slicedFeed, true)
                             ])
                                 .then((results) => {
+                                    console.log(results);
                                     return {
                                         isRecentPostsOnly: false,
-                                        recentPosts: results[0].data,
-                                        feedData: results[1].data
+                                        recentPosts: results[0].data.posts,
+                                        feedData: results[1].data.posts
                                     }
                                 })
                                 ;
@@ -197,7 +200,7 @@ class ReturningUserPage extends React.Component {
         let nextOpenPostIndex = this.state.nextOpenPostIndex;
         let index = 0;
         for (const feedItem of inputArray) {
-            masterArray.push(
+             masterArray.push(
                 <PostViewerController
                     key={nextOpenPostIndex++}
                     postIndex={index++}
@@ -234,7 +237,7 @@ class ReturningUserPage extends React.Component {
             .then((result) => {
                 if (result.data) {
                     this.setState((state) => ({
-                        feedData: state.feedData.concat(result.data),
+                        feedData: state.feedData.concat(result.data.posts),
                         nextOpenPostIndex: state.nextOpenPostIndex + state.fixedDataLoadLength,
                         hasMore: hasMore
                     }))

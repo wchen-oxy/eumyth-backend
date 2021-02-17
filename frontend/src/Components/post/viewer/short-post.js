@@ -236,7 +236,7 @@ class ShortPostViewer extends React.Component {
         }
     }
 
-    renderImageSlider() {
+    renderImageSlider(windowType) {
         let imageArray = this.props.eventData.image_data.map((key, i) =>
             returnUserImageURL(key)
         );
@@ -244,9 +244,7 @@ class ShortPostViewer extends React.Component {
         if (!this.state.annotations) {
             return (<></>);
         }
-        console.log(this.state.annotations[this.state.imageIndex]);
-        console.log(this.state.imageIndex);
-        console.log(this.state.selectedAnnotationIndex !== null ? "bla" : this.state.annotations[this.state.imageIndex].length);
+
         return (
             <div className={
                 this.props.largeViewMode ?
@@ -271,23 +269,31 @@ class ShortPostViewer extends React.Component {
     }
 
     renderComments(windowType) {
-        return (
-            <Comments
-                postType={SHORT}
-                comments={this.props.eventData.comments}
-                windowType={windowType}
-                visitorUsername={this.props.visitorUsername}
-                postId={this.props.postId}
-                postIndex={this.props.postIndex}
-                handleCommentInjection={this.props.handleCommentInjection}
-                selectedPostFeedType={this.props.selectedPostFeedType}
-                onPromptAnnotation={this.handlePromptAnnotation}
-                passAnnotationData={this.passAnnotationData}
-                onMouseClick={this.onMouseClick}
-                onMouseOver={this.onMouseOver}
-                onMouseOut={this.onMouseOut}
-            />
-        )
+        if (windowType === EXPANDED) {
+            return (
+                <Comments
+                    postType={SHORT}
+                    comments={this.props.eventData.comments}
+                    windowType={windowType}
+                    visitorUsername={this.props.visitorUsername}
+                    postId={this.props.postId}
+                    postIndex={this.props.postIndex}
+                    handleCommentInjection={this.props.handleCommentInjection}
+                    selectedPostFeedType={this.props.selectedPostFeedType}
+                    onPromptAnnotation={this.handlePromptAnnotation}
+                    passAnnotationData={this.passAnnotationData}
+                    onMouseClick={this.onMouseClick}
+                    onMouseOver={this.onMouseOver}
+                    onMouseOut={this.onMouseOut}
+                />
+            );
+        }
+        else if (windowType === COLLAPSED) {
+            console.log("Commentcount", this.props.eventData.comments);
+            return (
+                <p>{this.props.eventData.comments.length} Comments</p>
+            )
+        }
     }
     render() {
         if (this.state.window === INITIAL_STATE) {
@@ -351,6 +357,7 @@ class ShortPostViewer extends React.Component {
                                     />
                                 </div>
                             </div>
+                            {this.renderComments(COLLAPSED)}
                         </div>
                     )
                 }
@@ -362,7 +369,7 @@ class ShortPostViewer extends React.Component {
                         <div className="shortpostviewer-window">
 
                             <div id="shortpostviewer-large-main-container">
-                                {this.renderImageSlider()}
+                                {this.renderImageSlider(EXPANDED)}
                                 <div ref={this.heroRef}>
                                     <PostHeader
                                         isOwnProfile={this.props.isOwnProfile}
@@ -395,7 +402,7 @@ class ShortPostViewer extends React.Component {
                                     username={this.props.username}
                                     displayPhoto={this.props.eventData.display_photo_key}
                                 />
-                                {this.renderImageSlider()}
+                                {this.renderImageSlider(COLLAPSED)}
                                 <div className="shortpostviewer-inline-side-container">
                                     <ShortPostMetaInfo
                                         index={this.state.imageIndex}

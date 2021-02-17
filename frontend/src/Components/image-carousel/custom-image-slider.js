@@ -2,6 +2,7 @@ import React from 'react';
 import Annotation from 'react-image-annotation';
 import TextareaAutosize from "react-textarea-autosize";
 import "./custom-image-slider.scss";
+import { EXPANDED } from "../constants/flags";
 
 class CustomImageSlider extends React.Component {
 
@@ -16,6 +17,7 @@ class CustomImageSlider extends React.Component {
         this.renderEditor = this.renderEditor.bind(this);
         this.renderPromptOverlay = this.renderPromptOverlay.bind(this);
         this.activeAnnotationComparator = this.activeAnnotationComparator.bind(this);
+        this.renderImageControls = this.renderImageControls.bind(this);
     }
 
     onChange(annotation) {
@@ -80,6 +82,24 @@ class CustomImageSlider extends React.Component {
         return a.data.id === b
     }
 
+    renderImageControls(windowType) {
+        if (windowType === EXPANDED) return (
+            <div>
+                {
+                    this.props.imageArray.length > 1 ?
+                        (<>
+                            <button onClick={() => this.props.handleArrowPress(-1)}>Previous</button>
+                            <button onClick={() => this.props.handleArrowPress(1)}>Next</button>
+                        </>
+                        )
+                        : null
+                }
+
+                <button onClick={this.props.toggleAnnotations}>{this.props.areAnnotationsHidden ? "Show Annotations" : "Hide Annotations"}</button>
+            </div>
+        )
+    }
+
     render() {
         // console.log(this.props.imageArray[this.props.imageIndex]);
         // console.log(this.props.annotations);
@@ -102,19 +122,9 @@ class CustomImageSlider extends React.Component {
                     />
                 </div>
                 {this.props.showPromptOverlay ? <p>Click on a point in the image and drag!</p> : null}
-                <div>
-                    {
-                        this.props.imageArray.length > 1 ?
-                            (<>
-                                <button onClick={() => this.props.handleArrowPress(-1)}>Previous</button>
-                                <button onClick={() => this.props.handleArrowPress(1)}>Next</button>
-                            </>
-                            )
-                            : null
-                    }
 
-                    <button onClick={this.props.toggleAnnotations}>{this.props.areAnnotationsHidden ? "Show Annotations" : "Hide Annotations"}</button>
-                </div>
+                {  this.renderImageControls(this.props.windowType)}
+
 
             </>
         )

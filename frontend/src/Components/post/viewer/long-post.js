@@ -7,7 +7,7 @@ import { ImageBlockConfig } from 'Dante2/package/es/components/blocks/image.js';
 import { PlaceholderBlockConfig } from 'Dante2/package/es/components/blocks/placeholder';
 import _ from 'lodash';
 import { IMAGE_BASE_URL, returnUserImageURL } from '../../constants/urls';
-import { LONG, INITIAL_STATE, EDIT_STATE, REVIEW_STATE } from '../../constants/flags';
+import { LONG, INITIAL_STATE, EDIT_STATE, REVIEW_STATE, EXPANDED, COLLAPSED } from '../../constants/flags';
 
 import ReviewPost from "../draft/review-post";
 import { withFirebase } from "../../../Firebase/index";
@@ -37,18 +37,25 @@ const LongPostViewer = (props) => {
         }
     }
     const renderComments = (windowType) => {
-        return (
-            <Comments
-                postType={LONG}
-                comments={props.eventData.comments}
-                windowType={windowType}
-                visitorUsername={props.visitorUsername}
-                postId={props.postId}
-                postIndex={props.postIndex}
-                handleCommentInjection={props.handleCommentInjection}
-                selectedPostFeedType={props.selectedPostFeedType}
-            />
-        )
+        if (windowType === EXPANDED) {
+            return (
+                <Comments
+                    postType={LONG}
+                    comments={props.eventData.comments}
+                    windowType={windowType}
+                    visitorUsername={props.visitorUsername}
+                    postId={props.postId}
+                    postIndex={props.postIndex}
+                    handleCommentInjection={props.handleCommentInjection}
+                    selectedPostFeedType={props.selectedPostFeedType}
+                />
+            );
+        }
+        else if (windowType === COLLAPSED) {
+            return (
+                <p>{props.eventData.comments.length} Comments</p>
+            )
+        }
     }
 
     if (window === INITIAL_STATE) {

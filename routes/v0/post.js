@@ -5,7 +5,8 @@ const IndexUser = require('../../models/index.user.model');
 const Post = require("../../models/post.model");
 const PostPreview = require("../../models/post.preview.model");
 const UserPreview = require("../../models/user.preview.model");
-
+const mongoose = require('mongoose');
+const Comment = require("../../models/comment.model");
 const multer = require('multer');
 const AwsConstants = require('../../constants/aws');
 const multerS3 = require('multer-s3');
@@ -400,9 +401,8 @@ router.route('/')
       );
   });
 
-router.route('/multiple').get((req, res) => {
-  const postIdList = req.query.postIdList;
-  const includePostText = req.query.includePostText;
+const findPosts = (postIdList, includePostText) => {
+  console.log("finding");
   return Post.Model.find({
     '_id': { $in: postIdList }, function(err, docs) {
       if (err) console.log(err);
@@ -410,21 +410,89 @@ router.route('/multiple').get((req, res) => {
         console.log(docs);
       }
     }
-  }).sort({ createdAt: -1 }).then(
+  }).sort({ createdAt: -1 }).lean().then(
     (results) => {
+      console.log("found posts");
       let coverInfoArray = results;
       // console.log(coverInfoArray);
+      for (const result of results) {
+        console.log(result._id);
+      }
       if (!includePostText) {
         for (result of coverInfoArray) {
           result.text_data = "";
           result.feedback = "";
         }
       }
-      console.log(coverInfoArray);
+      // console.log("cover", coverInfoArray);
       // console.log("This way");
-      return res.status(200).json(coverInfoArray);
+      return coverInfoArray;
     })
-    .catch((err) => {
+
+}
+
+const countComments = (postIdList) => {
+  console.log("Counting", postIdList);
+  // console.log("posts", postIdList);
+  let transformedPostIdArray = [];
+  for (let postId of postIdList) {
+    transformedPostIdArray.push(mongoose.Types.ObjectId(postId));
+  }
+  return Comment.Model.aggregate([
+    {
+      $match: {
+        // _id: mongoose.Types.ObjectId('601728c2b2a30831410d0265'),
+        "parent_post_id": { $in: transformedPostIdArray },
+        //exclude root posts from ancestor post ids
+        // $and: [{ "ancestor_post_ids.3": { "$exists": false } }]
+      }
+    },
+
+    {
+      $group: {
+        "_id": "$parent_post_id",
+        "comment_count": { $sum: 1 },
+      }
+    },
+    {
+      $group: {
+        "_id": "",
+        "data": {
+          $mergeObjects: {
+            $arrayToObject: [[{ k: { $toString: "$_id" }, v: "$comment_count" }]]
+          }
+        }
+      }
+    },
+    /** Replace `data` field as a root of the document */
+    {
+      $replaceRoot: { newRoot: "$data" }
+    }
+
+  ])
+}
+router.route('/multiple').get((req, res) => {
+  const postIdList = req.query.postIdList;
+  const includePostText = req.query.includePostText;
+  console.log("ALL", postIdList);
+  return Promise.all([findPosts(postIdList, includePostText), countComments(postIdList)])
+    .then((results) => {
+      console.log("Made it!");
+      // console.log(results[0]);
+      // console.log("count result", results[1]);
+      let posts = results[0];
+      let commentData = results[1][0];
+
+      for (let post of posts) {
+
+        console.log(commentData[post._id]);
+        post.comment_count = commentData[post._id] ? commentData[post._id] : 0;
+      }
+
+      console.log(posts);
+      return res.status(200).json({ posts: results[0] });
+    }
+    ).catch((err) => {
       console.log(err);
       return res.status(500).send();
     })
