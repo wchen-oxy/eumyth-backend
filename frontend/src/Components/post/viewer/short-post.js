@@ -254,6 +254,7 @@ class ShortPostViewer extends React.Component {
             }
             >
                 <CustomImageSlider
+                    windowType={windowType}
                     hideAnnotations={this.state.areAnnotationsHidden}
                     imageArray={imageArray}
                     annotations={this.state.selectedAnnotationIndex !== null ? [this.state.annotations[this.state.imageIndex][this.state.selectedAnnotationIndex]] : this.state.annotations[this.state.imageIndex]}
@@ -367,7 +368,6 @@ class ShortPostViewer extends React.Component {
                 if (this.props.largeViewMode) {
                     return (
                         <div className="shortpostviewer-window">
-
                             <div id="shortpostviewer-large-main-container">
                                 {this.renderImageSlider(EXPANDED)}
                                 <div ref={this.heroRef}>
@@ -396,7 +396,7 @@ class ShortPostViewer extends React.Component {
                 else {
                     return (
                         <>
-                            <div id="shortpostviewer-inline-main-container" >
+                            <div id="shortpostviewer-inline-main-container" onClick={this.handleModalLaunch}>
                                 <PostHeader
                                     isOwnProfile={this.props.isOwnProfile}
                                     username={this.props.username}

@@ -86,7 +86,7 @@ class Timeline extends React.Component {
                 .then(
                     (result) => {
                         console.log(result.data);
-                        if (this._isMounted) this.createTimelineRow(result.data, this.props.mediaType);
+                        if (this._isMounted) this.createTimelineRow(result.data.posts, this.props.mediaType);
                     }
                 )
                 .catch((error) => console.log(error));
@@ -98,7 +98,7 @@ class Timeline extends React.Component {
                 .then(
                     (result) => {
                         console.log(result.data);
-                        if (this._isMounted) this.createTimelineRow(result.data, this.props.mediaType);
+                        if (this._isMounted) this.createTimelineRow(result.data.posts, this.props.mediaType);
                     }
                 )
                 .catch((error) => console.log(error));

@@ -2,7 +2,7 @@ import React from 'react';
 import Annotation from 'react-image-annotation';
 import TextareaAutosize from "react-textarea-autosize";
 import "./custom-image-slider.scss";
-import { EXPANDED } from "../constants/flags";
+import { EXPANDED, COLLAPSED } from "../constants/flags";
 
 class CustomImageSlider extends React.Component {
 
@@ -83,8 +83,10 @@ class CustomImageSlider extends React.Component {
     }
 
     renderImageControls(windowType) {
-        if (windowType === EXPANDED) return (
+        console.log(windowType);
+        return (
             <div>
+
                 {
                     this.props.imageArray.length > 1 ?
                         (<>
@@ -94,9 +96,10 @@ class CustomImageSlider extends React.Component {
                         )
                         : null
                 }
-
-                <button onClick={this.props.toggleAnnotations}>{this.props.areAnnotationsHidden ? "Show Annotations" : "Hide Annotations"}</button>
-            </div>
+                {    (windowType === EXPANDED) ?
+                    <button onClick={this.props.toggleAnnotations}>{this.props.areAnnotationsHidden ? "Show Annotations" : "Hide Annotations"}</button>
+                    : <></>
+                }   </div>
         )
     }
 
@@ -110,6 +113,7 @@ class CustomImageSlider extends React.Component {
                         src={this.props.imageArray[this.props.imageIndex]}
                         alt='Image Display Goes Here'
                         disableOverlay={this.props.hideAnnotations}
+                        disableAnnotation={this.props.windowType === COLLAPSED}
                         annotations={!this.props.hideAnnotations ? this.props.annotations : []}
                         activeAnnotationComparator={this.activeAnnotationComparator}
                         activeAnnotations={this.props.activeAnnotations}

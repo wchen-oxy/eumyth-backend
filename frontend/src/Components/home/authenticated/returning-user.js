@@ -119,16 +119,13 @@ class ReturningUserPage extends React.Component {
                                         recentPosts: results[0].data.posts,
                                         feedData: results[1].data.posts
                                     }
-                                })
-                                ;
+                                });
                         }
 
                     }
                 )
-
                 .then(
                     (result) => {
-
                         this.setState((state) =>
                         ({
                             firstName: firstName,
@@ -200,7 +197,7 @@ class ReturningUserPage extends React.Component {
         let nextOpenPostIndex = this.state.nextOpenPostIndex;
         let index = 0;
         for (const feedItem of inputArray) {
-             masterArray.push(
+            masterArray.push(
                 <PostViewerController
                     key={nextOpenPostIndex++}
                     postIndex={index++}

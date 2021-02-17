@@ -28,10 +28,10 @@ const Event = (props) => {
     if (props.mediaType === POST) {
         switch (post.post_format) {
             case (SHORT):
-                content = <ShortEvent post={post} />
+                content = <ShortEvent post={post} commentCount={post.comment_count}/>
                 break;
             case (LONG):
-                content = <LongEvent post={post} />
+                content = <LongEvent post={post} commentCount={post.comment_count}/>
                 break;
             default:
                 throw Error("No matching post type: " + post.post_format);
