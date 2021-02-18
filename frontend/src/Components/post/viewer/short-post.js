@@ -61,7 +61,6 @@ class ShortPostViewer extends React.Component {
         this.heroRef.current.scrollIntoView({ block: "center" });
         this.setState({ showPromptOverlay: true });
         setTimeout(() => {
-            console.log('Hello, World!');
             this.setState({ showPromptOverlay: false });
         }, 3000);
     }
@@ -75,7 +74,10 @@ class ShortPostViewer extends React.Component {
 
     handleArrowPress(value) {
         if (this.state.imageIndex + value === this.state.annotations.length) {
-            return this.setState({ imageIndex: 0, selectedAnnotationIndex: null });
+            return this.setState({
+                imageIndex: 0,
+                selectedAnnotationIndex: null
+            });
         }
         else if (this.state.imageIndex + value === -1) {
             return this.setState({ imageIndex: this.state.annotations.length - 1, selectedAnnotationIndex: null });
@@ -146,18 +148,6 @@ class ShortPostViewer extends React.Component {
                     }
                 });
                 fullAnnotationArray[this.state.imageIndex] = currentAnnotationArray;
-                // console.log(
-                //     result.data.rootCommentIdArray
-                // );
-                // console.log("Before, ", this.state.annotations[this.state.imageIndex]);
-                // console.log("AFTER", this.state.annotations[this.state.imageIndex].concat({
-                //     geometry,
-                //     data: {
-                //         ...data,
-                //         id: rootCommentIdArray[0]
-                //     },
-                // }));
-
                 this.setState({ annotations: fullAnnotationArray })
             })
             .catch((err) => {
@@ -246,12 +236,12 @@ class ShortPostViewer extends React.Component {
         }
 
         return (
-            <div className={
-                this.props.largeViewMode ?
+            <div
+                className={this.props.largeViewMode ?
                     "shortpostviewer-large-hero-container"
                     :
                     "shortpostviewer-inline-hero-container"
-            }
+                }
             >
                 <CustomImageSlider
                     windowType={windowType}

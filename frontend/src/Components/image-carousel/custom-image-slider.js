@@ -1,30 +1,30 @@
 import React from 'react';
 import Annotation from 'react-image-annotation';
 import TextareaAutosize from "react-textarea-autosize";
-import "./custom-image-slider.scss";
 import { EXPANDED, COLLAPSED } from "../constants/flags";
+import "./custom-image-slider.scss";
 
 class CustomImageSlider extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            annotation: {}, //current annotation
+            annotation: {}
         }
 
-        this.onChange = this.onChange.bind(this);
-        this.onSubmit = this.onSubmit.bind(this);
+        this.activeAnnotationComparator = this.activeAnnotationComparator.bind(this);
+        this.onAnnotationChange = this.onAnnotationChange.bind(this);
+        this.onAnnotationSubmit = this.onAnnotationSubmit.bind(this);
         this.renderEditor = this.renderEditor.bind(this);
         this.renderPromptOverlay = this.renderPromptOverlay.bind(this);
-        this.activeAnnotationComparator = this.activeAnnotationComparator.bind(this);
         this.renderImageControls = this.renderImageControls.bind(this);
     }
 
-    onChange(annotation) {
+    onAnnotationChange(annotation) {
         this.setState({ annotation })
     }
 
-    onSubmit(annotation) {
+    onAnnotationSubmit(annotation) {
         this.setState({ annotation: {} },
             this.props.onAnnotationSubmit(annotation));
 
@@ -33,7 +33,6 @@ class CustomImageSlider extends React.Component {
     renderEditor(props) {
         const { geometry } = props.annotation
         if (!geometry) return null
-        console.log(geometry);
         return (
             <div
                 style={{
@@ -71,8 +70,7 @@ class CustomImageSlider extends React.Component {
                     position: 'absolute',
                     top: 5,
                     left: 5
-                }}
-            >
+                }} >
                 Click and Drag to create an annotation!
             </div>
         )
@@ -83,53 +81,59 @@ class CustomImageSlider extends React.Component {
     }
 
     renderImageControls(windowType) {
-        console.log(windowType);
         return (
             <div>
-
-                {
-                    this.props.imageArray.length > 1 ?
-                        (<>
-                            <button onClick={() => this.props.handleArrowPress(-1)}>Previous</button>
-                            <button onClick={() => this.props.handleArrowPress(1)}>Next</button>
-                        </>
-                        )
-                        : null
+                {this.props.imageArray.length > 1 ?
+                    (<>
+                        <button
+                            onClick={() => this.props.handleArrowPress(-1)}>
+                            Previous
+                            </button>
+                        <button onClick={() => this.props.handleArrowPress(1)}>
+                            Next
+                            </button>
+                    </>
+                    )
+                    : null
                 }
-                {    (windowType === EXPANDED) ?
-                    <button onClick={this.props.toggleAnnotations}>{this.props.areAnnotationsHidden ? "Show Annotations" : "Hide Annotations"}</button>
+                {windowType === EXPANDED ?
+                    <button
+                        onClick={this.props.toggleAnnotations}>
+                        {this.props.areAnnotationsHidden ?
+                            "Show Annotations" :
+                            "Hide Annotations"
+                        }
+                    </button>
                     : <></>
-                }   </div>
+                }
+            </div>
         )
     }
 
     render() {
-        // console.log(this.props.imageArray[this.props.imageIndex]);
-        // console.log(this.props.annotations);
+        let annotations = !this.props.hideAnnotations ? this.props.annotations : [];
         return (
             <>
-                <div className="customimageslider-hero-container"  >
+                <div className="customimageslider-hero-container">
                     <Annotation
                         src={this.props.imageArray[this.props.imageIndex]}
                         alt='Image Display Goes Here'
+                        activeAnnotations={this.props.activeAnnotations}
+                        annotations={annotations}
                         disableOverlay={this.props.hideAnnotations}
                         disableAnnotation={this.props.windowType === COLLAPSED}
-                        annotations={!this.props.hideAnnotations ? this.props.annotations : []}
-                        activeAnnotationComparator={this.activeAnnotationComparator}
-                        activeAnnotations={this.props.activeAnnotations}
-                        type={this.state.type}
                         value={this.state.annotation}
-                        onChange={this.onChange}
-                        onSubmit={this.onSubmit}
                         renderEditor={this.renderEditor}
-                    // renderOverlay={  this.renderPromptOverlay   }
+                        activeAnnotationComparator={this.activeAnnotationComparator}
+                        onChange={this.onAnnotationChange}
+                        onSubmit={this.onAnnotationSubmit}
                     />
                 </div>
-                {this.props.showPromptOverlay ? <p>Click on a point in the image and drag!</p> : null}
-
-                {  this.renderImageControls(this.props.windowType)}
-
-
+                {this.props.showPromptOverlay ? (
+                    <p>Click on a point in the image and drag!</p>
+                ) : (null)
+                }
+                {this.renderImageControls(this.props.windowType)}
             </>
         )
     }
