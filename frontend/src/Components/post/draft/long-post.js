@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import LongEditor from '../editor/long-editor';
 import ReviewPost from './review-post';
+import {INITIAL_STATE, REVIEW_STATE, PUBLIC_FEED, PERSONAL_PAGE, PRIVATE } from "../../constants/flags";
+
 import "./long-post.scss";
 
 const INITIAL = "INITIAL";
@@ -9,7 +11,7 @@ const NONE = "NONE";
 const LONG = "LONG";
 
 const LongPost = (props) => {
-  const [windowState, setWindowState] = useState(INITIAL);
+  const [windowState, setWindowState] = useState(INITIAL_STATE);
   const [hasContent, setHasContent] = useState(props.onlineDraft !== null);
   const [isSavePending, setSavePending] = useState(false);
   const [localDraft, setLocalDraft] = useState(props.onlineDraft);
@@ -77,11 +79,11 @@ const LongPost = (props) => {
       if (windowType === NONE) {
         props.onPostTypeSet(windowType, localDraft);
       }
-      else if (windowType === INITIAL) {
+      else if (windowType === INITIAL_STATE) {
         setWindowState(windowType);
       }
       //already saved, just set the local state
-      else if (windowType === REVIEW) {
+      else if (windowType === REVIEW_STATE) {
         setWindowState(windowType);
         props.onLocalSync(localDraft);
       }
@@ -90,7 +92,7 @@ const LongPost = (props) => {
       }
     }
   }
-  if (windowState === INITIAL)
+  if (windowState === INITIAL_STATE)
     return (
       <div className="longpost-window">
         <div ref={postHeaderRef}>
@@ -101,7 +103,7 @@ const LongPost = (props) => {
               <button value={NONE} onClick={e => setPostStage(e.target.value, isSavePending)}>Return</button>
             </span>
             <span  >
-              <button value={REVIEW} disabled={!hasContent} onClick={(e) => setPostStage(e.target.value, isSavePending)}>Review Post</button>
+              <button value={REVIEW_STATE} disabled={!hasContent} onClick={(e) => setPostStage(e.target.value, isSavePending)}>Review Post</button>
             </span>
           </div>
         </div>
@@ -145,6 +147,7 @@ const LongPost = (props) => {
   else {
     return (
       <ReviewPost
+        previousState={INITIAL_STATE}
         displayPhoto={props.displayPhoto}
         isPaginated={false}
         textData={props.onlineDraft}

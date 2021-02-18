@@ -314,6 +314,7 @@ router.route('/')
     const postPrivacyType = !!req.body.postPrivacyType ? req.body.postPrivacyType : null;
     const pursuitCategory = !!req.body.pursuitCategory ? req.body.pursuitCategory : null;
     const date = !!req.body.date ? req.body.date : null;
+    console.log(req.body.date);
     const textData = !!req.body.textData ? req.body.textData : null;
     const minDuration = !!req.body.minDuration ? parseInt(req.body.minDuration) : null;
     const isMilestone = !!req.body.isMilestone ? req.body.isMilestone : null;

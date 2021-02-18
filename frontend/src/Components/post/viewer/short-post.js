@@ -465,18 +465,15 @@ class ShortPostViewer extends React.Component {
         }
         else {
 
-            let rawDate = null;
             let formattedDate = null;
             if (this.props.eventData.date) {
-                rawDate = new Date(this.props.eventData.date);
-                formattedDate =
-                    rawDate.getFullYear().toString() +
-                    "-" + rawDate.getMonth().toString() +
-                    "-" + rawDate.getDate().toString();
+                console.log(this.props.eventData.date);
+                formattedDate = new Date(this.props.eventData.date).toISOString().substring(0, 10);
             }
             return (
                 <ReviewPost
-                    isUpdateToPost={true}
+                    isUpdateToPost
+                    previousState={EDIT_STATE}
                     postId={this.props.eventData._id}
                     displayPhoto={this.props.displayPhoto}
                     isPaginated={this.state.isPaginated}

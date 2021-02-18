@@ -22,6 +22,8 @@ const LongPostViewer = (props) => {
     const [key, setKey] = useState(0);
     const [window, setWindow] = useState(INITIAL_STATE);
     const [localDraft, setLocalDraft] = useState(props.textData);
+    const [workingDraft, setWorkingDraft] = useState(props.textData);
+
 
     const windowSwitch = (window) => {
         if (window === INITIAL_STATE) {
@@ -170,12 +172,19 @@ const LongPostViewer = (props) => {
     }
 
     else if (window === EDIT_STATE) {
-
+        console.log("EDIT STATE");
         return (
             <div className="longpostviewer-window">
                 <div className="longpostviewer-button-container">
-                    {props.isOwnProfile ? <button onClick={() => windowSwitch(INITIAL_STATE)}>Cancel Edit</button> : <></>}
-                    {props.isOwnProfile ? <button onClick={() => windowSwitch(REVIEW_STATE)}>Review</button> : <></>}
+                    {props.isOwnProfile ? <button onClick={() => {
+                        setWorkingDraft(props.textData);
+                        setLocalDraft(props.textData);
+                        windowSwitch(INITIAL_STATE);
+                    }}>Cancel Edit</button> : <></>}
+                    {props.isOwnProfile ? <button onClick={() => {
+                        setWorkingDraft(localDraft);
+                        windowSwitch(REVIEW_STATE);
+                    }}>Review</button> : <></>}
                 </div>
                 <div className="longpostviewer-editor-container">
                     < DanteEditor
@@ -190,7 +199,7 @@ const LongPostViewer = (props) => {
                                 //     this.props.setLocalDraft(editorState);
                                 // }
                             }}
-                        content={props.textData}
+                        content={workingDraft}
                         default_wrappers={[
                             { className: 'my-custom-h1', block: 'header-one' },
                             { className: 'my-custom-h2', block: 'header-two' },
@@ -229,18 +238,18 @@ const LongPostViewer = (props) => {
     }
 
     else {
-        let rawDate = null;
         let formattedDate = null;
         if (props.eventData.date) {
-            rawDate = new Date(props.eventData.date);
-            formattedDate = rawDate.getFullYear().toString() + "-" + rawDate.getMonth().toString() + "-" + rawDate.getDate().toString();
+            console.log(props.eventData.date);
+            formattedDate = new Date(props.eventData.date).toISOString().substring(0, 10);
         }
         return (
             <ReviewPost
-
+                isUpdateToPost
+                previousState={EDIT_STATE}
                 displayPhoto={props.displayPhoto}
                 isPaginated={false}
-                textData={localDraft}
+                textData={workingDraft}
                 closeModal={props.closeModal}
                 postType={LONG}
                 setPostStage={setWindow}
@@ -248,7 +257,6 @@ const LongPostViewer = (props) => {
                 preferredPostType={props.preferredPostType}
                 pursuitNames={props.pursuitNames}
                 handlePreferredPostTypeChange={props.handlePreferredPostTypeChange}
-                isUpdateToPost={true}
                 postId={props.eventData._id}
                 isMilestone={props.eventData.is_milestone}
                 previewTitle={props.eventData.title}
@@ -257,6 +265,7 @@ const LongPostViewer = (props) => {
                 date={formattedDate}
                 min={props.eventData.min_duration}
                 selectedPursuit={props.eventData.pursuit_category}
+                onClick={() => windowSwitch(EDIT_STATE)}
 
             />
         );

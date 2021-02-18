@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import AxiosHelper from '../../../Axios/axios';
 import _ from 'lodash';
 import TextareaAutosize from 'react-textarea-autosize';
-import { PUBLIC_FEED, PERSONAL_PAGE, PRIVATE } from "../../constants/flags";
+import { INITIAL_STATE, EDIT_STATE, REVIEW_STATE, PUBLIC_FEED, PERSONAL_PAGE, PRIVATE } from "../../constants/flags";
 import "./review-post.scss";
 
 const INITIAL = "INITIAL";
@@ -22,7 +22,7 @@ const ReviewPost = (props) => {
     const [coverPhoto, setCover] = useState(null);
 
     const handlePostSubmit = () => {
-         let formData = new FormData();
+        let formData = new FormData();
         formData.append("displayPhoto", props.displayPhoto);
         formData.append("postType", props.postType);
         formData.append("username", props.username);
@@ -85,9 +85,9 @@ const ReviewPost = (props) => {
         );
     }
 
-    const returnToShortButton = (<button value={INITIAL} onClick={e => props.onClick(e.target.value)}>Return</button>);
-    const returnToLongButton = (<button value={INITIAL} onClick={e => props.setPostStage(e.target.value, false)}>Return</button>);
-
+    const returnToShortButton = (<button value={props.previousState} onClick={e => props.onClick(e.target.value)}>Return</button>);
+    const returnToLongButton = (<button value={props.previousState} onClick={e => props.setPostStage(e.target.value, false)}>Return</button>);
+    console.log( date);
     return (
         <div id="reviewpost-small-window">
             <div>
@@ -127,7 +127,7 @@ const ReviewPost = (props) => {
                             <option value={PUBLIC_FEED}>Post to your feed and page</option>
                         </select>
                     </div>
-                    <button onClick={(e) => handlePostSubmit()}>Post!</button>
+                    <button onClick={(e) => handlePostSubmit()}>{props.isUpdateToPost ? "Update!" : "Post!"}</button>
                 </div>
                 {error ? <p>An Error Occured. Please try again. </p> : <></>}
                 {loading ?

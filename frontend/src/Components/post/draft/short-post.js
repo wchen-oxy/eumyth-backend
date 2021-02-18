@@ -1,6 +1,7 @@
 import React from 'react';
 import ShortEditor from '../editor/short-editor';
 import ReviewPost from './review-post';
+import { INITIAL_STATE, EDIT_STATE, REVIEW_STATE, PUBLIC_FEED, PERSONAL_PAGE, PRIVATE } from "../../constants/flags";
 import "./short-post.scss";
 
 const NONE = "NONE";
@@ -21,7 +22,7 @@ class ShortPost extends React.Component {
       textData: '',
       isPaginated: false,
       postDisabled: true,
-      window: INITIAL,
+      window: INITIAL_STATE,
     };
 
     this.handleIndexChange = this.handleIndexChange.bind(this);
@@ -163,7 +164,7 @@ class ShortPost extends React.Component {
 
 
   handleSortEnd({ oldIndex, newIndex }) {
-    
+
     const items = Array.from(this.state.validFiles);
     const [reorderedItem] = items.splice(oldIndex, 1);
     items.splice(newIndex, 0, reorderedItem);
@@ -173,7 +174,7 @@ class ShortPost extends React.Component {
 
 
   render() {
-    if (this.state.window === INITIAL) {
+    if (this.state.window === INITIAL_STATE) {
       return (
         <div id="shortpost-window">
           <div className="shortpost-button-container">
@@ -183,7 +184,7 @@ class ShortPost extends React.Component {
                 <button value={NONE} onClick={e => this.props.onPostTypeSet(e.target.value, false)}>Return</button>
               </span>
               <span >
-                <button value={REVIEW} disabled={this.state.postDisabled} onClick={e => this.handleClick(e.target.value)}>Review Post</button>
+                <button value={REVIEW_STATE} disabled={this.state.postDisabled} onClick={e => this.handleClick(e.target.value)}>Review Post</button>
               </span>
             </div>
           </div>
@@ -212,8 +213,9 @@ class ShortPost extends React.Component {
       );
     }
     else {
-       return (
+      return (
         <ReviewPost
+          previousState={INITIAL_STATE}
           displayPhoto={this.props.displayPhoto}
           isPaginated={this.state.isPaginated}
           previewTitle={this.state.previewTitle}

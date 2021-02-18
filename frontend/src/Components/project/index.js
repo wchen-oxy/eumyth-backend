@@ -66,7 +66,7 @@ class ProjectController extends React.Component {
             selectedPosts: [],
             title: "",
             overview: "",
-            pursuitCategory: this.props.pursuitsNames ? this.props.pursuitsNames[0] : null,
+            pursuitCategory: this.props.pursuitNames ? this.props.pursuitNames[0] : null,
             startDate: "",
             endDate: "",
             isComplete: false,
@@ -252,7 +252,7 @@ class ProjectController extends React.Component {
 
             case (REVIEW):
                 let pursuitSelects = [];
-                for (const pursuit of this.props.pursuitsNames) {
+                for (const pursuit of this.props.pursuitNames) {
                     pursuitSelects.push(
                         <option key={pursuit} value={pursuit}>{pursuit}</option>
                     );
