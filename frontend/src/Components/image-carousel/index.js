@@ -35,16 +35,12 @@ class ImageSlider extends React.Component {
     this._isMounted = true;
     if (this._isMounted) {
       this.setState({ imageArray: this.props.imageArray })
-      // this.props.setImageArray(this.props.fileArray);
-      // this.transformImageProp();
     }
   }
 
   componentDidUpdate(prevProps) {
     if (this.props.imageArray !== prevProps.imageArray) {
       this.setState({ imageArray: this.props.imageArray })
-      // this.props.setImageArray(this.props.fileArray);
-      // this.transformImageProp();
     }
   }
 
@@ -56,27 +52,32 @@ class ImageSlider extends React.Component {
     let count = 0;
     if (isLoaded) {
       console.log(this.state.imageArray);
-      return (this.state.imageArray.map(item =>
-        <div className="imageslider-image-container" key={count++}>
-          {
-            this.props.disableAnnotations ?
-              <img alt="" key={count++} src={item} /> :
-              (
-                <>
-                <Annotator
-                  imageSource={item}
-                  annotations={this.props.annotations}
-                  activeAnnotations={this.props.activeAnnotations}
-                  onAnnotationSubmit={this.props.onAnnotationSubmit}
-                />
-                </>
-              )
-          }
-        </div>
-      ))
+      return (
+        this.state.imageArray.map(
+          item => (
+            <div
+              className="imageslider-image-container"
+              key={count++}
+            >
+              {this.props.disableAnnotations ? (
+                <img
+                  alt=""
+                  key={count++}
+                  src={item} />
+              ) : (
+                  <Annotator
+                    imageSource={item}
+                    annotations={this.props.annotations}
+                    activeAnnotations={this.props.activeAnnotations}
+                    onAnnotationSubmit={this.props.onAnnotationSubmit}
+                  />
+                )
+              }
+            </div>)
+        ))
     }
     else {
-      return (<p>IMAGE IS STILL LOADING</p>);
+      return <p>IMAGE IS STILL LOADING</p>;
     }
   }
 
