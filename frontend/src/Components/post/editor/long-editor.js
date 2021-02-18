@@ -58,7 +58,6 @@ class LongEditor extends React.Component {
                 onChange={
                     (editor) => {
                         const editorState = editor.emitSerializedOutput();
-                        console.log("ANY CHANGE???");
                         if (this.props.hasContent === false) {
                             for (let block of editorState.blocks) {
                                 if (block.text !== '') {
@@ -79,11 +78,9 @@ class LongEditor extends React.Component {
                                     this.setState({ needOnlineSync: false });
                                     return;
                                 }
-                                console.log("After Mount");
                                 const draftsIdentical = _.isEqual(editorState, this.props.localDraft);
                                 if (!draftsIdentical) {
-                                    if (editorState.blocks.length >= 2
-                                    ) {
+                                    if (editorState.blocks.length >= 2) {
                                         this.props.setLastTwoBlockIdentical(
                                             editorState.blocks[editorState.blocks.length - 1].text
                                             ===

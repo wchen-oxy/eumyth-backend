@@ -103,12 +103,12 @@ class ShortPostViewer extends React.Component {
     }
 
     returnValidAnnotations() {
-        const currentPageAnnotations = this.state.annotations[this.state.imageIndex];
-        if (this.state.selectedAnnotationIndex !== null) {
-            return [currentPageAnnotations[this.state.selectedAnnotationIndex]];
-        }
+        if (!this.state.annotations) return [];
         else {
-            return this.state.annotations[this.state.imageIndex];
+            const currentPageAnnotations = this.state.annotations[this.state.imageIndex];
+            return (this.state.selectedAnnotationIndex !== null ? (
+                [currentPageAnnotations[this.state.selectedAnnotationIndex]]) :
+                (currentPageAnnotations));
         }
     }
 
@@ -202,6 +202,7 @@ class ShortPostViewer extends React.Component {
             this.setState({ showPromptOverlay: false });
         }, 3000);
     }
+
     handleMouseOver(id) {
         this.setState({
             activeAnnotations: [
@@ -258,13 +259,14 @@ class ShortPostViewer extends React.Component {
             .then((result) => {
                 const rootCommentIdArray = result.data.rootCommentIdArray;
                 const fullAnnotationArray = this.state.annotations;
-                const currentAnnotationArray = this.state.annotations[this.state.imageIndex].concat({
-                    geometry,
-                    data: {
-                        ...data,
-                        id: rootCommentIdArray[0]
-                    }
-                });
+                const currentAnnotationArray = this.state.annotations[this.state.imageIndex]
+                    .concat({
+                        geometry,
+                        data: {
+                            ...data,
+                            id: rootCommentIdArray[0]
+                        }
+                    });
                 fullAnnotationArray[this.state.imageIndex] = currentAnnotationArray;
                 this.setState({ annotations: fullAnnotationArray })
             })
@@ -299,7 +301,10 @@ class ShortPostViewer extends React.Component {
 
     handleModalLaunch() {
         if (!this.props.isPostOnlyView) {
-            return this.props.passDataToModal(this.props.eventData, SHORT, this.props.postIndex)
+            return (this.props.passDataToModal(
+                this.props.eventData,
+                SHORT,
+                this.props.postIndex));
         }
     }
 
@@ -403,7 +408,10 @@ class ShortPostViewer extends React.Component {
                 else {
                     return (
                         <>
-                            <div id="shortpostviewer-inline-main-container" onClick={this.handleModalLaunch}>
+                            <div
+                                id="shortpostviewer-inline-main-container"
+                                onClick={this.handleModalLaunch}
+                            >
                                 <PostHeader
                                     isOwnProfile={this.props.isOwnProfile}
                                     username={this.props.username}
@@ -433,8 +441,14 @@ class ShortPostViewer extends React.Component {
             return (
                 <div className="shortpostviewer-window" >
                     <div className="shortpostviewer-button-container">
-                        <button onClick={() => this.handleWindowChange(INITIAL_STATE)}>Return</button>
-                        <button onClick={() => this.handleWindowChange(REVIEW_STATE)}>Review Post</button>
+                        <button
+                            onClick={() => (this.handleWindowChange(INITIAL_STATE))}>
+                            Return
+                        </button>
+                        <button
+                            onClick={() => this.handleWindowChange(REVIEW_STATE)}>
+                            Review Post
+                        </button>
 
                     </div>
                     <ShortReEditor
