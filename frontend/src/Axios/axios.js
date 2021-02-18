@@ -2,9 +2,6 @@ import axios from 'axios';
 import urls from "../Components/constants/urls";
 
 export default class AxiosHelper {
-    static testString() {
-        console.log("TEST SUCCESS");
-    }
 
     static changeRelationStatus(action, targetUsername, currentUsername, id) {
         return axios.put(urls.RELATION_SET_FOLLOWER_URL, {

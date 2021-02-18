@@ -35,7 +35,7 @@ const AccountPage = (props) => {
   }
 
   const showPhotoEditor = (ref) => {
-    if (ref.current.style.display === "") { ref.current.style.display = "flex" }
+    if (ref.current.style.display === "") { ref.current.style.display = "flex"; }
     else {
       ref.current.style.display = "";
     }
@@ -47,15 +47,24 @@ const AccountPage = (props) => {
         .deleteAccountPhoto(props.firebase.returnUsername(), photoType)
         .then(() => {
           if (photoType === DISPLAY) {
-            window.alert("Your Display Photo has been removed. You should see the changes take effect soon.");
+            window.alert(
+              `Your Display Photo has been removed. 
+              You should see the changes take effect soon.`
+            );
           }
           else if (photoType === COVER) {
-            window.alert("Your cover photo has been removed. You should see the changes take effect immediately.");
+            window.alert(
+              `Your cover photo has been removed. You should
+               see the changes take effect immediately.`
+            );
           }
         })
         .catch((err) => {
           console.log(err);
-          window.alert("Something went wrong while deleting your image. Please wait and try again later");
+          window.alert(
+            `Something went wrong while deleting your image.
+             Please wait and try again later`
+          );
         });
     }
   }
@@ -84,10 +93,14 @@ const AccountPage = (props) => {
   const handleProfilePrivacyChange = (privacySetting) => {
     const isPrivate = privacySetting === PRIVATE ? true : false;
     setIsPrivate(isPrivate);
-    return AxiosHelper.setProfilePrivacy(props.firebase.returnUsername(), isPrivate).catch((err) => {
-      console.log(err);
-      alert("Unable to update Profile Privacy.");
-    })
+    return AxiosHelper
+      .setProfilePrivacy(
+        props.firebase.returnUsername(),
+        isPrivate
+      ).catch((err) => {
+        console.log(err);
+        alert("Unable to update Profile Privacy.");
+      })
   }
 
   const submitPhoto = (photoType) => {
@@ -97,13 +110,30 @@ const AccountPage = (props) => {
       const titles = ["normal", "small", "tiny"];
       const canvas = AvatarEditorInstance.getImage();
       const image = imageCompression.canvasToFile(canvas);
-      image
-        .then((result) =>
-          Promise.all([
-            imageCompression(result, { maxWidthOrHeight: 250, maxSizeMB: 1, fileType: "image/jpeg" }),
-            imageCompression(result, { maxWidthOrHeight: 125, maxSizeMB: 1, fileType: "image/jpeg" }),
-            imageCompression(result, { maxWidthOrHeight: 62, maxSizeMB: 1, fileType: "image/jpeg" })
-          ]))
+      image.then((result) =>
+        Promise.all([
+          imageCompression(
+            result,
+            {
+              maxWidthOrHeight: 250,
+              maxSizeMB: 1,
+              fileType: "image/jpeg"
+            }),
+          imageCompression(
+            result,
+            {
+              maxWidthOrHeight: 125,
+              maxSizeMB: 1,
+              fileType: "image/jpeg"
+            }),
+          imageCompression(
+            result,
+            {
+              maxWidthOrHeight: 62,
+              maxSizeMB: 1,
+              fileType: "image/jpeg"
+            })
+        ]))
         .then((results) => {
           let imageArray = [];
           for (let i = 0; i < 3; i++) {
@@ -122,8 +152,10 @@ const AccountPage = (props) => {
       if (coverPhoto.size > 1000000) {
         return (
           imageCompression(coverPhoto, { maxSizeMB: 1, fileType: "image/jpeg" })
-            .then(formattedImage => formData.append('coverPhoto', formattedImage))
-            .then(() => handlePhotoSubmit(formData, photoType))
+            .then(formattedImage => {
+              formData.append('coverPhoto', formattedImage);
+              handlePhotoSubmit(formData, photoType);
+            })
         );
       }
       else {
@@ -196,26 +228,51 @@ const AccountPage = (props) => {
                 <option key="private" value={PRIVATE}>Private</option>
                 <option key="public" value={PUBLIC}>Public</option>
               </select>
-              <button onClick={() => showPhotoEditor(displayPhotoRef)}>Edit your Display Photo</button>
-              <div ref={displayPhotoRef} className="account-photo-edit-container">
+              <button onClick={() => showPhotoEditor(displayPhotoRef)}>
+                Edit your Display Photo
+              </button>
+              <div
+                ref={displayPhotoRef}
+                className="account-photo-edit-container"
+              >
                 <label>Change your display photo!</label>
-                <input type="file" onChange={(e) => setDisplayPhoto(e.target.files[0])} />
+                <input
+                  type="file"
+                  onChange={(e) => setDisplayPhoto(e.target.files[0])}
+                />
                 {displayPhoto ? renderProfilePhotoEditor() : <div></div>}
-                <button onClick={() => submitPhoto(DISPLAY)}>Submit your display photo!</button>
-                <button onClick={() => removePhoto(DISPLAY)}>Remove display Photo?</button>
+                <button onClick={() => submitPhoto(DISPLAY)}>
+                  Submit your display photo!
+                </button>
+                <button onClick={() => removePhoto(DISPLAY)}>
+                  Remove display Photo?
+                </button>
               </div>
-              <button onClick={() => showPhotoEditor(coverPhotoRef)}>Edit your Cover Photo</button>
+              <button onClick={() => showPhotoEditor(coverPhotoRef)}>
+                Edit your Cover Photo
+              </button>
               <div ref={coverPhotoRef} className="account-photo-edit-container">
                 <label>Change your cover photo!</label>
                 <input type="file" onChange={(e) => {
                   setCoverPhoto(e.target.files[0]);
                 }} />
-                <button onClick={() => submitPhoto(COVER)}>Submit your cover photo!</button>
-                <button onClick={() => removePhoto(COVER)}>Remove your cover photo</button>
+                <button onClick={() => submitPhoto(COVER)}>
+                  Submit your cover photo!
+                </button>
+                <button onClick={() => removePhoto(COVER)}>
+                  Remove your cover photo
+                </button>
               </div>
               <label>Edit your bio</label>
-              <textarea type="text" onChange={e => setBioText(e.target.value)} value={bio} maxLength={500} />
-              <button onClick={handleBioSubmit}>Submit Bio</button>
+              <textarea
+                type="text"
+                onChange={e => setBioText(e.target.value)}
+                value={bio}
+                maxLength={500}
+              />
+              <button onClick={handleBioSubmit}>
+                Submit Bio
+              </button>
             </div>
           );
         }
@@ -225,5 +282,4 @@ const AccountPage = (props) => {
 }
 
 const condition = authUser => !!authUser;
-
 export default withAuthorization(condition)(withFirebase(AccountPage));
