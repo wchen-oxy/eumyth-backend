@@ -294,8 +294,7 @@ class ProfilePage extends React.Component {
                     }
                 )
                 .catch(error => console.log(error));
-            // .then(() => this.setState({ selectedEvent: selectedEvent }));
-        }
+         }
 
         handleNewBackProjectClick() {
             if (!this.state.newProject) {

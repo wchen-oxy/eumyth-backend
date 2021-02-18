@@ -19,26 +19,13 @@ class Annotator extends React.Component {
     this.activeAnnotationComparator = this.activeAnnotationComparator.bind(this);
   }
 
-
   onChange(annotation) {
-    // console.log(annotation);
     this.setState({ annotation })
   }
 
   onSubmit(annotation) {
     this.setState({ annotation: {} },
       this.props.onAnnotationSubmit(annotation));
-    // const { geometry, data } = annotation
-    //  this.setState({
-    //   annotation: {},
-    //   annotations: this.state.annotations.concat({
-    //     geometry,
-    //     data: {
-    //       ...data,
-    //       id: Math.random()
-    //     }
-    //   })
-    // })
   }
 
   renderEditor(props) {
@@ -71,23 +58,16 @@ class Annotator extends React.Component {
     )
   }
 
-
-
   activeAnnotationComparator(a, b) {
     return a.data.id === b
   }
 
   render() {
-    console.log(this.state.annotation);
-    console.log(this.state.annotations);
     return (
       <div style={{ display: 'flex' }}>
-         <Annotation
-          src={
-            // "https://pics.dmm.co.jp/mono/movie/adult/venx004/venx004pl.jpg"
-            this.props.imageSource
-          }
-          // alt='Two pebbles anthropomorphized holding hands'
+        <Annotation
+          src={this.props.imageSource}
+          alt='Two pebbles anthropomorphized holding hands'
           annotations={this.props.annotations}
           activeAnnotationComparator={this.activeAnnotationComparator}
           activeAnnotations={this.props.activeAnnotations}

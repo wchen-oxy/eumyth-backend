@@ -4,76 +4,55 @@ import LongPostViewer from "./long-post";
 import { SHORT, LONG } from "../../constants/flags";
 import { withFirebase } from "../../../Firebase/index";
 
-class PostViewerController extends React.Component {
-    _isMounted = false;
-    constructor(props) {
-        super(props);
-        this.state = {
-
-        }
-    }
-
-    componentDidMount() {
-        this._isMounted = true;
-    }
-
-    componentWillUnmount() {
-        this._isMounted = false;
-    }
-
-    render() {
-        const isOwnProfile = this.props.eventData.username === this.props.firebase.returnUsername();
-        switch (this.props.eventData.post_format) {
-            case (SHORT):
-                return (
-                    <ShortPostViewer
-                        postId={this.props.eventData._id}
-                        postIndex={this.props.postIndex}
-                        displayPhoto={this.props.displayPhoto}
-                        username={this.props.username}
-                        visitorUsername={this.props.visitorUsername}
-                        pursuitNames={this.props.pursuitNames}
-                        preferredPostType={this.props.preferredPostType}
-                        textData={this.props.textData}
-                        largeViewMode={this.props.largeViewMode}
-                        isOwnProfile={isOwnProfile}
-                        isPostOnlyView={this.props.isPostOnlyView}
-                        eventData={this.props.eventData}
-                        onDeletePost={this.props.onDeletePost}
-                        closeModal={this.props.closeModal}
-                        passDataToModal={this.props.passDataToModal}
-                        handleCommentInjection={this.props.handleCommentInjection}
-                        selectedPostFeedType={this.props.selectedPostFeedType}
-                    />);
-
-            case (LONG):
-                return (
-                    <LongPostViewer
-                        postId={this.props.eventData._id}
-                        postIndex={this.props.postIndex}
-                        displayPhoto={this.props.displayPhoto}
-                        username={this.props.username}
-                        visitorUsername={this.props.visitorUsername}
-                        pursuitNames={this.props.pursuitNames}
-                        preferredPostType={this.props.preferredPostType}
-                        largeViewMode={this.props.largeViewMode}
-                        textData={this.props.textData}
-                        isOwnProfile={isOwnProfile}
-                        isPostOnlyView={this.props.isPostOnlyView}
-                        eventData={this.props.eventData}
-                        onDeletePost={this.props.onDeletePost}
-                        closeModal={this.props.closeModal}
-                        passDataToModal={this.props.passDataToModal}
-                        handleCommentInjection={this.props.handleCommentInjection}
-                        selectedPostFeedType={this.props.selectedPostFeedType}
-
-                    />
-                );
-
-            default:
-                throw new Error("No content type matched in event-modal.js");
-        }
-
+const PostViewerController = (props) => {
+    const isOwnProfile = (props.eventData.username === props.firebase.returnUsername());
+    switch (props.eventData.post_format) {
+        case (SHORT):
+            return (
+                <ShortPostViewer
+                    postId={props.eventData._id}
+                    postIndex={props.postIndex}
+                    displayPhoto={props.displayPhoto}
+                    username={props.username}
+                    visitorUsername={props.visitorUsername}
+                    pursuitNames={props.pursuitNames}
+                    preferredPostType={props.preferredPostType}
+                    textData={props.textData}
+                    largeViewMode={props.largeViewMode}
+                    isOwnProfile={isOwnProfile}
+                    isPostOnlyView={props.isPostOnlyView}
+                    eventData={props.eventData}
+                    onDeletePost={props.onDeletePost}
+                    closeModal={props.closeModal}
+                    passDataToModal={props.passDataToModal}
+                    handleCommentInjection={props.handleCommentInjection}
+                    selectedPostFeedType={props.selectedPostFeedType}
+                />
+            );
+        case (LONG):
+            return (
+                <LongPostViewer
+                    postId={props.eventData._id}
+                    postIndex={props.postIndex}
+                    displayPhoto={props.displayPhoto}
+                    username={props.username}
+                    visitorUsername={props.visitorUsername}
+                    pursuitNames={props.pursuitNames}
+                    preferredPostType={props.preferredPostType}
+                    largeViewMode={props.largeViewMode}
+                    textData={props.textData}
+                    isOwnProfile={isOwnProfile}
+                    isPostOnlyView={props.isPostOnlyView}
+                    eventData={props.eventData}
+                    onDeletePost={props.onDeletePost}
+                    closeModal={props.closeModal}
+                    passDataToModal={props.passDataToModal}
+                    handleCommentInjection={props.handleCommentInjection}
+                    selectedPostFeedType={props.selectedPostFeedType}
+                />
+            );
+        default:
+            throw new Error("No content type matched in event-modal.js");
     }
 }
 

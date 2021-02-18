@@ -73,7 +73,7 @@ class CustomImageSlider extends React.Component {
                 }} >
                 Click and Drag to create an annotation!
             </div>
-        )
+        );
     }
 
     activeAnnotationComparator(a, b) {
