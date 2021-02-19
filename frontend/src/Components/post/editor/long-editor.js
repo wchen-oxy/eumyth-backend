@@ -36,19 +36,20 @@ class LongEditor extends React.Component {
                 .catch(
                     (err) => this.handleSaveError(err)
                 )
-            //write up the new handle save with axioshelper. Also double check whether put and post is necessary.
         }
     }
 
     handleSaveSuccess(result) {
-        console.log("Reached");
+        console.log("Reached", result);
         this.props.onSavePending(false);
 
     }
     handleSaveError(result) {
         console.log("Fail")
         this.props.onSavePending(false);
-        alert("Draft Failed to Save. Please check your connection or save your draft locally for now. : (");
+        alert(`Draft Failed to Save. Please check your
+               connection or save your draft locally for now. : (`
+        );
     }
 
     render() {
@@ -78,17 +79,35 @@ class LongEditor extends React.Component {
                                     this.setState({ needOnlineSync: false });
                                     return;
                                 }
-                                const draftsIdentical = _.isEqual(editorState, this.props.localDraft);
+                                const draftsIdentical =
+                                    _.isEqual(
+                                        editorState,
+                                        this.props.localDraft);
                                 if (!draftsIdentical) {
+                                    const lastEditorBlock =
+                                        editorState
+                                            .blocks[editorState
+                                                .blocks
+                                                .length - 1]
+                                            .text;
+                                    const secondLastEditorBlock =
+                                        editorState
+                                            .blocks[editorState
+                                                .blocks
+                                                .length - 2]
+                                            .text;
                                     if (editorState.blocks.length >= 2) {
                                         this.props.setLastTwoBlockIdentical(
-                                            editorState.blocks[editorState.blocks.length - 1].text
+                                            lastEditorBlock
                                             ===
-                                            editorState.blocks[editorState.blocks.length - 2].text
+                                            secondLastEditorBlock
                                         );
                                     }
-                                    this.props.setLastBlockChanged(this.state.lastBlockText === editorState.blocks[editorState.blocks.length - 1].text);
-                                    this.props.setLastBlockText(editorState.blocks[editorState.blocks.length - 1].text);
+                                    this.props.setLastBlockChanged(
+                                        this.state.lastBlockText
+                                        ===
+                                        lastEditorBlock);
+                                    this.props.setLastBlockText(lastEditorBlock);
                                     this.props.onSavePending(true);
                                     this.props.setLocalDraft(editorState);
                                 }

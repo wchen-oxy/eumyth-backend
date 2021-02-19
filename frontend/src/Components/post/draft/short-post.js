@@ -1,13 +1,9 @@
 import React from 'react';
 import ShortEditor from '../editor/short-editor';
 import ReviewPost from './review-post';
-import { INITIAL_STATE, EDIT_STATE, REVIEW_STATE, PUBLIC_FEED, PERSONAL_PAGE, PRIVATE } from "../../constants/flags";
+import { INITIAL_STATE, REVIEW_STATE, SHORT, NONE } from "../../constants/flags";
 import "./short-post.scss";
 
-const NONE = "NONE";
-const INITIAL = "INITIAL";
-const REVIEW = "REVIEW";
-const SHORT = "SHORT";
 const TITLE = "TITLE";
 
 class ShortPost extends React.Component {
@@ -23,6 +19,7 @@ class ShortPost extends React.Component {
       isPaginated: false,
       postDisabled: true,
       window: INITIAL_STATE,
+      previewTitle: null
     };
 
     this.handleIndexChange = this.handleIndexChange.bind(this);
@@ -82,7 +79,9 @@ class ShortPost extends React.Component {
       this.setState({ textData: postArray, isPaginated: true });
     }
     else {
-      if (window.confirm("Switching back will remove all your captions except for the first one. Keep going?")) {
+      if (window.confirm(`Switching back will remove all your captions except 
+                          for the first one. Keep going?`
+      )) {
         const textData = this.state.textData[0];
         this.setState({ textData: textData, isPaginated: false });
       }
@@ -114,6 +113,8 @@ class ShortPost extends React.Component {
     }
     else {
       let newState;
+      const areFilesValid = this.state.validFiles.length === 0
+        || this.state.unsupportedFiles.length > 0;
       if (this.state.isPaginated) {
         let updatedArray = this.state.textData;
         updatedArray[this.state.imageIndex] = text;
@@ -122,21 +123,25 @@ class ShortPost extends React.Component {
       else {
         newState = text;
       }
-      this.setState((state) => ({
+      this.setState(({
         textData: newState,
-        postDisabled: (text.length === 0) && (state.validFiles.length === 0 || state.unsupportedFiles.length > 0)
+        postDisabled: (text.length === 0) && areFilesValid
       }));
     }
 
   }
 
   handleUnsupportedFileChange(file) {
-    this.setState((state) => ({ unsupportedFiles: state.unsupportedFiles.concat(file) }));
+    this.setState((state) => ({
+      unsupportedFiles: state.unsupportedFiles.concat(file)
+    }));
   }
 
 
   handleSelectedFileChange(file) {
-    this.setState((state) => ({ selectedFiles: state.selectedFiles.concat(file) }), this.generateValidFiles);
+    this.setState((state) => ({
+      selectedFiles: state.selectedFiles.concat(file)
+    }), this.generateValidFiles);
   }
 
 
@@ -181,10 +186,21 @@ class ShortPost extends React.Component {
             <h2>Placeholder for short</h2>
             <div>
               <span >
-                <button value={NONE} onClick={e => this.props.onPostTypeSet(e.target.value, false)}>Return</button>
+                <button
+                  value={NONE}
+                  onClick={e => this.props.onPostTypeSet(e.target.value, false)}
+                >
+                  Return
+                  </button>
               </span>
               <span >
-                <button value={REVIEW_STATE} disabled={this.state.postDisabled} onClick={e => this.handleClick(e.target.value)}>Review Post</button>
+                <button
+                  value={REVIEW_STATE}
+                  disabled={this.state.postDisabled}
+                  onClick={e => this.handleClick(e.target.value)}
+                >
+                  Review Post
+                  </button>
               </span>
             </div>
           </div>

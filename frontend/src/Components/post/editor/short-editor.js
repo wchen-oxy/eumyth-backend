@@ -8,7 +8,10 @@ import './short-editor.scss';
 
 var isAdvancedUpload = function () {
     var div = document.createElement('div');
-    return (('draggable' in div) || ('ondragstart' in div && 'ondrop' in div)) && 'FormData' in window && 'FileReader' in window;
+    return (('draggable' in div)
+        || ('ondragstart' in div && 'ondrop' in div))
+        && 'FormData' in window
+        && 'FileReader' in window;
 }();
 
 class ShortEditor extends React.Component {
@@ -62,21 +65,17 @@ class ShortEditor extends React.Component {
     fileInputClicked = () => {
         this.fileInputRef.current.click();
     }
-    //TODO CHANGE ALL THE SETSTATE FUNCTIONS TO UPDATE THE EXISTING ARRAY
     handleFiles = (files) => {
         let invalidFound = false;
         for (let i = 0; i < files.length; i++) {
             if (this.validateFile(files[i])) {
-                // this.setState((state) => ({ selectedFiles: state.selectedFiles.concat(files[i]) }), this.generateValidFiles);
                 this.props.onSelectedFileChange(files[i]);
 
             } else {
                 invalidFound = true;
                 files[i]['invalid'] = true;
-                // this.setState((state) => ({ selectedFiles: state.selectedFiles.concat(files[i]) }), this.generateValidFiles);
                 this.props.onSelectedFileChange(files[i]);
                 this.setErrorMessage('File type not permitted');
-                // this.setState((state) => ({ unsupportedFiles: state.unsupportedFiles.concat(files[i]) }));
                 this.props.onUnsupportedFileChange(files[i]);
             }
         }
@@ -104,7 +103,9 @@ class ShortEditor extends React.Component {
     }
 
     fileType = (fileName) => {
-        return fileName.substring(fileName.lastIndexOf('.') + 1, fileName.length) || fileName;
+        return fileName.substring(
+            fileName.lastIndexOf('.') + 1, fileName.length)
+            || fileName;
     }
 
     removeFile = (name) => {
@@ -134,7 +135,10 @@ class ShortEditor extends React.Component {
     }
 
     updateDisabilityState = (invalidFound) => {
-        invalidFound && this.props.textPageText.length === 0 ? this.props.onDisablePost(true) : this.props.onDisablePost(false);
+        invalidFound && this.props.textPageText.length === 0 ?
+            (this.props.onDisablePost(true))
+            :
+            (this.props.onDisablePost(false));
     }
 
     openImageModal = (file) => {
@@ -143,7 +147,10 @@ class ShortEditor extends React.Component {
         this.modalRef.current.style.display = "block";
         reader.readAsDataURL(file);
         reader.onload = function (e) {
-            that.modalImageRef.current.style.backgroundImage = `url(${e.target.result})`;
+            that
+                .modalImageRef
+                .current.style
+                .backgroundImage = `url(${e.target.result})`;
         }
     }
 
@@ -168,7 +175,7 @@ class ShortEditor extends React.Component {
     render() {
 
         if (!isAdvancedUpload) {
-            console.log("It's not a modern browser!");
+            console.log("Sorry, this is  not a modern browser! Try another browser.");
         }
 
         if (this.props.validFiles.length === 0) {
@@ -178,7 +185,8 @@ class ShortEditor extends React.Component {
                         {this.renderTextContainer()}
 
                     </div>
-                    {this.props.unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
+                    {this.props.unsupportedFiles.length ?
+                        (<p>Please remove all unsupported files.</p>) : ('')}
                     <ImageDrop
                         reference={this.fileInputRef}
                         dragOver={this.dragOver}
@@ -197,7 +205,8 @@ class ShortEditor extends React.Component {
                 <>
                     <div id="shorteditor-main-container">
                         <div id="shorteditor-hero-container">
-                            {this.props.unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
+                            {this.props.unsupportedFiles.length ?
+                                <p>Please remove all unsupported files.</p> : ''}
                             <div id="shorteditor-image-slider-container">
                                 <ImageSlider
                                     disableAnnotations={true}

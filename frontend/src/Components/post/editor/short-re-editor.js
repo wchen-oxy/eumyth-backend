@@ -35,14 +35,19 @@ const ShortReEditor = (props) => {
         );
     }
     else {
-        const images = props.eventData.image_data.map((url, index) => <img src={url} />);
+        const images = props
+            .eventData
+            .image_data
+            .map((url, index) => <img alt="Image for Slider" src={url} />);
         return (
             <div id="shortreeditor-main-container">
                 <div className="shortreeditor-hero-container">
-                    <Slider afterChange={index => (props.onIndexChange(index))} {...settings}>
+                    <Slider
+                        afterChange={index => (props.onIndexChange(index))}
+                        {...settings}
+                    >
                         {images}
                     </Slider>
-
                 </div>
                 <div className="shortreeditor-side-container">
                     {renderTextContainer()}

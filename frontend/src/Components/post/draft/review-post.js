@@ -2,12 +2,8 @@ import React, { useState } from 'react';
 import AxiosHelper from '../../../Axios/axios';
 import _ from 'lodash';
 import TextareaAutosize from 'react-textarea-autosize';
-import { INITIAL_STATE, EDIT_STATE, REVIEW_STATE, PUBLIC_FEED, PERSONAL_PAGE, PRIVATE } from "../../constants/flags";
+import { PUBLIC_FEED, PERSONAL_PAGE, PRIVATE, SHORT, LONG } from "../../constants/flags";
 import "./review-post.scss";
-
-const INITIAL = "INITIAL";
-const LONG = "LONG";
-const SHORT = "SHORT";
 
 const ReviewPost = (props) => {
     const [date, setDate] = useState(props.date);
@@ -16,10 +12,12 @@ const ReviewPost = (props) => {
     const [title, setTitle] = useState(props.previewTitle);
     const [subtitle, setSubtitle] = useState('');
     const [postPrivacyType, setPostPrivacyType] = useState(props.preferredPostType);
-    const [pursuitCategory, setPursuitCategory] = useState(props.selectedPursuit ? props.selectedPursuit : null)
+    const [pursuitCategory, setPursuitCategory] = useState(
+        props.selectedPursuit ? props.selectedPursuit : null)
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
     const [coverPhoto, setCover] = useState(null);
+    let pursuitSelects = [];
 
     const handlePostSubmit = () => {
         let formData = new FormData();
@@ -29,22 +27,27 @@ const ReviewPost = (props) => {
         formData.append("isPaginated", props.isPaginated);
         formData.append("isMilestone", milestone ? milestone : false)
         if (title) formData.append("title", _.trim(title));
-        if (subtitle) {
-            console.log("VALID");
-            formData.append("subtitle", _.trim(subtitle));
-        }
         if (postPrivacyType) formData.append("postPrivacyType", postPrivacyType);
         if (pursuitCategory) formData.append("pursuitCategory", pursuitCategory)
         if (date) formData.append("date", date);
         if (minDuration) formData.append("minDuration", minDuration);
-        if (props.textData) formData.append("textData", props.postType === SHORT ? props.textData : JSON.stringify(props.textData));
         if (coverPhoto) formData.append("coverPhoto", coverPhoto);
+        if (subtitle) {
+            formData.append("subtitle", _.trim(subtitle));
+        }
+        if (props.textData) {
+            formData.append(
+                "textData",
+                props.postType === SHORT ?
+                    props.textData :
+                    JSON.stringify(props.textData)
+            );
+        }
         if (props.imageArray && props.imageArray.length > 0) {
             for (const image of props.imageArray) {
                 formData.append("images", image);
             }
         }
-
         if (props.isUpdateToPost) {
             console.log(JSON.stringify(props.textData));
             if (props.postId) formData.append("postId", props.postId);
@@ -75,15 +78,6 @@ const ReviewPost = (props) => {
         setError(true);
     }
 
-    let pursuitSelects = [];
-    pursuitSelects.push(
-        <option value={null}></option>
-    )
-    for (const pursuit of props.pursuitNames) {
-        pursuitSelects.push(
-            <option key={pursuit} value={pursuit}>{pursuit}</option>
-        );
-    }
     const handleReturnClick = (stageValue) => {
         if (props.postType === SHORT) {
             props.setPostStage(stageValue);
@@ -94,56 +88,121 @@ const ReviewPost = (props) => {
         else {
             throw new Error("No value matched for return click.");
         }
+    }
 
+
+    const postTypeTitle = props.postType === SHORT ? (
+        <h2>Placeholder for Short</h2>)
+        :
+        (<h2>Placeholder for Long</h2>);
+
+    const optionalLongPostDescription = props.postType === LONG ? (
+        <TextareaAutosize
+            name="subtitle"
+            id='review-post-text'
+            placeholder='Create an Optional Description'
+            onChange={(e) => setSubtitle(e.target.value)}
+            maxLength={140} />)
+        :
+        (null);
+
+    const coverPhotoUploadText = props.coverPhoto ?
+        (<label>Upload New Cover Photo?</label>)
+        :
+        (<label>Upload a Cover Photo</label>);
+
+    pursuitSelects.push(
+        <option value={null}></option>
+    )
+    for (const pursuit of props.pursuitNames) {
+        pursuitSelects.push(
+            <option key={pursuit} value={pursuit}>{pursuit}</option>
+        );
     }
 
     return (
         <div id="reviewpost-small-window">
             <div>
                 <div>
-                    {props.postType === SHORT ? <h2>Placeholder for short</h2> : <h2>Placeholder for Long</h2>}
+                    {postTypeTitle}
                     <div>
                         <span >
-                            {<button value={props.previousState} onClick={e => handleReturnClick(e.target.value)}>Return</button>}
+                            <button
+                                value={props.previousState}
+                                onClick={e => handleReturnClick(e.target.value)}
+                            >
+                                Return
+                            </button>
                         </span>
                     </div>
                 </div>
                 <div className="reviewpost-button-container">
                     <label>Preview Title</label>
-                    <TextareaAutosize name="title" placeholder='Create an Optional Preview Title Text' value={title ? title : null} onChange={(e) => setTitle(e.target.value)} maxLength={100} />
-                    {props.postType === LONG ? <TextareaAutosize name="subtitle" id='review-post-text' placeholder='Create an Optional Description' onChange={(e) => setSubtitle(e.target.value)} maxLength={140} /> : <></>}
-                    {props.coverPhoto ? <label>Upload New Cover Photo?</label> : <label>Upload a Cover Photo</label>}
-                    <input type="file" onChange={(e) => {
-                        setCover(e.target.files[0]);
-                    }}></input>
+                    <TextareaAutosize
+                        name="title"
+                        placeholder='Create an Optional Preview Title Text'
+                        value={title ? title : null}
+                        onChange={(e) => setTitle(e.target.value)} maxLength={100}
+                    />
+                    {optionalLongPostDescription}
+                    {coverPhotoUploadText}
+                    <input
+                        type="file"
+                        onChange={(e) => setCover(e.target.files[0])}></input>
                     <label>Date</label>
-                    <input type="date" value={date} onChange={(e) => setDate(e.target.value)}></input>
+                    <input
+                        type="date"
+                        value={date}
+                        onChange={(e) => setDate(e.target.value)}
+                    ></input>
                     <label>Pursuit</label>
-                    <select name="pursuit-category" value={pursuitCategory} onChange={(e) => setPursuitCategory(e.target.value)}>
+                    <select
+                        name="pursuit-category"
+                        value={pursuitCategory}
+                        onChange={(e) => setPursuitCategory(e.target.value)}
+                    >
                         {pursuitSelects}
                     </select>
                     <label>Total Minutes</label>
-                    <input type="number" value={props.min} onChange={(e) => setMinDuration(e.target.value)}></input>
+                    <input
+                        type="number"
+                        value={props.min}
+                        onChange={(e) => setMinDuration(e.target.value)}>
+                    </input>
                     <label>Is Milestone</label>
-                    <input type="checkbox" value={milestone} onClick={() => setMilestone(!milestone)}></input>
+                    <input
+                        type="checkbox"
+                        value={milestone}
+                        onClick={() => setMilestone(!milestone)}>
+                    </input>
                 </div>
                 <div className="reviewpost-button-container">
                     <p>Post to:</p>
-                    <div  >
-                        <select name="posts" id="cars" value={props.preferredPostType ? props.preferredPostType : PUBLIC_FEED} onChange={(e) => setPostPrivacyType(e.target.value)}>
-                            <option value={PRIVATE}>Make post private on your page</option>
-                            <option value={PERSONAL_PAGE}>Make post public on your page:</option>
-                            <option value={PUBLIC_FEED}>Post to your feed and page</option>
+                    <div>
+                        <select
+                            name="posts"
+                            id="cars"
+                            value={props.preferredPostType ?
+                                props.preferredPostType : PUBLIC_FEED}
+                            onChange={(e) => setPostPrivacyType(e.target.value)}
+                        >
+                            <option value={PRIVATE}>
+                                Make post private on your page
+                            </option>
+                            <option value={PERSONAL_PAGE}>
+                                Make post public on your page:
+                            </option>
+                            <option value={PUBLIC_FEED}>
+                                Post to your feed and page
+                            </option>
                         </select>
                     </div>
-                    <button onClick={(e) => handlePostSubmit()}>{props.isUpdateToPost ? "Update!" : "Post!"}</button>
+                    <button onClick={(e) => handlePostSubmit()}>
+                        {props.isUpdateToPost ? "Update!" : "Post!"}
+                    </button>
                 </div>
                 {error ? <p>An Error Occured. Please try again. </p> : <></>}
-                {loading ?
-                    <div>
-                        <p> Loading...</p>
-                    </div> :
-                    <></>}
+                {loading ? <div>  <p> Loading...</p>  </div> : <></>}
             </div>
         </div>
     );

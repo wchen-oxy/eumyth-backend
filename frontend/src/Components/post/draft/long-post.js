@@ -4,14 +4,10 @@ import ReviewPost from './review-post';
 import {
   INITIAL_STATE,
   REVIEW_STATE,
-  PUBLIC_FEED,
-  PERSONAL_PAGE,
-  PRIVATE
+  NONE,
+  LONG
 } from "../../constants/flags";
 import "./long-post.scss";
-
-const NONE = "NONE";
-const LONG = "LONG";
 
 const LongPost = (props) => {
   const [windowState, setWindowState] = useState(INITIAL_STATE);
@@ -174,6 +170,7 @@ const LongPost = (props) => {
         preferredPostType={props.preferredPostType}
         pursuitNames={props.pursuitNames}
         handlePreferredPostTypeChange={props.handlePreferredPostTypeChange}
+        previewTitle={null}
       />
     )
   }
