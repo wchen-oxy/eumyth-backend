@@ -149,7 +149,11 @@ export default class WelcomePage extends React.Component {
           </div>
           <div>
             Please check your email for a verification link.
-              <span>Didn't see the link?  <button onClick={this.props.firebase.doSendEmailVerification}>Resend!</button></span>
+              <span>Didn't see the link?
+                <button onClick={this.props.firebase.doSendEmailVerification}>
+                Resend!
+                </button>
+            </span>
             <button onClick={this.handleRegisterSuccess}>Return</button>
           </div>
         </section>
