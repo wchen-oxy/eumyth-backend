@@ -111,7 +111,8 @@ class CustomImageSlider extends React.Component {
     }
 
     render() {
-        let annotations = !this.props.hideAnnotations ? this.props.annotations : [];
+        let annotations = !this.props.hideAnnotations
+            ? this.props.annotations : [];
         return (
             <>
                 <div className="customimageslider-hero-container">

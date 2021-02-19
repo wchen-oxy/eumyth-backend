@@ -37,7 +37,6 @@ class PostDraftController extends React.Component {
     this._isMounted = true;
     if (this._isMounted && this.props.username) {
       this.handleIndexUserDataSet();
-      // this.handleDraftRetrieval(true);
     }
   }
   componentWillUnmount() {
@@ -69,7 +68,10 @@ class PostDraftController extends React.Component {
             console.log("Error");
             this.setState({ errorSaving: true });
           }
-          this.setState({ onlineDraft: localDraft, updatingOnlineDraft: false });
+          this.setState({
+            onlineDraft: localDraft,
+            updatingOnlineDraft: false
+          });
           return true;
         }
       )
@@ -228,7 +230,11 @@ class PostDraftController extends React.Component {
     if (!this.state.indexUserData) return (<>updatingOnlineDraft...</>)
     return (
       <>
-        <span className="close" onClick={(() => this.props.closeModal())}>X</span>
+        <span
+          className="close"
+          onClick={(() => this.props.closeModal())}>
+          X
+          </span>
         {this.renderWindow(this.state.postType)}
       </>
     );

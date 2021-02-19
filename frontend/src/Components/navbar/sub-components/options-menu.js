@@ -43,7 +43,9 @@ class OptionsMenu extends React.Component {
                                     <Link to={"/account"}> Settings </Link>
                                 </div>
                                 <div className="optionsmenu-button-container">
-                                    <button onClick={this.props.firebase.doSignOut} ><h4>Sign Out</h4></button>
+                                    <button onClick={this.props.firebase.doSignOut}>
+                                        <h4>Sign Out</h4>
+                                    </button>
                                 </div>
                             </div>
                         )

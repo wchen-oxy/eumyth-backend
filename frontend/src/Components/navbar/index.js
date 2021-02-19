@@ -13,7 +13,8 @@ import './index.scss';
 const NavBar = () => (
   <AuthUserContext.Consumer>
     {authUser =>
-      authUser && authUser.emailVerified ? <NavigationAuthBase /> : <NavigationNonAuth />
+      authUser &&
+        authUser.emailVerified ? <NavigationAuthBase /> : <NavigationNonAuth />
     }
   </AuthUserContext.Consumer>
 );
@@ -122,7 +123,9 @@ class NavigationAuth extends React.Component {
                 <h3>Everfire</h3>
               </div>
             </Link>
-            <button onClick={() => this.openModal(POST)}><h4>New Entry</h4></button>
+            <button onClick={() => this.openModal(POST)}>
+              <h4>New Entry</h4>
+            </button>
           </div>
           <div id="navbar-right-container">
             {
@@ -138,7 +141,9 @@ class NavigationAuth extends React.Component {
                     </div>
                     <div id="navbar-main-action-buttons-container">
 
-                      <button onClick={() => this.openModal(REQUEST_ACTION)}><h4>Friends</h4></button>
+                      <button onClick={() => this.openModal(REQUEST_ACTION)}>
+                        <h4>Friends</h4>
+                      </button>
                     </div>
                   </>
                 )

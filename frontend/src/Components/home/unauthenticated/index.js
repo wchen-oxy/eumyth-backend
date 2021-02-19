@@ -82,7 +82,9 @@ export default class WelcomePage extends React.Component {
 
   handleLoginSubmit(e) {
     e.preventDefault();
-    if (!Isemail.validate(this.state.email)) return alert("This is not a valid email!");
+    if (!Isemail.validate(this.state.email)) {
+      return alert("This is not a valid email!");
+    }
     this.props.firebase.doSignIn(this.state.email, this.state.password).then(
       (result) => {
         if (result) {

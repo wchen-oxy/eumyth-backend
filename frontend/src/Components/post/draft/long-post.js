@@ -1,12 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import LongEditor from '../editor/long-editor';
 import ReviewPost from './review-post';
-import {INITIAL_STATE, REVIEW_STATE, PUBLIC_FEED, PERSONAL_PAGE, PRIVATE } from "../../constants/flags";
-
+import {
+  INITIAL_STATE,
+  REVIEW_STATE,
+  PUBLIC_FEED,
+  PERSONAL_PAGE,
+  PRIVATE
+} from "../../constants/flags";
 import "./long-post.scss";
 
-const INITIAL = "INITIAL";
-const REVIEW = "REVIEW";
 const NONE = "NONE";
 const LONG = "LONG";
 
@@ -25,13 +28,18 @@ const LongPost = (props) => {
 
   useEffect(() => {
     if (editorContainerRef.current) {
-      if (editorContainerRef.current.offsetHeight && (editorContainerRef.current.offsetHeight !== editorContainerSize &&
-        editorContainerRef.current.offsetHeight + postHeaderRef.current.offsetHeight > window.innerHeight
-        && lastBlockChanged
-      ) ||
-        (editorContainerRef.current.offsetHeight !== editorContainerSize &&
-          editorContainerRef.current.offsetHeight + postHeaderRef.current.offsetHeight > window.innerHeight &&
-          lastTwoBlockIdentical)
+      const correctedEditorHeight =
+        editorContainerRef.current.offsetHeight
+        + postHeaderRef.current.offsetHeight;
+      if (editorContainerRef.current.offsetHeight
+        && (editorContainerRef.current.offsetHeight !== editorContainerSize
+          &&
+          correctedEditorHeight > window.innerHeight
+          && lastBlockChanged
+        ) ||
+        (editorContainerRef.current.offsetHeight !== editorContainerSize
+          && correctedEditorHeight > window.innerHeight
+          && lastTwoBlockIdentical)
       ) {
         dummyScrollRef.current.scrollIntoView();
       }
@@ -64,31 +72,28 @@ const LongPost = (props) => {
         syncChanges();
       }
       else {
-        //don't care, just leave
         if (windowType === NONE) {
           props.onPostTypeSet(windowType, null);
         }
         else {
-          //go to review page
           setWindowState(windowType);
         }
-
       }
     }
     else {
-      if (windowType === NONE) {
-        props.onPostTypeSet(windowType, localDraft);
-      }
-      else if (windowType === INITIAL_STATE) {
-        setWindowState(windowType);
-      }
-      //already saved, just set the local state
-      else if (windowType === REVIEW_STATE) {
-        setWindowState(windowType);
-        props.onLocalSync(localDraft);
-      }
-      else {
-        setWindowState(windowType);
+      switch (windowType) {
+        case (NONE):
+          props.onPostTypeSet(windowType, localDraft);
+          break;
+        case (INITIAL_STATE):
+          setWindowState(windowType);
+          break;
+        case (REVIEW_STATE):
+          setWindowState(windowType);
+          props.onLocalSync(localDraft);
+          break;
+        default:
+          throw new Error("No Windows Matched");
       }
     }
   }
@@ -100,10 +105,21 @@ const LongPost = (props) => {
           {isSavePending ? (<p>Saving</p>) : (<p>Saved</p>)}
           <div className="longpost-button-container">
             <span  >
-              <button value={NONE} onClick={e => setPostStage(e.target.value, isSavePending)}>Return</button>
+              <button
+                value={NONE}
+                onClick={e => setPostStage(e.target.value, isSavePending)}
+              >
+                Return
+                </button>
             </span>
             <span  >
-              <button value={REVIEW_STATE} disabled={!hasContent} onClick={(e) => setPostStage(e.target.value, isSavePending)}>Review Post</button>
+              <button
+                value={REVIEW_STATE}
+                disabled={!hasContent}
+                onClick={(e) => setPostStage(e.target.value, isSavePending)}
+              >
+                Review Post
+              </button>
             </span>
           </div>
         </div>

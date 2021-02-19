@@ -84,10 +84,19 @@ const ReviewPost = (props) => {
             <option key={pursuit} value={pursuit}>{pursuit}</option>
         );
     }
+    const handleReturnClick = (stageValue) => {
+        if (props.postType === SHORT) {
+            props.setPostStage(stageValue);
+        }
+        else if (props.postType === LONG) {
+            props.setPostStage(stageValue, false)
+        }
+        else {
+            throw new Error("No value matched for return click.");
+        }
 
-    const returnToShortButton = (<button value={props.previousState} onClick={e => props.onClick(e.target.value)}>Return</button>);
-    const returnToLongButton = (<button value={props.previousState} onClick={e => props.setPostStage(e.target.value, false)}>Return</button>);
-    console.log( date);
+    }
+
     return (
         <div id="reviewpost-small-window">
             <div>
@@ -95,7 +104,7 @@ const ReviewPost = (props) => {
                     {props.postType === SHORT ? <h2>Placeholder for short</h2> : <h2>Placeholder for Long</h2>}
                     <div>
                         <span >
-                            {props.postType === SHORT ? returnToShortButton : returnToLongButton}
+                            {<button value={props.previousState} onClick={e => handleReturnClick(e.target.value)}>Return</button>}
                         </span>
                     </div>
                 </div>

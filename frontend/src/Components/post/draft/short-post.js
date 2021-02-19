@@ -221,7 +221,7 @@ class ShortPost extends React.Component {
           previewTitle={this.state.previewTitle}
           closeModal={this.props.closeModal}
           postType={SHORT}
-          onClick={this.handleClick}
+          setPostStage={this.handleClick}
           imageArray={this.state.validFiles}
           textData={this.state.textData}
           username={this.props.username}
