@@ -75,30 +75,46 @@ class ReturningUserPage extends React.Component {
                 .returnIndexUser(this.state.username)
                 .then(
                     (result) => {
+                        const indexUser = result.data;
                         const slicedFeed =
                             result.data.following_feed.slice(
                                 this.state.nextOpenPostIndex,
-                                this.state.nextOpenPostIndex + this.state.fixedDataLoadLength
+                                this.state.nextOpenPostIndex +
+                                this.state.fixedDataLoadLength
                             );
-                        allPostsIdArray = result.data.following_feed;
-                        preferredPostType = result.data.preferred_post_type
-                        croppedDisplayPhoto = result.data.cropped_display_photo_key;
-                        smallCroppedDisplayPhoto = result.data.small_cropped_display_photo_key;
-                        indexUserDataId = result.data._id;
-                        fullUserDataId = result.data.user_profile_id;
-                        pursuits = result.data.pursuits;
-                        hasMore = (!allPostsIdArray || allPostsIdArray.length === 0) ? false : true;
-
-
+                        allPostsIdArray =
+                            indexUser.following_feed;
+                        preferredPostType =
+                            indexUser.preferred_post_type
+                        croppedDisplayPhoto =
+                            indexUser.cropped_display_photo_key;
+                        smallCroppedDisplayPhoto =
+                            indexUser.small_cropped_display_photo_key;
+                        indexUserDataId =
+                            indexUser._id;
+                        fullUserDataId =
+                            indexUser.user_profile_id;
+                        pursuits =
+                            result.data.pursuits;
+                        hasMore = (
+                            !allPostsIdArray ||
+                            allPostsIdArray.length === 0)
+                            ? false : true;
                         if (result.data.pursuits) {
-                            const pursuitObjects = this.createPursuits(result.data.pursuits);
-                            pursuitNames = pursuitObjects.pursuitNames;
-                            pursuitInfoArray = pursuitObjects.pursuitInfoArray;
-                            totalMin = pursuitObjects.totalMin;
+                            const pursuitObjects =
+                                this.createPursuits(result.data.pursuits);
+                            pursuitNames =
+                                pursuitObjects.pursuitNames;
+                            pursuitInfoArray =
+                                pursuitObjects.pursuitInfoArray;
+                            totalMin =
+                                pursuitObjects.totalMin;
                         }
                         if (hasMore === false) {
-                            console.log(result.data.recent_posts);
-                            return AxiosHelper.returnMultiplePosts(result.data.recent_posts, false)
+                            return AxiosHelper
+                                .returnMultiplePosts(
+                                    result.data.recent_posts,
+                                    false)
                                 .then((result) => {
                                     console.log(result);
                                     return {
@@ -109,8 +125,14 @@ class ReturningUserPage extends React.Component {
                         }
                         else {
                             return Promise.all([
-                                AxiosHelper.returnMultiplePosts(result.data.recent_posts, false),
-                                AxiosHelper.returnMultiplePosts(slicedFeed, true)
+                                AxiosHelper
+                                    .returnMultiplePosts(
+                                        result.data.recent_posts,
+                                        false),
+                                AxiosHelper
+                                    .returnMultiplePosts(
+                                        slicedFeed,
+                                        true)
                             ])
                                 .then((results) => {
                                     console.log(results);
@@ -122,32 +144,37 @@ class ReturningUserPage extends React.Component {
                                 });
                         }
 
-                    }
-                )
+                    })
                 .then(
                     (result) => {
-                        this.setState((state) =>
-                        ({
-                            firstName: firstName,
-                            lastName: lastName,
-                            allPostsIdArray: allPostsIdArray ? allPostsIdArray : null,
-                            preferredPostType: preferredPostType,
-                            indexUserDataId: indexUserDataId,
-                            fullUserDataId: fullUserDataId,
-                            croppedDisplayPhoto: croppedDisplayPhoto,
-                            smallCroppedDisplayPhoto: smallCroppedDisplayPhoto,
-                            pursuits: pursuits,
-                            pursuitNames: pursuitNames,
-                            pursuitInfoArray: pursuitInfoArray,
-                            totalMin: totalMin,
-                            recentPosts: result.recentPosts.length > 0 ? result.recentPosts : [],
-                            feedData: !result.isRecentPostsOnly ? result.feedData : [],
-                            nextOpenPostIndex: state.nextOpenPostIndex + state.fixedDataLoadLength,
+                        const recentPosts = result.recentPosts.length > 0 ?
+                            result.recentPosts : [];
+                        const feedData = !result.isRecentPostsOnly ?
+                            result.feedData : [];
+                        const nextOpenPostIndex =
+                            this.state.nextOpenPostIndex +
+                            this.state.fixedDataLoadLength;
 
-                            hasMore: hasMore
-                        }));
-                    }
-                )
+                        this.setState(
+                            ({
+                                firstName: firstName,
+                                lastName: lastName,
+                                allPostsIdArray: allPostsIdArray,
+                                preferredPostType: preferredPostType,
+                                indexUserDataId: indexUserDataId,
+                                fullUserDataId: fullUserDataId,
+                                croppedDisplayPhoto: croppedDisplayPhoto,
+                                smallCroppedDisplayPhoto: smallCroppedDisplayPhoto,
+                                pursuits: pursuits,
+                                pursuitNames: pursuitNames,
+                                pursuitInfoArray: pursuitInfoArray,
+                                totalMin: totalMin,
+                                recentPosts: recentPosts,
+                                feedData: feedData,
+                                nextOpenPostIndex: nextOpenPostIndex,
+                                hasMore: hasMore
+                            }));
+                    })
                 .catch((err) => {
                     console.log(err);
                     alert("Could Not Load Feed." + err);
@@ -197,6 +224,13 @@ class ReturningUserPage extends React.Component {
         let nextOpenPostIndex = this.state.nextOpenPostIndex;
         let index = 0;
         for (const feedItem of inputArray) {
+
+            const preferredPostType = feedItem.username === this.state.username ? (
+                this.state.preferredPostType) : (null);
+            const textData = feedItem.post_format === SHORT ?
+                feedItem.text_data : JSON.parse(feedItem.text_data);
+            const onDeletePost = feedItem.username === this.state.username ?
+                this.handleDeletePost : null;
             masterArray.push(
                 <PostViewerController
                     key={nextOpenPostIndex++}
@@ -205,13 +239,13 @@ class ReturningUserPage extends React.Component {
                     visitorUsername={this.state.username}
                     isOwnProfile={feedItem.username === this.state.username}
                     displayPhoto={feedItem.display_photo_key}
-                    preferredPostType={feedItem.username === this.state.username ? this.state.preferredPostType : null}
+                    preferredPostType={preferredPostType}
                     closeModal={null}
                     pursuitNames={this.state.pursuitNames}
                     username={feedItem.username}
                     eventData={feedItem}
-                    textData={feedItem.post_format === SHORT ? feedItem.text_data : JSON.parse(feedItem.text_data)}
-                    onDeletePost={feedItem.username === this.state.username ? this.handleDeletePost : null}
+                    textData={textData}
+                    onDeletePost={onDeletePost}
                     passDataToModal={this.passDataToModal}
                     largeViewMode={false}
                 />);
@@ -221,21 +255,24 @@ class ReturningUserPage extends React.Component {
     }
 
     fetchNextPosts() {
-        console.log("FetchNextPost");
+        const newEndIndex = this.state.nextOpenPostIndex +
+            this.state.fixedDataLoadLength;
+        const slicedPostsArray = this.state.allPostsIdArray.slice(
+            this.state.nextOpenPostIndex,
+            newEndIndex)
         let hasMore = true;
-        if (this.state.nextOpenPostIndex + this.state.fixedDataLoadLength >= this.state.allPostsIdArray.length) {
+        if (newEndIndex >= this.state.allPostsIdArray.length) {
             hasMore = false;
         }
         return (AxiosHelper
             .returnMultiplePosts(
-                this.state.allPostsIdArray.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength),
+                slicedPostsArray,
                 false)
-
             .then((result) => {
                 if (result.data) {
                     this.setState((state) => ({
                         feedData: state.feedData.concat(result.data.posts),
-                        nextOpenPostIndex: state.nextOpenPostIndex + state.fixedDataLoadLength,
+                        nextOpenPostIndex: newEndIndex,
                         hasMore: hasMore
                     }))
                 }
@@ -257,9 +294,10 @@ class ReturningUserPage extends React.Component {
     }
 
     passDataToModal(data, type, postIndex) {
+        const textData = type === SHORT ? data.text_data : JSON.parse(data.text_data)
         this.setState({
             selectedEvent: data,
-            textData: type === SHORT ? data.text_data : JSON.parse(data.text_data),
+            textData: textData,
             selectedPostFeedType: FRIEND_POSTS,
             selectedPostIndex: postIndex,
         }, this.openModal())
@@ -315,11 +353,21 @@ class ReturningUserPage extends React.Component {
             totalMin += pursuit.total_min;
             pursuitInfoArray.push(
                 <tr key={pursuit.name}>
-                    <th key={pursuit.name + " name"}>{pursuit.name}</th>
-                    <td key={pursuit.name + " experience"}>{pursuit.experience_level}</td>
-                    <td key={pursuit.total_min + "minutes"}>{pursuit.total_min}</td>
-                    <td key={pursuit.num_posts + "posts"}>{pursuit.num_posts}</td>
-                    <td key={pursuit.num_milestones + " milestones"}>{pursuit.num_milestones}</td>
+                    <th key={pursuit.name + " name"}>
+                        {pursuit.name}
+                    </th>
+                    <td key={pursuit.name + " experience"}>
+                        {pursuit.experience_level}
+                    </td>
+                    <td key={pursuit.total_min + "minutes"}>
+                        {pursuit.total_min}
+                    </td>
+                    <td key={pursuit.num_posts + "posts"}>
+                        {pursuit.num_posts}
+                    </td>
+                    <td key={pursuit.num_milestones + " milestones"}>
+                        {pursuit.num_milestones}
+                    </td>
                 </tr>
             );
         }
@@ -330,44 +378,51 @@ class ReturningUserPage extends React.Component {
         }
     }
 
-    renderModal(isModalCalled) {
-        if (isModalCalled) {
-            return (
-                <PostViewerController
-                    largeViewMode={true}
-                    visitorUsername={this.state.username}
-                    key={this.state.selectedEvent._id}
-                    postIndex={this.state.selectedPostIndex}
-                    isOwnProfile={true}
-                    isPostOnlyView={false}
-                    displayPhoto={this.state.smallCroppedDisplayPhoto}
-                    preferredPostType={this.state.preferredPostType}
-                    closeModal={this.closeModal}
-                    pursuitNames={this.state.pursuitNames}
-                    username={this.state.selectedEvent.username}
-                    eventData={this.state.selectedEvent}
-                    selectedPostFeedType={this.state.selectedPostFeedType}
-                    textData={this.state.textData}
-                    onDeletePost={this.handleDeletePost}
-                    handleCommentInjection={this.injectComment}
-                />
-            );
-        }
-        else {
-            return null;
-        }
+    renderModal() {
+        return (
+            <PostViewerController
+                largeViewMode={true}
+                visitorUsername={this.state.username}
+                key={this.state.selectedEvent._id}
+                postIndex={this.state.selectedPostIndex}
+                isOwnProfile={true}
+                isPostOnlyView={false}
+                displayPhoto={this.state.smallCroppedDisplayPhoto}
+                preferredPostType={this.state.preferredPostType}
+                closeModal={this.closeModal}
+                pursuitNames={this.state.pursuitNames}
+                username={this.state.selectedEvent.username}
+                eventData={this.state.selectedEvent}
+                selectedPostFeedType={this.state.selectedPostFeedType}
+                textData={this.state.textData}
+                onDeletePost={this.handleDeletePost}
+                handleCommentInjection={this.injectComment}
+            />
+        );
     }
 
     render() {
-        const renderedFeed = this.state.feedData.length > 0 ? this.createFeed(this.state.feedData) : null;
+        const renderedFeed = this.state.feedData.length > 0 ?
+            this.createFeed(this.state.feedData) : null;
+        const imageURL = this.state.croppedDisplayPhoto ? (
+            returnUserImageURL(this.state.croppedDisplayPhoto))
+            : (
+                TEMP_PROFILE_PHOTO_URL);
+        const renderedRecentPosts = this.state.recentPosts ?
+            this.renderRecentPosts(this.state.recentPosts) : null;
+        const renderedModal = this.state.isModalShowing &&
+            this.state.selectedEvent ? this.renderModal() : null;
         return (
             <div>
-                <div id="returninguser-profile-container" className="returninguser-main-row">
+                <div
+                    id="returninguser-profile-container"
+                    className="returninguser-main-row"
+                >
                     <div className="returninguser-profile-column">
                         <img
                             alt=""
                             id="returninguser-profile-photo"
-                            src={this.state.croppedDisplayPhoto ? returnUserImageURL(this.state.croppedDisplayPhoto) : TEMP_PROFILE_PHOTO_URL}>
+                            src={imageURL}>
                         </img>
                         <div className="returninguser-profile-text-container">
                             <p>{this.state.username}</p>
@@ -397,15 +452,29 @@ class ReturningUserPage extends React.Component {
                         </table>
                     </div>
                 </div>
-                <div id="returninguser-recent-work-container" className="returninguser-main-row">
+                <div
+                    id="returninguser-recent-work-container"
+                    className="returninguser-main-row"
+                >
                     <div className="returninguser-row">
-                        <Link id="returninguser-recent-work-title" className="returninguser-title" to={"/" + this.state.username}>Your Recent Work</Link>
+                        <Link
+                            id="returninguser-recent-work-title"
+                            className="returninguser-title"
+                            to={"/" + this.state.username}
+                        >
+                            Your Recent Work
+                        </Link>
                     </div>
-                    <div id="returninguser-recent-posts-container" className="returninguser-row">
-                        {this.state.recentPosts ? this.renderRecentPosts(this.state.recentPosts) : null}
+                    <div
+                        id="returninguser-recent-posts-container"
+                        className="returninguser-row">
+                        {renderedRecentPosts}
                     </div>
                 </div>
-                <div id="returninguser-feed-container" className="returninguser-main-row">
+                <div
+                    id="returninguser-feed-container"
+                    className="returninguser-main-row"
+                >
                     <h4 className="returninguser-title">Your Feed</h4>
                     <div id="returninguser-infinite-scroll-container" >
                         <InfiniteScroll
@@ -417,21 +486,24 @@ class ReturningUserPage extends React.Component {
                                 <p style={{ textAlign: 'center' }}>
                                     <b>Yay! You have seen it all</b>
                                 </p>}>
-                            {
-                                renderedFeed ? renderedFeed.map((feedItem, index) =>
+                            {renderedFeed ? (
+                                renderedFeed.map((feedItem) =>
                                     <div className="returninguser-feed-object-container">
                                         {feedItem}
                                     </div>
-                                ) : null
-                            }
+                                )) :
+                                null}
                         </InfiniteScroll>
                     </div>
                 </div>
-
                 <div className="modal" ref={this.modalRef}>
-                    <div className="overlay" onClick={(() => this.closeModal())}></div>
+                    <div
+                        className="overlay"
+                        onClick={(() => this.closeModal())}
+                    >
+                    </div>
                     <span className="close" onClick={(() => this.closeModal())}>X</span>
-                    {this.renderModal(this.state.isModalShowing && this.state.selectedEvent)}
+                    {renderedModal}
                 </div>
             </div>
         )

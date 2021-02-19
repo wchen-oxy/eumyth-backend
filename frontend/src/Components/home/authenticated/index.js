@@ -18,7 +18,8 @@ class UserHomePage extends React.Component {
         this.props.firebase.checkIsExistingUser().then(
             result => {
                 if (this._isMounted) {
-                    result ? this.setState({ isNewUser: false }) : this.setState({ isNewUser: true });
+                    result ? this.setState({ isNewUser: false })
+                        : this.setState({ isNewUser: true });
                 }
             }
         );
@@ -32,7 +33,10 @@ class UserHomePage extends React.Component {
         if (this.state.isNewUser === null) {
             return (<div>Grabbing User Info</div>);
         }
-        return (this.state.isNewUser ? <InitialCustomizationPage /> : <ReturningUserPage />);
+        return (this.state.isNewUser ?
+            <InitialCustomizationPage /> :
+            <ReturningUserPage />
+        );
     }
 }
 
