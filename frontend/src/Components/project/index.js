@@ -24,17 +24,17 @@ const handleIndexUpdate = (index) => {
     index++;
     if (index === 4) return 0;
     else {
-        return index++;
+        return index;
     }
 }
-const SortableItem = SortableElement(({ mediaType, data, indexValue }) => (
+const SortableItem = SortableElement(({ mediaType, value, classColumnIndex }) => (
     <div className="sortable-project-post">
         <Event
-            index={indexValue}
+            index={classColumnIndex}
             mediaType={mediaType}
-            eventData={data}
+            eventData={value}
             newProjectView={false}
-            key={data._id}
+            key={value._id}
             disableModalPreview={true}
         />
     </div>
@@ -50,8 +50,9 @@ const SortableList = SortableContainer(({ mediaType, items, onSortEnd }) => (
                 return (
                     <SortableItem
                         key={`item-${index}`}
-                        indexValue={index}
-                        data={value}
+                        index={index}
+                        classColumnIndex={value.column_index}
+                        value={value}
                         mediaType={mediaType}
                         onSortEnd={onSortEnd}
                     />
@@ -164,15 +165,23 @@ class ProjectController extends React.Component {
             eventData.column_index = index;
             updatedProjectData.push(eventData);
         }
+        console.log(updatedProjectData);
         this.setState({ selectedPosts: updatedProjectData });
     }
 
 
     handleSortEnd({ oldIndex, newIndex }) {
-        const items = Array.from(this.state.selectedPosts);
+        console.log(oldIndex, newIndex);
+        const items = this.state.selectedPosts;
+
         const [reorderedItem] = items.splice(oldIndex, 1);
+        let index = -1;
         items.splice(newIndex, 0, reorderedItem);
-        // console.log(items);
+        for (let item of items) {
+            index = handleIndexUpdate(index);
+            item.column_index = index;
+        }
+        console.log(items);
         this.setState({ selectedPosts: items });
     }
 
@@ -228,9 +237,6 @@ class ProjectController extends React.Component {
                         <div className="personal-profile-timeline-container">
                             {this.props.newProject ? <ProjectText titleValue={this.state.title} descriptionValue={this.state.overview} onTextChange={this.handleInputChange} /> : <></>}
                             {this.props.newProject ? <p>Select the posts you want to include in this project!</p> : <></>}
-                            {/* <div id="project-edit-button-container">
-                                <button id="sort-by-date-button">Sort By Date</button>
-                            </div> */}
                             <Timeline
                                 mediaType={this.state.projectSelected || this.props.newProject ? POST : this.props.mediaType}
                                 selectedPosts={this.state.selectedPosts}
@@ -252,7 +258,7 @@ class ProjectController extends React.Component {
                             <button onClick={() => this.handleWindowSwitch(MAIN)}>Return</button>
                             <button onClick={() => this.handleWindowSwitch(REVIEW)}>Finalize</button>
                         </div>
-                        <div className="personal-profile-timeline-container">
+                        <div id="personal-profile-project-submit-container">
                             <SortableList
                                 mediaType={POST}
                                 items={this.state.selectedPosts}
