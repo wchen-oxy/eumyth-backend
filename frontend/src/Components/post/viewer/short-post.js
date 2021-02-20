@@ -7,7 +7,14 @@ import ShortReEditor from '../editor/short-re-editor';
 import ReviewPost from "../draft/review-post";
 import AxiosHelper from "../../../Axios/axios";
 import CustomImageSlider from '../../image-carousel/custom-image-slider';
-import { EXPANDED, COLLAPSED, SHORT, INITIAL_STATE, EDIT_STATE, REVIEW_STATE } from "../../constants/flags";
+import {
+    EXPANDED,
+    COLLAPSED,
+    SHORT,
+    INITIAL_STATE,
+    EDIT_STATE,
+    REVIEW_STATE
+} from "../../constants/flags";
 import { returnUserImageURL } from "../../constants/urls";
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
@@ -173,14 +180,15 @@ class ShortPostViewer extends React.Component {
     }
 
     handleArrowPress(value) {
-        if (this.state.imageIndex + value === this.state.annotations.length) {
+        const currentIndex = this.state.imageIndex + value;
+        if (currentIndex === this.state.annotations.length) {
             return (
                 this.setState({
                     imageIndex: 0,
                     selectedAnnotationIndex: null
                 }));
         }
-        else if (this.state.imageIndex + value === -1) {
+        else if (currentIndex === -1) {
             return (
                 this.setState({
                     imageIndex: this.state.annotations.length - 1,
@@ -189,8 +197,8 @@ class ShortPostViewer extends React.Component {
         }
         else {
             return (
-                this.setState((state) => ({
-                    imageIndex: state.imageIndex + value, selectedAnnotationIndex: null
+                this.setState(({
+                    imageIndex: currentIndex, selectedAnnotationIndex: null
                 })));
         }
     }
@@ -234,7 +242,9 @@ class ShortPostViewer extends React.Component {
                             selectedAnnotationIndex: annotationIndex,
                             areAnnotationsHidden: false,
                         },
-                            this.heroRef.current.scrollIntoView({ block: "center" }))
+                            this.heroRef.current.scrollIntoView({
+                                block: "center"
+                            }))
                     }
                     annotationIndex++;
                 }
@@ -259,15 +269,18 @@ class ShortPostViewer extends React.Component {
             .then((result) => {
                 const rootCommentIdArray = result.data.rootCommentIdArray;
                 const fullAnnotationArray = this.state.annotations;
-                const currentAnnotationArray = this.state.annotations[this.state.imageIndex]
-                    .concat({
-                        geometry,
-                        data: {
-                            ...data,
-                            id: rootCommentIdArray[0]
-                        }
-                    });
-                fullAnnotationArray[this.state.imageIndex] = currentAnnotationArray;
+                const currentAnnotationArray =
+                    this.state
+                        .annotations[this.state.imageIndex]
+                        .concat({
+                            geometry,
+                            data: {
+                                ...data,
+                                id: rootCommentIdArray[0]
+                            }
+                        });
+                fullAnnotationArray[this.state.imageIndex] =
+                    currentAnnotationArray;
                 this.setState({ annotations: fullAnnotationArray })
             })
             .catch((err) => {
@@ -340,8 +353,6 @@ class ShortPostViewer extends React.Component {
                             </div>
                             {this.renderComments(EXPANDED)}
                         </div>
-
-
                     )
                 }
                 else {
@@ -432,7 +443,6 @@ class ShortPostViewer extends React.Component {
                             </div>
                             {this.renderComments(COLLAPSED)}
                         </>
-
                     );
                 }
             }
@@ -464,11 +474,12 @@ class ShortPostViewer extends React.Component {
             )
         }
         else {
-
             let formattedDate = null;
             if (this.props.eventData.date) {
-                console.log(this.props.eventData.date);
-                formattedDate = new Date(this.props.eventData.date).toISOString().substring(0, 10);
+                formattedDate =
+                    new Date(this.props.eventData.date)
+                        .toISOString()
+                        .substring(0, 10);
             }
             return (
                 <ReviewPost
@@ -494,7 +505,6 @@ class ShortPostViewer extends React.Component {
                     onClick={this.handleWindowChange}
                 />
             );
-
         }
     }
 

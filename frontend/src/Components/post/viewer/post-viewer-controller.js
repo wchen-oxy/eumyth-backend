@@ -6,7 +6,6 @@ import { withFirebase } from "../../../Firebase/index";
 
 const PostViewerController = (props) => {
     const isOwnProfile = (props.eventData.username === props.firebase.returnUsername());
-    console.log(props.pursuitNames);
     switch (props.eventData.post_format) {
         case (SHORT):
             return (

@@ -20,7 +20,13 @@ const IS_COMPLETE = "IS_COMPLETE";
 const MINUTES = "MINUTES";
 const COVER_PHOTO = "COVER_PHOTO";
 
-
+const handleIndexUpdate = (index) => {
+    index++;
+    if (index === 4) return 0;
+    else {
+        return index++;
+    }
+}
 const SortableItem = SortableElement(({ mediaType, data, indexValue }) => (
     <div className="sortable-project-post">
         <Event
@@ -41,7 +47,6 @@ const SortableList = SortableContainer(({ mediaType, items, onSortEnd }) => (
     <ul>
         {
             items.map((value, index) => {
-                console.log(index);
                 return (
                     <SortableItem
                         key={`item-${index}`}
@@ -49,7 +54,6 @@ const SortableList = SortableContainer(({ mediaType, items, onSortEnd }) => (
                         data={value}
                         mediaType={mediaType}
                         onSortEnd={onSortEnd}
-
                     />
                 )
             })
@@ -141,18 +145,26 @@ class ProjectController extends React.Component {
     }
 
 
-    handleProjectEventSelect(eventData, isSelected) {
+    handleProjectEventSelect(eventData) {
         let updatedProjectData = [];
         let existsAlready = false;
-        for (const postData of this.state.selectedPosts) {
-            if (postData._id !== eventData._id) updatedProjectData.push(postData);
+        let index = -1;
+        for (let postData of this.state.selectedPosts) {
+            if (postData._id !== eventData._id) {
+                index = handleIndexUpdate(index);
+                postData.column_index = index;
+                updatedProjectData.push(postData);
+            }
             else {
                 existsAlready = true;
             }
         }
-        if (!existsAlready) updatedProjectData.push(eventData);
+        if (!existsAlready) {
+            index = handleIndexUpdate(index);
+            eventData.column_index = index;
+            updatedProjectData.push(eventData);
+        }
         this.setState({ selectedPosts: updatedProjectData });
-
     }
 
 
@@ -160,7 +172,7 @@ class ProjectController extends React.Component {
         const items = Array.from(this.state.selectedPosts);
         const [reorderedItem] = items.splice(oldIndex, 1);
         items.splice(newIndex, 0, reorderedItem);
-        console.log(items);
+        // console.log(items);
         this.setState({ selectedPosts: items });
     }
 
@@ -194,6 +206,7 @@ class ProjectController extends React.Component {
     }
 
     render() {
+        // console.log(this.state.selectedPosts);
         switch (this.state.window) {
             case (MAIN):
                 return (

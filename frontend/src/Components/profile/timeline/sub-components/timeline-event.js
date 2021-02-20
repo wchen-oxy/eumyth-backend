@@ -2,8 +2,8 @@ import React from 'react';
 import ShortEvent from "./timeline-short-event";
 import LongEvent from "./timeline-long-event";
 import ProjectEvent from "./timeline-project-event";
-import './timeline-event.scss';
 import { POST, PROJECT, LONG, SHORT } from "../../../constants/flags";
+import './timeline-event.scss';
 
 const selectClassStyle = (num) => {
     console.log(num);
@@ -17,21 +17,40 @@ const selectClassStyle = (num) => {
         case (3):
             return "event-last-container";
         default:
-            throw new Error("Element Index in Timeline Event is incorrect:" + num);
+            throw new Error("Element Index in Timeline Event is incorrect:", num);
     }
 }
-
 
 const Event = (props) => {
     const post = props.eventData;
     let content = null;
+
+    const handleRecentEventClick = () => {
+        if (!props.disableModalPreview) {
+            props.onEventClick(post, props.index)
+        }
+        else {
+            console.log("Selected")
+        }
+    }
+    
     if (props.mediaType === POST) {
         switch (post.post_format) {
             case (SHORT):
-                content = <ShortEvent post={post} commentCount={post.comment_count}/>
+                content = (
+                    <ShortEvent
+                        post={post}
+                        commentCount={post.comment_count}
+                    />
+                );
                 break;
             case (LONG):
-                content = <LongEvent post={post} commentCount={post.comment_count}/>
+                content = (
+                    <LongEvent
+                        post={post}
+                        commentCount={post.comment_count}
+                    />
+                );
                 break;
             default:
                 throw Error("No matching post type: " + post.post_format);
@@ -39,7 +58,8 @@ const Event = (props) => {
         if (props.isRecentEvents) {
             return (
                 <div className={"event-middle-container"}>
-                    <div onClick={props.disableModalPreview ? () => console.log("Selected") : () => props.onEventClick(post, props.index)}>
+                    <div
+                        onClick={handleRecentEventClick}>
                         {content}
                     </div>
                     {props.newProjectView ? <input type="checkbox" defaultChecked={props.isSelected} onClick={(e) => props.onProjectEventSelect(post, e.target.value)} /> : <></>}

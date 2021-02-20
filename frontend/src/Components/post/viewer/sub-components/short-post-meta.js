@@ -3,7 +3,6 @@ import { returnFormattedDate } from "../../../constants/ui-text";
 
 const ShortPostMetaInfo = (props) => {
     const date = props.date ? returnFormattedDate(props.date) : null;
-
     return (
         <div>
             <div>
@@ -12,7 +11,8 @@ const ShortPostMetaInfo = (props) => {
                 {props.pursuit ? <p>{props.pursuit}</p> : <></>}
                 {props.min ? <p>{props.min} minutes</p> : <></>}
             </div>
-            <p>{props.isPaginated && props.textData ? props.textData[props.index] : props.textData}</p>
+            <p>{props.isPaginated && props.textData ?
+                props.textData[props.index] : props.textData}</p>
         </div>
     )
 }

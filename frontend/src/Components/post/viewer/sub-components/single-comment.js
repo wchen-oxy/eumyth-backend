@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { returnUserImageURL } from "../../../constants/urls";
 import CommentInput from "./comment-input";
 import AxiosHelper from "../../../../Axios/axios";
@@ -26,8 +26,6 @@ class SingleComment extends React.Component {
 
     }
     componentDidMount() {
-        console.log(this.props.commentId);
-        console.log(this.props.ancestors);
         if (this.props.likes.includes(this.props.visitorProfilePreviewId)) {
             this.setState({ previousVote: 1 })
         }
@@ -43,14 +41,17 @@ class SingleComment extends React.Component {
     }
 
     toggleReplyBox() {
-        this.setState((state) => ({ isReplyBoxToggled: !state.isReplyBoxToggled }))
+        this.setState((state) => ({
+            isReplyBoxToggled: !state.isReplyBoxToggled
+        }))
     }
 
     handleVote(currentVote) {
         const temporaryOverallVoteScore = this.state.overallVoteScore;
         const temporaryPreviousVoteValue = this.state.previousVote;
-
         const combinedVote = temporaryPreviousVoteValue + currentVote;
+        const voteValue = combinedVote > -1 && combinedVote < 1 ?
+            currentVote : combinedVote;
         let newCurrentVote = currentVote;
         let overallVoteScoreModifier = currentVote;
 
@@ -65,8 +66,12 @@ class SingleComment extends React.Component {
         }
 
         else if (combinedVote === 0) {
-            if (temporaryPreviousVoteValue === -1) overallVoteScoreModifier = 2;
-            else if (temporaryPreviousVoteValue === 1) overallVoteScoreModifier = -2;
+            if (temporaryPreviousVoteValue === -1) {
+                overallVoteScoreModifier = 2;
+            }
+            else if (temporaryPreviousVoteValue === 1) {
+                overallVoteScoreModifier = -2;
+            }
         }
 
         this.setState({
@@ -78,7 +83,7 @@ class SingleComment extends React.Component {
             .voteOnComment({
                 visitorProfilePreviewId: this.props.visitorProfilePreviewId,
                 commentId: this.props.commentId,
-                voteValue: combinedVote > -1 && combinedVote < 1 ? currentVote : combinedVote,
+                voteValue: voteValue,
             })
             .then((result) => {
                 console.log(result);
@@ -95,8 +100,8 @@ class SingleComment extends React.Component {
 
     isReplyTextInvalid() {
         return (
-            this.state.replyText.replaceAll("\\s+", "").length === 0 ||
-            this.state.replyText.length === 0
+            this.state.replyText.replaceAll("\\s+", "").length === 0
+            || this.state.replyText.length === 0
         );
     }
 
@@ -146,8 +151,10 @@ class SingleComment extends React.Component {
     }
 
     render() {
-         return (
-            <div className={this.props.level > 1 ? "singlecomment-multiple-thread-style" : ""}>
+        const masterClassName = this.props.level > 1 ?
+            "singlecomment-multiple-thread-style" : "";
+        return (
+            <div className={masterClassName}>
                 {this.props.level > 1 ? (
                     <div className="singlecomment-thread-indicator-container">
                         {this.renderThreadIndicators(this.props.level - 1)}
@@ -156,7 +163,9 @@ class SingleComment extends React.Component {
                 <div className="singlecomment-main-container">
                     <div className="singlecomment-header-container">
                         <div className="singlecomment-display-photo-container">
-                            <img src={returnUserImageURL(this.props.displayPhoto)} />
+                            <img
+                                alt="Single Comment Display Photo Url"
+                                src={returnUserImageURL(this.props.displayPhoto)} />
                         </div>
                         <div className="singlecomment-username-container">
                             <p>{this.props.username}</p>
@@ -169,17 +178,26 @@ class SingleComment extends React.Component {
                         <div className={"singlecomment-main-content-container"}>
                             <div className="singlecomment-comment-container"
                                 key={this.props.commentId}
-                                onMouseOver={() => this.props.onMouseOver(this.props.commentId)}
-                                onMouseOut={() => this.props.onMouseOut(this.props.commentId)}
-                                onClick={() => this.props.onMouseClick(this.props.commentId)}
+                                onMouseOver={() => (
+                                    this.props.onMouseOver(this.props.commentId))}
+                                onMouseOut={() => (
+                                    this.props.onMouseOut(this.props.commentId))}
+                                onClick={() => (
+                                    this.props.onMouseClick(this.props.commentId))}
                             >
                                 <p>{this.props.commentText}</p>
                             </div>
                             <div className="singlecomment-management-container">
-                                <button onClick={() => this.handleVote(1)}>Upvote</button>
+                                <button onClick={() => this.handleVote(1)}>
+                                    Upvote
+                                </button>
                                 <p>{this.state.overallVoteScore}</p>
-                                <button onClick={() => this.handleVote(-1)}>Downvote</button>
-                                <button onClick={() => this.toggleReplyBox()}>Reply</button>
+                                <button onClick={() => this.handleVote(-1)}>
+                                    Downvote
+                                </button>
+                                <button onClick={() => this.toggleReplyBox()}>
+                                    Reply
+                                </button>
                             </div>
                             <div>
                                 {this.state.isReplyBoxToggled ?
@@ -190,8 +208,12 @@ class SingleComment extends React.Component {
                                             handleTextChange={this.setReplyText}
                                             commentText={this.state.replyText}
                                         />
-                                        <button onClick={this.cancelTextInput}>Cancel</button>
-                                        <button onClick={this.postReply}>Reply</button>
+                                        <button onClick={this.cancelTextInput}>
+                                            Cancel
+                                        </button>
+                                        <button onClick={this.postReply}>
+                                            Reply
+                                        </button>
                                     </>
                                     :
                                     <></>

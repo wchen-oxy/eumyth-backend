@@ -175,7 +175,7 @@ class ShortEditor extends React.Component {
     render() {
 
         if (!isAdvancedUpload) {
-            console.log("Sorry, this is  not a modern browser! Try another browser.");
+            console.log("Sorry, this is not a modern browser! Try another browser.");
         }
 
         if (this.props.validFiles.length === 0) {

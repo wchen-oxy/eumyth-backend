@@ -4,7 +4,7 @@ import Event from './sub-components/timeline-event';
 import AxiosHelper from '../../../Axios/axios';
 import { PROJECT } from "../../constants/flags";
 import './index.scss';
- 
+
 class Timeline extends React.Component {
     _isMounted = false;
     constructor(props) {
@@ -76,29 +76,42 @@ class Timeline extends React.Component {
     }
 
     fetchNextPosts() {
-        if (this.state.nextOpenPostIndex + this.state.fixedDataLoadLength >= this.props.allPosts.length) {
+        if (this.state.nextOpenPostIndex + this.state.fixedDataLoadLength
+            >= this.props.allPosts.length) {
             console.log("Length of All Posts Exceeded");
             this.setState({ hasMore: false });
         }
         if (this.props.mediaType === PROJECT) {
             return AxiosHelper.returnMultipleProjects(
-                this.props.allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength))
+                this.props.allPosts.slice(
+                    this.state.nextOpenPostIndex,
+                    this.state.nextOpenPostIndex + this.state.fixedDataLoadLength))
                 .then(
                     (result) => {
                         console.log(result.data);
-                        if (this._isMounted) this.createTimelineRow(result.data.posts, this.props.mediaType);
+                        if (this._isMounted) {
+                            this.createTimelineRow(
+                                result.data,
+                                this.props.mediaType);
+                        }
                     }
                 )
                 .catch((error) => console.log(error));
         }
         else {
             return AxiosHelper.returnMultiplePosts(
-                this.props.allPosts.slice(this.state.nextOpenPostIndex, this.state.nextOpenPostIndex + this.state.fixedDataLoadLength),
+                this.props.allPosts.slice(
+                    this.state.nextOpenPostIndex,
+                    this.state.nextOpenPostIndex + this.state.fixedDataLoadLength),
                 false)
                 .then(
                     (result) => {
                         console.log(result.data);
-                        if (this._isMounted) this.createTimelineRow(result.data.posts, this.props.mediaType);
+                        if (this._isMounted) {
+                            this.createTimelineRow(
+                                result.data.posts,
+                                this.props.mediaType);
+                        }
                     }
                 )
                 .catch((error) => console.log(error));
@@ -106,46 +119,42 @@ class Timeline extends React.Component {
     }
 
     render() {
+        const endMessage = (
+            <div>
+                <br />
+                <p style={{ textAlign: 'center' }}>
+                    Yay! You have seen it all
+            </p>
+            </div>
+        )
         if (!this._isMounted || !this.props.allPosts) return (
             <div>
                 <p>Loading</p>
             </div>
         );
         return (
-            <div >
-                {
-                    this.props.allPosts && this.props.allPosts.length > 0 ?
-                        (
-                            <InfiniteScroll
-                                dataLength={this.state.nextOpenPostIndex}
-                                next={this.fetchNextPosts}
-                                hasMore={this.state.hasMore}
-                                loader={<h4>Loading...</h4>}
-                                endMessage=
-                                {
-                                    <p style={{ textAlign: 'center' }}>
-                                        <b>Yay! You have seen it all</b>
-                                    </p>
-                                }>
-                                {
-                                    this.state.feedData.map(
-                                        (item, index) => {
-                                            return (
-                                                <div className="timeline-infinite-scroll-row"
-                                                    key={index}>
-                                                    {item}
-                                                </div>
-                                            )
-                                        }
-                                    )
-                                }
-                                <br />
-                            </InfiniteScroll>
-                        )
-                        :
-                        <p>There doesn't seem to be anything here</p>
+            <div>
+                {this.props.allPosts && this.props.allPosts.length > 0 ?
+                    (<InfiniteScroll
+                        dataLength={this.state.nextOpenPostIndex}
+                        next={this.fetchNextPosts}
+                        hasMore={this.state.hasMore}
+                        loader={<h4>Loading...</h4>}
+                        endMessage={endMessage}>
+                        {this.state.feedData.map((item, index) => (
+                            <div
+                                className="timeline-infinite-scroll-row"
+                                key={index}
+                            >
+                                {item}
+                            </div>
+                        ))}
+                        <br />
+                    </InfiniteScroll>
+                    )
+                    :
+                    <p>There doesn't seem to be anything here</p>
                 }
-
             </div>
         )
     }

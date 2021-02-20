@@ -8,7 +8,6 @@ import PostViewerController from "../post/viewer/post-viewer-controller";
 import FollowButton from "./sub-components/follow-buttons";
 import ProjectController from "../project/index";
 import { returnUserImageURL } from "../constants/urls";
-
 import {
     ALL,
     POST,
@@ -51,7 +50,7 @@ class ProfilePage extends React.Component {
             feedId: null,
             feedData: null,
             mediaType: POST,
-            selectedPursuitIndex: -1, //for pursuit name
+            selectedPursuitIndex: -1,
 
 
             lastRetrievedPostIndex: 0,
@@ -66,6 +65,7 @@ class ProfilePage extends React.Component {
         this.handleEventClick = this.handleEventClick.bind(this);
         this.closeModal = this.closeModal.bind(this);
         this.openModal = this.openModal.bind(this);
+        this.returnPublicPosts = this.returnPublicPosts.bind(this);
         this.handleFollowClick = this.handleFollowClick.bind(this);
         this.handleFollowerStatusChange = this.handleFollowerStatusChange.bind(this);
         this.handleOptionsClick = this.handleOptionsClick.bind(this);
@@ -84,26 +84,21 @@ class ProfilePage extends React.Component {
                         let targetUserInfo = null;
                         AxiosHelper
                             .returnUser(this.state.targetUsername)
-                            .then(
-                                response => {
-                                    targetUserInfo = response.data;
-                                    if (user.displayName !== this.state.targetUsername) {
-                                        return AxiosHelper
-                                            .returnFollowerStatus(
-                                                user.displayName,
-                                                targetUserInfo.user_relation_id
-                                            )
-                                    }
-                                    else return null; //if user owns current profile
-                                }
-                            )
+                            .then(response => {
+                                targetUserInfo = response.data;
+                                return user.displayName !== this.state.targetUsername ?
+                                    AxiosHelper
+                                        .returnFollowerStatus(
+                                            user.displayName,
+                                            targetUserInfo.user_relation_id
+                                        ) : null;
+                            })
                             .then((response) => {
-                                if (response) {
-                                    this.handleResponseData(user, targetUserInfo, response);
-                                }
-                                else {
-                                    this.handleResponseData(user, targetUserInfo, null);
-                                }
+                                this.handleResponseData(
+                                    user,
+                                    targetUserInfo,
+                                    response ? response : null
+                                );
                             })
                             .catch(err => console.log(err));
                     }
@@ -120,12 +115,11 @@ class ProfilePage extends React.Component {
         else if (this._isMounted && this.props.match.params.postId) {
             this.props.firebase.auth.onAuthStateChanged(
                 (user) =>
-                    Promise.all([AxiosHelper
-                        .retrievePost(this.props.match.params.postId, false),
-
-
-                    AxiosHelper
-                        .returnUser(user.displayName)
+                    Promise.all([
+                        AxiosHelper
+                            .retrievePost(this.props.match.params.postId, false),
+                        AxiosHelper
+                            .returnUser(user.displayName)
                     ])
                         .then(
                             (result => {
@@ -140,16 +134,15 @@ class ProfilePage extends React.Component {
                                     postOnlyView: true,
                                     postType: result[0].data.post_format,
                                     visitorUsername: user ? user.displayName : null,
-                                    targetUsername : result[0].data.username,
+                                    targetUsername: result[0].data.username,
                                     pursuitNames: pursuitNameArray,
-
                                 })
                             })
-                        ),
-
-
-
+                        )
             )
+        }
+        else {
+            throw new Error("No profile or post matched");
         }
     }
 
@@ -175,9 +168,11 @@ class ProfilePage extends React.Component {
                 feedId: state.pursuits[state.selectedPursuitIndex].name + mediaType,
                 mediaType: mediaType,
                 feedData: mediaType === POST ?
-                    (state.pursuits[state.selectedPursuitIndex].all_posts ? state.pursuits[state.selectedPursuitIndex].all_posts : [])
+                    (state.pursuits[state.selectedPursuitIndex].all_posts ?
+                        state.pursuits[state.selectedPursuitIndex].all_posts : [])
                     :
-                    (state.pursuits[state.selectedPursuitIndex].all_projects ? state.pursuits[state.selectedPursuitIndex].all_projects : [])
+                    (state.pursuits[state.selectedPursuitIndex].all_projects ?
+                        state.pursuits[state.selectedPursuitIndex].all_projects : [])
             }));
         }
     }
@@ -207,7 +202,12 @@ class ProfilePage extends React.Component {
     }
 
     handleDeletePost() {
-        return AxiosHelper.deletePost(this.state.targetProfileId, this.state.targetIndexUserId, this.state.selectedEvent._id).then((result) => console.log(result));
+        return AxiosHelper
+            .deletePost(
+                this.state.targetProfileId,
+                this.state.targetIndexUserId,
+                this.state.selectedEvent._id)
+            .then((result) => console.log(result));
     }
 
     handleFollowerStatusResponse(followerStatusResponse) {
@@ -226,21 +226,28 @@ class ProfilePage extends React.Component {
                 }
             }
             else if (followerStatusResponse.data.error) {
-                return followerStatusResponse.data.error === NOT_A_FOLLOWER_STATE || followerStatusResponse.data.error === UNFOLLOWED_STATE ?
-                    NOT_A_FOLLOWER_STATE :
-                    FOLLOW_REQUESTED_STATE;
+                return (followerStatusResponse.data.error === NOT_A_FOLLOWER_STATE
+                    || followerStatusResponse.data.error === UNFOLLOWED_STATE ?
+                    NOT_A_FOLLOWER_STATE
+                    :
+                    FOLLOW_REQUESTED_STATE);
             }
         }
     }
 
+    returnPublicPosts(allPosts) {
+        return allPosts.reduce((result, value) => {
+            if (value.post_privacy_type !== PRIVATE) { result.push(value); }
+            return result;
+        }, [])
+    }
     handleResponseData(user, targetUserInfo, followerStatusResponse) {
         let pursuitNameArray = [];
         let projectArray = [];
-        let postsArray = user.displayName === targetUserInfo.username ? targetUserInfo.all_posts : targetUserInfo.all_posts.reduce((result, value) => {
-            if (value.post_privacy_type !== PRIVATE) { result.push(value); }
-            return result;
-        }, []);
-        const followerStatus = followerStatusResponse ? this.handleFollowerStatusResponse(followerStatusResponse) : null;
+        const postsArray = user.displayName === targetUserInfo.username ?
+            targetUserInfo.all_posts : this.returnPublicPosts(targetUserInfo.all_posts);
+        const followerStatus = followerStatusResponse ?
+            this.handleFollowerStatusResponse(followerStatusResponse) : null;
         for (const pursuit of targetUserInfo.pursuits) {
             pursuitNameArray.push(pursuit.name);
             if (pursuit.projects) {
@@ -249,7 +256,6 @@ class ProfilePage extends React.Component {
                 }
             }
         }
-        console.log(user);
 
         //set visitor user info and targetUserinfo
         if (this._isMounted) this.setState({
@@ -384,7 +390,7 @@ class ProfilePage extends React.Component {
             }
         }
         if (this.state.postOnlyView) {
-             return (
+            return (
                 <PostViewerController
                     key={this.state.selectedEvent._id}
                     isOwnProfile={this.state.visitorUsername === this.state.selectedEvent.username}
@@ -407,7 +413,7 @@ class ProfilePage extends React.Component {
                 />
             )
         }
-        else if (!this.state.postOnlyView)
+        else if (!this.state.postOnlyView) {
             return (
                 <div>
                     <div id="profile-main-container">
@@ -517,6 +523,7 @@ class ProfilePage extends React.Component {
                     </div>
                 </div>
             );
+        }
         else {
             return new Error("State condition for postOnlyView was null");
         }

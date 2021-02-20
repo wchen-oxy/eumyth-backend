@@ -16,13 +16,11 @@ class Comments extends React.Component {
             commentText: "",
             loadingComments: true,
 
-
         }
         this.renderCommentSectionType = this.renderCommentSectionType.bind(this);
         this.renderCommentInput = this.renderCommentInput.bind(this);
         this.renderCommentThreads = this.renderCommentThreads.bind(this);
         this.recursiveRenderComments = this.recursiveRenderComments.bind(this);
-
         this.handleCommentTextChange = this.handleCommentTextChange.bind(this);
         this.handleCommentPost = this.handleCommentPost.bind(this);
     }
@@ -44,7 +42,11 @@ class Comments extends React.Component {
                             loadingComments: false,
                             currentComments: result.data.rootComments
                         }, () => {
-                            if (this.props.postType === SHORT) this.props.passAnnotationData(result.data.rootComments, result.data.userPreviewId)
+                            if (this.props.postType === SHORT) {
+                                this.props.passAnnotationData(
+                                    result.data.rootComments,
+                                    result.data.userPreviewId)
+                            }
                         });
 
 
@@ -52,14 +54,22 @@ class Comments extends React.Component {
                 )
         }
         else {
-            AxiosHelper.getUserPreviewId({ params: { username: this.props.visitorUsername } })
+            AxiosHelper
+                .getUserPreviewId({
+                    params: { username: this.props.visitorUsername }
+                })
                 .then((result) => {
                     this.setState({
                         visitorProfilePreviewId: result.data.userPreviewId,
                         loadingComments: false,
                         currentComments: []
                     }, () => {
-                        if (this.props.postType === SHORT) this.props.passAnnotationData(null, result.data.userPreviewId)
+                        if (this.props.postType === SHORT) {
+                            this.props.passAnnotationData(
+                                null,
+                                result.data.userPreviewId
+                            );
+                        }
                     });
                 })
         }
@@ -81,13 +91,23 @@ class Comments extends React.Component {
             .postComment(payload)
             .then(
                 (result) => {
+                    const commentArray = result.data.rootCommentIdArray
                     return AxiosHelper
-                        .refreshComments({ params: { rootCommentIdArray: JSON.stringify(result.data.rootCommentIdArray) } })
+                        .refreshComments({
+                            params:
+                            {
+                                rootCommentIdArray: JSON.stringify(commentArray)
+                            }
+                        })
                         .then((result) => {
-                            this.props.handleCommentInjection(this.props.postIndex, result.data.rootComments, this.props.selectedPostFeedType);
-                            this.setState({ currentComments: result.data.rootComments });
-                        }
-                        )
+                            this.props.handleCommentInjection(
+                                this.props.postIndex,
+                                result.data.rootComments,
+                                this.props.selectedPostFeedType);
+                            this.setState({
+                                currentComments: result.data.rootComments
+                            });
+                        })
                 })
             .then(() => alert("Success!"))
 
@@ -117,9 +137,11 @@ class Comments extends React.Component {
 
     recursiveRenderComments(commentData, level) {
         const currentLevel = level + 1;
-        const annotation = commentData.annotation ? JSON.parse(commentData.annotation.data) : null;
-        const text = commentData.comment ? commentData.comment : annotation.text;
-        console.log(commentData);
+        const annotation =
+            commentData.annotation ?
+                JSON.parse(commentData.annotation.data) : null;
+        const text = commentData.comment ?
+            commentData.comment : annotation.text;
         if (!commentData.replies) {
             return (
                 <SingleComment
@@ -202,7 +224,10 @@ class Comments extends React.Component {
         if (this.props.visitorUsername) {
             return (
                 <div className={viewingMode === COLLAPSED ?
-                    "comments-collapsed-input-container" : "comments-expanded-input-container"}>
+                    "comments-collapsed-input-container"
+                    :
+                    "comments-expanded-input-container"}
+                >
                     <CommentInput
                         classStyle={viewingMode === COLLAPSED ?
                             "comments-collapsed-input" : "comments-expanded-input"}
@@ -227,7 +252,7 @@ class Comments extends React.Component {
         }
     }
 
-   
+
 
     render() {
         if (this.state.windowType === COLLAPSED) {
