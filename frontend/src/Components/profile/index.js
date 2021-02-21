@@ -63,6 +63,7 @@ class ProfilePage extends React.Component {
         this.modalRef = React.createRef();
         this.miniModalRef = React.createRef();
         this.handleEventClick = this.handleEventClick.bind(this);
+        this.renderHeroContent = this.renderHeroContent.bind(this);
         this.closeModal = this.closeModal.bind(this);
         this.openModal = this.openModal.bind(this);
         this.returnPublicPosts = this.returnPublicPosts.bind(this);
@@ -241,6 +242,7 @@ class ProfilePage extends React.Component {
             return result;
         }, [])
     }
+
     handleResponseData(user, targetUserInfo, followerStatusResponse) {
         let pursuitNameArray = [];
         let projectArray = [];
@@ -318,6 +320,30 @@ class ProfilePage extends React.Component {
             .catch(error => console.log(error));
     }
 
+    renderHeroContent() {
+        return this.state.mediaType === POST ? (
+            < Timeline
+                mediaType={this.state.mediaType}
+                key={this.state.feedId}
+                allPosts={this.state.feedData}
+                onEventClick={this.handleEventClick}
+                targetProfileId={this.state.targetProfileId} />)
+            :
+            (<ProjectController
+                username={this.state.targetUsername}
+                displayPhoto={this.state.smallCroppedDisplayPhoto}
+                targetProfileId={this.state.targetProfileId}
+                targetIndexUserId={this.state.targetIndexUserId}
+                mediaType={this.state.mediaType}
+                newProject={this.state.newProject}
+                key={this.state.feedId}
+                allPosts={this.state.feedData}
+                onEventClick={this.handleEventClick}
+                onNewBackProjectClick={this.handleNewBackProjectClick}
+                pursuitNames={this.state.pursuitNames}
+            />)
+    }
+
     handleNewBackProjectClick() {
         if (!this.state.newProject) {
             this.setState((state) => ({
@@ -368,7 +394,14 @@ class ProfilePage extends React.Component {
     }
 
     render() {
-        var pursuitHolderArray = [
+        const shouldHideProfile = (
+            this.state.visitorUsername === null && this.state.isPrivate)
+            || (this.state.visitorUsername !== this.state.targetUsername
+                && this.state.isPrivate
+            )
+            && (this.state.followerStatus !== "FOLLOWING" &&
+                this.state.followerStatus !== "REQUEST_ACCEPTED");
+        let pursuitHolderArray = [
             <PursuitHolder
                 key={ALL}
                 name={ALL}
@@ -420,15 +453,27 @@ class ProfilePage extends React.Component {
                         <div id="profile-cover-photo-container">
                             {
                                 this.state.coverPhoto ?
-                                    (<img src={returnUserImageURL(this.state.coverPhoto)}></img>) :
-                                    (<div id="profile-temp-cover"></div>)
+                                    (<img
+                                        alt="cover photo"
+                                        src={returnUserImageURL(
+                                            this.state.coverPhoto)}
+                                    ></img>
+                                    ) : (
+                                        <div id="profile-temp-cover"></div>
+                                    )
                             }
                         </div>
                         <div id="profile-intro-container">
                             <div id="profile-display-photo-container">
-                                {this.state.croppedDisplayPhoto ?
-                                    <img src={returnUserImageURL(this.state.croppedDisplayPhoto)}></img> :
-                                    <></>
+                                {this.state.croppedDisplayPhoto ? (
+                                    <img
+                                        alt="user profile photo"
+                                        src={returnUserImageURL(
+                                            this.state.croppedDisplayPhoto)}
+                                    ></img>
+                                ) : (
+                                        <></>
+                                    )
                                 }
                                 <div id="profile-name-container">
                                     <h4>{this.state.targetUsername}</h4>
@@ -452,50 +497,28 @@ class ProfilePage extends React.Component {
 
                         <div id="profile-content-switch-container">
                             <button
-                                disabled={this.state.mediaType === POST ? true : false}
+                                disabled={this.state.mediaType === POST ?
+                                    true : false}
                                 onClick={() => this.handleMediaTypeSwitch(POST)}>
                                 Posts
                         </button>
                             <button
-                                disabled={this.state.mediaType === PROJECT ? true : false}
+                                disabled={this.state.mediaType === PROJECT ?
+                                    true : false}
                                 onClick={() => this.handleMediaTypeSwitch(PROJECT)}>
                                 Projects
                         </button>
                         </div>
                         {
-                            (this.state.visitorUsername === null && this.state.isPrivate) ||
-                                (this.state.visitorUsername !== this.state.targetUsername && this.state.isPrivate) &&
-                                (
-                                    this.state.followerStatus !== "FOLLOWING" &&
-                                    this.state.followerStatus !== "REQUEST_ACCEPTED"
-                                )
+                            shouldHideProfile
                                 ?
-                                <p>This profile is private. To see these posts, please request access. </p> :
-                                this.state.mediaType === POST ?
-                                    < Timeline
-                                        mediaType={this.state.mediaType}
-                                        key={this.state.feedId}
-                                        allPosts={this.state.feedData}
-                                        onEventClick={this.handleEventClick}
-                                        targetProfileId={this.state.targetProfileId} />
-                                    :
+                                <p>This profile is private. To see
+                                    these posts, please request access. </p>
+                                :
+                                this.renderHeroContent()
 
-                                    <ProjectController
-                                        username={this.state.targetUsername}
-                                        displayPhoto={this.state.smallCroppedDisplayPhoto}
-                                        targetProfileId={this.state.targetProfileId}
-                                        targetIndexUserId={this.state.targetIndexUserId}
-                                        mediaType={this.state.mediaType}
-                                        newProject={this.state.newProject}
-                                        key={this.state.feedId}
-                                        allPosts={this.state.feedData}
-                                        onEventClick={this.handleEventClick}
-                                        onNewBackProjectClick={this.handleNewBackProjectClick}
-                                        pursuitNames={this.state.pursuitNames}
-                                    />
                         }
                     </div>
-
                     <div className="modal" ref={this.modalRef}>
                         <div className="overlay" onClick={(() => this.closeModal())}></div>
                         <span className="close" onClick={(() => this.closeModal())}>X</span>

@@ -1,3 +1,5 @@
+@import "../../partials";
+
 #sort-by-date-button {
     float: right;
 }
@@ -6,11 +8,15 @@
     float: right;
 }
 
-.sortable-project-post {
+.projectcontroller-event-container {
     display: inline-block;
 }
 
-#personal-profile-project-submit-container {
+#projectcontroller-submit-container{
+    @include flex-display-column;
+}
+
+#projectcontroller-sortable-list-container {
     ul {
         padding: 0;
     }

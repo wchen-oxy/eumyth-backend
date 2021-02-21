@@ -28,7 +28,7 @@ router.route('/').post(
         const displayPhoto = req.body.displayPhoto;
         const userId = req.body.userId;
         const indexUserId = req.body.indexUserId;
-        const selectedPosts = [];
+        const selectedPosts = req.body.selectedPosts ? JSON.parse(req.body.selectedPosts) : [];
         const title = req.body.title ? req.body.title : null;
         const overview = req.body.overview ? req.body.overview : null;
         const pursuitCategory = req.body.pursuitCategory ? req.body.pursuitCategory : null;
@@ -37,10 +37,8 @@ router.route('/').post(
         const isComplete = req.body.isComplete ? req.body.isComplete : null;
         const minDuration = req.body.minDuration ? req.body.minDuration : null;
         const coverPhotoURL = req.files ? req.files.coverPhoto[0].key : null;
-      
-        for (const post of (req.body.selectedPosts)) {
-            selectedPosts.push(JSON.parse(post)._id);
-        }
+        console.log(selectedPosts);
+        
         const newProject = new Project.Model({
             username: username,
             author_id: indexUserId,

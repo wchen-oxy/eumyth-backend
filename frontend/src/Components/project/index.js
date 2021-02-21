@@ -28,7 +28,7 @@ const handleIndexUpdate = (index) => {
     }
 }
 const SortableItem = SortableElement(({ mediaType, value, classColumnIndex }) => (
-    <div className="sortable-project-post">
+    <div className="projectcontroller-event-container">
         <Event
             index={classColumnIndex}
             mediaType={mediaType}
@@ -199,10 +199,12 @@ class ProjectController extends React.Component {
         if (this.state.isComplete) formData.append("isComplete", this.state.isComplete);
         if (this.state.minDuration) formData.append("minDuration", this.state.minDuration);
         if (this.state.coverPhoto) formData.append("coverPhoto", this.state.coverPhoto);
-        for (const post of this.state.selectedPosts) {
-            formData.append("selectedPosts", JSON.stringify(post));
-        }
-        AxiosHelper.createProject(formData)
+        if (this.state.selectedPosts) formData.append("selectedPosts", JSON.stringify(this.state.selectedPosts));
+
+        // for (const post of this.state.selectedPosts) {
+        //     formData.append("selectedPosts", JSON.stringify(post));
+        // }
+        return AxiosHelper.createProject(formData)
             .then((result) => {
                 console.log(result);
                 alert(result);
@@ -220,7 +222,7 @@ class ProjectController extends React.Component {
             case (MAIN):
                 return (
                     <>
-                        <div className="personal-profile-content-switch-container">
+                        <div className="">
                             {
                                 this.props.newProject || this.state.projectSelected ?
                                     <button onClick={this.handleBackClick}>Back</button>
@@ -234,7 +236,7 @@ class ProjectController extends React.Component {
                                     <></>
                             }
                         </div>
-                        <div className="personal-profile-timeline-container">
+                        <div className="">
                             {this.props.newProject ? <ProjectText titleValue={this.state.title} descriptionValue={this.state.overview} onTextChange={this.handleInputChange} /> : <></>}
                             {this.props.newProject ? <p>Select the posts you want to include in this project!</p> : <></>}
                             <Timeline
@@ -254,11 +256,11 @@ class ProjectController extends React.Component {
 
                 return (
                     <div >
-                        <div className="personal-profile-content-switch-container">
+                        <div className="">
                             <button onClick={() => this.handleWindowSwitch(MAIN)}>Return</button>
                             <button onClick={() => this.handleWindowSwitch(REVIEW)}>Finalize</button>
                         </div>
-                        <div id="personal-profile-project-submit-container">
+                        <div id="projectcontroller-sortable-list-container">
                             <SortableList
                                 mediaType={POST}
                                 items={this.state.selectedPosts}
@@ -279,32 +281,30 @@ class ProjectController extends React.Component {
 
                 return (
                     <div >
-                        <div className="personal-profile-content-switch-container">
+                        <div className="">
                             <button onClick={() => this.handleWindowSwitch(MAIN)}>Return</button>
                             <button onClick={() => this.handlePost()}>Post!</button>
                         </div>
-                        <div className="personal-profile-timeline-container">
-                            <div id="personal-profile-project-submit-container">
-                                <TextareaAutosize value={this.state.title} onChange={(e) => this.handleInputChange(TITLE, e.target.value)} />
-                                <TextareaAutosize value={this.state.overview} onChange={(e) => this.handleInputChange(OVERVIEW, e.target.value)} />
-                                <label>Pursuit</label>
-                                <select name="pursuit-category" value={this.state.pursuitCategory} onChange={(e) => this.handleInputChange(PURSUIT, e.target.value)}>
-                                    {pursuitSelects}
-                                </select>
-                                <label>Start Date</label>
-                                <input type="date" value={this.state.startDate} onChange={(e) => this.handleInputChange(START_DATE, e.target.value)}></input>
-                                <label>End Date</label>
-                                <input type="date" value={this.state.endDate} onChange={(e) => this.handleInputChange(END_DATE, e.target.value)}></input>
-                                <label>Total Minutes</label>
-                                <input type="number" value={this.state.minDuration} onChange={(e) => this.handleInputChange(MINUTES, e.target.value)}></input>
-                                <label>Is Complete</label>
-                                <input type="checkbox" onClick={() => this.handleInputChange(IS_COMPLETE, !this.state.isComplete)}></input>
-                                <label>Cover Photo</label>
-                                <input type="file" onChange={(e) => this.handleInputChange(COVER_PHOTO, e.target.files[0])} />
-                                <button onClick={this.handlePost}>Submit</button>
-                            </div>
-
+                        <div id="projectcontroller-submit-container">
+                            <TextareaAutosize value={this.state.title} onChange={(e) => this.handleInputChange(TITLE, e.target.value)} />
+                            <TextareaAutosize value={this.state.overview} onChange={(e) => this.handleInputChange(OVERVIEW, e.target.value)} />
+                            <label>Pursuit</label>
+                            <select name="pursuit-category" value={this.state.pursuitCategory} onChange={(e) => this.handleInputChange(PURSUIT, e.target.value)}>
+                                {pursuitSelects}
+                            </select>
+                            <label>Start Date</label>
+                            <input type="date" value={this.state.startDate} onChange={(e) => this.handleInputChange(START_DATE, e.target.value)}></input>
+                            <label>End Date</label>
+                            <input type="date" value={this.state.endDate} onChange={(e) => this.handleInputChange(END_DATE, e.target.value)}></input>
+                            <label>Total Minutes</label>
+                            <input type="number" value={this.state.minDuration} onChange={(e) => this.handleInputChange(MINUTES, e.target.value)}></input>
+                            <label>Is Complete</label>
+                            <input type="checkbox" onClick={() => this.handleInputChange(IS_COMPLETE, !this.state.isComplete)}></input>
+                            <label>Cover Photo</label>
+                            <input type="file" onChange={(e) => this.handleInputChange(COVER_PHOTO, e.target.files[0])} />
+                            <button onClick={this.handlePost}>Submit</button>
                         </div>
+
                     </div>
                 )
             default:
