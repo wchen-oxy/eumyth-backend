@@ -4,9 +4,9 @@ import Timeline from "../profile/timeline/index";
 import Event from "../profile/timeline/sub-components/timeline-event";
 import TextareaAutosize from 'react-textarea-autosize';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
-import "./index.scss";
 import AxiosHelper from '../../Axios/axios';
 import { POST } from "../constants/flags";
+import "./index.scss";
 
 const MAIN = "MAIN";
 const EDIT = "EDIT";
@@ -27,38 +27,34 @@ const handleIndexUpdate = (index) => {
         return index;
     }
 }
-const SortableItem = SortableElement(({ mediaType, value, classColumnIndex }) => (
-    <div className="projectcontroller-event-container">
-        <Event
-            index={classColumnIndex}
-            mediaType={mediaType}
-            eventData={value}
-            newProjectView={false}
-            key={value._id}
-            disableModalPreview={true}
-        />
-    </div>
 
-)
-
-);
+const SortableItem = SortableElement(({ mediaType, value, classColumnIndex }) =>
+(<div className="projectcontroller-event-container">
+    <Event
+        index={classColumnIndex}
+        mediaType={mediaType}
+        eventData={value}
+        newProjectView={false}
+        key={value._id}
+        disableModalPreview={true}
+    />
+</div>
+));
 
 const SortableList = SortableContainer(({ mediaType, items, onSortEnd }) => (
     <ul>
-        {
-            items.map((value, index) => {
-                return (
-                    <SortableItem
-                        key={`item-${index}`}
-                        index={index}
-                        classColumnIndex={value.column_index}
-                        value={value}
-                        mediaType={mediaType}
-                        onSortEnd={onSortEnd}
-                    />
-                )
-            })
-        }
+        { items.map((value, index) => {
+            return (
+                <SortableItem
+                    key={`item-${index}`}
+                    index={index}
+                    classColumnIndex={value.column_index}
+                    value={value}
+                    mediaType={mediaType}
+                    onSortEnd={onSortEnd}
+                />
+            )
+        })}
     </ul>
 )
 );
@@ -192,22 +188,37 @@ class ProjectController extends React.Component {
         formData.append("userId", this.props.targetProfileId);
         formData.append("indexUserId", this.props.targetIndexUserId);
         formData.append("title", this.state.title);
-        if (this.state.overview) formData.append("overview", this.state.overview);
-        if (this.state.pursuitCategory) formData.append("pursuitCategory", this.state.pursuitCategory);
-        if (this.state.startDate) formData.append("startDate", this.state.startDate);
-        if (this.state.endDate) formData.append("endDate", this.state.endDate);
-        if (this.state.isComplete) formData.append("isComplete", this.state.isComplete);
-        if (this.state.minDuration) formData.append("minDuration", this.state.minDuration);
-        if (this.state.coverPhoto) formData.append("coverPhoto", this.state.coverPhoto);
-        if (this.state.selectedPosts) formData.append("selectedPosts", JSON.stringify(this.state.selectedPosts));
+        if (this.state.overview) {
+            formData.append("overview", this.state.overview);
+        }
+        if (this.state.pursuitCategory) {
+            formData.append("pursuitCategory", this.state.pursuitCategory);
+        }
+        if (this.state.startDate) {
+            formData.append("startDate", this.state.startDate);
+        }
+        if (this.state.endDate) {
+            formData.append("endDate", this.state.endDate);
+        }
+        if (this.state.isComplete) {
+            formData.append("isComplete", this.state.isComplete);
+        }
+        if (this.state.minDuration) {
+            formData.append("minDuration", this.state.minDuration);
+        }
+        if (this.state.coverPhoto) {
+            formData.append("coverPhoto", this.state.coverPhoto);
+        }
+        if (this.state.selectedPosts) {
+            const stringArray = JSON.stringify(this.state.selectedPosts);
+            formData.append("selectedPosts", stringArray);
+        }
 
-        // for (const post of this.state.selectedPosts) {
-        //     formData.append("selectedPosts", JSON.stringify(post));
-        // }
         return AxiosHelper.createProject(formData)
             .then((result) => {
                 console.log(result);
-                alert(result);
+                alert("Success!");
+                window.location.reload();
             })
             .catch(err => console.log(err));
     }
@@ -217,36 +228,63 @@ class ProjectController extends React.Component {
     }
 
     render() {
-        // console.log(this.state.selectedPosts);
         switch (this.state.window) {
             case (MAIN):
+                const isNewProjectState = this.props.newProject || this.state.projectSelected;
                 return (
                     <>
                         <div className="">
-                            {
-                                this.props.newProject || this.state.projectSelected ?
-                                    <button onClick={this.handleBackClick}>Back</button>
-                                    :
-                                    <button onClick={this.props.onNewBackProjectClick}>New</button>
+                            {isNewProjectState ? (
+                                <button
+                                    onClick={this.handleBackClick}
+                                >
+                                    Back
+                                </button>)
+                                :
+                                <button
+                                    onClick={this.props.onNewBackProjectClick}
+                                >
+                                    New
+                                </button>
                             }
-                            {
-                                this.props.newProject ?
-                                    <button id="project-info-button" onClick={() => this.handleWindowSwitch(EDIT)}>Next Step</button>
-                                    :
-                                    <></>
+                            {this.props.newProject ?
+                                <button
+                                    id="project-info-button"
+                                    onClick={() => this.handleWindowSwitch(EDIT)}
+                                >
+                                    Next Step
+                                </button>
+                                :
+                                <></>
                             }
                         </div>
                         <div className="">
-                            {this.props.newProject ? <ProjectText titleValue={this.state.title} descriptionValue={this.state.overview} onTextChange={this.handleInputChange} /> : <></>}
-                            {this.props.newProject ? <p>Select the posts you want to include in this project!</p> : <></>}
+                            {this.props.newProject ?
+                                <ProjectText
+                                    titleValue={this.state.title}
+                                    descriptionValue={this.state.overview}
+                                    onTextChange={this.handleInputChange}
+                                />
+                                : (<></>)
+                            }
+                            {this.props.newProject ?
+                                <p>Select the posts you want to include in this project!</p>
+                                : <></>}
                             <Timeline
-                                mediaType={this.state.projectSelected || this.props.newProject ? POST : this.props.mediaType}
+                                mediaType={isNewProjectState ?
+                                    POST : this.props.mediaType}
                                 selectedPosts={this.state.selectedPosts}
                                 newProjectView={this.props.newProject}
                                 onProjectEventSelect={this.handleProjectEventSelect}
                                 onProjectClick={this.handleProjectClick}
-                                key={this.state.projectSelected ? this.state.projectSelected._id : this.props.feedId}
-                                allPosts={this.state.projectSelected ? this.state.projectSelected.post_ids : this.props.allPosts}
+                                key={this.state.projectSelected ? (
+                                    this.state.projectSelected._id)
+                                    : (
+                                        this.props.feedId)}
+                                allPosts={this.state.projectSelected ? (
+                                    this.state.projectSelected.post_ids
+                                ) : (
+                                        this.props.allPosts)}
                                 onEventClick={this.props.onEventClick}
                                 targetProfileId={this.props.targetProfileId} />
                         </div>
@@ -257,8 +295,16 @@ class ProjectController extends React.Component {
                 return (
                     <div >
                         <div className="">
-                            <button onClick={() => this.handleWindowSwitch(MAIN)}>Return</button>
-                            <button onClick={() => this.handleWindowSwitch(REVIEW)}>Finalize</button>
+                            <button
+                                onClick={() => this.handleWindowSwitch(MAIN)}
+                            >
+                                Return
+                                </button>
+                            <button
+                                onClick={() => this.handleWindowSwitch(REVIEW)}
+                            >
+                                Finalize
+                            </button>
                         </div>
                         <div id="projectcontroller-sortable-list-container">
                             <SortableList
@@ -282,27 +328,81 @@ class ProjectController extends React.Component {
                 return (
                     <div >
                         <div className="">
-                            <button onClick={() => this.handleWindowSwitch(MAIN)}>Return</button>
-                            <button onClick={() => this.handlePost()}>Post!</button>
+                            <button
+                                onClick={() => this.handleWindowSwitch(MAIN)}
+                            >
+                                Return
+                            </button>
+                            <button
+                                onClick={() => this.handlePost()}
+                            >
+                                Post!
+                            </button>
                         </div>
                         <div id="projectcontroller-submit-container">
-                            <TextareaAutosize value={this.state.title} onChange={(e) => this.handleInputChange(TITLE, e.target.value)} />
-                            <TextareaAutosize value={this.state.overview} onChange={(e) => this.handleInputChange(OVERVIEW, e.target.value)} />
+                            <TextareaAutosize
+                                value={this.state.title}
+                                onChange={(e) => (
+                                    this.handleInputChange(TITLE, e.target.value)
+                                )}
+                            />
+                            <TextareaAutosize
+                                value={this.state.overview}
+                                onChange={(e) => (
+                                    this.handleInputChange(OVERVIEW, e.target.value)
+                                )} />
                             <label>Pursuit</label>
-                            <select name="pursuit-category" value={this.state.pursuitCategory} onChange={(e) => this.handleInputChange(PURSUIT, e.target.value)}>
+                            <select
+                                name="pursuit-category"
+                                value={this.state.pursuitCategory}
+                                onChange={(e) => (
+                                    this.handleInputChange(PURSUIT, e.target.value)
+                                )}
+                            >
                                 {pursuitSelects}
                             </select>
                             <label>Start Date</label>
-                            <input type="date" value={this.state.startDate} onChange={(e) => this.handleInputChange(START_DATE, e.target.value)}></input>
+                            <input
+                                type="date"
+                                value={this.state.startDate}
+                                onChange={(e) => (
+                                    this.handleInputChange(START_DATE, e.target.value))}
+                            />
                             <label>End Date</label>
-                            <input type="date" value={this.state.endDate} onChange={(e) => this.handleInputChange(END_DATE, e.target.value)}></input>
+                            <input
+                                type="date"
+                                value={this.state.endDate}
+                                onChange={(e) => (
+                                    this.handleInputChange(END_DATE, e.target.value))}
+                            />
                             <label>Total Minutes</label>
-                            <input type="number" value={this.state.minDuration} onChange={(e) => this.handleInputChange(MINUTES, e.target.value)}></input>
+                            <input
+                                type="number"
+                                value={this.state.minDuration}
+                                onChange={(e) => (
+                                    this.handleInputChange(MINUTES, e.target.value)
+                                )}
+                            />
                             <label>Is Complete</label>
-                            <input type="checkbox" onClick={() => this.handleInputChange(IS_COMPLETE, !this.state.isComplete)}></input>
+                            <input
+                                type="checkbox"
+                                onClick={() => (
+                                    this.handleInputChange(IS_COMPLETE,
+                                        !this.state.isComplete)
+                                )}
+                            />
                             <label>Cover Photo</label>
-                            <input type="file" onChange={(e) => this.handleInputChange(COVER_PHOTO, e.target.files[0])} />
-                            <button onClick={this.handlePost}>Submit</button>
+                            <input
+                                type="file"
+                                onChange={(e) => (
+                                    this.handleInputChange(COVER_PHOTO, e.target.files[0])
+                                )}
+                            />
+                            <button
+                                onClick={this.handlePost}
+                            >
+                                Submit
+                            </button>
                         </div>
 
                     </div>
