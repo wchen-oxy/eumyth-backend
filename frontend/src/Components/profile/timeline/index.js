@@ -72,7 +72,10 @@ class Timeline extends React.Component {
             index++;
             k = 0;
         }
-        this.setState({ feedData: masterArray, nextOpenPostIndex: nextOpenPostIndex });
+        this.setState({
+            feedData: masterArray,
+            nextOpenPostIndex: nextOpenPostIndex
+        });
     }
 
     fetchNextPosts() {

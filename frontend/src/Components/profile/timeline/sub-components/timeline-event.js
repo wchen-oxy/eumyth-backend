@@ -17,7 +17,7 @@ const selectClassStyle = (num) => {
         case (3):
             return "event-last-container";
         default:
-            throw new Error("Element Index in Timeline Event is incorrect:", num);
+            throw new Error("Element Index in Timeline Event is incorrect: ", num);
     }
 }
 
@@ -32,8 +32,17 @@ const Event = (props) => {
         else {
             console.log("Selected")
         }
-    }
-    
+    };
+
+    const renderCheckbox = (e) => (
+        props.newProjectView ? (
+            <input
+                type="checkbox"
+                defaultChecked={props.isSelected}
+                onClick={(e) => props.onProjectEventSelect(post, e.target.value)} />
+        ) : (<></>)
+    );
+
     if (props.mediaType === POST) {
         switch (post.post_format) {
             case (SHORT):
@@ -62,17 +71,22 @@ const Event = (props) => {
                         onClick={handleRecentEventClick}>
                         {content}
                     </div>
-                    {props.newProjectView ? <input type="checkbox" defaultChecked={props.isSelected} onClick={(e) => props.onProjectEventSelect(post, e.target.value)} /> : <></>}
+                    {renderCheckbox()}
                 </div>
             );
         }
         else {
             return (
-                <div className={props.index !== null ? selectClassStyle(props.index) : "event-middle-container"}>
-                    <div onClick={props.disableModalPreview ? () => console.log("Selected") : () => props.onEventClick(post, props.index)}>
+                <div className={props.index !== null ?
+                    selectClassStyle(props.index) : "event-middle-container"}>
+                    <div onClick={props.disableModalPreview ?
+                        () => console.log("Selected")
+                        :
+                        () => props.onEventClick(post, props.index)}
+                    >
                         {content}
                     </div>
-                    {props.newProjectView ? <input type="checkbox" defaultChecked={props.isSelected} onClick={(e) => props.onProjectEventSelect(post, e.target.value)} /> : <></>}
+                    {renderCheckbox()}
                 </div>
             );
         }
@@ -80,11 +94,16 @@ const Event = (props) => {
     else if (props.mediaType === PROJECT) {
         content = <ProjectEvent post={post} />;
         return (
-            <div className={props.index !== null ? selectClassStyle(props.index) : "event-middle-container"}>
-                <div onClick={props.disableModalPreview ? () => console.log("Selected") : () => props.onProjectClick(post)}>
+            <div className={props.index !== null ?
+                selectClassStyle(props.index) : "event-middle-container"}>
+                <div onClick={props.disableModalPreview ?
+                    () => console.log("Selected")
+                    :
+                    () => props.onProjectClick(post)}
+                >
                     {content}
                 </div>
-                {props.newProjectView ? <input type="checkbox" defaultChecked={props.isSelected} onClick={(e) => props.onProjectEventSelect(post, e.target.value)} /> : <></>}
+                {renderCheckbox()}
             </div>
         );
     }

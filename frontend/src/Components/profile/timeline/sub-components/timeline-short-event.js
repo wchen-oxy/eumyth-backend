@@ -16,8 +16,13 @@ const ShortEvent = (props) => {
                 </div>
                 <div className="shortevent-text-container">
                     {post.title ? <h4>{post.title}</h4> : <></>}
-                    {post.pursuit_category ? <p>{post.pursuit_category} {activityType} </p> : <></>}
-                    {date ? <p>{date.month}, {date.day}, {date.year} </p> : <></>}
+                    {post.pursuit_category ?
+                        <p>{post.pursuit_category} {activityType}</p>
+                        : <></>
+                    }
+                    {date ? <p>{date.month}, {date.day}, {date.year} </p>
+                        : <></>
+                    }
                     <p>{props.commentCount} Comments</p>
                 </div>
 
@@ -32,6 +37,7 @@ const ShortEvent = (props) => {
             <div>
                 <div className="shortevent-with-cover-photo-container">
                     <img
+                        alt="short event cover photo"
                         className="shortevent-cover-photo"
                         src={
                             post.cover_photo_key ?
@@ -41,7 +47,10 @@ const ShortEvent = (props) => {
                 </div>
                 <div className="shortevent-text-container">
                     {post.title ? <h4>{post.title}</h4> : <></>}
-                    {post.pursuit_category ? <h4>{post.pursuit_category} {activityType} </h4> : <></>}
+                    {post.pursuit_category ?
+                        <h4>{post.pursuit_category} {activityType} </h4>
+                        : <></>
+                    }
                     <p>{props.commentCount} Comments</p>
                 </div>
 
