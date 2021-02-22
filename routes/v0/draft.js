@@ -3,28 +3,29 @@ var router = express.Router();
 let IndexUser = require('../../models/index.user.model');
 const AwsConstants = require('../../constants/aws');
 
-router.route('/').get((req, res) => {
-    const username = req.query.username;
-    return IndexUser.Model.findOne({ username: username })
-        .then((user) => {
-            if (!user) {
-                return res.status(204);
-            }
-            if (!user.draft)
-                return res.status(200).send(
-                    {
+router.route('/')
+    .get((req, res) => {
+        const username = req.query.username;
+
+        return IndexUser.Model.findOne({ username: username })
+            .then((user) => {
+                let draft = null;
+                if (!user) {
+                    return res.status(204);
+                }
+                if (!user.draft)
+                    return res.status(200).send({
                         smallDisplayPhoto: user.small_cropped_display_photo_key,
                         draft: null
-                    }
-                );
+                    });
 
-            return res.status(200).send({
-                smallDisplayPhoto: user.tiny_cropped_display_photo_key,
-                draft: user.draft.text ? user.draft.text : null
-            });
-        })
-        .catch(err => console.log('ERROR' + err));
-})
+                return res.status(200).send({
+                    smallDisplayPhoto: user.tiny_cropped_display_photo_key,
+                    draft: user.draft.text ? user.draft.text : null
+                });
+            })
+            .catch(err => console.log('ERROR' + err));
+    })
     .put((req, res) => {
         const username = req.body.username;
         const draft = req.body.draft;

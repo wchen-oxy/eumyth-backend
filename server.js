@@ -1,61 +1,51 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-const Grid = require("gridfs-stream");
-
-let gfs;
-let db;
-
-
 const mongoose = require('mongoose');
 const cors = require('cors');
-require('dotenv').config();
-var port = process.env.PORT || 5000;
-
-
-var indexUserRouter = require('./routes/v0/index');
-var usersRouter = require('./routes/v0/user');
-var testRouter = require('./routes/v0/test');
-var pursuitsRouter = require('./routes/v0/pursuit');
-var postRouter = require('./routes/v0/post');
-var imageRouter = require('./routes/v0/image');
-var draftRouter = require('./routes/v0/draft');
-var relationRouter = require('./routes/v0/relation');
-var projectRouter = require('./routes/v0/project');
-var commentRouter = require('./routes/v0/comment');
-var UserPreviewRouter = require('./routes/v0/userPreview');
-
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const port = process.env.PORT || 5000;
+const indexUserRouter = require('./routes/v0/index');
+const usersRouter = require('./routes/v0/user');
+const testRouter = require('./routes/v0/test');
+const pursuitsRouter = require('./routes/v0/pursuit');
+const postRouter = require('./routes/v0/post');
+const imageRouter = require('./routes/v0/image');
+const draftRouter = require('./routes/v0/draft');
+const relationRouter = require('./routes/v0/relation');
+const projectRouter = require('./routes/v0/project');
+const commentRouter = require('./routes/v0/comment');
+const UserPreviewRouter = require('./routes/v0/userPreview');
 var app = express();
+require('dotenv').config();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
-
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
 app.use(cors());
 
 // Mongoose specific code
 const uri = process.env.ATLAS_URI;
 console.log(uri);
 
+mongoose.connect(
+  uri,
+  {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useUnifiedTopology: true,
+    autoIndex: true
+  });
 
-mongoose.connect(uri, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true, autoIndex: true }
-);
 const connection = mongoose.connection;
 connection.once('open', () => {
   console.log("MongoDB database connection established successfully");
-  gfs = Grid(connection.db, mongoose.mongo);
-  db = connection.db;
-  gfs.collection('posts');
-  gfs.collection('images');
-  console.log("GFS image connection succesful");
 })
 
 app.use('/pursuit', pursuitsRouter);
@@ -71,7 +61,6 @@ app.use('/comment', commentRouter);
 app.use('/user-preview', UserPreviewRouter);
 // console.log that your server is up and running
 app.listen(port, () => console.log(`Listening on port ${port}`));
-
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
