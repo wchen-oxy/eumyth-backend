@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 const IndexPursuit = require("./index.pursuit.model");
 const Draft = require("./draft.model");
 
-const indexUserSchema = new Schema(
+const IndexUserSchema = new Schema(
     {
         username: {
             type: String,
@@ -79,9 +79,9 @@ const indexUserSchema = new Schema(
     }
 );
 
-const indexUserModel = mongoose.model('index_user', indexUserSchema);
+const IndexUserModel = mongoose.model('index_user', IndexUserSchema);
 
 module.exports = {
-    Schema: indexUserSchema,
-    Model: indexUserModel
+    Schema: IndexUserSchema,
+    Model: IndexUserModel
 };

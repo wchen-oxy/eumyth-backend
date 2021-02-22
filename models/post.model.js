@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
-const Comment = require("./comment.model");
 const Schema = mongoose.Schema;
 
-const postSchema = new Schema({
+const PostSchema = new Schema({
 
   title: {
     type: String,
@@ -44,7 +43,7 @@ const postSchema = new Schema({
     type: String,
     required: false,
   },
-  
+
   pursuit_category: {
     type: String,
     required: false,
@@ -70,7 +69,7 @@ const postSchema = new Schema({
     type: String,
     required: false
   },
-  
+
   text_data: {
     type: String,
     required: false
@@ -78,9 +77,9 @@ const postSchema = new Schema({
 
   image_data: {
     type: [String],
-    required:  false,
+    required: false,
   },
-  
+
   min_duration: {
     type: Number,
     required: false
@@ -95,9 +94,9 @@ const postSchema = new Schema({
   timestamps: true,
 });
 
-const postModel = mongoose.model('post', postSchema);
+const PostModel = mongoose.model('post', PostSchema);
 
 module.exports = {
-  Schema: postSchema,
-  Model: postModel
+  Schema: PostSchema,
+  Model: PostModel
 };

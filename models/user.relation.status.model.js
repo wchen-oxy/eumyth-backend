@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const userRelationStatusSchema = new Schema({
+const UserRelationStatusSchema = new Schema({
     _id: false,
 
     user_preview_id: mongoose.Types.ObjectId,
@@ -9,9 +9,9 @@ const userRelationStatusSchema = new Schema({
     status: { type: String },
 })
 
-const userRelationStatusModel = mongoose.model('user_relation_status', userRelationStatusSchema);
+const UserRelationStatusModel = mongoose.model('user_relation_status', UserRelationStatusSchema);
 
 module.exports = {
-    Schema: userRelationStatusSchema,
-    Model: userRelationStatusModel
+    Schema: UserRelationStatusSchema,
+    Model: UserRelationStatusModel
 };

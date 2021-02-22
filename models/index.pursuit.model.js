@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const indexPursuitSchema = new Schema({
+const IndexPursuitSchema = new Schema({
     name: String,
 
     experience_level: {
@@ -31,9 +31,9 @@ const indexPursuitSchema = new Schema({
     }
 });
 
-const indexPursuitModel = mongoose.model('index_pursuit', indexPursuitSchema);
+const IndexPursuitModel = mongoose.model('index_pursuit', IndexPursuitSchema);
 
 module.exports = {
-    Schema: indexPursuitSchema,
-    Model: indexPursuitModel
+    Schema: IndexPursuitSchema,
+    Model: IndexPursuitModel
 };

@@ -3,7 +3,7 @@ const Project = require('./project.model');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const pursuitSchema = new Schema({
+const PursuitSchema = new Schema({
   name: {
     type: String,
     required: false,
@@ -60,9 +60,9 @@ const pursuitSchema = new Schema({
   timestamps: true,
 });
 
-const pursuitModel = mongoose.model('pursuit', pursuitSchema);
+const PursuitModel = mongoose.model('pursuit', PursuitSchema);
 
 module.exports = {
-  Schema: pursuitSchema,
-  Model: pursuitModel
+  Schema: PursuitSchema,
+  Model: PursuitModel
 };

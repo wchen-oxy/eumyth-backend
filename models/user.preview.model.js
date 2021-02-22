@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const userPreviewSchema = new Schema({
+const UserPreviewSchema = new Schema({
 
     parent_index_user_id: {
         type: mongoose.Types.ObjectId,
@@ -37,9 +37,9 @@ const userPreviewSchema = new Schema({
 
 });
 
-const userPreviewModel = mongoose.model('user_preview', userPreviewSchema);
+const UserPreviewModel = mongoose.model('user_preview', UserPreviewSchema);
 
 module.exports = {
-    Schema: userPreviewSchema,
-    Model: userPreviewModel
+    Schema: UserPreviewSchema,
+    Model: UserPreviewModel
 }

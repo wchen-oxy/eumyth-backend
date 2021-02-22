@@ -1,28 +1,17 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-
-
-const annotationSchema = new Schema({
+const AnnotationSchema = new Schema({
     _id: false,
-    // data_annotation_id: Number,
-    // data_annotation_text: String,
-    // geometry_annotation_type: String,
-    // geometry_x_coordinate: Number,
-    // geometry_y_coordinate: Number,
-    // geometry_width: Number,
-    // geometry_height: Number,
     image_page_number: { type: Number },
     data: { type: String },
     geometry: { type: String },
 
-},
-);
+});
 
-const annotationModel = mongoose.model('annotation', annotationSchema);
-
+const AnnotationModel = mongoose.model('annotation', AnnotationSchema);
 
 module.exports = {
-    Schema: annotationSchema,
-    Model: annotationModel
+    Schema: AnnotationSchema,
+    Model: AnnotationModel
 };

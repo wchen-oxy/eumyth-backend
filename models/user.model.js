@@ -6,7 +6,7 @@ const PostPreview = require('./post.preview.model');
 const userPreview = require('./user.preview.model');
 const Schema = mongoose.Schema;
 
-const userSchema = new Schema({
+const UserSchema = new Schema({
   username: {
     type: String,
     required: true,
@@ -85,9 +85,9 @@ const userSchema = new Schema({
   timestamps: true,
 });
 
-const userModel = mongoose.model('user', userSchema);
+const UserModel = mongoose.model('user', UserSchema);
 
 module.exports = {
-  Schema: userSchema,
-  Model: userModel
+  Schema: UserSchema,
+  Model: UserModel
 };

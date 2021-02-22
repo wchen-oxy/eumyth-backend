@@ -1,8 +1,8 @@
+const ImageAnnotation = require("./image.annotation.model");
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const ImageAnnotation = require("./image.annotation.model");
 
-const commentSchema = new Schema({
+const CommentSchema = new Schema({
 
     parent_post_id: {
         type: mongoose.Types.ObjectId,
@@ -41,10 +41,10 @@ const commentSchema = new Schema({
 
 
 
-const commentModel = mongoose.model('comment', commentSchema);
+const CommentModel = mongoose.model('comment', CommentSchema);
 
 
 module.exports = {
-    Schema: commentSchema,
-    Model: commentModel
+    Schema: CommentSchema,
+    Model: CommentModel
 };
