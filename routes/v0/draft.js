@@ -1,17 +1,20 @@
 var express = require('express');
 var router = express.Router();
 let IndexUser = require('../../models/index.user.model');
-const AwsConstants = require('../../constants/aws');
+const AWSConstants = require('../../constants/aws');
+const Helper = require('../../constants/helper');
 
 router.route('/')
     .get((req, res) => {
         const username = req.query.username;
 
-        return IndexUser.Model.findOne({ username: username })
+        return IndexUser.Model
+            .findOne({ username: username }, Helper.resultCallback)
             .then((user) => {
-                let draft = null;
                 if (!user) {
-                    return res.status(204);
+                    const findUserError = "No user found with that username.";
+                    console.log(findUserError);
+                    return res.status(204).json({ error: findUserError });
                 }
                 if (!user.draft)
                     return res.status(200).send({
@@ -24,24 +27,23 @@ router.route('/')
                     draft: user.draft.text ? user.draft.text : null
                 });
             })
-            .catch(err => console.log('ERROR' + err));
+            .catch((error) => {
+                console.log(error);
+                return res.status(500).json({ error: error });
+            });
     })
     .put((req, res) => {
         const username = req.body.username;
         const draft = req.body.draft;
-        IndexUser.Model.findOne({ username: username },
-            (err, indexUserProfile) => {
-                if (err) {
-                    console.log(err);
-                    res.status(500).json("Error: " + err)
-                }
-            }
-        ).then(
-            indexUser => {
+        const parsedDraft = JSON.parse(draft).blocks;
+
+        return IndexUser.Model
+            .findOne({ username: username }, Helper.resultCallback)
+            .then(indexUser => {
+                const previousURLs = indexUser.draft.links;
                 let toDeleteURLs = [];
                 let currentURLs = [];
-                const previousURLs = indexUser.draft.links;
-                for (const block of JSON.parse(draft).blocks) {
+                for (const block of parsedDraft) {
                     if (Object.keys(block.data).length) {
                         const url = block.data.url;
                         if (block.type !== 'unstyled') currentURLs.push(url);
@@ -52,65 +54,45 @@ router.route('/')
                         console.log(url);
                         const path = new URL(url).pathname;
                         const key = path[0] == '/' ? path.substr(1) : path;
-                        toDeleteURLs.push({ Key: key }
-                        );
+                        toDeleteURLs.push({ Key: key });
                     }
                 }
                 indexUser.draft.text = draft;
                 indexUser.draft.links = currentURLs;
                 if (toDeleteURLs.length > 0)
                     return Promise.all(
-                        [indexUser.save((err) => {
-                            if (err) {
-                                console.error('ERROR: ' + err);
-                                res.status(500).json(err);
-                            }
-                        }),
-                        AwsConstants.S3_INTERFACE.deleteObjects({
-                            Bucket: AwsConstants.BUCKET_NAME,
+                        [indexUser.save(),
+                        AWSConstants.S3_INTERFACE.deleteObjects({
+                            Bucket: AWSConstants.BUCKET_NAME,
                             Delete: {
                                 Objects: toDeleteURLs
                             }
-                        }, function (err, data) {
-                            if (err) {
-                                console.log(err, err.stack);
-                            }
-                            else { console.log("Success", data); }
-                        }).promise()
+                        }, Helper.resultCallback)
                         ]);
                 else {
-                    return indexUser.save((err) => {
-                        if (err) {
-                            console.error('ERROR: ' + err);
-                            res.status(500).json(err);
-                        }
-                    });
+                    return indexUser.save();
                 }
-            }
-        )
-            .then(() => res.sendStatus(200)).catch(err => console.log(err));
+            })
+            .then(() => res.sendStatus(200))
+            .catch((error) => {
+                console.log(error);
+                return res.status(500).json({ error: error });
+            });
     })
     .delete((req, res) => {
         const username = req.headers.username;
-        IndexUser.Model.findOne({ username: username },
-            (err, indexUserProfile) => {
-                if (err) {
-                    console.log(err);
-                    res.status(500).json("Error: " + err)
-                }
-            }
-        ).then(
-            indexUser => {
+
+        return IndexUser.Model
+            .findOne({ username: username }, Helper.resultCallback)
+            .then(indexUser => {
                 indexUser.draft = null;
-                indexuser.save((err) => {
-                    if (err) {
-                        console.error('ERROR: ' + err);
-                        res.status(500).json(err);
-                    }
-                });
-            }
-        )
-            .then(() => res.sendStatus(201)).catch(err => console.log(err));
+                indexuser.save();
+            })
+            .then(() => res.sendStatus(201))
+            .catch((error) => {
+                console.log(error);
+                return res.status(500).json({ error: error });
+            });
 
     })
 

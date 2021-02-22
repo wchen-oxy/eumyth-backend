@@ -5,21 +5,18 @@ const Comment = require("../../models/comment.model");
 const ImageAnnotation = require('../../models/image.annotation.model');
 const Post = require("../../models/post.model");
 const UserPreview = require('../../models/user.preview.model');
+const Helper = require('../../constants/helper');
 
 const COLLAPSED = "COLLAPSED";
 const EXPANDED = "EXPANDED";
 
-const returnComments = (commentIdArray) =>
-(Comment.Model
-    .find({
-        '_id': { $in: commentIdArray }, function(err, docs) {
-            if (err) console.log(err);
-            else {
-                console.log(docs);
-            }
-        }
-    })
-    .lean()
+const returnComments = (commentIdArray) => (
+    Comment.Model
+        .find({
+            '_id': { $in: commentIdArray }
+        }, Helper.resultCallback
+        )
+        .lean()
 );
 
 const processRootAndTopComments = (rootComments) => {
@@ -44,119 +41,6 @@ const processRootAndTopComments = (rootComments) => {
         commentArray: commentArray,
         transformedRootCommentIdArray: transformedRootCommentIdArray
     }
-}
-
-
-const returnCollapsedComments = (rootCommentIdArray) => {
-    let commentArray = null;
-
-    return returnComments(rootCommentIdArray)
-        .then((rawComments) => {
-            const processedRootComments = processRootAndTopComments(rawComments);
-            let slicedCommentIdArray = [];
-            commentArray = processedRootComments.commentArray;
-            topComment = processedRootComments.topComment;
-
-            for (const comment of commentArray.slice(0, 4)) {
-                slicedCommentIdArray.push(comment.commenter_user_id.toString());
-            }
-
-            return UserPreview.Model.find({
-                '_id': { $in: slicedCommentIdArray }, function(err, docs) {
-                    if (err) console.log(err);
-                    else {
-                        console.log(docs);
-                    }
-                }
-            })
-        })
-        .then((results) => {
-            let userProfileHashTable = {}
-
-            results.forEach(
-                (value) => userProfileHashTable[value._id.toString()] = value
-            );
-
-            return nestCompleteComments(
-                commentArray,
-                userProfileHashTable,
-                null
-            );
-        });
-
-};
-
-const returnExpandedComments = (rootCommentIdArray) => {
-    let topComment = null;
-    let rootCommentArray = null;
-    let commentUserProfileIdArray = null;
-    let transformedRootCommentIdArray = null;
-
-    return returnComments(rootCommentIdArray)
-        .then(
-            (rawComments) => {
-                const processedRootComments =
-                    processRootAndTopComments(rawComments);
-                commentUserProfileIdArray =
-                    processedRootComments.commentUserProfileIdArray;
-                rootCommentArray = processedRootComments.commentArray;
-                topComment = processedRootComments.topComment;
-                transformedRootCommentIdArray =
-                    processedRootComments.transformedRootCommentIdArray;
-
-                return Comment.Model
-                    .aggregate([
-                        {
-                            $match: {
-                                "ancestor_post_ids": { $in: transformedRootCommentIdArray },
-                            }
-                        },
-                        {
-                            $group: {
-                                "_id": "$_id",
-                                "parent_post_id": { $first: "$parent_post_id" },
-                                "commenter_user_id": { $first: "$commenter_user_id" },
-                                "ancestor_post_ids": { $first: "$ancestor_post_ids" },
-                                "comment": { $first: "$comment" },
-                                "annotation": { $first: "$annotation" },
-                                "likes": { $first: "$likes" },
-                                "dislikes": { $first: "$dislikes" },
-                                "createdAt": { $first: "$createdAt" }
-                            }
-                        }
-                    ]);
-            })
-        .then((replies) => {
-            if (replies.length > 0) {
-                let replyingUserProfileIdArray = [];
-                for (const reply of replies) {
-                    replyingUserProfileIdArray.push(reply.commenter_user_id.toString());
-                }
-                commentUserProfileIdArray.concat(replyingUserProfileIdArray);
-                commentUserProfileIdArray = [... new Set(commentUserProfileIdArray)];
-            }
-            return UserPreview.Model.find({
-                '_id': { $in: commentUserProfileIdArray }, function(err, docs) {
-                    if (err) console.log(err);
-                    else {
-                        console.log(docs);
-                    }
-                }
-            })
-        })
-        .then(
-            (results) => {
-                let userProfileHashTable = {}
-                results.forEach(
-                    (value) => userProfileHashTable[value._id.toString()] = value
-                )
-                return nestCompleteComments(
-                    rootCommentArray,
-                    userProfileHashTable,
-                    replies.length === 0 ? null : replies
-                );
-            }
-        );
 }
 
 
@@ -215,7 +99,7 @@ const nestCompleteComments = (rootCommentArray, userProfileHashTable, repliesArr
                 allCommentsArray[nextValueIndex].replies.push(reply);
             }
             else {
-                console.log("Orphaned Comment:", reply);
+                console.log("Orphaned/Root Comment: ", reply);
             }
         }
         return (allCommentsArray
@@ -224,6 +108,109 @@ const nestCompleteComments = (rootCommentArray, userProfileHashTable, repliesArr
                 allCommentsArray.length));
     }
 }
+
+const returnCollapsedComments = (rootCommentIdArray) => {
+    let commentArray = null;
+
+    return returnComments(rootCommentIdArray)
+        .then((rawComments) => {
+            const processedRootComments = processRootAndTopComments(rawComments);
+            let slicedCommentIdArray = [];
+            commentArray = processedRootComments.commentArray;
+            topComment = processedRootComments.topComment;
+
+            for (const comment of commentArray.slice(0, 4)) {
+                slicedCommentIdArray.push(comment.commenter_user_id.toString());
+            }
+
+            return UserPreview.Model.find({
+                '_id': { $in: slicedCommentIdArray }
+            },
+                Helper.resultCallback)
+        })
+        .then((results) => {
+            let userProfileHashTable = {}
+
+            results.forEach((value) => (
+                userProfileHashTable[value._id.toString()] = value));
+
+            return nestCompleteComments(
+                commentArray,
+                userProfileHashTable,
+                null
+            );
+        });
+
+};
+
+const returnExpandedComments = (rootCommentIdArray) => {
+    let rootCommentArray = null;
+    let commentUserProfileIdArray = null;
+    let transformedRootCommentIdArray = null;
+    let replies = null;
+
+    return returnComments(rootCommentIdArray)
+        .then(
+            (rawComments) => {
+                const processedRootComments =
+                    processRootAndTopComments(rawComments);
+                commentUserProfileIdArray =
+                    processedRootComments.commentUserProfileIdArray;
+                rootCommentArray = processedRootComments.commentArray;
+                topComment = processedRootComments.topComment;
+                transformedRootCommentIdArray =
+                    processedRootComments.transformedRootCommentIdArray;
+
+                return Comment.Model
+                    .aggregate([
+                        {
+                            $match: {
+                                "ancestor_post_ids": { $in: transformedRootCommentIdArray },
+                            }
+                        },
+                        {
+                            $group: {
+                                "_id": "$_id",
+                                "parent_post_id": { $first: "$parent_post_id" },
+                                "commenter_user_id": { $first: "$commenter_user_id" },
+                                "ancestor_post_ids": { $first: "$ancestor_post_ids" },
+                                "comment": { $first: "$comment" },
+                                "annotation": { $first: "$annotation" },
+                                "likes": { $first: "$likes" },
+                                "dislikes": { $first: "$dislikes" },
+                                "createdAt": { $first: "$createdAt" }
+                            }
+                        }
+                    ]);
+            })
+        .then((results) => {
+            replies = results;
+            if (replies.length > 0) {
+                let replyingUserProfileIdArray = [];
+                for (const reply of replies) {
+                    replyingUserProfileIdArray.push(reply.commenter_user_id.toString());
+                }
+                commentUserProfileIdArray.concat(replyingUserProfileIdArray);
+                commentUserProfileIdArray = [... new Set(commentUserProfileIdArray)];
+            }
+            return UserPreview.Model.find({
+                '_id': { $in: commentUserProfileIdArray }
+            }, Helper.resultCallback)
+        })
+        .then((results) => {
+            let userProfileHashTable = {}
+            results.forEach(
+                (value) => userProfileHashTable[value._id.toString()] = value
+            )
+            return nestCompleteComments(
+                rootCommentArray,
+                userProfileHashTable,
+                replies.length === 0 ? null : replies
+            );
+        });
+}
+
+
 
 const removeVote = (array, voteId) => {
     let index = array.indexOf(voteId);
@@ -241,9 +228,9 @@ router.route('/')
         if (viewingMode === COLLAPSED) {
             return returnCollapsedComments(rootCommentIdArray)
                 .then((result) => res.status(200).send(result))
-                .catch((err) => {
-                    console.log(err);
-                    res.status(500).send(err);
+                .catch((error) => {
+                    console.log(error);
+                    return res.status(500).json({ error: error })
                 });
         }
         else if (viewingMode === EXPANDED) {
@@ -252,16 +239,18 @@ router.route('/')
                 returnExpandedComments(rootCommentIdArray)
             ])
                 .then((results) => {
-                    res.status(200).json({
+                    return res.status(200).json({
                         userPreviewId: results[0]._id,
                         rootComments: results[1]
                     });
+                })
+                .catch((error) => {
+                    console.log(error);
+                    return res.status(500).json({ error: error })
                 });
         }
         else {
-            const error = "No comment viewing modes matched";
-            console.log(error)
-            return res.status(500).send(error);
+            return (error) => res.status(500).json({ error: error });
         }
     });
 
@@ -280,16 +269,10 @@ router.route('/reply')
 
         return newReply
             .save()
-            .then((result) => {
-                console.log(result);
-                res.status(200).send();
-            })
-            .catch((err) => {
-                if (err.status === 204) {
-                    console.log("No parent comment or commenter user profile found");
-                }
-                console.log(err);
-                res.status(500).send();
+            .then(() => res.status(200).send())
+            .catch((error) => {
+                console.log(error);
+                return res.status(500).json({ error: error });
             });
     })
 
@@ -329,15 +312,14 @@ router.route('/root')
                 rootCommentArray = result[0].comments;
 
                 return Promise.all([result[0].save(), newRootComment.save()]);
-            }
-            )
+            })
             .then(() => {
                 res.status(200).json({ rootCommentIdArray: rootCommentArray });
             })
-            .catch((err) => {
-                if (err.status === 204) console.log("No user or original post found");
-                console.log(err);
-                res.status(500).send();
+            .catch((error) => {
+                if (error.status === 204) console.log("No user or original post found");
+                console.log(error);
+                return res.status(500).json({ error: error });
             });
     });
 
@@ -347,7 +329,11 @@ router.route('/refresh')
         return returnExpandedComments(rootCommentIdArray)
             .then((results) => {
                 res.status(200).json({ rootComments: results });
-            });
+            })
+            .catch((error) => {
+                console.log(error);
+                return res.status(500).json({ error: error });
+            })
     })
 
 
@@ -387,13 +373,13 @@ router.route('/vote')
                 return results[1].save();
             })
             .then(() => res.status(200).send("Success!"))
-            .catch((err) => {
-                if (err.status === 204) {
+            .catch((error) => {
+                if (error.status === 204) {
                     console.log("No user or no comment found");
-                    return res.status(204).send(err);
+                    return res.status(204).json({ error: error });
                 }
-                console.log(err);
-                return res.status(500).send(err);
+                console.log(error);
+                return res.status(500).json({ error: error });
             })
     })
 
