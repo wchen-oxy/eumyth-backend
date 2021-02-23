@@ -15,6 +15,11 @@ const profileImageUpload = multer({
             cb(null, "images/profile/" + uuid.v1())
         }
     })
+}, function (err, data) {
+    if (err) {
+        console.log(err, err.stack);
+        throw new Error("Something went wrong while uploading the file to  Amazon.", err)
+    };
 });
 
 const contentImageUpload = multer({

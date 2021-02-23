@@ -14,8 +14,7 @@ const returnComments = (commentIdArray) => (
     Comment.Model
         .find({
             '_id': { $in: commentIdArray }
-        }, Helper.resultCallback
-        )
+        }, Helper.resultCallback)
         .lean()
 );
 

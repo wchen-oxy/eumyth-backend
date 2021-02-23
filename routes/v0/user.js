@@ -6,7 +6,7 @@ let Pursuit = require('../../models/pursuit.model');
 let IndexPursuit = require('../../models/index.pursuit.model');
 const UserRelation = require('../../models/user.relation.model');
 const Draft = require("../../models/draft.model");
-const upload = require('../../constants/multer').profileImageUpload;
+const MulterHelper = require('../../constants/multer').profileImageUpload;
 const UserPreview = require('../../models/user.preview.model');
 
 router.route('/')
@@ -27,7 +27,7 @@ router.route('/')
     )
   }
   )
-  .post(upload.fields([{ name: "croppedImage" }, { name: "smallCroppedImage" }, { name: "tinyCroppedImage" }]),
+  .post(MulterHelper.fields([{ name: "croppedImage" }, { name: "smallCroppedImage" }, { name: "tinyCroppedImage" }]),
     (req, res) => {
       console.log(req.files);
       console.log(req.body);
