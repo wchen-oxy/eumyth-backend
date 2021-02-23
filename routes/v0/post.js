@@ -1,31 +1,34 @@
+const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
+
 const User = require('../../models/user.model');
 const IndexUser = require('../../models/index.user.model');
 const Post = require("../../models/post.model");
 const PostPreview = require("../../models/post.preview.model");
 const UserPreview = require("../../models/user.preview.model");
-const mongoose = require('mongoose');
 const Comment = require("../../models/comment.model");
-const multer = require('multer');
-const AwsConstants = require('../../constants/aws');
-const multerS3 = require('multer-s3');
-const uuid = require('uuid');
-const userRelation = require('../../models/user.relation.model');
+const UserRelation = require('../../models/user.relation.model');
+const MulterHelper = require('../../constants/multer');
+const RECENT_POSTS_LIMIT = 5;
 const SHORT = "SHORT";
 const LONG = "LONG";
-const RECENT_POSTS_LIMIT = 5;
 
+const postImageFields = [{ name: "images" }, { name: "coverPhoto", maxCount: 1 }];
 const setPursuitAttributes = (isMilestone, pursuit, minDuration, postId, date) => {
   if (isMilestone) {
     pursuit.num_milestones = Number(pursuit.num_milestones) + 1;
   }
 
   if (postId) {
-    if (date) { insertIntoDatedPosts(pursuit.dated_posts, postId, date) }
-    else { pursuit.undated_posts.unshift(postId); }
+    date ? (
+      insertIntoDatedPosts(pursuit.dated_posts, postId, date))
+      :
+      (pursuit.undated_posts.unshift(postId));
+
     pursuit.all_posts.unshift(postId);
   }
+
   pursuit.total_min = Number(pursuit.total_min) + minDuration;
   pursuit.num_posts = Number(pursuit.num_posts) + 1;
   return pursuit;
@@ -36,51 +39,48 @@ const insertIntoDatedPosts = (datedPosts, postId, date) => {
     post_id: postId,
     date: date
   }));
+
   if (datedPosts.length > 1) {
     datedPosts.sort((a, b) => b.date - a.date);
   }
+
   return datedPosts;
 }
 
-var upload = multer({
-  storage: multerS3({
-    s3: AwsConstants.S3_INTERFACE,
-    bucket: AwsConstants.BUCKET_NAME,
-    contentType: multerS3.AUTO_CONTENT_TYPE,
-    metadata: function (req, file, cb) {
-      cb(null, { fieldName: file.fieldname });
-    },
-    key: function (req, file, cb) {
-      cb(null, "images/content/" + uuid.v1())
-    }
-  })
-});
-
 const getImageUrls = (array) => {
   let imageArray = [];
+
   for (const imageFile of array) {
     imageArray.push(imageFile.key);
   }
+
   return imageArray;
 }
 
 const makeTextSnippet = (postType, isPaginated, textData) => {
   if (postType === SHORT) {
     if (isPaginated) {
-      return textData[0].length > 140 ? textData[0].substring(0, 140).trim() + "..." : textData[0];
+      return (textData[0].length > 140
+        ? (textData[0].substring(0, 140).trim()) + "..."
+        : textData[0]);
     }
     else {
-      return textData.length > 140 ? textData.substring(0, 140).trim() + "..." : textData;
+      return (textData.length > 140
+        ? textData.substring(0, 140).trim() + "..."
+        : textData);
     }
   }
   else {
     const completeText = JSON.parse(textData).blocks[0].text;
-    return completeText.length > 140 ? completeText.substring(0, 140).trim() + "..." : completeText.trim();
+
+    return completeText.length > 140
+      ? completeText.substring(0, 140).trim() + "..."
+      : completeText.trim();
   }
 }
 
 router.route('/')
-  .post(upload.fields([{ name: "images" }, { name: "coverPhoto", maxCount: 1 }]), (req, res) => {
+  .post(MulterHelper.contentImageUpload.fields(postImageFields), (req, res) => {
     const postType = req.body.postType ? req.body.postType : null;
     const username = req.body.username;
     const displayPhoto = req.body.displayPhoto;
@@ -100,15 +100,19 @@ router.route('/')
     let indexUser = null;
     let followerArrayID = null;
     let textSnippet = null;
+
     if (textData) {
       textSnippet = makeTextSnippet(postType, isPaginated, textData)
     }
-    console.log("1");
+
     let resolvedUserPreview = UserPreview.Model.findOne({ username: username });
     let resolvedNewPost = resolvedUserPreview
-      .then((resolvedUserPrevew) => IndexUser.Model.findById(resolvedUserPrevew.parent_index_user_id))
+      .then((resolvedUserPrevew) => (
+        IndexUser.Model.findById(resolvedUserPrevew.parent_index_user_id)))
       .then(resolvedIndexUser => {
+        let newRecentPosts = null;
         indexUser = resolvedIndexUser;
+
         switch (postType) {
           case (SHORT):
             post = new Post.Model({
@@ -148,9 +152,11 @@ router.route('/')
             });
             break;
           default:
-            res.status(500).send();
+            throw new Error("No post type matched.");
         }
+
         followerArrayID = indexUser.user_relation_id;
+
         if (indexUser.preferred_post_type !== postPrivacyType) {
           indexUser.preferred_post_type = postPrivacyType;
         }
@@ -163,30 +169,25 @@ router.route('/')
             }
           }
         }
-        let newRecentPosts = resolvedIndexUser.recent_posts;
-        console.log(newRecentPosts, "BEFORE");
+
+        newRecentPosts = resolvedIndexUser.recent_posts;
         newRecentPosts.unshift(post);
+
         if (newRecentPosts.length > RECENT_POSTS_LIMIT) {
           newRecentPosts.pop();
         }
+
         indexUser.recent_posts = newRecentPosts;
         return indexUser.user_profile_id;
-      }
-      )
-      .catch(
-        (err) => {
-          console.log(err);
-          res.status(500).json(err);
-        }
-      );;
+      })
+      .catch((error) => {
+        console.log(error);
+        return res.status(500).json({ error: error });
+      });
 
-    console.log("2");
+    let resolvedUser = resolvedNewPost.then((result) => (
+      User.Model.findById(result)));
 
-    let resolvedUser = resolvedNewPost.then(
-      (result) => {
-        return User.Model.findById(result);
-      }
-    );
     resolvedUser.then(
       resolvedUser => {
         const user = resolvedUser;
@@ -233,7 +234,7 @@ router.route('/')
       })
       .then(
         (result) => {
-          return userRelation.Model.findById(followerArrayID)
+          return UserRelation.Model.findById(followerArrayID)
 
         }
       )
@@ -289,23 +290,24 @@ router.route('/')
               indexUser.save().then(() => resolve("saved"));
             })
           );
-          return Promise.all(promisedUpdatedFollowerArray).then((result) => {
-            console.log("Finished!");
-            console.log(result);
-            res.status(201).send("Feel Free to continue browsing as we push updates")
-          });
+          return Promise.all(promisedUpdatedFollowerArray)
+            .then((result) => {
+              console.log("Finished!");
+              console.log(result);
+              res.status(201).send("Feel Free to continue browsing as we push updates")
+            });
         }
       ).
       catch(
         (err) => {
           if (err.code === 500) console.log("error when pushing new entries to followers")
           console.log(err);
-          res.status(500).json(err);
+          return res.status(500).json({error: error});
         }
       );
 
   })
-  .put(upload.single({ name: "coverPhoto", maxCount: 1 }), (req, res) => {
+  .put(MulterHelper.contentImageUpload.single({ name: "coverPhoto", maxCount: 1 }), (req, res) => {
     const postId = !!req.body.postId ? req.body.postId : null;
     const username = req.body.username;
     const displayPhoto = req.body.displayPhoto;
@@ -471,7 +473,7 @@ router.route('/multiple').get((req, res) => {
         for (let post of posts) {
           post.comment_count = commentData[post._id.toString()] ? commentData[post._id.toString()] : 0;
         }
-        
+
       }
       else {
         for (let post of posts) {
