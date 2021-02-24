@@ -197,7 +197,7 @@ const ReviewPost = (props) => {
                             </option>
                         </select>
                     </div>
-                    <button onClick={(e) => handlePostSubmit()}>
+                    <button onClick={(e) => handlePostSubmit(e)}>
                         {props.isUpdateToPost ? "Update!" : "Post!"}
                     </button>
                 </div>

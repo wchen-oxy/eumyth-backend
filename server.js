@@ -20,19 +20,20 @@ const UserPreviewRouter = require('./routes/v0/userPreview');
 var app = express();
 require('dotenv').config();
 
+// Mongoose specific code
+const uri = process.env.ATLAS_URI;
+console.log(uri);
+
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.use(logger('dev'));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
-
-// Mongoose specific code
-const uri = process.env.ATLAS_URI;
-console.log(uri);
 
 mongoose.connect(
   uri,
@@ -59,6 +60,7 @@ app.use('/image', imageRouter);
 app.use('/draft', draftRouter);
 app.use('/comment', commentRouter);
 app.use('/user-preview', UserPreviewRouter);
+
 // console.log that your server is up and running
 app.listen(port, () => console.log(`Listening on port ${port}`));
 

@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
-
 const User = require('../../models/user.model');
 const IndexUser = require('../../models/index.user.model');
 const Post = require("../../models/post.model");
@@ -15,6 +14,18 @@ const SHORT = "SHORT";
 const LONG = "LONG";
 
 const postImageFields = [{ name: "images" }, { name: "coverPhoto", maxCount: 1 }];
+
+const setRecentPosts = (post, inputRecentPosts) => {
+  let newRecentPosts = inputRecentPosts;
+  newRecentPosts.unshift(post);
+
+  if (newRecentPosts.length > RECENT_POSTS_LIMIT) {
+    newRecentPosts.pop();
+  }
+
+  return newRecentPosts;
+}
+
 const setPursuitAttributes = (isMilestone, pursuit, minDuration, postId, date) => {
   if (isMilestone) {
     pursuit.num_milestones = Number(pursuit.num_milestones) + 1;
@@ -31,7 +42,7 @@ const setPursuitAttributes = (isMilestone, pursuit, minDuration, postId, date) =
 
   pursuit.total_min = Number(pursuit.total_min) + minDuration;
   pursuit.num_posts = Number(pursuit.num_posts) + 1;
-  return pursuit;
+  // return pursuit;
 }
 
 const insertIntoDatedPosts = (datedPosts, postId, date) => {
@@ -79,6 +90,64 @@ const makeTextSnippet = (postType, isPaginated, textData) => {
   }
 }
 
+
+const findPosts = (postIdList, includePostText) => {
+  return Post.Model.find({
+    '_id': { $in: postIdList }, function(error, docs) {
+      if (error) console.log(error);
+      else {
+        console.log(docs);
+      }
+    }
+  }).sort({ createdAt: -1 }).lean().then(
+    (results) => {
+      let coverInfoArray = results;
+      if (!includePostText) {
+        for (result of coverInfoArray) {
+          result.text_data = "";
+          result.feedback = "";
+        }
+      }
+      return coverInfoArray;
+    })
+
+}
+
+const countComments = (postIdList) => {
+  let transformedPostIdArray = [];
+  for (let postId of postIdList) {
+    transformedPostIdArray.push(mongoose.Types.ObjectId(postId));
+  }
+  console.log("Counting", transformedPostIdArray);
+  return Comment.Model.aggregate([
+    {
+      $match: {
+        "parent_post_id": { $in: transformedPostIdArray },
+      }
+    },
+    {
+      $group: {
+        "_id": "$parent_post_id",
+        "comment_count": { $sum: 1 },
+      }
+    },
+    {
+      $group: {
+        "_id": "",
+        "data": {
+          $mergeObjects: {
+            $arrayToObject: [[{ k: { $toString: "$_id" }, v: "$comment_count" }]]
+          }
+        }
+      }
+    },
+    {
+      $replaceRoot: { newRoot: "$data" }
+    }
+
+  ])
+}
+
 router.route('/')
   .post(MulterHelper.contentImageUpload.fields(postImageFields), (req, res) => {
     const postType = req.body.postType ? req.body.postType : null;
@@ -99,19 +168,21 @@ router.route('/')
     let post = null;
     let indexUser = null;
     let followerArrayID = null;
+    let userRelationResult = null;
     let textSnippet = null;
+
 
     if (textData) {
       textSnippet = makeTextSnippet(postType, isPaginated, textData)
     }
 
-    let resolvedUserPreview = UserPreview.Model.findOne({ username: username });
-    let resolvedNewPost = resolvedUserPreview
+    return UserPreview.Model
+      .findOne({ username: username })
       .then((resolvedUserPrevew) => (
         IndexUser.Model.findById(resolvedUserPrevew.parent_index_user_id)))
       .then(resolvedIndexUser => {
-        let newRecentPosts = null;
         indexUser = resolvedIndexUser;
+        followerArrayID = indexUser.user_relation_id;
 
         switch (postType) {
           case (SHORT):
@@ -155,8 +226,6 @@ router.route('/')
             throw new Error("No post type matched.");
         }
 
-        followerArrayID = indexUser.user_relation_id;
-
         if (indexUser.preferred_post_type !== postPrivacyType) {
           indexUser.preferred_post_type = postPrivacyType;
         }
@@ -169,28 +238,15 @@ router.route('/')
             }
           }
         }
-
-        newRecentPosts = resolvedIndexUser.recent_posts;
-        newRecentPosts.unshift(post);
-
-        if (newRecentPosts.length > RECENT_POSTS_LIMIT) {
-          newRecentPosts.pop();
-        }
-
-        indexUser.recent_posts = newRecentPosts;
-        return indexUser.user_profile_id;
+        indexUser.recent_posts = setRecentPosts(post, resolvedIndexUser.recent_posts);
+        return;
       })
-      .catch((error) => {
-        console.log(error);
-        return res.status(500).json({ error: error });
-      });
-
-    let resolvedUser = resolvedNewPost.then((result) => (
-      User.Model.findById(result)));
-
-    resolvedUser.then(
-      resolvedUser => {
-        const user = resolvedUser;
+      .then(() => (Promise.all([
+        User.Model.findById(indexUser.user_profile_id),
+        UserRelation.Model.findById(followerArrayID)])))
+      .then(results => {
+        const user = results[0];
+        userRelationResult = results[1];
         user.all_posts.unshift(post._id);
         if (date) {
           insertIntoDatedPosts(user.dated_posts, post._id, date);
@@ -209,55 +265,47 @@ router.route('/')
           }
         }
         return user;
-      }
-    ).
-      then(user => {
-        const savedIndexUser = indexUser.save().catch(err => {
-          if (err) {
-            console.log(err);
-            res.status(500).json('Error: ' + err);
+      })
+      .then(user => {
+        const savedIndexUser = indexUser.save().catch(error => {
+          if (error) {
+            console.log(error);
+            res.status(500).json('Error: ' + error);
           }
         });
-        const savedUser = user.save().catch(err => {
-          if (err) {
-            console.log(err);
-            res.status(500).json('Error: ' + err);
+        const savedUser = user.save().catch(error => {
+          if (error) {
+            console.log(error);
+            res.status(500).json('Error: ' + error);
           }
         });
-        const savedPost = post.save().catch(err => {
-          if (err) {
-            console.log(err);
-            res.status(500).json('Error: ' + err);
+        const savedPost = post.save().catch(error => {
+          if (error) {
+            console.log(error);
+            res.status(500).json('Error: ' + error);
           }
         });
         return Promise.all([savedIndexUser, savedUser, savedPost]);
       })
-      .then(
-        (result) => {
-          return UserRelation.Model.findById(followerArrayID)
-
-        }
-      )
-      .then(
-        (userRelationResult) => {
-          if (userRelationResult) {
-            let followersIdArray = [];
-            for (const user of userRelationResult.followers) {
-              followersIdArray.push(user.user_preview_id);
-            }
-            return UserPreview.Model.find({
-              '_id': { $in: followersIdArray }, function(err, docs) {
-                if (err) console.log(err);
-                else {
-                  console.log(docs);
-                }
+      .then(() => {
+        if (userRelationResult) {
+          let followersIdArray = [];
+          for (const user of userRelationResult.followers) {
+            followersIdArray.push(user.user_preview_id);
+          }
+          return UserPreview.Model.find({
+            '_id': { $in: followersIdArray }, function(error, docs) {
+              if (error) console.log(error);
+              else {
+                console.log(docs);
               }
-            });
-          }
-          else {
-            Promise.reject("Unable to push new posts to followers because User Relation was not found.");
-          }
+            }
+          });
         }
+        else {
+          Promise.reject("Unable to push new posts to followers because User Relation was not found.");
+        }
+      }
       )
       .then((result) => {
         if (result) {
@@ -266,8 +314,8 @@ router.route('/')
             indexUserIdArray.push(previewedUser.parent_index_user_id);
           }
           return IndexUser.Model.find({
-            '_id': { $in: indexUserIdArray }, function(err, docs) {
-              if (err) console.log(err);
+            '_id': { $in: indexUserIdArray }, function(error, docs) {
+              if (error) console.log(error);
               else {
                 console.log(docs);
               }
@@ -297,15 +345,14 @@ router.route('/')
               res.status(201).send("Feel Free to continue browsing as we push updates")
             });
         }
-      ).
-      catch(
-        (err) => {
-          if (err.code === 500) console.log("error when pushing new entries to followers")
-          console.log(err);
-          return res.status(500).json({error: error});
+      )
+      .catch(
+        (error) => {
+          if (error.code === 500) console.log("error when pushing new entries to followers")
+          console.log(error);
+          return res.status(500).json({ error: error });
         }
       );
-
   })
   .put(MulterHelper.contentImageUpload.single({ name: "coverPhoto", maxCount: 1 }), (req, res) => {
     const postId = !!req.body.postId ? req.body.postId : null;
@@ -340,22 +387,13 @@ router.route('/')
           post.text_data = textData;
           post.post_privacy_type = postPrivacyType;
           return post.save()
-            .catch(err => {
-              if (err) {
-                console.log(err);
-                res.status(500).json('Error: ' + err);
-              }
-            });;
-        }
-      )
-      .then(
-        () => {
-          return res.status(200).send();
-        }
-      )
-      .catch(err => {
-        console.log(err);
-        res.status(500).send()
+        })
+      .then(() => {
+        return res.status(200).send();
+      })
+      .catch(error => {
+        console.log(error);
+        return res.status(500).json({ error: error })
       })
   })
   .delete((req, res) => {
@@ -364,8 +402,10 @@ router.route('/')
     const postId = req.body.postId;
     let returnedUser = null;
     let returnedIndexUser = null;
+
     const resolvedIndexUser = IndexUser.Model.findById(indexUserId)
       .then((user) => {
+        if (!user) throw new Error(500, "no user found");
         returnedUser = user;
         let updatedRecentPosts = [];
 
@@ -377,11 +417,13 @@ router.route('/')
         returnedIndexUser.recent_posts = updatedRecentPosts;
         return returnedIndexUser.save();
       })
-      .catch(
-        (err) => console.log(err)
-      );
+      .catch((error) => {
+        throw new Error(error, "Something went wrong resolving index user")
+      });
+
     const resolvedUser = User.Model.findById(userId)
       .then((user) => {
+        if (!user) throw new Error(500, "no user found");
         returnedUser = user;
         let updatedAllPosts = [];
         for (const post of user.all_posts) {
@@ -393,79 +435,24 @@ router.route('/')
         return returnedUser.save();
       })
       .catch(
-        (err) => console.log(err)
+        (error) => { throw new Error(error, "Something went wrong resolving user") }
       );
-    return Promise.all([resolvedIndexUser, resolvedUser]).then((result) => Post.Model.deleteOne({ _id: postId }))
-      .then((result) => res.status(204).send())
-      .catch(err => {
-        console.log(err);
-        res.status(500).send();
+    return Promise.all([resolvedIndexUser, resolvedUser])
+      .then(() => Post.Model.deleteOne({ _id: postId }))
+      .then(() => res.status(204).send())
+      .catch(error => {
+        console.log(error);
+        return res.status(500).json({ error: error });
       }
       );
   });
 
-const findPosts = (postIdList, includePostText) => {
-  return Post.Model.find({
-    '_id': { $in: postIdList }, function(err, docs) {
-      if (err) console.log(err);
-      else {
-        console.log(docs);
-      }
-    }
-  }).sort({ createdAt: -1 }).lean().then(
-    (results) => {
-      let coverInfoArray = results;
-      if (!includePostText) {
-        for (result of coverInfoArray) {
-          result.text_data = "";
-          result.feedback = "";
-        }
-      }
-      return coverInfoArray;
-    })
-
-}
-
-const countComments = (postIdList) => {
-  // console.log("Counting", postIdList);
-  // console.log("posts", postIdList);
-  let transformedPostIdArray = [];
-  for (let postId of postIdList) {
-    transformedPostIdArray.push(mongoose.Types.ObjectId(postId));
-  }
-  console.log("Counting", transformedPostIdArray);
-  return Comment.Model.aggregate([
-    {
-      $match: {
-        "parent_post_id": { $in: transformedPostIdArray },
-      }
-    },
-    {
-      $group: {
-        "_id": "$parent_post_id",
-        "comment_count": { $sum: 1 },
-      }
-    },
-    {
-      $group: {
-        "_id": "",
-        "data": {
-          $mergeObjects: {
-            $arrayToObject: [[{ k: { $toString: "$_id" }, v: "$comment_count" }]]
-          }
-        }
-      }
-    },
-    {
-      $replaceRoot: { newRoot: "$data" }
-    }
-
-  ])
-}
 router.route('/multiple').get((req, res) => {
   const postIdList = req.query.postIdList;
   const includePostText = req.query.includePostText;
-  return Promise.all([findPosts(postIdList, includePostText), countComments(postIdList)])
+  return Promise.all([
+    findPosts(postIdList, includePostText),
+    countComments(postIdList)])
     .then((results) => {
       let posts = results[0];
       if (results[1].length > 0) {
@@ -483,9 +470,9 @@ router.route('/multiple').get((req, res) => {
       return res.status(200).json({ posts: posts });
 
     }
-    ).catch((err) => {
-      console.log(err);
-      return res.status(500).send();
+    ).catch((error) => {
+      console.log(error);
+      return res.status(500).json({ error: error });
     })
 });
 
@@ -495,19 +482,19 @@ router.route('/single').get((req, res) => {
   return Post.Model.findById(postId)
     .then(result => {
       if (textOnly === "TRUE") {
-        res.status(200).send(result.text_data);
+        return res.status(200).send(result.text_data);
       }
       else {
         console.log(result);
-        res.status(200).send(result);
+        return res.status(200).send(result);
       }
     })
-    .catch(err => {
-      console.log(err);
-      if (err.name === 'CastError') {
-        return res.status(500).send("Malformed Object ID");
+    .catch(error => {
+      console.log(error);
+      if (error.name === 'CastError') {
+        return res.status(500).json({ error: "Malformed Object ID" });
       }
-      res.status(500).send("No Post Found");
+      return res.status(500).json({ error: "No Post Found" });
     });
 
 })
