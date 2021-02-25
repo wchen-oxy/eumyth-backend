@@ -65,6 +65,7 @@ const AccountPage = (props) => {
                see the changes take effect immediately.`
             );
           }
+          window.location.reload();
         })
         .catch((err) => {
           console.log(err);
@@ -95,6 +96,7 @@ const AccountPage = (props) => {
         .then((results) => {
           console.log(results);
           alert("Successfully updated!");
+          window.location.reload();
         })
         .catch((err) => {
           console.log(err);
@@ -109,7 +111,10 @@ const AccountPage = (props) => {
         bio: bio,
         username: props.firebase.returnUsername()
       })
-        .then(() => alert("Successfully updated your bio!"))
+        .then(() => {
+           alert("Successfully updated your bio!"); 
+           window.location.reload();
+          })
         .catch((err) => console.log(err))
     );
   }

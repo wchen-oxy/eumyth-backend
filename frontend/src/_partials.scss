@@ -68,7 +68,15 @@ $small-post-height: 74vh;
     align-items: center;
 }
 
-@mixin short-post-hero-container {
+@mixin short-post-hero-text-container {
+    height: 100%;
+    width: 65%;
+    margin: auto;
+    text-align: center;
+    justify-content: center;
+}
+
+@mixin short-post-hero-image-container {
     height: 100%;
     width: 65%;
     margin: auto;

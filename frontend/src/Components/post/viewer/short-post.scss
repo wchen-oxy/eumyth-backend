@@ -8,8 +8,13 @@
     height: $small-post-height;
 }
 
-.shortpostviewer-large-hero-container {
-    @include short-post-hero-container;
+.shortpostviewer-large-hero-image-container {
+    @include short-post-hero-image-container;
+    height: auto;
+}
+
+.shortpostviewer-large-hero-text-container {
+    @include short-post-hero-text-container;
     height: auto;
 }
 

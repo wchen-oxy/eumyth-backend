@@ -150,7 +150,7 @@ class ShortPostViewer extends React.Component {
     renderImageSlider(windowType) {
         const validAnnotations = this.returnValidAnnotations();
         const sliderClassName = this.props.largeViewMode ?
-            "shortpostviewer-large-hero-container" :
+            "shortpostviewer-large-hero-image-container" :
             "shortpostviewer-inline-hero-container";
 
         let imageArray = this.props.eventData.image_data.map((key, i) =>
@@ -328,7 +328,7 @@ class ShortPostViewer extends React.Component {
                     return (
                         <div className="shortpostviewer-window">
                             <div id="shortpostviewer-large-main-container" >
-                                <div className="shortpostviewer-large-hero-container">
+                                <div className="shortpostviewer-large-hero-text-container">
                                     <ShortHeroText
                                         text={this.props.textData} />
                                 </div>

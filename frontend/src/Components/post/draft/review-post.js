@@ -76,6 +76,7 @@ const ReviewPost = (props) => {
     const handleSuccess = () => {
         alert("Post Successful! You will see your post soon.");
         props.closeModal();
+        window.location.reload();
     }
 
     const handleError = () => {

@@ -15,7 +15,7 @@
 }
 
 #shorteditor-hero-container {
-    @include short-post-hero-container;
+    @include short-post-hero-image-container;
     
     #shorteditor-image-slider-container {
         height: 30vh;
