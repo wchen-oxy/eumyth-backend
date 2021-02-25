@@ -7,6 +7,7 @@ import { PlaceholderBlockConfig } from 'Dante2/package/es/components/blocks/plac
 import { withFirebase } from '../../../Firebase';
 import { IMAGE_BASE_URL } from '../../constants/urls';
 
+
 const SAVE_INTERVAL = 4000;
 class LongEditor extends React.Component {
     constructor(props) {
@@ -22,7 +23,6 @@ class LongEditor extends React.Component {
         this.handleSaveError = this.handleSaveError.bind(this);
     }
     handleSave(editorContext, content) {
-        //prevent false save
         if (!this.props.isSavePending) {
             console.log("Catch uneccessary save");
         }
@@ -131,8 +131,7 @@ class LongEditor extends React.Component {
                                     ctx.data.url);
                                 this.setState({ needOnlineSync: true })
                             },
-                            upload_error_callback: (ctx,
-                                img) => {
+                            upload_error_callback: (ctx, img) => {
                                 console.log(ctx)
                             },
                         },
@@ -148,10 +147,8 @@ class LongEditor extends React.Component {
                     }
                 }
             />
-
         );
     }
-
 }
 
 export default withFirebase(LongEditor);

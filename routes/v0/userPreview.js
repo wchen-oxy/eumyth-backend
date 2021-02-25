@@ -7,12 +7,11 @@ router.route("/id").get((req, res) => {
     return UserPreview.Model
         .findOne({ username: username })
         .then(result => {
-            res.status(200).json({ userPreviewId: result._id });
-
+            return res.status(200).json({ userPreviewId: result._id });
         })
-        .catch((err) => {
-            console.log(err);
-            res.status(500).send();
+        .catch((error) => {
+            console.log(error);
+            return res.status(500).json({ error: error });
         })
 })
 

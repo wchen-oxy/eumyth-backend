@@ -212,7 +212,7 @@ class ShortPost extends React.Component {
             unsupportedFiles={this.state.unsupportedFiles}
             isPaginated={this.state.isPaginated}
             textPageText={this.state.textData}
-            textPageIndex={this.state.imageIndex}
+            imageIndex={this.state.imageIndex}
             onSortEnd={this.handleSortEnd}
             setImageArray={this.setImageArray}
             onPaginatedChange={this.handlePaginatedChange}

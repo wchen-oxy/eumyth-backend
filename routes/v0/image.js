@@ -63,9 +63,10 @@ router.route('/display-photo')
         console.log("No image here");
         return res.status(500).json({ error: "Something went wrong during image upload." });
       }
-
+      console.log(username);
       return IndexUser.Model.findOne({ username: username })
         .then((result) => {
+          console.log(result);
           if (!result) throw new Error(204);
 
           returnedIndexUser = result;
@@ -90,20 +91,20 @@ router.route('/display-photo')
             result[0].save(),
             result[1].save()]);
         })
-        .then(() => res.status(201).send("Display photo successfully changed!"))
+        .then(() => res.status(201).json({ imageKey: smallCroppedImage }))
         .catch((error) => {
           console.log(error);
-          if (err.status === 204) return res.status(204).json({ error: error })
+          if (error.status === 204) return res.status(204).json({ error: error })
           return res.status(500).json({ error: error });
         });
     })
   .delete((req, res) => {
     const username = req.body.username;
     let returnedIndexUser = null;
-
     return IndexUser.Model.findOne({ username: username })
       .then((result) => {
         returnedIndexUser = result;
+        // console.log(returnedIndexUser);
         if (returnedIndexUser.cropped_display_photo_key === '') {
           throw new Error(204);
         }
@@ -121,10 +122,11 @@ router.route('/display-photo')
             .deleteObjects({
               Bucket: AWSConstants.BUCKET_NAME,
               Delete: { Objects: displayPhotoKeys }
-            }, function (err, data) {
-              if (err) {
-                console.log(err, err.stack);
-                throw new Error(err);
+            }, function (error, data) {
+              if (error) {
+                console.log("Something bad happened");
+                console.log(error, error.stack);
+                throw new Error(error);
               }
               else { console.log("Success", data); }
             })
@@ -149,14 +151,16 @@ router.route('/display-photo')
       .then(() => (
         res.status(201).json({ userId: returnedIndexUser.user_profile_id }))
       )
-      .catch((err) => {
-        console.log(err);
-
-        if (err === 204) {
-          return res.status(204).json({ error: "No Content" });
+      .catch((error) => {
+        console.log(error.message);
+        console.log("thing");
+        if (error.message === "204") {
+          console.log("werewr");
+          return res.status(204).json({ result: "No Content" });
         }
-
-        return res.status(500).json({ error: error });
+        else {
+          return res.status(500).json({ error: error });
+        }
       });
   });
 
@@ -182,9 +186,9 @@ router.route('/cover')
         return returnedUser.save();
       })
       .then(() => res.status(200).send())
-      .catch(err => {
-        console.log(err);
-        if (err.status === 204) return res.status(204).json({ error: "No user found." })
+      .catch(error => {
+        console.log(error);
+        if (error.status === 204) return res.status(204).json({ error: "No user found." })
         return res.status(500).send();
       })
   })
@@ -203,10 +207,10 @@ router.route('/cover')
           .deleteObject({
             Bucket: AWSConstants.BUCKET_NAME,
             Key: user.cover_photo_key,
-          }, function (err, data) {
-            if (err) {
-              console.log(err, err.stack);
-              throw new Error("Something went wrong while deleting the file from Amazon.", err)
+          }, function (error, data) {
+            if (error) {
+              console.log(error, error.stack);
+              throw new Error("Something went wrong while deleting the file from Amazon.", error)
             };
           });
       })
@@ -215,10 +219,10 @@ router.route('/cover')
         return returnedUser.save();
       })
       .then(() => (res.status(204).send()))
-      .catch((err) => {
-        console.log(err);
+      .catch((error) => {
+        console.log(error);
 
-        if (err === 204) {
+        if (error === 204) {
           return res.status(204).json("No Content");
         }
 

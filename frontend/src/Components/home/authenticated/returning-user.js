@@ -116,7 +116,6 @@ class ReturningUserPage extends React.Component {
                                     result.data.recent_posts,
                                     false)
                                 .then((result) => {
-                                    console.log(result);
                                     return {
                                         isRecentPostsOnly: true,
                                         recentPosts: result.data.posts
@@ -135,7 +134,6 @@ class ReturningUserPage extends React.Component {
                                         true)
                             ])
                                 .then((results) => {
-                                    console.log(results);
                                     return {
                                         isRecentPostsOnly: false,
                                         recentPosts: results[0].data.posts,
@@ -145,36 +143,35 @@ class ReturningUserPage extends React.Component {
                         }
 
                     })
-                .then(
-                    (result) => {
-                        const recentPosts = result.recentPosts.length > 0 ?
-                            result.recentPosts : [];
-                        const feedData = !result.isRecentPostsOnly ?
-                            result.feedData : [];
-                        const nextOpenPostIndex =
-                            this.state.nextOpenPostIndex +
-                            this.state.fixedDataLoadLength;
+                .then((result) => {
+                    const recentPosts = result.recentPosts.length > 0 ?
+                        result.recentPosts : [];
+                    const feedData = !result.isRecentPostsOnly ?
+                        result.feedData : [];
+                    const nextOpenPostIndex =
+                        this.state.nextOpenPostIndex +
+                        this.state.fixedDataLoadLength;
 
-                        this.setState(
-                            ({
-                                firstName: firstName,
-                                lastName: lastName,
-                                allPostsIdArray: allPostsIdArray,
-                                preferredPostType: preferredPostType,
-                                indexUserDataId: indexUserDataId,
-                                fullUserDataId: fullUserDataId,
-                                croppedDisplayPhoto: croppedDisplayPhoto,
-                                smallCroppedDisplayPhoto: smallCroppedDisplayPhoto,
-                                pursuits: pursuits,
-                                pursuitNames: pursuitNames,
-                                pursuitInfoArray: pursuitInfoArray,
-                                totalMin: totalMin,
-                                recentPosts: recentPosts,
-                                feedData: feedData,
-                                nextOpenPostIndex: nextOpenPostIndex,
-                                hasMore: hasMore
-                            }));
-                    })
+                    this.setState(
+                        ({
+                            firstName: firstName,
+                            lastName: lastName,
+                            allPostsIdArray: allPostsIdArray,
+                            preferredPostType: preferredPostType,
+                            indexUserDataId: indexUserDataId,
+                            fullUserDataId: fullUserDataId,
+                            croppedDisplayPhoto: croppedDisplayPhoto,
+                            smallCroppedDisplayPhoto: smallCroppedDisplayPhoto,
+                            pursuits: pursuits,
+                            pursuitNames: pursuitNames,
+                            pursuitInfoArray: pursuitInfoArray,
+                            totalMin: totalMin,
+                            recentPosts: recentPosts,
+                            feedData: feedData,
+                            nextOpenPostIndex: nextOpenPostIndex,
+                            hasMore: hasMore
+                        }));
+                })
                 .catch((err) => {
                     console.log(err);
                     alert("Could Not Load Feed." + err);
@@ -280,7 +277,10 @@ class ReturningUserPage extends React.Component {
                     this.setState({ hasMore: false })
                 }
             })
-            .catch((error) => console.log(error)));
+            .catch((error) => {
+                console.log(error);
+                alert(error);
+            }));
     }
 
     handleDeletePost() {
@@ -289,7 +289,10 @@ class ReturningUserPage extends React.Component {
             this.state.indexUserDataId,
             this.state.selectedEvent._id
         ).then(
-            (result) => console.log(result)
+            (result) => {
+                console.log(result);
+                alert(result);
+            }
         );
     }
 

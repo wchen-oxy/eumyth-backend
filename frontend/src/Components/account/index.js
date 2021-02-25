@@ -42,9 +42,16 @@ const AccountPage = (props) => {
   }
 
   const removePhoto = (photoType) => {
+    const username = props.firebase.returnUsername();
     if (window.confirm("Are you sure you want to remove your photo?")) {
       AxiosHelper
-        .deleteAccountPhoto(props.firebase.returnUsername(), photoType)
+        .deleteAccountPhoto(username, photoType)
+        .then((results) => {
+          let formData = new FormData();
+          formData.append("username", username);
+          formData.append("imageKey", "");
+          return AxiosHelper.updatePostDisplayPhotos(formData)
+        })
         .then(() => {
           if (photoType === DISPLAY) {
             window.alert(
@@ -69,15 +76,32 @@ const AccountPage = (props) => {
     }
   }
 
-  const handlePhotoSubmit = (formData, photoType) => (
-    AxiosHelper.deleteAccountPhoto(props.firebase.returnUsername(), photoType)
-      .then(() => AxiosHelper.updateAccountImage(formData, photoType))
-      .then(() => alert("Successfully updated!"))
-      .catch((err) => {
-        console.log(err);
-        alert("Something has gone wrong while updating :(")
-      })
-  );
+  const handlePhotoSubmit = (formData, photoType) => {
+    const username = props.firebase.returnUsername();
+    return (
+      AxiosHelper
+        .deleteAccountPhoto(username, photoType)
+        .then((result) => {
+          console.log(result);
+          return AxiosHelper.updateAccountImage(formData, photoType);
+        })
+        .then((results) => {
+          const form = {
+            username: username,
+            imageKey: results.data.imageKey
+          };
+          return AxiosHelper.updatePostDisplayPhotos(form)
+        })
+        .then((results) => {
+          console.log(results);
+          alert("Successfully updated!");
+        })
+        .catch((err) => {
+          console.log(err);
+          alert("Something has gone wrong while updating :(")
+        })
+    );
+  }
 
   const handleBioSubmit = () => {
     return (
@@ -105,7 +129,7 @@ const AccountPage = (props) => {
 
   const submitPhoto = (photoType) => {
     let formData = new FormData();
-    formData.append('displayName', props.firebase.returnUsername());
+    formData.append('username', props.firebase.returnUsername());
     if (photoType === DISPLAY) {
       const titles = ["normal", "small", "tiny"];
       const canvas = AvatarEditorInstance.getImage();

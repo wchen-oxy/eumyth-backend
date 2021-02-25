@@ -44,6 +44,7 @@ const ReviewPost = (props) => {
             );
         }
         if (props.imageArray && props.imageArray.length > 0) {
+            console.log("image array");
             for (const image of props.imageArray) {
                 formData.append("images", image);
             }
@@ -52,19 +53,23 @@ const ReviewPost = (props) => {
             console.log(JSON.stringify(props.textData));
             if (props.postId) formData.append("postId", props.postId);
             return AxiosHelper.updatePost(formData)
-                .then(
-                    (result) => {
-                        result.status === 200 ? handleSuccess() : handleError();
-                    }
-                );
+                .then((result) => {
+                    result.status === 200 ? handleSuccess() : handleError();
+                }).catch((result) => {
+                    console.log(result.error);
+                    alert(result);
+                });
         }
         else {
+            console.log("Posting");
             return AxiosHelper.createPost(formData)
-                .then(
-                    (result) => {
-                        result.status === 201 ? handleSuccess() : handleError();
-                    }
-                );
+                .then((result) => {
+                    result.status === 201 ? handleSuccess() : handleError();
+                })
+                .catch((result) => {
+                    console.log(result.error);
+                    alert(result);
+                });
         }
     }
 

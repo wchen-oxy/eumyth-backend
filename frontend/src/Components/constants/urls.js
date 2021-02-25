@@ -43,7 +43,7 @@ const MULTIPLE_POSTS_URL = POST_BASE_URL + "/multiple";
 const WITH_IMAGE_POST_URL = POST_BASE_URL + "/with-image";
 const NO_IMAGE_POST_URL = POST_BASE_URL + "/no-image";
 const SOCIAL_FEED_POSTS_URL = POST_BASE_URL + "/feed";
-
+const POST_DISPLAY_PHOTO_URL = POST_BASE_URL + "/display-photo";
 const SINGLE_POST_TEXT_DATA_URL = POST_BASE_URL + "/single"
 
 //project
@@ -88,6 +88,7 @@ module.exports = {
     WITH_IMAGE_POST_URL,
     NO_IMAGE_POST_URL,
     SOCIAL_FEED_POSTS_URL,
+    POST_DISPLAY_PHOTO_URL,
     SINGLE_POST_TEXT_DATA_URL,
     INDEX_BASE_URL,
     CHECK_USERNAME_URL,

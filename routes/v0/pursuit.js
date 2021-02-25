@@ -13,7 +13,7 @@ router.route('/').get((req, res) => {
     .then(
       result => res.json(result.pursuits)
     )
-    .catch(err => res.status(400).json('Error: ' + err));
+    .catch(error => res.status(500).json({error : error}));
 });
 
 module.exports = router;

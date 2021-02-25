@@ -150,6 +150,8 @@ const countComments = (postIdList) => {
 
 router.route('/')
   .post(MulterHelper.contentImageUpload.fields(postImageFields), (req, res) => {
+    console.log("POST1");
+
     const postType = req.body.postType ? req.body.postType : null;
     const username = req.body.username;
     const displayPhoto = req.body.displayPhoto;
@@ -175,7 +177,7 @@ router.route('/')
     if (textData) {
       textSnippet = makeTextSnippet(postType, isPaginated, textData)
     }
-
+    console.log("POST");
     return UserPreview.Model
       .findOne({ username: username })
       .then((resolvedUserPrevew) => (
@@ -460,7 +462,6 @@ router.route('/multiple').get((req, res) => {
         for (let post of posts) {
           post.comment_count = commentData[post._id.toString()] ? commentData[post._id.toString()] : 0;
         }
-
       }
       else {
         for (let post of posts) {
@@ -468,9 +469,8 @@ router.route('/multiple').get((req, res) => {
         }
       }
       return res.status(200).json({ posts: posts });
-
-    }
-    ).catch((error) => {
+    })
+    .catch((error) => {
       console.log(error);
       return res.status(500).json({ error: error });
     })
@@ -499,4 +499,17 @@ router.route('/single').get((req, res) => {
 
 })
 
+router.route('/display-photo').patch((req, res) => {
+  console.log(req.body);
+  const username = req.body.username;
+  const imageKey = req.body.imageKey;
+  return Post.Model.updateMany({ username: username }, { display_photo_key: imageKey })
+    .then(() => {
+      return res.status(200).send();
+    })
+    .catch((error) => {
+      console.log(error);
+      return res.status(500).send();
+    })
+})
 module.exports = router;

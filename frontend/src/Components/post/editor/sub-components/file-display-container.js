@@ -71,4 +71,4 @@ const FileDisplayContainer = (props) => {
     )
 };
 
-export default FileDisplayContainer;
+export default React.memo(FileDisplayContainer);
