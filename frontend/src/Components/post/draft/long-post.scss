@@ -1,5 +1,13 @@
 @import "../../../partials";
 
+#longpost-container {
+    @include long-post-editor-container;
+    width: 700px;
+    input {
+        color: black;
+    }
+}
+
 .longpost-window {
     @include large-post-window;
 }
