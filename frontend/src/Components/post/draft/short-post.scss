@@ -1,9 +1,0 @@
-@import "../../../partials";
-#shortpost-window {
-    @include flex-display-column;
-    @include small-post-window;
-}
-
-.shortpost-button-container {
-    @include centered-vertical-button-container;
-}
