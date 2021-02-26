@@ -6,8 +6,7 @@ import { POST, PROJECT, LONG, SHORT } from "../../../constants/flags";
 import './timeline-event.scss';
 
 const selectClassStyle = (num) => {
-    console.log(num);
-    switch (num) {
+     switch (num) {
         case (0):
             return "event-first-container";
         case (1):
@@ -30,7 +29,7 @@ const Event = (props) => {
             props.onEventClick(post, props.index)
         }
         else {
-            console.log("Selected")
+            console.log("Selected, but disabled")
         }
     };
 

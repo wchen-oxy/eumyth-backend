@@ -8,6 +8,7 @@ $primary-large-font-size: 22.5px;
 $primary-medium-font-size: 15px;
 
 $small-post-height: 74vh;
+$small-button-window: 19vh;
 
 @mixin flex-display-row {
     display: flex;
@@ -62,7 +63,18 @@ $small-post-height: 74vh;
     overflow: scroll;
 }
 
-@mixin long-post-editor-container{
+@mixin small-button-window {
+    position: absolute;
+    // margin-top: 9.5vh;
+    // margin-left: -19vw;
+    // top: 50%;
+    // left: 50%;
+    z-index: 50;
+    height: $small-button-window;
+    // width: 38vw;
+}
+
+@mixin long-post-editor-container {
     margin: 0 auto;
 }
 

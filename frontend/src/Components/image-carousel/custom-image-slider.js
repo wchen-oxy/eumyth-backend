@@ -20,6 +20,10 @@ class CustomImageSlider extends React.Component {
         this.renderImageControls = this.renderImageControls.bind(this);
     }
 
+    componentWillUnmount() {
+        console.log("Image Slider unmount");
+    }
+
     onAnnotationChange(annotation) {
         this.setState({ annotation })
     }
@@ -113,6 +117,7 @@ class CustomImageSlider extends React.Component {
     render() {
         let annotations = !this.props.hideAnnotations
             ? this.props.annotations : [];
+
         return (
             <>
                 <div className="customimageslider-hero-container">

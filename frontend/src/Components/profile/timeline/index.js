@@ -107,15 +107,13 @@ class Timeline extends React.Component {
                     this.state.nextOpenPostIndex,
                     this.state.nextOpenPostIndex + this.state.fixedDataLoadLength),
                 false)
-                .then(
-                    (result) => {
-                        console.log(result.data);
-                        if (this._isMounted) {
-                            this.createTimelineRow(
-                                result.data.posts,
-                                this.props.mediaType);
-                        }
+                .then((result) => {
+                    if (this._isMounted) {
+                        this.createTimelineRow(
+                            result.data.posts,
+                            this.props.mediaType);
                     }
+                }
                 )
                 .catch((error) => console.log(error));
         }

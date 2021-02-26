@@ -28,6 +28,7 @@ class ShortPostViewer extends React.Component {
         this.state = {
             annotations: null,
             activeAnnotations: [],
+            fullCommentData: [],
             visitorProfilePreviewId: '',
             areAnnotationsHidden: true,
             selectedAnnotationIndex: null,
@@ -104,6 +105,7 @@ class ShortPostViewer extends React.Component {
             }
         }
         this.setState({
+            fullCommentData: rawComments,
             annotations: annotations,
             visitorProfilePreviewId: visitorProfilePreviewId
         })
@@ -124,7 +126,8 @@ class ShortPostViewer extends React.Component {
             return (
                 <Comments
                     postType={SHORT}
-                    comments={this.props.eventData.comments}
+                    commentIDArray={this.props.eventData.comments}
+                    fullCommentData={this.state.fullCommentData}
                     windowType={windowType}
                     visitorUsername={this.props.visitorUsername}
                     postId={this.props.postId}
@@ -140,7 +143,6 @@ class ShortPostViewer extends React.Component {
             );
         }
         else if (windowType === COLLAPSED) {
-            console.log("Commentcount", this.props.eventData.comments);
             return (
                 <p>{this.props.eventData.comment_count} Comments</p>
             )
@@ -268,7 +270,7 @@ class ShortPostViewer extends React.Component {
             .postComment(annotationPayload)
             .then((result) => {
                 const rootCommentIdArray = result.data.rootCommentIdArray;
-                const fullAnnotationArray = this.state.annotations;
+                const newRootCommentData = result.data.newRootComment;
                 const currentAnnotationArray =
                     this.state
                         .annotations[this.state.imageIndex]
@@ -279,9 +281,19 @@ class ShortPostViewer extends React.Component {
                                 id: rootCommentIdArray[0]
                             }
                         });
+                let fullAnnotationArray = this.state.annotations;
+                let fullCommentData = this.state.fullCommentData;
+                fullCommentData.push(newRootCommentData);
+
                 fullAnnotationArray[this.state.imageIndex] =
                     currentAnnotationArray;
-                this.setState({ annotations: fullAnnotationArray })
+                    console.log(newRootCommentData);
+                    console.log(fullCommentData);
+                return this.setState({
+                    annotations: fullAnnotationArray,
+                    commentArray: rootCommentIdArray,
+                    fullCommentData: fullCommentData
+                })
             })
             .catch((err) => {
                 console.log(err);
@@ -393,7 +405,10 @@ class ShortPostViewer extends React.Component {
                         <div className="shortpostviewer-window">
                             <div id="shortpostviewer-large-main-container">
                                 {this.renderImageSlider(EXPANDED)}
-                                <div ref={this.heroRef}>
+                                <div
+                                    className="shortpostviewer-large-side-container"
+                                    ref={this.heroRef}
+                                >
                                     <PostHeader
                                         isOwnProfile={this.props.isOwnProfile}
                                         username={this.props.username}

@@ -43,7 +43,7 @@ const LongPostViewer = (props) => {
             return (
                 <Comments
                     postType={LONG}
-                    comments={props.eventData.comments}
+                    commentIDArray={props.eventData.comments}
                     windowType={windowType}
                     visitorUsername={props.visitorUsername}
                     postId={props.postId}

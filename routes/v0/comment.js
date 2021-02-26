@@ -285,7 +285,9 @@ router.route('/root')
         const imagePageNumber = req.body.imagePageNumber;
         const resolvedPost = Post.Model.findById(postId);
         const resolvedUser = UserPreview.Model.findById(commenterId);
+        let newRootCommentJSON = null;
         let rootCommentArray = null;
+        let displayPhotoKey = "";
 
         return Promise.all([resolvedPost, resolvedUser])
             .then((result) => {
@@ -299,21 +301,33 @@ router.route('/root')
                     })
                     : null;
 
-                const newRootComment = new Comment.Model({
+                const commentData = {
                     parent_post_id: postId,
                     ancestor_post_ids: [],
                     commenter_user_id: result[1]._id,
                     comment: comment,
                     annotation: annotationPayload
-                })
-
+                }
+                const newRootComment = new Comment.Model(commentData)
+                console.log(result[1].tiny_cropped_display_photo_key);
+                newRootCommentJSON = {
+                    ...commentData,
+                    display_photo_key: result[1].tiny_cropped_display_photo_key,
+                    likes: [],
+                    dislikes: [],
+                    score: 0
+                }
                 result[0].comments.unshift(newRootComment._id);
                 rootCommentArray = result[0].comments;
 
                 return Promise.all([result[0].save(), newRootComment.save()]);
             })
             .then(() => {
-                res.status(200).json({ rootCommentIdArray: rootCommentArray });
+                console.log(newRootCommentJSON);
+                return res.status(200).json({
+                    rootCommentIdArray: rootCommentArray,
+                    newRootComment: newRootCommentJSON
+                });
             })
             .catch((error) => {
                 if (error.status === 204) console.log("No user or original post found");

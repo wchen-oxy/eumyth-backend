@@ -6,7 +6,7 @@ import { AuthUserContext } from '../../Components/session/'
 import { withFirebase } from '../../Firebase';
 import { Link } from 'react-router-dom';
 import { POST, REQUEST_ACTION } from "../constants/flags";
-import { returnUserImageURL } from "../constants/urls";
+import { returnUserImageURL, TEMP_PROFILE_PHOTO_URL } from "../constants/urls";
 import AxiosHelper from '../../Axios/axios';
 import './index.scss';
 
@@ -59,7 +59,7 @@ class NavigationAuth extends React.Component {
       .then((result) => {
         this.setState({
           existingUserLoading: isUserStillLoading,
-          tinyDisplayPhoto: returnUserImageURL(result.data)
+          tinyDisplayPhoto: result.data ? returnUserImageURL(result.data) : TEMP_PROFILE_PHOTO_URL
         });
       })
       ;
@@ -90,10 +90,13 @@ class NavigationAuth extends React.Component {
     let modal = null;
     if (this.state.isPostModalShowing) {
       modal = (
-        <PostDraftController
-          username={this.state.username}
-          closeModal={this.closeModal}
-        />
+        <>
+          <div className="overlay" onClick={(() => this.closeModal())}></div>
+          <PostDraftController
+            username={this.state.username}
+            closeModal={this.closeModal}
+          />
+        </>
       );
     }
     else if (this.state.isRequestModalShowing) {

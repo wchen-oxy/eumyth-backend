@@ -12,7 +12,7 @@ class Comments extends React.Component {
         super(props);
         this.state = {
             windowType: this.props.windowType,
-            currentComments: null,
+            
             commentText: "",
             loadingComments: true,
 
@@ -26,12 +26,12 @@ class Comments extends React.Component {
     }
 
     componentDidMount() {
-        if (this.props.comments.length > 0) {
+        if (this.props.commentIDArray.length > 0) {
 
-            AxiosHelper.getComments({
+            return AxiosHelper.getComments({
                 params: {
                     visitorUsername: this.props.visitorUsername,
-                    rootCommentIdArray: JSON.stringify(this.props.comments),
+                    rootCommentIdArray: JSON.stringify(this.props.commentIDArray),
                     viewingMode: this.state.windowType
                 }
             })
@@ -40,7 +40,7 @@ class Comments extends React.Component {
                         this.setState({
                             visitorProfilePreviewId: result.data.userPreviewId,
                             loadingComments: false,
-                            currentComments: result.data.rootComments
+
                         }, () => {
                             if (this.props.postType === SHORT) {
                                 this.props.passAnnotationData(
@@ -54,7 +54,7 @@ class Comments extends React.Component {
                 )
         }
         else {
-            AxiosHelper
+            return AxiosHelper
                 .getUserPreviewId({
                     params: { username: this.props.visitorUsername }
                 })
@@ -62,7 +62,7 @@ class Comments extends React.Component {
                     this.setState({
                         visitorProfilePreviewId: result.data.userPreviewId,
                         loadingComments: false,
-                        currentComments: []
+                        
                     }, () => {
                         if (this.props.postType === SHORT) {
                             this.props.passAnnotationData(
@@ -114,7 +114,7 @@ class Comments extends React.Component {
     }
 
     renderCommentSectionType(viewingMode) {
-        if (this.state.loadingComments) {
+        if (this.state.loadingComments || !this.props.fullCommentData) {
             return <div>
                 Loading...
             </div>
@@ -122,12 +122,12 @@ class Comments extends React.Component {
 
         if (viewingMode === COLLAPSED) {
             return (
-                this.renderCommentThreads(this.state.currentComments)
+                this.renderCommentThreads(this.props.fullCommentData)
             )
         }
         else if (viewingMode === EXPANDED) {
             return (
-                this.renderCommentThreads(this.state.currentComments)
+                this.renderCommentThreads(this.props.fullCommentData)
             )
         }
         else {
@@ -255,7 +255,7 @@ class Comments extends React.Component {
 
 
     render() {
-        if (this.state.windowType === COLLAPSED) {
+         if (this.state.windowType === COLLAPSED) {
             return (
                 <div className="comments-main-container">
                     {this.renderCommentSectionType(COLLAPSED)}

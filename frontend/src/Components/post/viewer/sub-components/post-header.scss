@@ -12,12 +12,24 @@
 
 .postheader-main-container {
     @include flex-display-row;
-    .postheader-author-information{
+    .postheader-author-information {
         @include flex-display-row;
         align-items: center;
-        img, h4 {
+        img,
+        h4 {
             padding-left: 5px;
             padding-right: 5px;
         }
+    }
+
+    button {
+        height: fit-content;
+    }
+}
+
+#postheader-main-button-container {
+    margin: auto 0;
+    #postheader-button-pop-up {
+        @include small-button-window;
     }
 }

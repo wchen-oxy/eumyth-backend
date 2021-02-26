@@ -5,7 +5,7 @@ const REGION = 'us-west-1';
 const returnUserImageURL = (key) => ("http://" + BUCKET_NAME + ".s3." + REGION + ".amazonaws.com/" + key);
 
 //Temporary Profile Photo
-const TEMP_PROFILE_PHOTO_URL = "https://i.redd.it/73j1cgr028u21.jpg";
+const TEMP_PROFILE_PHOTO_URL = "https://qph.fs.quoracdn.net/main-qimg-2b21b9dd05c757fe30231fac65b504dd";
 
 const ROOT_URL = "http://localhost:5000";
 const DRAFT_BASE_URL = ROOT_URL + "/draft";

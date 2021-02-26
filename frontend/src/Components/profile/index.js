@@ -124,7 +124,6 @@ class ProfilePage extends React.Component {
                     ])
                         .then(
                             (result => {
-                                console.log(result[1]);
                                 let pursuitNameArray = [];
                                 for (const pursuit of result[1].data.pursuits) {
                                     pursuitNameArray.push(pursuit.name);

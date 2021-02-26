@@ -10,7 +10,7 @@
     "@testing-library/user-event": "^7.1.2",
     "@wchen-oxy/Dante2": "https://github.com/wchen-oxy/dante2/tarball/master",
     "@wchen-oxy/dante2": "0.5.0-rc25",
-    "Dante2": "^0.5.0-rc25",
+    "Dante2": "^0.5.0-rc26",
     "axios": "^0.19.2",
     "bootstrap": "^4.5.0",
     "draft-convert": "^2.1.10",
