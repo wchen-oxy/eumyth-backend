@@ -24,7 +24,6 @@ var app = express();
 const uri = process.env.ATLAS_URI;
 console.log(uri);
 
-
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');

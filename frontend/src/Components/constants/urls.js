@@ -7,7 +7,8 @@ const returnUserImageURL = (key) => ("http://" + BUCKET_NAME + ".s3." + REGION +
 //Temporary Profile Photo
 const TEMP_PROFILE_PHOTO_URL = "https://qph.fs.quoracdn.net/main-qimg-2b21b9dd05c757fe30231fac65b504dd";
 
-const ROOT_URL = "http://localhost:5000";
+// const ROOT_URL = "http://localhost:5000";
+const ROOT_URL = "";
 const DRAFT_BASE_URL = ROOT_URL + "/draft";
 
 //image
