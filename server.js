@@ -7,6 +7,7 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const port = process.env.PORT || 5000;
 const indexUserRouter = require('./routes/v0/index');
+require('dotenv').config();
 const usersRouter = require('./routes/v0/user');
 const testRouter = require('./routes/v0/test');
 const pursuitsRouter = require('./routes/v0/pursuit');
@@ -18,7 +19,6 @@ const projectRouter = require('./routes/v0/project');
 const commentRouter = require('./routes/v0/comment');
 const UserPreviewRouter = require('./routes/v0/userPreview');
 var app = express();
-require('dotenv').config();
 
 // Mongoose specific code
 const uri = process.env.ATLAS_URI;
@@ -42,7 +42,8 @@ mongoose.connect(
     useCreateIndex: true,
     useUnifiedTopology: true,
     autoIndex: true
-  });
+  }).catch(err => console.log(err));
+
 
 const connection = mongoose.connection;
 connection.once('open', () => {
