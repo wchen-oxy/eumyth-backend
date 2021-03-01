@@ -35,9 +35,10 @@ app.use(logger('dev'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname,  "build")));
-app.use(express.static(path.join(__dirname, 'public')));
-
+app.use(express.static(path.join(__dirname, "build")));
+process.env.NODE_ENV === 'production' ? app.get('/*', function (req, res) {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+}) : console.log("Local Development");
 
 mongoose.connect(
   uri,
@@ -74,7 +75,7 @@ app.use(function (req, res, next) {
   next(createError(404));
 });
 
- app.use(function (err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
