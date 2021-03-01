@@ -68,10 +68,6 @@ app.use('/user-preview', UserPreviewRouter);
 // console.log that your server is up and running
 app.listen(port, () => console.log(`Listening on port ${port}`));
 
-// catch 404 and forward to error handler
-app.use(function (req, res, next) {
-  next(createError(404));
-});
 
 app.use(function (err, req, res, next) {
   // set locals, only providing error in development
@@ -85,6 +81,11 @@ app.use(function (err, req, res, next) {
 process.env.IS_LOCAL === 'TRUE' ? app.get('/*', function (req, res) {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 }) : console.log("Local Development");
+
+// catch 404 and forward to error handler
+app.use(function (req, res, next) {
+  next(createError(404));
+});
 
 console.log("Server is now running");
 module.exports = app;
