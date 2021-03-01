@@ -3,8 +3,6 @@ var express = require('express');
 var router = express.Router();
 const UserPreview = require('../../models/user.preview.model');
 const UserRelationStatus = require("../../models/user.relation.status.model");
-const User = require('../../models/user.model');
-const IndexUser = require('../../models/index.user.model');
 const UserRelation = require('../../models/user.relation.model');
 const NOT_A_FOLLOWER_STATE = "NOT_A_FOLLOWER";
 
