@@ -1,3 +1,4 @@
+require('dotenv').config();
 const mongoose = require('mongoose');
 const cors = require('cors');
 const createError = require('http-errors');
@@ -7,7 +8,6 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const port = process.env.PORT || 5000;
 const indexUserRouter = require('./routes/v0/index');
-require('dotenv').config();
 const usersRouter = require('./routes/v0/user');
 const testRouter = require('./routes/v0/test');
 const pursuitsRouter = require('./routes/v0/pursuit');
