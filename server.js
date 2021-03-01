@@ -36,9 +36,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "build")));
-process.env.NODE_ENV === 'production' ? app.get('/*', function (req, res) {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
-}) : console.log("Local Development");
+
 
 mongoose.connect(
   uri,
@@ -84,5 +82,9 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+process.env.IS_LOCAL === 'TRUE' ? app.get('/*', function (req, res) {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+}) : console.log("Local Development");
+
 console.log("Server is now running");
 module.exports = app;
