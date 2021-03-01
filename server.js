@@ -46,9 +46,9 @@ connection.once('open', () => {
 app.listen(port, () => console.log(`Listening on port ${port}`));
 app.use('/api', indexRouter);
 
-process.env.IS_LOCAL === 'TRUE' ? app.get('/*', function (req, res) {
+process.env.IS_LOCAL ? console.log("Local Development") : app.get('/*', function (req, res) {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
-}) : console.log("Local Development");
+})
 
 
 app.use(function (err, req, res, next) {
@@ -63,6 +63,8 @@ app.use(function (err, req, res, next) {
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
+  console.log(req);
+  console.log(res);
   next(createError(404));
 });
 
