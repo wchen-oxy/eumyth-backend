@@ -4,12 +4,11 @@ const cors = require('cors');
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
-const fs = require('fs')
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const port = process.env.PORT || 5000;
 const indexRouter = require("./routes/v0/index")
-
+const fs = require('fs');
 var app = express();
 
 // Mongoose specific code
@@ -25,7 +24,7 @@ app.use(logger('dev'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
-// app.use(express.static(path.join(__dirname, "build")));
+app.use(express.static(path.join(__dirname, "build")));
 
 
 mongoose.connect(
@@ -54,10 +53,10 @@ try {
       res.sendFile(path.join(__dirname, 'build', 'index.html'));
     })
   }
-  else {
-    console.log("Development Build");
+  else{
+    console.log("Development Build")
   }
-} catch (err) {
+} catch(err) {
   console.error(err);
 }
 
