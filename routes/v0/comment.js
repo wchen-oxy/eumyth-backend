@@ -341,7 +341,7 @@ router.route('/refresh')
         const rootCommentIdArray = JSON.parse(req.query.rootCommentIdArray);
         return returnExpandedComments(rootCommentIdArray)
             .then((results) => {
-                res.status(200).json({ rootComments: results });
+                return res.status(200).json({ rootComments: results });
             })
             .catch((error) => {
                 console.log(error);

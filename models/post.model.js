@@ -88,7 +88,16 @@ const PostSchema = new Schema({
   comments: {
     type: [mongoose.Types.ObjectId],
     default: []
+  },
+
+  labels: {
+    type: [String]
+  },
+
+  branch: {
+    type: mongoose.Types.ObjectId
   }
+
 
 }, {
   timestamps: true,

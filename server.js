@@ -45,8 +45,10 @@ connection.once('open', () => {
 // console.log that your server is up and running
 app.listen(port, () => console.log(`Listening on port ${port}`));
 app.use('/api', indexRouter);
+console.log(process.argv.slice(2)[0]);
 try {
-  if (fs.existsSync(path.join(__dirname, 'build')) && process.argv.slice(2)[0]) {
+  const buildExists = fs.existsSync(path.join(__dirname, 'build'));
+  if (buildExists && process.argv.slice(2)[0]) {
     console.log("Production Build")
     app.get('/*', function (req, res) {
       res.sendFile(path.join(__dirname, 'build', 'index.html'));
@@ -54,6 +56,7 @@ try {
   }
   else {
     console.log("Development Build")
+    console.log(buildExists ? "Build Folder Detected" : "No Build Folder Detected");
   }
 } catch (err) {
   console.error(err);
