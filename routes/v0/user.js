@@ -135,7 +135,11 @@ router.route('/account-settings-info')
     const username = req.query.username;
     return User.Model.findOne({ username: username })
       .then((result) => {
-        return res.status(200).json({ bio: result.bio, private: result.private });
+        let pursuitNames = [];
+        for (const pursuit of result.pursuits){
+          pursuitNames.push(pursuit.name);
+        }
+        return res.status(200).json({ bio: result.bio, private: result.private, pursuitNames: pursuitNames });
       })
       .catch(
         (error) => {
