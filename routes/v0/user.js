@@ -133,13 +133,19 @@ router.route('/')
 router.route('/account-settings-info')
   .get((req, res) => {
     const username = req.query.username;
-    return User.Model.findOne({ username: username })
+    return IndexUser.Model.findOne({ username: username })
       .then((result) => {
-        let pursuitNames = [];
-        for (const pursuit of result.pursuits){
-          pursuitNames.push(pursuit.name);
+        let pursuitsJSON = {};
+        for (const pursuit of result.pursuits) {
+          pursuitsJSON[pursuit.name] = pursuit.meta_template ?
+            pursuit.meta_template : "";
         }
-        return res.status(200).json({ bio: result.bio, private: result.private, pursuitNames: pursuitNames });
+        return res.status(200).json({
+          _id: result.index_user_id,
+          bio: result.bio,
+          private: result.private,
+          pursuits: pursuitsJSON
+        });
       })
       .catch(
         (error) => {
@@ -148,6 +154,32 @@ router.route('/account-settings-info')
         }
       )
   });
+
+router.route('/template')
+  .put((req, res) => {
+
+    const userID = req.body.indexUserID;
+    const templateText = req.body.text;
+    const selectedPursuit = req.body.pursuit;
+    return IndexUser.Model.findById(userID)
+      .then(
+        (result) => {
+          let indexUser = result;
+          for (let pursuit of indexUser.pursuits) {
+            if (pursuit.name === selectedPursuit) {
+              pursuit.meta_template = templateText;
+            }
+          }
+          return indexUser.save();
+        }
+      )
+      .then((result) => res.status(200).send())
+      .catch((err) => {
+        console.log(err);
+        return res.status(500).send();
+      })
+
+  })
 
 router.route('/bio')
   .get((req, res) => {

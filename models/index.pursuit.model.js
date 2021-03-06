@@ -28,7 +28,10 @@ const IndexPursuitSchema = new Schema({
     total_min: {
         type: Number,
         required: false,
-    }
+    },
+    
+    meta_template: String,
+
 });
 
 const IndexPursuitModel = mongoose.model('index_pursuit', IndexPursuitSchema);

@@ -72,7 +72,6 @@ const IndexUserSchema = new Schema(
         notifications: {
             type: [String],
         },
-        meta_template: [String],
         pursuits: [IndexPursuit.Schema],
         following_feed: [mongoose.Types.ObjectId], //feed from others
         recent_posts: [mongoose.Types.ObjectId] // 4 most recent posts
