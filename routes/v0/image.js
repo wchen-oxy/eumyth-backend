@@ -200,8 +200,11 @@ router.route('/cover')
       .then((user) => {
         returnedUser = user;
 
-        if (returnedUser.cover_photo_key === "") throw 204;
+        if (!returnedUser.cover_photo_key || returnedUser.cover_photo_key === "")
+          return res.status(204).json("No Content");
+        else {
 
+        }
         return AWSConstants
           .S3_INTERFACE
           .deleteObject({
@@ -212,21 +215,15 @@ router.route('/cover')
               console.log(error, error.stack);
               throw new Error("Something went wrong while deleting the file from Amazon.", error)
             };
-          });
+          })
+          .then(() => {
+            returnedUser.cover_photo_key = "";
+            return returnedUser.save();
+          })
+          .then(() => (res.status(204).send()));
       })
-      .then(() => {
-        returnedUser.cover_photo_key = "";
-        return returnedUser.save();
-      })
-      .then(() => (res.status(204).send()))
       .catch((error) => {
-        console.log(error);
-
-        if (error === 204) {
-          return res.status(204).json("No Content");
-        }
-
-        return res.status(500).send()
+        return res.status(500).json({error: error})
       });
   });
 
