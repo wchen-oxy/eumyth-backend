@@ -287,8 +287,7 @@ router.route('/root')
         const resolvedUser = UserPreview.Model.findById(commenterId);
         let newRootCommentJSON = null;
         let rootCommentArray = null;
-        let displayPhotoKey = "";
-
+ 
         return Promise.all([resolvedPost, resolvedUser])
             .then((result) => {
                 if (!result[0] || !result[1]) throw new Error(204);
@@ -312,6 +311,7 @@ router.route('/root')
                 console.log(result[1].tiny_cropped_display_photo_key);
                 newRootCommentJSON = {
                     ...commentData,
+                    _id: newRootComment._id,
                     display_photo_key: result[1].tiny_cropped_display_photo_key,
                     likes: [],
                     dislikes: [],
