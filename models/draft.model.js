@@ -4,6 +4,13 @@ const DraftSchema = new Schema(
     {
         _id: false,
 
+        title: {
+            type: String,
+            required: false,
+            default: "",
+            trim: true
+        },
+
         text: {
             type: String,
             required: false,

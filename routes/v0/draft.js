@@ -35,6 +35,7 @@ router.route('/')
     .put((req, res) => {
         const username = req.body.username;
         const draft = req.body.draft;
+        const draftTitle = req.body.draftTitle;
         const parsedDraft = JSON.parse(draft).blocks;
 
         return IndexUser.Model
@@ -59,6 +60,7 @@ router.route('/')
                 }
                 indexUser.draft.text = draft;
                 indexUser.draft.links = currentURLs;
+                if (draftTitle) { indexUser.draft.title = draftTitle; }
                 if (toDeleteURLs.length > 0)
                     return Promise.all(
                         [indexUser.save(),
@@ -96,32 +98,23 @@ router.route('/')
 
     })
 
-// router.route('/title').put((req, res) => {
-//     const username = req.body.username;
-//     const title = req.body.title;
-//     IndexUser.Model.findOne({ username: username },
-//         (err, indexUserProfile) => {
-//             if (err) {
-//                 console.log(err);
-//                 res.status(500).json("Error: " + err)
-//             }
-//         }
-//     )
-//         .then(
-//             (indexUser) => {
-//                 indexUser.draft.title = title;
-//                 return indexUser.save((err) => {
-//                     if (err) {
-//                         console.error('ERROR: ' + err);
-//                         res.status(500).json(err);
-//                     }
-//                 });
-
-//             }
-//         ).then(() => res.sendStatus(201)).catch(err => console.log(err));
-
-// }
-// )
+router.route('/title')
+    .put((req, res) => {
+        const username = req.body.username;
+        const draftTitle = req.body.draftTitle;
+        return IndexUser.Model.findOne({ username: username })
+            .then(
+                (indexUser) => {
+                    indexUser.draft.title = draftTitle;
+                    return indexUser.save();
+                }
+            )
+            .then(() => res.sendStatus(201))
+            .catch(err => {
+                console.log(err);
+                return res.status(500).send();
+            });
+    })
 
 // router.route('/desc').put((req, res) => {
 //     const username = req.body.username;
