@@ -158,8 +158,6 @@ const countComments = (postIdList) => {
 
 router.route('/')
   .post(MulterHelper.contentImageUpload.fields(postImageFields), (req, res) => {
-    console.log("POST1");
-
     const postType = req.body.postType ? req.body.postType : null;
     const username = req.body.username;
     const displayPhoto = req.body.displayPhoto;
@@ -170,23 +168,20 @@ router.route('/')
     const date = req.body.date ? new Date(req.body.date) : null;
     const textData = req.body.textData ? req.body.textData : null;
     const minDuration = !!req.body.minDuration ? parseInt(req.body.minDuration) : null;
-    const isMilestone = Boolean.prototype.valueOf(req.body.isMilestone);
-    const isPaginated = Boolean.prototype.valueOf(req.body.isPaginated);
+    const isMilestone = req.body.isMilestone.trim().toLowerCase() === 'true';
+    const isPaginated = req.body.isPaginated.trim().toLowerCase() === 'true';
     const coverPhotoKey = req.files && req.files.coverPhoto ? req.files.coverPhoto[0].key : null;
     const imageData = req.files && req.files.images ? getImageUrls(req.files.images) : [];
-    const useImageForThumbnail = req.body.useImageForThumbnail ? req.body.useImageForThumbnail : null;
-
     let post = null;
     let indexUser = null;
     let followerArrayID = null;
     let userRelationResult = null;
     let textSnippet = null;
 
-
     if (textData) {
       textSnippet = makeTextSnippet(postType, isPaginated, textData)
     }
-    console.log("POST");
+
     return UserPreview.Model
       .findOne({ username: username })
       .then((resolvedUserPrevew) => (
@@ -365,53 +360,47 @@ router.route('/')
         }
       );
   })
-  .put(
-    MulterHelper.contentImageUpload.single("coverPhoto"),
-    (req, res) => {
-      const postId = !!req.body.postId ? req.body.postId : null;
-      const username = req.body.username;
-      const displayPhoto = req.body.displayPhoto;
-      const title = !!req.body.title ? req.body.title : null;
-      const subtitle = !!req.body.subtitle ? req.body.subtitle : null;
-      const postPrivacyType = !!req.body.postPrivacyType ? req.body.postPrivacyType : null;
-      const pursuitCategory = !!req.body.pursuitCategory ? req.body.pursuitCategory : null;
-      const date = !!req.body.date ? req.body.date : null;
-      console.log("hello");
-      console.log(req.file);
-      console.log(req.files)
-      console.log(req.body)
-      const textData = !!req.body.textData ? req.body.textData : null;
-      const minDuration = !!req.body.minDuration ? parseInt(req.body.minDuration) : null;
-      const isMilestone = !!req.body.isMilestone ? req.body.isMilestone : null;
-      const isPaginated = req.body.isPaginated ? true : false;
-      const coverPhotoKey = req.file ? req.file.key : null;
+  .put(MulterHelper.contentImageUpload.single("coverPhoto"), (req, res) => {
+    const postId = !!req.body.postId ? req.body.postId : null;
+    const username = req.body.username;
+    const displayPhoto = req.body.displayPhoto;
+    const title = !!req.body.title ? req.body.title : null;
+    const subtitle = !!req.body.subtitle ? req.body.subtitle : null;
+    const postPrivacyType = !!req.body.postPrivacyType ? req.body.postPrivacyType : null;
+    const pursuitCategory = !!req.body.pursuitCategory ? req.body.pursuitCategory : null;
+    const date = !!req.body.date ? req.body.date : null;
+    const textData = !!req.body.textData ? req.body.textData : null;
+    const minDuration = !!req.body.minDuration ? parseInt(req.body.minDuration) : null;
+    const isMilestone = !!req.body.isMilestone ? req.body.isMilestone : null;
+    const isPaginated = req.body.isPaginated ? true : false;
+    const coverPhotoKey = req.file ? req.file.key : null;
 
-      return Post.Model.findById(postId)
-        .then(
-          (result) => {
-            let post = result;
-            post.username = username;
-            post.display_photo_key = displayPhoto;
-            post.title = title;
-            post.subtitle = subtitle;
-            post.pursuit_category = pursuitCategory;
-            post.date = date;
-            post.min_duration = minDuration;
-            post.is_milestone = isMilestone;
-            post.is_paginated = isPaginated;
-            post.cover_photo_key = coverPhotoKey;
-            post.text_data = textData;
-            post.post_privacy_type = postPrivacyType;
-            return post.save()
-          })
-        .then(() => {
-          return res.status(200).send();
+    return Post.Model.findById(postId)
+      .then(
+        (result) => {
+          let post = result;
+          post.username = username;
+          post.display_photo_key = displayPhoto;
+          post.title = title;
+          post.subtitle = subtitle;
+          post.pursuit_category = pursuitCategory;
+          post.date = date;
+          post.min_duration = minDuration;
+          post.is_milestone = isMilestone;
+          post.is_paginated = isPaginated;
+          post.cover_photo_key = coverPhotoKey;
+          post.text_data = textData;
+          post.post_privacy_type = postPrivacyType;
+          return post.save()
         })
-        .catch(error => {
-          console.log(error);
-          return res.status(500).json({ error: error })
-        })
-    })
+      .then(() => {
+        return res.status(200).send();
+      })
+      .catch(error => {
+        console.log(error);
+        return res.status(500).json({ error: error })
+      })
+  })
   .delete((req, res) => {
     const indexUserId = req.body.indexUserId;
     const userId = req.body.userId;
@@ -499,7 +488,6 @@ router.route('/single').get((req, res) => {
         return res.status(200).send(result.text_data);
       }
       else {
-        console.log(result);
         return res.status(200).send(result);
       }
     })
@@ -514,7 +502,6 @@ router.route('/single').get((req, res) => {
 })
 
 router.route('/display-photo').patch((req, res) => {
-  console.log(req.body);
   const username = req.body.username;
   const imageKey = req.body.imageKey;
   return Post.Model.updateMany({ username: username }, { display_photo_key: imageKey })
