@@ -6,6 +6,8 @@ const User = require('../../models/user.model');
 const IndexUser = require('../../models/index.user.model');
 const UserPreview = require('../../models/user.preview.model');
 
+
+
 const displayPhotoUploadFields = [
   { name: "croppedImage" },
   { name: "smallCroppedImage" },
@@ -13,28 +15,52 @@ const displayPhotoUploadFields = [
 ];
 
 router.route('/')
+  .get((req, res) => {
+    return AWSConstants
+      .S3_INTERFACE
+      .getObject({
+        Bucket: AWSConstants.BUCKET_NAME,
+        Key: req.query.imageKey,
+      }
+      ).promise()
+      .then((data) => {
+        return res.status(200).json({ "image": "data:" + data.ContentType + ";base64," + data.Body.toString('base64') });
+      })
+  })
   .post(MulterHelper.contentImageUpload.single('file'), (req, res) => {
     return res.status(200).json({
       'url': req.file.location,
       'file': req.file.key
     });
-  });
-
-
-router.route('/single')
-  .post(MulterHelper.contentImageUpload.single('file'), (req, res) => {
-    return res.status(200).json({ 'imageUrl': req.file.key });
-  });
-
-
-router.route('/multiple')
-  .post(MulterHelper.contentImageUpload.array('files'), (req, res) => {
-    let imageArray = [];
-    for (const imageFile of req.files) {
-      imageArray.push(imageFile.key);
+  })
+  .delete((req, res) => {
+    const key = req.body.key;
+    if (!key) return res.status(500).json({ error: "No image key provided." });
+    else {
+      return AWSConstants
+        .S3_INTERFACE
+        .deleteObjects({
+          Bucket: AWSConstants.BUCKET_NAME,
+          Key: key
+        }, function (error, data) {
+          if (error) {
+            console.log("Something bad happened");
+            console.log(error, error.stack);
+            throw new Error(error);
+          }
+          else { console.log("Success", data); }
+        })
+        .promise()
+        .then(() => {
+          return res.status(204).send()
+        })
+        .catch((err) => {
+          console.log(err);
+          return res.status(500).json({ error: err })
+        });
     }
-    return res.status(200).json({ 'imageUrls': imageArray });
   });
+
 
 router.route('/navbar-display-photo')
   .get((req, res) => IndexUser.Model.findOne({ username: req.query.username })
@@ -223,7 +249,7 @@ router.route('/cover')
           .then(() => (res.status(204).send()));
       })
       .catch((error) => {
-        return res.status(500).json({error: error})
+        return res.status(500).json({ error: error })
       });
   });
 

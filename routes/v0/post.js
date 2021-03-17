@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
+const axios = require('axios');
+const AWSConstants = require('../../constants/aws');
+
 const User = require('../../models/user.model');
 const IndexUser = require('../../models/index.user.model');
 const Post = require("../../models/post.model");
@@ -14,6 +17,10 @@ const SHORT = "SHORT";
 const LONG = "LONG";
 
 const postImageFields = [{ name: "images" }, { name: "coverPhoto", maxCount: 1 }];
+
+// const retrieveImage = () => {
+//   if ()
+// }
 
 const setRecentPosts = (post, inputRecentPosts) => {
   let newRecentPosts = inputRecentPosts;
@@ -148,6 +155,7 @@ const countComments = (postIdList) => {
   ])
 }
 
+
 router.route('/')
   .post(MulterHelper.contentImageUpload.fields(postImageFields), (req, res) => {
     console.log("POST1");
@@ -166,6 +174,7 @@ router.route('/')
     const isPaginated = Boolean.prototype.valueOf(req.body.isPaginated);
     const coverPhotoKey = req.files && req.files.coverPhoto ? req.files.coverPhoto[0].key : null;
     const imageData = req.files && req.files.images ? getImageUrls(req.files.images) : [];
+    const useImageForThumbnail = req.body.useImageForThumbnail ? req.body.useImageForThumbnail : null;
 
     let post = null;
     let indexUser = null;
@@ -356,48 +365,53 @@ router.route('/')
         }
       );
   })
-  .put(MulterHelper.contentImageUpload.single({ name: "coverPhoto", maxCount: 1 }), (req, res) => {
-    const postId = !!req.body.postId ? req.body.postId : null;
-    const username = req.body.username;
-    const displayPhoto = req.body.displayPhoto;
-    const title = !!req.body.title ? req.body.title : null;
-    const subtitle = !!req.body.subtitle ? req.body.subtitle : null;
-    const postPrivacyType = !!req.body.postPrivacyType ? req.body.postPrivacyType : null;
-    const pursuitCategory = !!req.body.pursuitCategory ? req.body.pursuitCategory : null;
-    const date = !!req.body.date ? req.body.date : null;
-    console.log(req.body.date);
-    const textData = !!req.body.textData ? req.body.textData : null;
-    const minDuration = !!req.body.minDuration ? parseInt(req.body.minDuration) : null;
-    const isMilestone = !!req.body.isMilestone ? req.body.isMilestone : null;
-    const isPaginated = req.body.isPaginated ? true : false;
-    const coverPhotoKey = req.files ? req.files.coverPhoto[0].key : null;
+  .put(
+    MulterHelper.contentImageUpload.single("coverPhoto"),
+    (req, res) => {
+      const postId = !!req.body.postId ? req.body.postId : null;
+      const username = req.body.username;
+      const displayPhoto = req.body.displayPhoto;
+      const title = !!req.body.title ? req.body.title : null;
+      const subtitle = !!req.body.subtitle ? req.body.subtitle : null;
+      const postPrivacyType = !!req.body.postPrivacyType ? req.body.postPrivacyType : null;
+      const pursuitCategory = !!req.body.pursuitCategory ? req.body.pursuitCategory : null;
+      const date = !!req.body.date ? req.body.date : null;
+      console.log("hello");
+      console.log(req.file);
+      console.log(req.files)
+      console.log(req.body)
+      const textData = !!req.body.textData ? req.body.textData : null;
+      const minDuration = !!req.body.minDuration ? parseInt(req.body.minDuration) : null;
+      const isMilestone = !!req.body.isMilestone ? req.body.isMilestone : null;
+      const isPaginated = req.body.isPaginated ? true : false;
+      const coverPhotoKey = req.file ? req.file.key : null;
 
-    return Post.Model.findById(postId)
-      .then(
-        (result) => {
-          let post = result;
-          post.username = username;
-          post.display_photo_key = displayPhoto;
-          post.title = title;
-          post.subtitle = subtitle;
-          post.pursuit_category = pursuitCategory;
-          post.date = date;
-          post.min_duration = minDuration;
-          post.is_milestone = isMilestone;
-          post.is_paginated = isPaginated;
-          post.cover_photo_key = coverPhotoKey;
-          post.text_data = textData;
-          post.post_privacy_type = postPrivacyType;
-          return post.save()
+      return Post.Model.findById(postId)
+        .then(
+          (result) => {
+            let post = result;
+            post.username = username;
+            post.display_photo_key = displayPhoto;
+            post.title = title;
+            post.subtitle = subtitle;
+            post.pursuit_category = pursuitCategory;
+            post.date = date;
+            post.min_duration = minDuration;
+            post.is_milestone = isMilestone;
+            post.is_paginated = isPaginated;
+            post.cover_photo_key = coverPhotoKey;
+            post.text_data = textData;
+            post.post_privacy_type = postPrivacyType;
+            return post.save()
+          })
+        .then(() => {
+          return res.status(200).send();
         })
-      .then(() => {
-        return res.status(200).send();
-      })
-      .catch(error => {
-        console.log(error);
-        return res.status(500).json({ error: error })
-      })
-  })
+        .catch(error => {
+          console.log(error);
+          return res.status(500).json({ error: error })
+        })
+    })
   .delete((req, res) => {
     const indexUserId = req.body.indexUserId;
     const userId = req.body.userId;
