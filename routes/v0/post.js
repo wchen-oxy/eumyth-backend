@@ -362,6 +362,7 @@ router.route('/')
   })
   .put(MulterHelper.contentImageUpload.single("coverPhoto"), (req, res) => {
     const postId = !!req.body.postId ? req.body.postId : null;
+    const postType = req.body.postType ? req.body.postType : null;
     const username = req.body.username;
     const displayPhoto = req.body.displayPhoto;
     const title = !!req.body.title ? req.body.title : null;
@@ -371,14 +372,24 @@ router.route('/')
     const date = !!req.body.date ? req.body.date : null;
     const textData = !!req.body.textData ? req.body.textData : null;
     const minDuration = !!req.body.minDuration ? parseInt(req.body.minDuration) : null;
-    const isMilestone = !!req.body.isMilestone ? req.body.isMilestone : null;
-    const isPaginated = req.body.isPaginated ? true : false;
+    const isMilestone = !!req.body.isMilestone ? req.body.isMilestone : null; //fixme check if isPaginated works now
+    const isPaginated = req.body.isPaginated ? req.body.isPaginated.trim().toLowerCase() === 'true' : false;
     const coverPhotoKey = req.file ? req.file.key : null;
+    const removeCoverPhoto = req.body.removeCoverPhoto
+      ? req.body.removeCoverPhoto
+        .trim()
+        .toLowerCase() === 'true' : false;
 
     return Post.Model.findById(postId)
       .then(
         (result) => {
           let post = result;
+          if (removeCoverPhoto) {
+            post.cover_photo_key = null;
+          }
+          else if (coverPhotoKey) {
+            post.cover_photo_key = coverPhotoKey;
+          }
           post.username = username;
           post.display_photo_key = displayPhoto;
           post.title = title;
@@ -388,9 +399,10 @@ router.route('/')
           post.min_duration = minDuration;
           post.is_milestone = isMilestone;
           post.is_paginated = isPaginated;
-          post.cover_photo_key = coverPhotoKey;
           post.text_data = textData;
+          post.text_snippet = textData ? makeTextSnippet(postType, isPaginated, textData) : null;
           post.post_privacy_type = postPrivacyType;
+
           return post.save()
         })
       .then(() => {

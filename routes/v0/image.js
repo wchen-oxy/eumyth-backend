@@ -35,11 +35,12 @@ router.route('/')
   })
   .delete((req, res) => {
     const key = req.body.key;
+    console.log(key);
     if (!key) return res.status(500).json({ error: "No image key provided." });
     else {
       return AWSConstants
         .S3_INTERFACE
-        .deleteObjects({
+        .deleteObject({
           Bucket: AWSConstants.BUCKET_NAME,
           Key: key
         }, function (error, data) {
