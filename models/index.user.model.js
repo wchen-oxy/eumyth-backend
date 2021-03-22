@@ -13,6 +13,12 @@ const IndexUserSchema = new Schema(
             trim: true
         },
 
+        bio: {
+            type: String,
+            trim: true,
+            default: ""
+        },
+
         private: {
             type: Boolean,
             required: true,

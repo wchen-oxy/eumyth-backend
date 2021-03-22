@@ -144,7 +144,8 @@ router.route('/account-settings-info')
           _id: result.index_user_id,
           bio: result.bio,
           private: result.private,
-          pursuits: pursuitsJSON
+          pursuits: pursuitsJSON,
+          cropped_display_photo_key: result.cropped_display_photo_key
         });
       })
       .catch(
@@ -157,7 +158,6 @@ router.route('/account-settings-info')
 
 router.route('/template')
   .put((req, res) => {
-
     const userID = req.body.indexUserID;
     const templateText = req.body.text;
     const selectedPursuit = req.body.pursuit;
@@ -198,11 +198,15 @@ router.route('/bio')
   .put((req, res) => {
     const username = req.body.username;
     const bio = req.body.bio;
-
-    return User.Model.findOne({ username: username })
-      .then((result) => {
-        result.bio = bio;
-        return result.save();
+    return Promise.all([
+      User.Model.findOne({ username: username }),
+      IndexUser.Model.findOne({ username: username })])
+      .then((results) => {
+        results[0].bio = bio;
+        results[1].bio = bio;
+        return Promise.all([
+          results[0].save(),
+          results[1].save()]);
       })
       .then(() => res.status(201).send())
       .catch((error) => {
