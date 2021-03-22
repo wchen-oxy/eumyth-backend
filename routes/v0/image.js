@@ -78,7 +78,7 @@ router.route('/navbar-display-photo')
   )
 
 router.route('/display-photo')
-  .post(MulterHelper.contentImageUpload.fields(displayPhotoUploadFields),
+  .post(MulterHelper.profileImageUpload.fields(displayPhotoUploadFields),
     (req, res) => {
       const username = req.body.username;
       const croppedImage = req.files.croppedImage ? req.files.croppedImage[0].key : null;
