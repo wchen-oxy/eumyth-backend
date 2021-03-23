@@ -516,6 +516,7 @@ router.route('/single').get((req, res) => {
 router.route('/display-photo').patch((req, res) => {
   const username = req.body.username;
   const imageKey = req.body.imageKey;
+  console.log(imageKey);
   return Post.Model.updateMany({ username: username }, { display_photo_key: imageKey })
     .then(() => {
       return res.status(200).send();

@@ -221,7 +221,6 @@ const removeVote = (array, voteId) => {
 
 router.route('/')
     .get((req, res) => {
-        const visitorUsername = req.query.visitorUsername;
         const rootCommentIdArray = JSON.parse(req.query.rootCommentIdArray);
         const viewingMode = req.query.viewingMode;
         if (viewingMode === COLLAPSED) {
@@ -233,14 +232,11 @@ router.route('/')
                 });
         }
         else if (viewingMode === EXPANDED) {
-            return Promise.all([
-                UserPreview.Model.findOne({ username: visitorUsername }),
-                returnExpandedComments(rootCommentIdArray)
-            ])
+            return returnExpandedComments(rootCommentIdArray)
                 .then((results) => {
+                    console.log(results);
                     return res.status(200).json({
-                        userPreviewId: results[0]._id,
-                        rootComments: results[1]
+                        rootComments: results
                     });
                 })
                 .catch((error) => {
@@ -287,7 +283,7 @@ router.route('/root')
         const resolvedUser = UserPreview.Model.findById(commenterId);
         let newRootCommentJSON = null;
         let rootCommentArray = null;
- 
+
         return Promise.all([resolvedPost, resolvedUser])
             .then((result) => {
                 if (!result[0] || !result[1]) throw new Error(204);

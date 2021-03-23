@@ -4,6 +4,8 @@ const UserPreview = require('../../models/user.preview.model');
 
 router.route("/id").get((req, res) => {
     const username = req.query.username;
+    console.log(req.query);
+    console.log(username);
     return UserPreview.Model
         .findOne({ username: username })
         .then(result => {
