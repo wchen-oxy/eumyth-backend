@@ -364,7 +364,6 @@ router.route('/')
     const postId = !!req.body.postId ? req.body.postId : null;
     const postType = req.body.postType ? req.body.postType : null;
     const username = req.body.username;
-    const displayPhoto = req.body.displayPhoto;
     const title = !!req.body.title ? req.body.title : null;
     const subtitle = !!req.body.subtitle ? req.body.subtitle : null;
     const postPrivacyType = !!req.body.postPrivacyType ? req.body.postPrivacyType : null;
@@ -391,7 +390,6 @@ router.route('/')
             post.cover_photo_key = coverPhotoKey;
           }
           post.username = username;
-          post.display_photo_key = displayPhoto;
           post.title = title;
           post.subtitle = subtitle;
           post.pursuit_category = pursuitCategory;
@@ -467,6 +465,8 @@ router.route('/')
 router.route('/multiple').get((req, res) => {
   const postIdList = req.query.postIdList;
   const includePostText = req.query.includePostText;
+  console.log(postIdList);
+  console.log(includePostText);
   return Promise.all([
     findPosts(postIdList, includePostText),
     countComments(postIdList)])
