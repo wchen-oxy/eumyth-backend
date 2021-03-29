@@ -131,11 +131,9 @@ router.route('/display-photo')
     return IndexUser.Model.findOne({ username: username })
       .then((result) => {
         returnedIndexUser = result;
-        // console.log(returnedIndexUser);
         if (returnedIndexUser.cropped_display_photo_key === '') {
           throw new Error(204);
         }
-
         const displayPhotoKeys = [
           { Key: returnedIndexUser.cropped_display_photo_key },
           { Key: returnedIndexUser.small_cropped_display_photo_key },
@@ -222,27 +220,25 @@ router.route('/cover')
   .delete((req, res) => {
     const username = req.body.username;
     let returnedUser = null;
-
     return User.Model.findOne({ username: username })
       .then((user) => {
         returnedUser = user;
-
         if (!returnedUser.cover_photo_key || returnedUser.cover_photo_key === "")
           return res.status(204).json("No Content");
-        else {
-
-        }
         return AWSConstants
           .S3_INTERFACE
           .deleteObject({
             Bucket: AWSConstants.BUCKET_NAME,
             Key: user.cover_photo_key,
           }, function (error, data) {
+            console.log(error);
+            console.log(data);
             if (error) {
               console.log(error, error.stack);
               throw new Error("Something went wrong while deleting the file from Amazon.", error)
             };
           })
+          .promise()
           .then(() => {
             returnedUser.cover_photo_key = "";
             return returnedUser.save();
@@ -250,8 +246,33 @@ router.route('/cover')
           .then(() => (res.status(204).send()));
       })
       .catch((error) => {
+        console.log(error);
         return res.status(500).json({ error: error })
       });
   });
+
+router.route('/multiple')
+  .delete((req, res) => {
+    const photoKeys = req.body.keys;
+    return AWSConstants
+      .S3_INTERFACE
+      .deleteObjects({
+        Bucket: AWSConstants.BUCKET_NAME,
+        Delete: { Objects: photoKeys }
+      }, function (error, data) {
+        if (error) {
+          console.log("Something bad happened");
+          console.log(error, error.stack);
+          throw new Error(error);
+        }
+        else { console.log("Success", data); }
+      })
+      .promise()
+      .then((result) => res.status(204).send())
+      .catch((error) => {
+        console.log(error);
+        return res.status(500).json({ error: error })
+      });
+  })
 
 module.exports = router;
