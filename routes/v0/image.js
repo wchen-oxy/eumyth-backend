@@ -6,7 +6,7 @@ const User = require('../../models/user.model');
 const IndexUser = require('../../models/index.user.model');
 const UserPreview = require('../../models/user.preview.model');
 
-
+const imageUpload = MulterHelper.contentImageUpload.single('file');
 
 const displayPhotoUploadFields = [
   { name: "croppedImage" },
@@ -27,7 +27,7 @@ router.route('/')
         return res.status(200).json({ "image": "data:" + data.ContentType + ";base64," + data.Body.toString('base64') });
       })
   })
-  .post(MulterHelper.contentImageUpload.single('file'), (req, res) => {
+  .post(imageUpload, (req, res) => {
     return res.status(200).json({
       'url': req.file.location,
       'file': req.file.key
@@ -254,11 +254,16 @@ router.route('/cover')
 router.route('/multiple')
   .delete((req, res) => {
     const photoKeys = req.body.keys;
+    let transformedKeys = [];
+    for (const key of photoKeys) {
+      transformedKeys.push({ Key: key })
+    }
+    console.log(transformedKeys);
     return AWSConstants
       .S3_INTERFACE
       .deleteObjects({
         Bucket: AWSConstants.BUCKET_NAME,
-        Delete: { Objects: photoKeys }
+        Delete: { Objects: transformedKeys }
       }, function (error, data) {
         if (error) {
           console.log("Something bad happened");
@@ -275,4 +280,19 @@ router.route('/multiple')
       });
   })
 
+const compressor = (req, res, next) => {
+  console.log(req);
+  let image = req.body.file;
+  let images = req.body;
+  console.log(image);
+  console.log(images);
+  console.log(req.file);
+
+  next();
+}
+
+router.route('/compress')
+  .post(compressor, (req, res) => {
+    return res.status(200).send();
+  })
 module.exports = router;

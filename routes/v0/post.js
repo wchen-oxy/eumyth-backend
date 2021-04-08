@@ -1,9 +1,6 @@
 const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
-const axios = require('axios');
-const AWSConstants = require('../../constants/aws');
-
 const User = require('../../models/user.model');
 const IndexUser = require('../../models/index.user.model');
 const Post = require("../../models/post.model");
@@ -17,10 +14,6 @@ const SHORT = "SHORT";
 const LONG = "LONG";
 
 const postImageFields = [{ name: "images" }, { name: "coverPhoto", maxCount: 1 }];
-
-// const retrieveImage = () => {
-//   if ()
-// }
 
 const setRecentPosts = (post, inputRecentPosts) => {
   let newRecentPosts = inputRecentPosts;
@@ -415,22 +408,23 @@ router.route('/')
     const indexUserId = req.body.indexUserId;
     const userId = req.body.userId;
     const postId = req.body.postId;
+    console.log(postId);
+    console.log(userId);
     let returnedUser = null;
-    let returnedIndexUser = null;
 
     const resolvedIndexUser = IndexUser.Model.findById(indexUserId)
       .then((user) => {
         if (!user) throw new Error(500, "no user found");
-        returnedUser = user;
         let updatedRecentPosts = [];
 
+        console.log(user);
         for (const post of user.recent_posts) {
           if (post._id.toString() !== postId) {
             updatedRecentPosts.unshift(post);
           }
         }
-        returnedIndexUser.recent_posts = updatedRecentPosts;
-        return returnedIndexUser.save();
+        user.recent_posts = updatedRecentPosts;
+        return user.save();
       })
       .catch((error) => {
         throw new Error(error, "Something went wrong resolving index user")
@@ -452,8 +446,23 @@ router.route('/')
       .catch(
         (error) => { throw new Error(error, "Something went wrong resolving user") }
       );
-    return Promise.all([resolvedIndexUser, resolvedUser])
-      .then(() => Post.Model.deleteOne({ _id: postId }))
+
+    return Promise.all([resolvedIndexUser, resolvedUser, Post.Model.findById(postId)])
+      .then((results) => {
+        return Promise.all([
+          Post.Model.deleteOne({ _id: postId }),
+          Comment.Model.deleteMany({
+            _id: {
+              $in: results[2].comments
+            }
+          },
+            (err) => {
+              if (err) {
+                throw new Error(500, err);
+              }
+            })
+        ])
+      })
       .then(() => res.status(204).send())
       .catch(error => {
         console.log(error);
