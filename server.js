@@ -18,14 +18,12 @@ console.log(uri);
 // // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
-
 app.use(cors()); //for serving cross origin content on same machine
 app.use(logger('dev'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "build")));
-
 
 mongoose.connect(
   uri,
