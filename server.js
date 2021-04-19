@@ -13,7 +13,6 @@ var app = express();
 
 // Mongoose specific code
 const uri = process.env.ATLAS_URI;
-console.log(uri);
 
 // // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -43,7 +42,6 @@ connection.once('open', () => {
 // console.log that your server is up and running
 app.listen(port, () => console.log(`Listening on port ${port}`));
 app.use('/api', indexRouter);
-console.log(process.argv.slice(2)[0]);
 try {
   const buildExists = fs.existsSync(path.join(__dirname, 'build'));
   if (buildExists && process.argv.slice(2)[0]) {
@@ -64,21 +62,9 @@ process.env.IS_LOCAL ? console.log("Local Development") : app.get('/*', function
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 })
 
-
-app.use(function (err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
-
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-  console.log(req);
-  console.log(res);
+  console.log("No Build Folder Detected to Serve Static File For Route");
   next(createError(404));
 });
 
