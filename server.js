@@ -62,9 +62,9 @@ try {
   console.error(err);
 }
 
-// process.env.IS_LOCAL ? console.log("Local Development") : app.get('/*', function (req, res) {
-//   res.sendFile(path.join(__dirname, 'build', 'index.html'));
-// })
+process.env.IS_LOCAL ? console.log("Local Development") : app.get('/*', function (req, res) {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+})
 
 
 app.use(function (err, req, res, next) {
