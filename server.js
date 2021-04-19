@@ -63,9 +63,11 @@ process.env.IS_LOCAL ? console.log("Local Development") : app.get('/*', function
 })
 
 // catch 404 and forward to error handler
-app.use(function (req, res, next) {
-  console.log("No Build Folder Detected to Serve Static File For Route");
-  next(createError(404));
+app.use((error, req, res, next) => {
+  console.log("error handler", error.statusCode);
+  if (!error.statusCode) error.statusCode = 500;
+  console.log(error.statusCode);
+  next(createError(error.statusCode));
 });
 
 console.log("Server is now running");
