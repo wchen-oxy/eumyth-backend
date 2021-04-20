@@ -64,10 +64,10 @@ process.env.IS_LOCAL ? console.log("Local Development") : app.get('/*', function
 
 // catch 404 and forward to error handler
 app.use((error, req, res, next) => {
-  console.log("error handler", error.statusCode);
   if (!error.statusCode) error.statusCode = 500;
-  console.log(error.statusCode);
-  next(createError(error.statusCode));
+  if (!error.message) error.message = "An Unspecified Error Occured";
+  console.log("msg", error.message);
+  next(createError(error.statusCode, error.message));
 });
 
 console.log("Server is now running");
