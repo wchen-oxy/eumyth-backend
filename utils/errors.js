@@ -7,7 +7,7 @@ class BadRequestError extends Error {
 
 class NoContentError extends Error {
     constructor(error) {
-        super(ErrorEvent);
+        super(error);
         this.statusCode = 404;
     }
 }

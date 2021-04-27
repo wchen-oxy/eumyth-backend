@@ -1,54 +1,50 @@
 var router = require('express').Router();
 let IndexUser = require('../../models/index.user.model');
-let { BadRequestError, NoContentError } = require("../../utils/errors");
-let { NO_USER_FOUND, NO_USERNAME_SUPPLIED } = require("../../utils/constants");
+let { NoContentError } = require("../../utils/errors");
+let { NO_USER_FOUND } = require("../../constants/messages");
+const { doesValidationErrorExist, validateQueryUsername } = require("../../utils/validators");
 
-router.get('/', (req, res, next) => {
-  const username = req.query.username;
+const doesUserExist = (result) => {
+  if (!result) {
+    throw new NoContentError(NO_USER_FOUND);
+  };
+};
+
+const retrieveIndexUser = (username) => {
   return IndexUser.Model
     .findOne({ username: username })
     .then(result => {
-      if (!result) {
-        throw new NoContentError(NO_USER_FOUND);
-      };
+      doesUserExist(result);
+      return result;
+    });
+}
+
+router.get('/', validateQueryUsername, doesValidationErrorExist, (req, res, next) => {
+  const username = req.query.username;
+  return retrieveIndexUser(username)
+    .then(result => {
+      console.log("adsfadsfasdfadsfsdfsdf");
       return (res.status(200).json(result));
     })
     .catch(next)
 })
 
-router.get('/pursuits', (req, res) => {
+router.get('/pursuits', validateQueryUsername, doesValidationErrorExist, (req, res, next) => {
   const username = req.query.username;
-  return IndexUser.Model
-    .findOne({ username: username })
+  return retrieveIndexUser(username)
     .then(result => {
-      if (!result) {
-        throw new NoContentError(NO_USER_FOUND);
-      };
       return res.status(200).json(result.pursuits);
     })
-    .catch(error => {
-    
-      if (error.status === 204) {
-        return res.status(204).json({ error: "No IndexUser found." });
-      }
-      return res.status(500).json({ error: error });
-    })
+    .catch(next)
 })
 
-router.get('/username', (req, res) => {
+router.get('/username', validateQueryUsername, doesValidationErrorExist, (req, res, next) => {
   const username = req.query.username;
-  return IndexUser.Model
-    .findOne({ username: username })
+  return retrieveIndexUser(username)
     .then(result => {
-      if (result) return res.status(200).send("Username exists");
-      else {
-        return res.status(204).send("Username not Found!");
-      }
+      return res.status(200).send();
     })
-    .catch((error) => {
-      console.log(error);
-      return res.status(500).json({ error: error });
-    })
+    .catch(next)
 })
 
 module.exports = router;

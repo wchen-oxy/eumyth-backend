@@ -11,15 +11,17 @@ const isEmpty = (...input) => {
     return false;
 }
 
-const validateUsername = (username) => {
-    if (username === undefined || username === null)
-        throw new BadRequestError(NO_USERNAME_SUPPLIED);
-    else {
-        return username;
-    }
-}
+// const validateUsername = (username) => {
+//     if (username === undefined || username === null)
+//         throw new BadRequestError(NO_USERNAME_SUPPLIED);
+//     else {
+//         return username;
+//     }
+// }
+
+
 
 module.exports = {
     isEmpty: isEmpty,
-    validateUsername: validateUsername
+    // validateUsername: validateUsername
 }

@@ -8,14 +8,16 @@ const UserRelation = require('../../models/user.relation.model');
 const Draft = require("../../models/draft.model");
 const MulterHelper = require('../../constants/multer').profileImageUpload;
 const UserPreview = require('../../models/user.preview.model');
+const {validateQueryUsername, doesValidationErrorExist } = require("../../utils/validators");
 
 const imageFields = [
   { name: "croppedImage" },
   { name: "smallCroppedImage" },
-  { name: "tinyCroppedImage" }];
+  { name: "tinyCroppedImage" }
+];
 
 router.route('/')
-  .get((req, res) => {
+  .get(validateQueryUsername, doesValidationErrorExist, (req, res) => {
     const username = req.query.username;
     return User.Model.findOne({ username: username })
       .then(user => {

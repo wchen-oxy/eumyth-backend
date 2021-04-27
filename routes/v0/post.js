@@ -10,8 +10,7 @@ const Comment = require("../../models/comment.model");
 const UserRelation = require('../../models/user.relation.model');
 const MulterHelper = require('../../constants/multer');
 const RECENT_POSTS_LIMIT = 5;
-const SHORT = "SHORT";
-const LONG = "LONG";
+const {SHORT, LONG} = require("../../constants/flags");
 
 const postImageFields = [{ name: "images" }, { name: "coverPhoto", maxCount: 1 }];
 
@@ -42,7 +41,6 @@ const setPursuitAttributes = (isMilestone, pursuit, minDuration, postId, date) =
 
   pursuit.total_min = Number(pursuit.total_min) + minDuration;
   pursuit.num_posts = Number(pursuit.num_posts) + 1;
-  // return pursuit;
 }
 
 const insertIntoDatedPosts = (datedPosts, postId, date) => {
