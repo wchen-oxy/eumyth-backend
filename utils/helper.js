@@ -1,5 +1,5 @@
-let { BadRequestError } = require('./errors');
-let { NO_USERNAME_SUPPLIED } = require('./constants');
+let { NoContentError } = require("./errors");
+let { NO_USER_FOUND } = require('../constants/messages');
 
 const isEmpty = (...input) => {
     let testString = [...input];
@@ -20,8 +20,14 @@ const isEmpty = (...input) => {
 // }
 
 
+const doesUserExist = (result) => {
+    if (!result) {
+        throw new NoContentError(NO_USER_FOUND);
+    };
+};
 
 module.exports = {
-    isEmpty: isEmpty,
+    isEmpty,
+    doesUserExist
     // validateUsername: validateUsername
 }
