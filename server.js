@@ -62,7 +62,7 @@ process.env.IS_LOCAL ? console.log("Local Development") : app.get('/*', function
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 })
 
-// catch 404 or errors in general and forward to error handler
+// catch errors in general and forward to error handler
 app.use((error, req, res, next) => {
   if (!error.statusCode) error.statusCode = 500;
   if (!error.message) {

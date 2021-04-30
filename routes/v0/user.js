@@ -8,6 +8,9 @@ const UserRelation = require('../../models/user.relation.model');
 const Draft = require("../../models/draft.model");
 const MulterHelper = require('../../constants/multer').profileImageUpload;
 const UserPreview = require('../../models/user.preview.model');
+
+const { retrieveCompleteUserByUsername, retrieveIndexUser, retrieveIndexUserByUsername, } = require('../../data_access/dal');
+
 const {
   doesValidationErrorExist,
   validateQueryUsername,
@@ -26,29 +29,22 @@ const imageFields = [
   { name: "tinyCroppedImage" }
 ];
 
+
+
+
 router.route('/')
   .get(validateQueryUsername, doesValidationErrorExist, (req, res) => {
     const username = req.query.username;
-    return User.Model.findOne({ username: username })
-      .then(user => {
-        if (user) {
-          return res.status(200).json(user);
-        }
-        else {
-          return res.status(204).send();
-        }
-      }
-      )
-      .catch(error => {
-        console.log(error);
-        return res.status(500).json({ error: error });
-      })
+    retrieveCompleteUserByUsername(username)
+      .then(user => res.status(200).json(user))
+      .catch(next)
   })
   .post(
+    MulterHelper.fields(imageFields),
     validateBodyUsername,
     validateBodyFullNames,
     validateBodyPursuits,
-    MulterHelper.fields(imageFields),
+    doesValidationErrorExist,
     (req, res) => {
       const username = req.body.username;
       const firstName = req.body.firstName;
@@ -141,16 +137,13 @@ router.route('/')
         savedUserRelation,
         savedUserPreview])
         .then(() => res.status(201).json("Success!"))
-        .catch(error => {
-          console.log(error);
-          return res.status(500).json({ error: error });
-        });
+        .catch(next);
     });
 
 router.route('/account-settings-info')
-  .get(validateQueryUsername, (req, res) => {
+  .get(validateQueryUsername, doesValidationErrorExist, (req, res) => {
     const username = req.query.username;
-    return IndexUser.Model.findOne({ username: username })
+    return retrieveIndexUserByUsername(username)
       .then((result) => {
         let pursuitsJSON = {};
         for (const pursuit of result.pursuits) {
@@ -165,59 +158,43 @@ router.route('/account-settings-info')
           cropped_display_photo_key: result.cropped_display_photo_key
         });
       })
-      .catch(
-        (error) => {
-          console.log(error);
-          return res.status(500).json({ error: error });
-        }
-      )
+      .catch(next);
   });
 
 router.route('/template')
-  .put(validateBodyIndexUserID, validateBodyText, validateBodyPursuits, (req, res) => {
+  .put(validateBodyIndexUserID, validateBodyText, validateBodyPursuits, doesValidationErrorExist, (req, res) => {
     const userID = req.body.indexUserID;
     const templateText = req.body.text;
     const selectedPursuit = req.body.pursuit;
-    return IndexUser.Model.findById(userID)
-      .then(
-        (result) => {
-          let indexUser = result;
-          for (let pursuit of indexUser.pursuits) {
-            if (pursuit.name === selectedPursuit) {
-              pursuit.meta_template = templateText;
-            }
+    return retrieveIndexUserByID(userID)
+      .then((result) => {
+        let indexUser = result;
+        for (let pursuit of indexUser.pursuits) {
+          if (pursuit.name === selectedPursuit) {
+            pursuit.meta_template = templateText;
           }
-          return indexUser.save();
         }
-      )
-      .then((result) => res.status(200).send())
-      .catch((err) => {
-        console.log(err);
-        return res.status(500).send();
+        return indexUser.save();
       })
-
+      .then(() => res.status(200).send())
+      .catch(next);
   })
 
 router.route('/bio')
-  .get(validateQueryUsername, (req, res) => {
+  .get(validateQueryUsername, doesValidationErrorExist, (req, res) => {
     const username = req.query.username;
-    return User.Model.findOne({ username: username })
+    return retrieveCompleteUserByUsername(username)
       .then((result) => {
         return res.status(200).json({ bio: result.bio });
       })
-      .catch(
-        (error) => {
-          console.log(error);
-          return res.status(500).json({ error: error });
-        }
-      )
+      .catch(next)
   })
   .put(validateBodyUsername, validateBodyBio, (req, res) => {
     const username = req.body.username;
     const bio = req.body.bio;
     return Promise.all([
-      User.Model.findOne({ username: username }),
-      IndexUser.Model.findOne({ username: username })])
+      retrieveCompleteUserByUsername(username),
+      retrieveIndexUserByUsername(username)])
       .then((results) => {
         results[0].bio = bio;
         results[1].bio = bio;
@@ -226,27 +203,19 @@ router.route('/bio')
           results[1].save()]);
       })
       .then(() => res.status(201).send())
-      .catch((error) => {
-        console.log(error);
-        return res.status(500).json({ error: error });
-      });
+      .catch(next);
   })
 
-router.route('/private').put(validateBodyUsername, validateBodyPrivate, (req, res) => {
+router.route('/private').put(validateBodyUsername, validateBodyPrivate, doesValidationErrorExist, (req, res) => {
   const username = req.body.username;
   const isPrivate = req.body.private;
-  return User.Model.findOne({ username: username })
+  return retrieveCompleteUserByUsername(username)
     .then((result) => {
-      if (result === null) throw 204;
       result.private = isPrivate;
       return result.save()
     })
     .then(() => res.status(200).send())
-    .catch((error) => {
-      console.log(error);
-      if (error === 204) return res.status(500).send("No User Found");
-      return res.status(500).json({ error: error });
-    })
+    .catch(next)
 })
 
 
