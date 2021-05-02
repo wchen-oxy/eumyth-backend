@@ -40,6 +40,9 @@ const validateQueryFullNames = [query("firstName").exists(), query("lastName").e
 const validateQueryPostID = [query('postID').exists()];
 const validateQueryTextOnly = [query('textOnly').exists()];
 const validateQueryIncludePostText = [query('inludePostText').exists()]
+const validateQueryUserRelationArrayID = [query('userRelationArrayId').exists()];
+const validateBodyUserRelationArrayID = [body('userRelationArrayId').exists()];
+
 const validateBodyFullNames = [body("firstName").exists(), body("lastName").exists()];
 const validateBodyUsername = [body("username").exists()];
 const validateBodyImageKey = [body('imageKey').exists()];
@@ -67,7 +70,9 @@ module.exports = {
     validateQueryFullNames,
     validateQueryPostID,
     validateQueryIncludePostText,
+    validateQueryUserRelationArrayID,
     validateQueryTextOnly,
+    validateBodyUserRelationArrayID,
     validateBodyFullNames,
     validateBodyUsername,
     validateBodyImageKey,

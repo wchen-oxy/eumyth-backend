@@ -4,272 +4,283 @@ var router = express.Router();
 const UserPreview = require('../../models/user.preview.model');
 const UserRelationStatus = require("../../models/user.relation.status.model");
 const UserRelation = require('../../models/user.relation.model');
+const { validateQueryUsername, validateQueryUserRelationArrayID, validateBodyUserRelationArrayID, validateBodyUsername, doesValidationErrorExist, } = require('../../utils/validators');
 const NOT_A_FOLLOWER_STATE = "NOT_A_FOLLOWER";
 
-router.route('/').get((req, res) => {
-  const visitorUsername = req.query.visitorUsername;
-  const followerArrayId = req.query.userRelationArrayId;
-  let resolvedVistorPreviewId = UserPreview.Model
-    .findOne({ username: visitorUsername });
-  return resolvedVistorPreviewId
-    .then((visitorUserPreview) => {
-      return UserRelation.Model.findById(followerArrayId)
-        .then(
-          (userRelationInfo) => {
-            if (!userRelationInfo) return res.status(204).send();
-            else {
-              if (userRelationInfo.followers.length !== 0) {
-                for (const user of userRelationInfo.followers) {
-                  if (visitorUserPreview._id.toString()
-                    === user.user_preview_id.toString()) {
-                    return res.status(200).json({ success: user.status });
+router.route('/').get(
+  validateQueryUsername,
+  validateQueryUserRelationArrayID,
+  doesValidationErrorExist,
+  (req, res) => {
+    const visitorUsername = req.query.visitorUsername;
+    const followerArrayId = req.query.userRelationArrayId;
+    let resolvedVistorPreviewId = UserPreview.Model
+      .findOne({ username: visitorUsername });
+    return resolvedVistorPreviewId
+      .then((visitorUserPreview) => {
+        return UserRelation.Model.findById(followerArrayId)
+          .then(
+            (userRelationInfo) => {
+              if (!userRelationInfo) return res.status(204).send();
+              else {
+                if (userRelationInfo.followers.length !== 0) {
+                  for (const user of userRelationInfo.followers) {
+                    if (visitorUserPreview._id.toString()
+                      === user.user_preview_id.toString()) {
+                      return res.status(200).json({ success: user.status });
+                    }
                   }
+                  return res.status(200).json({ error: NOT_A_FOLLOWER_STATE });
                 }
                 return res.status(200).json({ error: NOT_A_FOLLOWER_STATE });
               }
-              return res.status(200).json({ error: NOT_A_FOLLOWER_STATE });
             }
+          )
+      })
+      .catch(error => {
+        console.log(error);
+        return res.status(500).json({ error: error });
+      });
+  });
+
+router.route('/info').get(
+  validateQueryUsername,
+  doesValidationErrorExist,
+  (req, res) => {
+    const username = req.query.username;
+    let id = null;
+    return UserPreview.Model.findOne({ username: username })
+      .then((user) => {
+        return UserRelation.Model.findById(user.user_relation_id)
+      })
+      .then((result) => {
+        id = result._id;
+        let following = [];
+        let followers = [];
+        let requested = [];
+        for (const profile of result.following) {
+          following.push(profile.user_preview_id);
+        }
+        for (const profile of result.followers) {
+          if (profile.status === "FOLLOW_REQUESTED") {
+            requested.push(profile.user_preview_id);
           }
-        )
-    })
-    .catch(error => {
-      console.log(error);
-      return res.status(500).json({ error: error });
-    });
-});
-
-router.route('/info').get((req, res) => {
-  const username = req.query.username;
-  let id = null;
-  return UserPreview.Model.findOne({ username: username })
-    .then((user) => {
-      return UserRelation.Model.findById(user.user_relation_id)
-    })
-    .then((result) => {
-      id = result._id;
-      let following = [];
-      let followers = [];
-      let requested = [];
-      for (const profile of result.following) {
-        following.push(profile.user_preview_id);
-      }
-      for (const profile of result.followers) {
-        if (profile.status === "FOLLOW_REQUESTED") {
-          requested.push(profile.user_preview_id);
+          else if (profile.status === "FOLLOWING") {
+            followers.push(profile.user_preview_id);
+          }
         }
-        else if (profile.status === "FOLLOWING") {
-          followers.push(profile.user_preview_id);
-        }
-      }
-      const resolvedFollowing = UserPreview.Model.find({
-        '_id': { $in: following }
-      }, function (error, docs) {
-        if (error) console.log(error);
-        else {
-          console.log(docs)
-        }
-      });
-      const resolvedFollowers = UserPreview.Model.find({
-        '_id': { $in: followers }
-      }, function (error, docs) {
-        if (error) console.log(error);
-        else {
-          console.log(docs)
-        }
-      });
-      const resolvedRequested = UserPreview.Model.find({
-        '_id': { $in: requested }
-      }, function (error, docs) {
-        if (error) console.log(error);
-        else {
-          console.log(docs)
-        }
-      });
-
-      return Promise.all([
-        resolvedFollowing,
-        resolvedFollowers,
-        resolvedRequested]);
-    })
-    .then((profiles) => {
-      let finalFollowing = [];
-      let finalFollowers = [];
-      let finalRequested = [];
-      for (const profile of profiles[0]) {
-        const username = profile.username;
-        finalFollowing.push({
-          username: username,
-          display_photo: profile.tiny_cropped_display_photo_key
-        });
-      }
-      for (const profile of profiles[1]) {
-        const username = profile.username;
-        finalFollowers.push({
-          username: username,
-          display_photo: profile.tiny_cropped_display_photo_key
-        });
-      }
-      for (const profile of profiles[2]) {
-        const username = profile.username;
-        finalRequested.push({
-          username: username,
-          display_photo: profile.tiny_cropped_display_photo_key
-        });
-      }
-      return res.status(200).json({
-        _id: id,
-        following: finalFollowing,
-        followers: finalFollowers,
-        requested: finalRequested
-      });
-    })
-    .catch(error => {
-      console.log(error);
-      return res.status(500).send();
-    })
-})
-
-router.route('/status').put((req, res) => {
-  const visitorUsername = req.body.visitorUsername;
-  const targetUserRelationId = req.body.targetUserRelationId;
-  const targetUserPreviewId = req.body.targetProfilePreviewId;
-  let visitorUserPreview = null;
-
-  const isPrivate = req.body.isPrivate;
-  const action = req.body.action;
-  let resultStatus = "";
-
-  const FOLLOW = "FOLLOW";
-  const ACCEPT_REQUEST = "ACCEPT_REQUEST";
-  const UNFOLLOW = "UNFOLLOW";
-  const FOLLOW_REQUESTED = "FOLLOW_REQUESTED";
-  const FOLLOWING = "FOLLOWING";
-  const REQUEST_ACCEPTED = "REQUEST_ACCEPTED";
-  const UNFOLLOWED = "UNFOLLOWED";
-
-  const resolvedVisitor = UserPreview.Model
-    .findOne({ username: visitorUsername });
-
-  const resolvedUserRelation = resolvedVisitor
-    .then((result) => {
-      visitorUserPreview = result;
-      const userRelationArray = [
-        targetUserRelationId,
-        visitorUserPreview.user_relation_id];
-      return UserRelation.Model.find({
-        '_id': { $in: userRelationArray }, function(error, docs) {
+        const resolvedFollowing = UserPreview.Model.find({
+          '_id': { $in: following }
+        }, function (error, docs) {
           if (error) console.log(error);
           else {
-            console.log(docs);
+            console.log(docs)
           }
-        }
-      })
-    });
-
-  const resolvedUpdate = resolvedUserRelation
-    .then((userRelation) => {
-      const targetUserRelation =
-        userRelation[0]._id.toString() === targetUserRelationId.toString()
-          ? userRelation[0]
-          : userRelation[1];
-      const visitorUserRelation =
-        userRelation[1]._id.toString() === visitorUserPreview
-          .user_relation_id.toString()
-          ? userRelation[1]
-          : userRelation[0];
-      let targetFollowersArray = targetUserRelation.followers;
-      let visitorFollowingArray = visitorUserRelation.following;
-      let user = null;
-      switch (action) {
-        case (FOLLOW):
-          for (const follower of targetFollowersArray) {
-            if (follower.user_preview_id.toString()
-              === visitorUserPreview._id.toString()) {
-              return Promise.reject("Already Following User");
-            }
-          }
-          if (isPrivate === true) {
-
-            targetFollowersArray.push(new UserRelationStatus.Model({
-              status: FOLLOW_REQUESTED,
-              user_preview_id: visitorUserPreview._id,
-            }));
-
-            visitorFollowingArray.push(new UserRelationStatus.Model({
-              status: FOLLOW_REQUESTED,
-              user_preview_id: targetUserPreviewId,
-            }));
-
-            resultStatus = FOLLOW_REQUESTED;
-          }
+        });
+        const resolvedFollowers = UserPreview.Model.find({
+          '_id': { $in: followers }
+        }, function (error, docs) {
+          if (error) console.log(error);
           else {
-            targetFollowersArray.push(new UserRelationStatus.Model({
-              status: FOLLOWING,
-              user_preview_id: visitorUserPreview._id,
-            }));
-
-            visitorFollowingArray.push(new UserRelationStatus.Model({
-              status: FOLLOWING,
-              user_preview_id: targetUserPreviewId,
-            }));
-
-            resultStatus = FOLLOWING;
+            console.log(docs)
           }
-          break;
-        case (ACCEPT_REQUEST):
-          for (const follower of targetFollowersArray) {
-            if (follower.user_preview_id.toString()
-              === visitorUserPreview._id.toString()) {
-              user = follower;
-              break;
-            }
+        });
+        const resolvedRequested = UserPreview.Model.find({
+          '_id': { $in: requested }
+        }, function (error, docs) {
+          if (error) console.log(error);
+          else {
+            console.log(docs)
           }
-          user.status = FOLLOWING;
-          resultStatus = REQUEST_ACCEPTED;
-          break;
-        case (UNFOLLOW):
-          let updatedTargetFollowers = [];
-          let updatedVisitorFollowing = [];
-          for (const follower of targetFollowersArray) {
-            if (follower.user_preview_id.toString()
-              !== visitorUserPreview._id.toString()) {
-              updatedTargetFollowers.push(follower);
-            }
-          }
+        });
 
-          for (const followingPerson of visitorFollowingArray) {
-            if (followingPerson.user_preview_id.toString()
-              !== targetUserPreviewId.toString()) {
-              updatedVisitorFollowing.push(followingPerson);
-            }
-          }
-          targetUserRelation.followers = updatedTargetFollowers;
-          visitorUserRelation.following = updatedVisitorFollowing;
-          resultStatus = UNFOLLOWED;
-          break;
-        default:
-          break;
-      }
-      const savedTargetFollowers = targetUserRelation.save();
-      const savedVisitorFollowing = visitorUserRelation.save();
-
-      return (Promise.all([savedTargetFollowers, savedVisitorFollowing]));
-    })
-
-  resolvedUpdate.then(() => {
-    if (resultStatus === UNFOLLOWED) {
-      return res.status(200).json({ error: NOT_A_FOLLOWER_STATE });
-    }
-    else {
-      return res.status(200).json({ success: resultStatus });
-    }
+        return Promise.all([
+          resolvedFollowing,
+          resolvedFollowers,
+          resolvedRequested]);
+      })
+      .then((profiles) => {
+        let finalFollowing = [];
+        let finalFollowers = [];
+        let finalRequested = [];
+        for (const profile of profiles[0]) {
+          const username = profile.username;
+          finalFollowing.push({
+            username: username,
+            display_photo: profile.tiny_cropped_display_photo_key
+          });
+        }
+        for (const profile of profiles[1]) {
+          const username = profile.username;
+          finalFollowers.push({
+            username: username,
+            display_photo: profile.tiny_cropped_display_photo_key
+          });
+        }
+        for (const profile of profiles[2]) {
+          const username = profile.username;
+          finalRequested.push({
+            username: username,
+            display_photo: profile.tiny_cropped_display_photo_key
+          });
+        }
+        return res.status(200).json({
+          _id: id,
+          following: finalFollowing,
+          followers: finalFollowers,
+          requested: finalRequested
+        });
+      })
+      .catch(error => {
+        console.log(error);
+        return res.status(500).send();
+      })
   })
-    .catch((error) => {
-      console.log(error);
-      return res.status(500).send(error);
-    });
 
-});
+router.route('/status').put(
+  validateBodyUsername,
+  validateBodyUserRelationArrayID,
+  (req, res) => {
+    const visitorUsername = req.body.visitorUsername;
+    const targetUserRelationId = req.body.userRelationArrayId;
+    const targetUserPreviewId = req.body.targetProfilePreviewId;
+    let visitorUserPreview = null;
+
+    const isPrivate = req.body.isPrivate;
+    const action = req.body.action;
+    let resultStatus = "";
+
+    const FOLLOW = "FOLLOW";
+    const ACCEPT_REQUEST = "ACCEPT_REQUEST";
+    const UNFOLLOW = "UNFOLLOW";
+    const FOLLOW_REQUESTED = "FOLLOW_REQUESTED";
+    const FOLLOWING = "FOLLOWING";
+    const REQUEST_ACCEPTED = "REQUEST_ACCEPTED";
+    const UNFOLLOWED = "UNFOLLOWED";
+
+    const resolvedVisitor = UserPreview.Model
+      .findOne({ username: visitorUsername });
+
+    const resolvedUserRelation = resolvedVisitor
+      .then((result) => {
+        visitorUserPreview = result;
+        const userRelationArray = [
+          targetUserRelationId,
+          visitorUserPreview.user_relation_id];
+        return UserRelation.Model.find({
+          '_id': { $in: userRelationArray }, function(error, docs) {
+            if (error) console.log(error);
+            else {
+              console.log(docs);
+            }
+          }
+        })
+      });
+
+    const resolvedUpdate = resolvedUserRelation
+      .then((userRelation) => {
+        const targetUserRelation =
+          userRelation[0]._id.toString() === targetUserRelationId.toString()
+            ? userRelation[0]
+            : userRelation[1];
+        const visitorUserRelation =
+          userRelation[1]._id.toString() === visitorUserPreview
+            .user_relation_id.toString()
+            ? userRelation[1]
+            : userRelation[0];
+        let targetFollowersArray = targetUserRelation.followers;
+        let visitorFollowingArray = visitorUserRelation.following;
+        let user = null;
+        switch (action) {
+          case (FOLLOW):
+            for (const follower of targetFollowersArray) {
+              if (follower.user_preview_id.toString()
+                === visitorUserPreview._id.toString()) {
+                return Promise.reject("Already Following User");
+              }
+            }
+            if (isPrivate === true) {
+
+              targetFollowersArray.push(new UserRelationStatus.Model({
+                status: FOLLOW_REQUESTED,
+                user_preview_id: visitorUserPreview._id,
+              }));
+
+              visitorFollowingArray.push(new UserRelationStatus.Model({
+                status: FOLLOW_REQUESTED,
+                user_preview_id: targetUserPreviewId,
+              }));
+
+              resultStatus = FOLLOW_REQUESTED;
+            }
+            else {
+              targetFollowersArray.push(new UserRelationStatus.Model({
+                status: FOLLOWING,
+                user_preview_id: visitorUserPreview._id,
+              }));
+
+              visitorFollowingArray.push(new UserRelationStatus.Model({
+                status: FOLLOWING,
+                user_preview_id: targetUserPreviewId,
+              }));
+
+              resultStatus = FOLLOWING;
+            }
+            break;
+          case (ACCEPT_REQUEST):
+            for (const follower of targetFollowersArray) {
+              if (follower.user_preview_id.toString()
+                === visitorUserPreview._id.toString()) {
+                user = follower;
+                break;
+              }
+            }
+            user.status = FOLLOWING;
+            resultStatus = REQUEST_ACCEPTED;
+            break;
+          case (UNFOLLOW):
+            let updatedTargetFollowers = [];
+            let updatedVisitorFollowing = [];
+            for (const follower of targetFollowersArray) {
+              if (follower.user_preview_id.toString()
+                !== visitorUserPreview._id.toString()) {
+                updatedTargetFollowers.push(follower);
+              }
+            }
+
+            for (const followingPerson of visitorFollowingArray) {
+              if (followingPerson.user_preview_id.toString()
+                !== targetUserPreviewId.toString()) {
+                updatedVisitorFollowing.push(followingPerson);
+              }
+            }
+            targetUserRelation.followers = updatedTargetFollowers;
+            visitorUserRelation.following = updatedVisitorFollowing;
+            resultStatus = UNFOLLOWED;
+            break;
+          default:
+            break;
+        }
+        const savedTargetFollowers = targetUserRelation.save();
+        const savedVisitorFollowing = visitorUserRelation.save();
+
+        return (Promise.all([savedTargetFollowers, savedVisitorFollowing]));
+      })
+
+    resolvedUpdate.then(() => {
+      if (resultStatus === UNFOLLOWED) {
+        return res.status(200).json({ error: NOT_A_FOLLOWER_STATE });
+      }
+      else {
+        return res.status(200).json({ success: resultStatus });
+      }
+    })
+      .catch((error) => {
+        console.log(error);
+        return res.status(500).send(error);
+      });
+
+  });
 
 router.route('/set').put((req, res) => {
   const id = req.body.id;
