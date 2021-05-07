@@ -1,5 +1,5 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 let User = require('../../models/user.model');
 let IndexUser = require('../../models/index.user.model');
 let Pursuit = require('../../models/pursuit.model');
@@ -18,9 +18,9 @@ const {
   validateBodyFullNames,
   validateBodyIndexUserID,
   validateBodyText,
-  validateBodyPursuits,
-  validateBodyPrivate,
-  validateBodyBio
+  validateBodyIsPrivate,
+  validateBodyBio,
+  validateBodyPursuitArray
 } = require("../../utils/validators");
 
 const imageFields = [
@@ -33,7 +33,7 @@ const imageFields = [
 
 
 router.route('/')
-  .get(validateQueryUsername, doesValidationErrorExist, (req, res) => {
+  .get(validateQueryUsername, doesValidationErrorExist, (req, res, next) => {
     const username = req.query.username;
     retrieveCompleteUserByUsername(username)
       .then(user => res.status(200).json(user))
@@ -43,13 +43,13 @@ router.route('/')
     MulterHelper.fields(imageFields),
     validateBodyUsername,
     validateBodyFullNames,
-    validateBodyPursuits,
+    validateBodyPursuitArray,
     doesValidationErrorExist,
     (req, res) => {
       const username = req.body.username;
       const firstName = req.body.firstName;
       const lastName = req.body.lastName;
-      const pursuitsArray = JSON.parse(req.body.pursuits);
+      const pursuitsArray = JSON.parse(req.body.pursuitArray);
       const croppedImage = req.files.croppedImage ? req.files.croppedImage[0].key : null;
       const smallCroppedImage = req.files.smallCroppedImage ? req.files.smallCroppedImage[0].key : null;
       const tinyCroppedImage = req.files.tinyCroppedImage ? req.files.tinyCroppedImage[0].key : null;
@@ -162,10 +162,10 @@ router.route('/account-settings-info')
   });
 
 router.route('/template')
-  .put(validateBodyIndexUserID, validateBodyText, validateBodyPursuits, doesValidationErrorExist, (req, res) => {
+  .put(validateBodyIndexUserID, validateBodyText, validateBodyPursuitArray, doesValidationErrorExist, (req, res) => {
     const userID = req.body.indexUserID;
     const templateText = req.body.text;
-    const selectedPursuit = req.body.pursuit;
+    const selectedPursuit = req.body.pursuitCategory;
     return retrieveIndexUserByID(userID)
       .then((result) => {
         let indexUser = result;
@@ -206,17 +206,21 @@ router.route('/bio')
       .catch(next);
   })
 
-router.route('/private').put(validateBodyUsername, validateBodyPrivate, doesValidationErrorExist, (req, res) => {
-  const username = req.body.username;
-  const isPrivate = req.body.private;
-  return retrieveCompleteUserByUsername(username)
-    .then((result) => {
-      result.private = isPrivate;
-      return result.save()
+router.route('/private')
+  .put(validateBodyUsername,
+    validateBodyIsPrivate,
+    doesValidationErrorExist,
+    (req, res) => {
+      const username = req.body.username;
+      const isPrivate = req.body.private;
+      return retrieveCompleteUserByUsername(username)
+        .then((result) => {
+          result.private = isPrivate;
+          return result.save()
+        })
+        .then(() => res.status(200).send())
+        .catch(next)
     })
-    .then(() => res.status(200).send())
-    .catch(next)
-})
 
 
 

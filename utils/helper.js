@@ -19,6 +19,7 @@ const isEmpty = (...input) => {
 //     }
 // }
 
+const checkStringBoolean = (string) => string.trim().toLowerCase() === 'true'; 
 
 const doesUserExist = (result) => {
     if (!result) {
@@ -27,6 +28,7 @@ const doesUserExist = (result) => {
 };
 
 module.exports = {
+    checkStringBoolean,
     isEmpty,
     doesUserExist
     // validateUsername: validateUsername

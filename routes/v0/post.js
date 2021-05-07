@@ -9,7 +9,11 @@ const UserPreview = require("../../models/user.preview.model");
 const Comment = require("../../models/comment.model");
 const UserRelation = require('../../models/user.relation.model');
 const MulterHelper = require('../../constants/multer');
-const { retrievePostInList, retriveUserPreviewByUsername, retrieveIndexUserByID } = require('../../data_access/dal');
+const {
+  retrievePostInList,
+  retriveUserPreviewByUsername,
+  retrieveIndexUserByID
+} = require('../../data_access/dal');
 const RECENT_POSTS_LIMIT = 5;
 const { SHORT, LONG } = require("../../constants/flags");
 const { validateBodyUsername,
@@ -20,16 +24,21 @@ const { validateBodyUsername,
   validateBodyPostID,
   validateBodyIndexUserID,
   validateBodyUserID,
-  doesValidationErrorExist,
   validateQueryPostID,
   validateQueryIncludePostText,
   validateQueryTextOnly,
   validateBodyImageKey,
+  validateQueryPostIDList,
+  doesValidationErrorExist,
+  validateBodyRemoveCoverPhoto,
 } = require('../../utils/validators');
+const { checkStringBoolean } = require('../../utils/helper');
 
 const postImageFields = [
   { name: "images" },
   { name: "coverPhoto", maxCount: 1 }];
+
+
 
 const setRecentPosts = (post, inputRecentPosts) => {
   let newRecentPosts = inputRecentPosts;
@@ -42,27 +51,27 @@ const setRecentPosts = (post, inputRecentPosts) => {
   return newRecentPosts;
 }
 
-const setPursuitAttributes = (isMilestone, pursuit, minDuration, postId, date) => {
+const setPursuitAttributes = (isMilestone, pursuit, minDuration, postID, date) => {
   if (isMilestone) {
     pursuit.num_milestones = Number(pursuit.num_milestones) + 1;
   }
 
-  if (postId) {
+  if (postID) {
     date ? (
-      insertIntoDatedPosts(pursuit.dated_posts, postId, date))
+      insertIntoDatedPosts(pursuit.dated_posts, postID, date))
       :
-      (pursuit.undated_posts.unshift(postId));
+      (pursuit.undated_posts.unshift(postID));
 
-    pursuit.all_posts.unshift(postId);
+    pursuit.all_posts.unshift(postID);
   }
 
   pursuit.total_min = Number(pursuit.total_min) + minDuration;
   pursuit.num_posts = Number(pursuit.num_posts) + 1;
 }
 
-const insertIntoDatedPosts = (datedPosts, postId, date) => {
+const insertIntoDatedPosts = (datedPosts, postID, date) => {
   datedPosts.unshift(new PostPreview.Model({
-    post_id: postId,
+    post_id: postID,
     date: date
   }));
 
@@ -107,7 +116,7 @@ const makeTextSnippet = (postType, isPaginated, textData) => {
 
 
 const findPosts = (postIDList, includePostText) => {
-  retrievePostInList(postIDList, includePostText)
+  return retrievePostInList(postIDList)
     .then(
       (results) => {
         let coverInfoArray = results;
@@ -122,16 +131,15 @@ const findPosts = (postIDList, includePostText) => {
 
 }
 
-const countComments = (postIdList) => {
-  let transformedPostIdArray = [];
-  for (let postId of postIdList) {
-    transformedPostIdArray.push(mongoose.Types.ObjectId(postId));
+const countComments = (postIDList) => {
+  let transformedPostIDArray = [];
+  for (let postID of postIDList) {
+    transformedPostIDArray.push(mongoose.Types.ObjectId(postID));
   }
-  console.log("Counting", transformedPostIdArray);
   return Comment.Model.aggregate([
     {
       $match: {
-        "parent_post_id": { $in: transformedPostIdArray },
+        "parent_post_id": { $in: transformedPostIDArray },
       }
     },
     {
@@ -234,9 +242,8 @@ router.route('/').post(
     const postType = req.body.postType;
     const username = req.body.username;
     const postPrivacyType = req.body.postPrivacyType;
-    const isMilestone = req.body.isMilestone.trim().toLowerCase() === 'true';
-    const isPaginated = req.body.isPaginated.trim().toLowerCase() === 'true';
-
+    const isMilestone = checkStringBoolean(req.body.isMilestone);
+    const isPaginated = checkStringBoolean(req.body.isPaginated);
     const displayPhoto = req.body.displayPhoto;
     const title = req.body.title ? req.body.title : null;
     const subtitle = req.body.subtitle ? req.body.subtitle : null;
@@ -268,8 +275,8 @@ router.route('/').post(
       minDuration
     );
 
-    if (indexUser.preferred_post_type !== postPrivacyType) {
-      indexUser.preferred_post_type = postPrivacyType;
+    if (indexUser.preferred_post_privacy !== postPrivacyType) {
+      indexUser.preferred_post_privacy = postPrivacyType;
     }
 
     if (minDuration) {
@@ -323,12 +330,12 @@ router.route('/').post(
 
   }, (req, res, next) => {
 
-    let followersIdArray = [];
+    let followersIDArray = [];
     for (const user of req.userRelation.followers) {
-      followersIdArray.push(user.user_preview_id);
+      followersIDArray.push(user.user_preview_id);
     }
     return UserPreview.Model.find({
-      '_id': { $in: followersIdArray }, function(error, docs) {
+      '_id': { $in: followersIDArray }, function(error, docs) {
         if (error) console.log(error);
         else {
           console.log(docs);
@@ -336,12 +343,12 @@ router.route('/').post(
       }
     }).then((result) => {
       if (result) {
-        let indexUserIdArray = []
+        let indexUserIDArray = []
         for (const previewedUser of result) {
-          indexUserIdArray.push(previewedUser.parent_index_user_id);
+          indexUserIDArray.push(previewedUser.parent_index_user_id);
         }
         return IndexUser.Model.find({
-          '_id': { $in: indexUserIdArray }, function(error, docs) {
+          '_id': { $in: indexUserIDArray }, function(error, docs) {
             if (error) console.log(error);
             else {
               console.log(docs);
@@ -377,19 +384,18 @@ router.route('/').post(
     MulterHelper.contentImageUpload.single("coverPhoto"),
     validateBodyPostID,
     validateBodyUsername,
-    validateBodyPostPrivacy,
     validateBodyPostType,
     validateBodyIsMilestone,
     validateBodyIsPaginated,
+    validateBodyRemoveCoverPhoto,
     doesValidationErrorExist,
     (req, res) => {
-      const postId = req.body.postId;
+      const postID = req.body.postID;
       const postType = req.body.postType;
       const username = req.body.username;
-      const isMilestone = req.body.isMilestone.trim().toLowerCase() === 'true';
-      const isPaginated = req.body.isPaginated.trim().toLowerCase() === 'true';
-      const postPrivacyType = req.body.postPrivacyType;
-
+      const isMilestone = checkStringBoolean(req.body.isMilestone);
+      const isPaginated = checkStringBoolean(req.body.isPaginated);
+      const postPrivacyType = req.body.postPrivacyType ? req.body.postPrivacyType : null;
       const title = !!req.body.title ? req.body.title : null;
       const subtitle = !!req.body.subtitle ? req.body.subtitle : null;
       const pursuitCategory = !!req.body.pursuitCategory ? req.body.pursuitCategory : null;
@@ -397,15 +403,14 @@ router.route('/').post(
       const textData = !!req.body.textData ? req.body.textData : null;
       const minDuration = !!req.body.minDuration ? parseInt(req.body.minDuration) : null;
       const coverPhotoKey = req.file ? req.file.key : null;
-      const removeCoverPhoto = req.body.removeCoverPhoto
-        ? req.body.removeCoverPhoto
-          .trim()
-          .toLowerCase() === 'true' : false;
-
-      return Post.Model.findById(postId)
+      const removeCoverPhoto = checkStringBoolean(req.body.removeCoverPhoto);
+      return Post.Model.findById(postID)
         .then(
           (result) => {
             let post = result;
+            if (post.post_privacy_type) {
+              post.post_privacy_type = postPrivacyType;
+            }
             if (removeCoverPhoto) {
               post.cover_photo_key = null;
             }
@@ -422,8 +427,6 @@ router.route('/').post(
             post.is_paginated = isPaginated;
             post.text_data = textData;
             post.text_snippet = textData ? makeTextSnippet(postType, isPaginated, textData) : null;
-            post.post_privacy_type = postPrivacyType;
-
             return post.save()
           })
         .then(() => {
@@ -440,16 +443,16 @@ router.route('/').post(
     validateBodyPostID,
     doesValidationErrorExist,
     (req, res) => {
-      const indexUserId = req.body.indexUserId;
-      const userId = req.body.userId;
-      const postId = req.body.postId;
+      const indexUserID = req.body.indexUserID;
+      const userID = req.body.userID;
+      const postID = req.body.postID;
       let returnedUser = null;
-      const resolvedIndexUser = IndexUser.Model.findById(indexUserId)
+      const resolvedIndexUser = IndexUser.Model.findById(indexUserID)
         .then((user) => {
           if (!user) throw new Error(500, "no user found");
           let updatedRecentPosts = [];
           for (const post of user.recent_posts) {
-            if (post._id.toString() !== postId) {
+            if (post._id.toString() !== postID) {
               updatedRecentPosts.unshift(post);
             }
           }
@@ -460,13 +463,13 @@ router.route('/').post(
           throw new Error(error, "Something went wrong resolving index user")
         });
 
-      const resolvedUser = User.Model.findById(userId)
+      const resolvedUser = User.Model.findById(userID)
         .then((user) => {
           if (!user) throw new Error(500, "no user found");
           returnedUser = user;
           let updatedAllPosts = [];
           for (const post of user.all_posts) {
-            if (post.toString() !== postId) {
+            if (post.toString() !== postID) {
               updatedAllPosts.unshift(post);
             }
           }
@@ -477,10 +480,10 @@ router.route('/').post(
           (error) => { throw new Error(error, "Something went wrong resolving user") }
         );
 
-      return Promise.all([resolvedIndexUser, resolvedUser, Post.Model.findById(postId)])
+      return Promise.all([resolvedIndexUser, resolvedUser, Post.Model.findById(postID)])
         .then((results) => {
           return Promise.all([
-            Post.Model.deleteOne({ _id: postId }),
+            Post.Model.deleteOne({ _id: postID }),
             Comment.Model.deleteMany({
               _id: {
                 $in: results[2].comments
@@ -502,15 +505,15 @@ router.route('/').post(
     });
 
 router.route('/multiple').get(
-  validateQueryPostID,
+  validateQueryPostIDList,
   validateQueryIncludePostText,
   doesValidationErrorExist,
   (req, res) => {
-    const postIdList = req.query.postIdList;
+    const postIDList = req.query.postIDList;
     const includePostText = req.query.includePostText;
     return Promise.all([
-      findPosts(postIdList, includePostText),
-      countComments(postIdList)])
+      findPosts(postIDList, includePostText),
+      countComments(postIDList)])
       .then((results) => {
         let posts = results[0];
         if (results[1].length > 0) {
@@ -538,8 +541,8 @@ router.route('/single').get(
   doesValidationErrorExist,
   (req, res) => {
     const textOnly = req.query.textOnly.toUpperCase();
-    const postId = req.query.postId;
-    return Post.Model.findById(postId)
+    const postID = req.query.postID;
+    return Post.Model.findById(postID)
       .then(result => {
         if (textOnly === "TRUE") {
           return res.status(200).send(result.text_data);
@@ -566,7 +569,6 @@ router.route('/display-photo')
     (req, res) => {
       const username = req.body.username;
       const imageKey = req.body.imageKey;
-      console.log(imageKey);
       return Post.Model.updateMany({ username: username }, { display_photo_key: imageKey })
         .then(() => {
           return res.status(200).send();

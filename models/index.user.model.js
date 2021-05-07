@@ -61,7 +61,7 @@ const IndexUserSchema = new Schema(
             type: Number
         },
 
-        preferred_post_type: {
+        preferred_post_privacy: {
             type: String,
             required: false,
         },

@@ -1,10 +1,10 @@
 
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 const UserPreview = require('../../models/user.preview.model');
 const UserRelationStatus = require("../../models/user.relation.status.model");
 const UserRelation = require('../../models/user.relation.model');
-const { validateQueryUsername, validateQueryUserRelationArrayID, validateBodyUserRelationArrayID, validateBodyUsername, doesValidationErrorExist, } = require('../../utils/validators');
+const { validateQueryUsername, validateQueryUserRelationArrayID, validateBodyUserRelationArrayID, validateBodyUsername, doesValidationErrorExist, validateBodyVisitorUsername, validateBodyTargetProfilePreviewID, validateBodyIsPrivate, validateBodyAction, validateBodyID, validateBodyTargetUsername, validateBodyCurrentUsername, } = require('../../utils/validators');
 const NOT_A_FOLLOWER_STATE = "NOT_A_FOLLOWER";
 
 router.route('/').get(
@@ -13,7 +13,7 @@ router.route('/').get(
   doesValidationErrorExist,
   (req, res) => {
     const visitorUsername = req.query.visitorUsername;
-    const followerArrayId = req.query.userRelationArrayId;
+    const followerArrayId = req.query.userRelationArrayID;
     let resolvedVistorPreviewId = UserPreview.Model
       .findOne({ username: visitorUsername });
     return resolvedVistorPreviewId
@@ -48,13 +48,13 @@ router.route('/info').get(
   doesValidationErrorExist,
   (req, res) => {
     const username = req.query.username;
-    let id = null;
+    let ID = null;
     return UserPreview.Model.findOne({ username: username })
       .then((user) => {
         return UserRelation.Model.findById(user.user_relation_id)
       })
       .then((result) => {
-        id = result._id;
+        ID = result._id;
         let following = [];
         let followers = [];
         let requested = [];
@@ -125,7 +125,7 @@ router.route('/info').get(
           });
         }
         return res.status(200).json({
-          _id: id,
+          _id: ID,
           following: finalFollowing,
           followers: finalFollowers,
           requested: finalRequested
@@ -138,12 +138,16 @@ router.route('/info').get(
   })
 
 router.route('/status').put(
-  validateBodyUsername,
+  validateBodyVisitorUsername,
   validateBodyUserRelationArrayID,
+  validateBodyTargetProfilePreviewID,
+  validateBodyIsPrivate,
+  validateBodyAction,
+  doesValidationErrorExist,
   (req, res) => {
     const visitorUsername = req.body.visitorUsername;
-    const targetUserRelationId = req.body.userRelationArrayId;
-    const targetUserPreviewId = req.body.targetProfilePreviewId;
+    const targetUserRelationID = req.body.userRelationArrayID;
+    const targetUserPreviewID = req.body.targetProfilePreviewID;
     let visitorUserPreview = null;
 
     const isPrivate = req.body.isPrivate;
@@ -165,7 +169,7 @@ router.route('/status').put(
       .then((result) => {
         visitorUserPreview = result;
         const userRelationArray = [
-          targetUserRelationId,
+          targetUserRelationID,
           visitorUserPreview.user_relation_id];
         return UserRelation.Model.find({
           '_id': { $in: userRelationArray }, function(error, docs) {
@@ -180,7 +184,7 @@ router.route('/status').put(
     const resolvedUpdate = resolvedUserRelation
       .then((userRelation) => {
         const targetUserRelation =
-          userRelation[0]._id.toString() === targetUserRelationId.toString()
+          userRelation[0]._id.toString() === targetUserRelationID.toString()
             ? userRelation[0]
             : userRelation[1];
         const visitorUserRelation =
@@ -208,7 +212,7 @@ router.route('/status').put(
 
               visitorFollowingArray.push(new UserRelationStatus.Model({
                 status: FOLLOW_REQUESTED,
-                user_preview_id: targetUserPreviewId,
+                user_preview_id: targetUserPreviewID,
               }));
 
               resultStatus = FOLLOW_REQUESTED;
@@ -221,7 +225,7 @@ router.route('/status').put(
 
               visitorFollowingArray.push(new UserRelationStatus.Model({
                 status: FOLLOWING,
-                user_preview_id: targetUserPreviewId,
+                user_preview_id: targetUserPreviewID,
               }));
 
               resultStatus = FOLLOWING;
@@ -250,7 +254,7 @@ router.route('/status').put(
 
             for (const followingPerson of visitorFollowingArray) {
               if (followingPerson.user_preview_id.toString()
-                !== targetUserPreviewId.toString()) {
+                !== targetUserPreviewID.toString()) {
                 updatedVisitorFollowing.push(followingPerson);
               }
             }
@@ -282,23 +286,29 @@ router.route('/status').put(
 
   });
 
-router.route('/set').put((req, res) => {
-  const id = req.body.id;
+router.route('/set').put(
+  validateBodyID,
+  validateBodyTargetUsername,
+  validateBodyCurrentUsername,
+  validateBodyAction,
+  doesValidationErrorExist,
+  (req, res) => {
+  const ID = req.body.ID;
   const targetUsername = req.body.targetUsername;
   const currentUsername = req.body.currentUsername;
   const action = req.body.action;
   let userRelation = null;
 
   if (action === "UNFOLLOW") {
-    return UserRelation.Model.findById(id)
+    return UserRelation.Model.findById(ID)
       .then(result => {
         if (!result) throw 204;
         userRelation = result;
         let updatedFollowing = [];
-        let followingUserRelationId = null;
+        let followingUserRelationID = null;
         for (const profile of userRelation.following) {
           if (profile.username === targetUsername) {
-            followingUserRelationId = profile.user_relation_id;
+            followingUserRelationID = profile.user_relation_id;
           }
           else if (profile.username !== targetUsername) {
             updatedFollowing.push(profile);
@@ -306,7 +316,7 @@ router.route('/set').put((req, res) => {
         }
         userRelation.following = updatedFollowing;
         userRelation.save();
-        return UserRelation.Model.findById(followingUserRelationId);
+        return UserRelation.Model.findById(followingUserRelationID);
       })
       .then((result) => {
         let followerUserRelation = result;
@@ -327,7 +337,7 @@ router.route('/set').put((req, res) => {
       });
   }
   else {
-    return UserRelation.Model.findById(id)
+    return UserRelation.Model.findById(ID)
       .then((result) => {
         userRelation = result;
         for (const profile of userRelation.followers) {
@@ -340,7 +350,7 @@ router.route('/set').put((req, res) => {
       })
       .then((result) => {
         for (const profile of result.followers) {
-          if (profile.user_relation_id === id) {
+          if (profile.user_relation_id === ID) {
             profile.status = action === 'ACCEPT' ? "FOLLOWING" : "DECLINED";
             result.save();
             return UserRelation.Model.findById(profile.user_relation_id);
@@ -354,7 +364,6 @@ router.route('/set').put((req, res) => {
         return res.status(500).json({ error: error });
       })
   }
-
 })
 
 module.exports = router;

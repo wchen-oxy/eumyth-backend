@@ -42,7 +42,7 @@ const retrieveCompleteUserByID = (id) => {
 
 //Post
 
-const retrievePostInList = (postIDList, includePostText) => {
+const retrievePostInList = (postIDList) => {
     return Post.Model.find({
         '_id': { $in: postIDList }, function(error, docs) {
             if (error) console.log(error);
