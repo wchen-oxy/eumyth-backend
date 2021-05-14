@@ -3,22 +3,23 @@ const express = require('express');
 const router = express.Router();
 const UserPreview = require('../../models/user.preview.model');
 const UserRelationStatus = require("../../models/user.relation.status.model");
-const UserRelation = require('../../models/user.relation.model');
 const { validateQueryUsername, validateQueryUserRelationArrayID, validateBodyUserRelationArrayID, validateBodyUsername, doesValidationErrorExist, validateBodyVisitorUsername, validateBodyTargetProfilePreviewID, validateBodyIsPrivate, validateBodyAction, validateBodyID, validateBodyTargetUsername, validateBodyCurrentUsername, } = require('../../utils/validators');
+const { findUserRelations,
+  retrieveUserPreviewByUsername,
+  retrieveUserRelationByID } = require('../../data_access/dal');
 const NOT_A_FOLLOWER_STATE = "NOT_A_FOLLOWER";
 
 router.route('/').get(
   validateQueryUsername,
   validateQueryUserRelationArrayID,
   doesValidationErrorExist,
-  (req, res) => {
+  (req, res, next) => {
     const visitorUsername = req.query.visitorUsername;
     const followerArrayId = req.query.userRelationArrayID;
-    let resolvedVistorPreviewId = UserPreview.Model
-      .findOne({ username: visitorUsername });
+    let resolvedVistorPreviewId = retrieveUserPreviewByUsername(visitorUsername);
     return resolvedVistorPreviewId
       .then((visitorUserPreview) => {
-        return UserRelation.Model.findById(followerArrayId)
+        return retrieveUserRelationByID(followerArrayId)
           .then(
             (userRelationInfo) => {
               if (!userRelationInfo) return res.status(204).send();
@@ -37,21 +38,18 @@ router.route('/').get(
             }
           )
       })
-      .catch(error => {
-        console.log(error);
-        return res.status(500).json({ error: error });
-      });
+      .catch(next);
   });
 
 router.route('/info').get(
   validateQueryUsername,
   doesValidationErrorExist,
-  (req, res) => {
+  (req, res, next) => {
     const username = req.query.username;
     let ID = null;
-    return UserPreview.Model.findOne({ username: username })
+    return retrieveUserPreviewByUsername(username)
       .then((user) => {
-        return UserRelation.Model.findById(user.user_relation_id)
+        return retrieveUserRelationByID(user.user_relation_id)
       })
       .then((result) => {
         ID = result._id;
@@ -131,10 +129,7 @@ router.route('/info').get(
           requested: finalRequested
         });
       })
-      .catch(error => {
-        console.log(error);
-        return res.status(500).send();
-      })
+      .catch(next)
   })
 
 router.route('/status').put(
@@ -144,7 +139,7 @@ router.route('/status').put(
   validateBodyIsPrivate,
   validateBodyAction,
   doesValidationErrorExist,
-  (req, res) => {
+  (req, res, next) => {
     const visitorUsername = req.body.visitorUsername;
     const targetUserRelationID = req.body.userRelationArrayID;
     const targetUserPreviewID = req.body.targetProfilePreviewID;
@@ -162,8 +157,7 @@ router.route('/status').put(
     const REQUEST_ACCEPTED = "REQUEST_ACCEPTED";
     const UNFOLLOWED = "UNFOLLOWED";
 
-    const resolvedVisitor = UserPreview.Model
-      .findOne({ username: visitorUsername });
+    const resolvedVisitor = retrieveUserPreviewByUsername(visitorUsername);
 
     const resolvedUserRelation = resolvedVisitor
       .then((result) => {
@@ -171,14 +165,7 @@ router.route('/status').put(
         const userRelationArray = [
           targetUserRelationID,
           visitorUserPreview.user_relation_id];
-        return UserRelation.Model.find({
-          '_id': { $in: userRelationArray }, function(error, docs) {
-            if (error) console.log(error);
-            else {
-              console.log(docs);
-            }
-          }
-        })
+        return findUserRelations(userRelationArray)
       });
 
     const resolvedUpdate = resolvedUserRelation
@@ -279,11 +266,7 @@ router.route('/status').put(
         return res.status(200).json({ success: resultStatus });
       }
     })
-      .catch((error) => {
-        console.log(error);
-        return res.status(500).send(error);
-      });
-
+      .catch(next);
   });
 
 router.route('/set').put(
@@ -292,78 +275,73 @@ router.route('/set').put(
   validateBodyCurrentUsername,
   validateBodyAction,
   doesValidationErrorExist,
-  (req, res) => {
-  const ID = req.body.ID;
-  const targetUsername = req.body.targetUsername;
-  const currentUsername = req.body.currentUsername;
-  const action = req.body.action;
-  let userRelation = null;
+  (req, res, next) => {
+    const ID = req.body.ID;
+    const targetUsername = req.body.targetUsername;
+    const currentUsername = req.body.currentUsername;
+    const action = req.body.action;
+    let userRelation = null;
 
-  if (action === "UNFOLLOW") {
-    return UserRelation.Model.findById(ID)
-      .then(result => {
-        if (!result) throw 204;
-        userRelation = result;
-        let updatedFollowing = [];
-        let followingUserRelationID = null;
-        for (const profile of userRelation.following) {
-          if (profile.username === targetUsername) {
-            followingUserRelationID = profile.user_relation_id;
+    if (action === "UNFOLLOW") {
+      return retrieveUserRelationByID(ID)
+        .then(result => {
+          userRelation = result;
+          let updatedFollowing = [];
+          let followingUserRelationID = null;
+          for (const profile of userRelation.following) {
+            if (profile.username === targetUsername) {
+              followingUserRelationID = profile.user_relation_id;
+            }
+            else if (profile.username !== targetUsername) {
+              updatedFollowing.push(profile);
+            }
           }
-          else if (profile.username !== targetUsername) {
-            updatedFollowing.push(profile);
+          userRelation.following = updatedFollowing;
+          userRelation.save();
+          return retrieveUserRelationByID(followingUserRelationID);
+        })
+        .then((result) => {
+          let followerUserRelation = result;
+          let updatedFollowers = [];
+          for (const profile of followerUserRelation.followers) {
+            if (profile.username !== currentUsername) {
+              updatedFollowers.push(profile);
+            }
           }
-        }
-        userRelation.following = updatedFollowing;
-        userRelation.save();
-        return UserRelation.Model.findById(followingUserRelationID);
-      })
-      .then((result) => {
-        let followerUserRelation = result;
-        let updatedFollowers = [];
-        for (const profile of followerUserRelation.followers) {
-          if (profile.username !== currentUsername) {
-            updatedFollowers.push(profile);
+          followerUserRelation.followers = updatedFollowers;
+          return followerUserRelation.save();
+        })
+        .then(() => res.status(200).send())
+        .catch((error) => {
+          console.log(error);
+          if (204) res.status(204).send("No User Found");
+          return res.status(500).json({ error: error });
+        });
+    }
+    else {
+      return retrieveUserRelationByID(ID)
+        .then((result) => {
+          userRelation = result;
+          for (const profile of userRelation.followers) {
+            if (profile.username === targetUsername) {
+              profile.status = action === 'ACCEPT' ? "FOLLOWING" : "DECLINED";
+              userRelation.save();
+              return retrieveUserRelationByID(profile.user_relation_id);
+            }
           }
-        }
-        followerUserRelation.followers = updatedFollowers;
-        return followerUserRelation.save();
-      })
-      .then(() => res.status(200).send())
-      .catch((error) => {
-        console.log(error);
-        if (204) res.status(204).send("No User Found");
-        return res.status(500).json({ error: error });
-      });
-  }
-  else {
-    return UserRelation.Model.findById(ID)
-      .then((result) => {
-        userRelation = result;
-        for (const profile of userRelation.followers) {
-          if (profile.username === targetUsername) {
-            profile.status = action === 'ACCEPT' ? "FOLLOWING" : "DECLINED";
-            userRelation.save();
-            return UserRelation.Model.findById(profile.user_relation_id);
+        })
+        .then((result) => {
+          for (const profile of result.followers) {
+            if (profile.user_relation_id === ID) {
+              profile.status = action === 'ACCEPT' ? "FOLLOWING" : "DECLINED";
+              result.save();
+              return retrieveUserRelationByID(profile.user_relation_id);
+            }
           }
-        }
-      })
-      .then((result) => {
-        for (const profile of result.followers) {
-          if (profile.user_relation_id === ID) {
-            profile.status = action === 'ACCEPT' ? "FOLLOWING" : "DECLINED";
-            result.save();
-            return UserRelation.Model.findById(profile.user_relation_id);
-          }
-        }
-      })
-      .then(() => res.status(200).send())
-      .catch((error) => {
-        if (204) res.status(204).send("No User Found");
-        console.log(error);
-        return res.status(500).json({ error: error });
-      })
-  }
-})
+        })
+        .then(() => res.status(200).send())
+        .catch(next)
+    }
+  })
 
 module.exports = router;

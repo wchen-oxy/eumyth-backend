@@ -1,10 +1,40 @@
-const { doesUserExist } = require("../utils/helper");
+const { doesCommentExist,
+    doesUserExist,
+    doesUserPreviewExist,
+    doesPostExist } = require("../utils/helper");
 const IndexUser = require('../models/index.user.model');
 const User = require('../models/user.model');
 const Post = require('../models/post.model');
-const userPreview = require("../models/user.preview.model");
+const UserPreview = require("../models/user.preview.model");
+const UserRelation = require("../models/user.relation.model");
+const Project = require("../models/project.model");
+const Helper = require('../constants/helper');
 
+const deleteCommentsByID = (commentIDArray) => {
+    return Comment.Model.deleteMany({
+        _id: {
+            $in: commentIDArray
+        }
+    },
+        (err) => {
+            if (err) {
+                throw new Error(500, err);
+            }
+        })
+}
 //IndexUser
+
+const retrieveIndexUserByList = (indexUserIDArray) => {
+    return IndexUser.Model.find({
+        '_id': { $in: indexUserIDArray }, function(error, docs) {
+            if (error) console.log(error);
+            else {
+                console.log(docs);
+            }
+        }
+    });
+}
+
 const retrieveIndexUserByUsername = (username) => {
     return IndexUser.Model
         .findOne({ username: username })
@@ -40,9 +70,39 @@ const retrieveCompleteUserByID = (id) => {
         });
 }
 
+const findProjectsByID = (projectIDArray) => {
+    return Project.Model.find({
+        '_id': { $in: projectIDArray }, function(err, docs) {
+            if (err) console.log(err);
+            else {
+                console.log(docs);
+            }
+        }
+    });
+}
+
 //Post
 
-const retrievePostInList = (postIDList) => {
+const deletePostByID = (postID) => {
+    return Post.Model.deleteOne({ _id: postID });
+}
+
+const retrievePostByID = (postID) => {
+    return Post.Model.findById(postID)
+        .then(result => {
+            doesPostExist(result);
+            return result;
+        })
+}
+
+const updatePostUserDisplayPhoto = (username, imageKey) => {
+    return Post.Model.updateMany(
+        { username: username },
+        { display_photo_key: imageKey }
+    );
+}
+
+const findPostInList = (postIDList) => {
     return Post.Model.find({
         '_id': { $in: postIDList }, function(error, docs) {
             if (error) console.log(error);
@@ -51,25 +111,103 @@ const retrievePostInList = (postIDList) => {
             }
         }
     }).sort({ createdAt: -1 }).lean()
-
 }
 
-//UserPreview
-
-const retriveUserPreviewByUsername = (username) => {
-    return userPreview.Model.findOne({ username: username })
+const retrieveUserByID = (userID) => {
+    return User.Model.findById(userID)
         .then(result => {
             doesUserExist(result);
             return result;
         });
 }
 
+
+const retrieveUserByUsername = (username) => {
+    return User.Model.findById(username)
+        .then(result => {
+            doesUserExist(result);
+            return result;
+        });
+}
+
+//UserPreview
+
+const retrieveUserPreviewByUsername = (username) => {
+    return UserPreview.Model.findOne({ username: username })
+        .then(result => {
+            doesUserPreviewExist(result);
+            return result;
+        });
+}
+
+const retrieveUserPreviewByID = (userPreviewID) => {
+    return UserPreview.Model.findById(userPreviewID)
+        .then(result => {
+            doesUserPreviewExist(result);
+            return result;
+        });
+}
+
+const findUserPreviewByIDList = (userProfileIDArray) => {
+    return UserPreview.Model.find({
+        '_id': { $in: userProfileIDArray }
+    }, Helper.resultCallback)
+}
+
+const findUserRelations = (userRelationArray) => {
+    return UserRelation.Model.find({
+        '_id': { $in: userRelationArray }, function(error, docs) {
+            if (error) console.log(error);
+            else {
+                console.log(docs);
+            }
+        }
+    })
+}
+
+const retrieveUserRelationByID = (userRelationID) => {
+    return UserRelation.Model.findById(userRelationID)
+        .then(result => {
+            doesUserRelationExist(result);
+            return result;
+        })
+}
+
+const retrieveCommentByID = (commentID) => {
+    return Comment.Model.findById(commentID)
+        .then(result => {
+            doesCommentExist(result);
+            return result;
+        })
+}
+const findComments = (commentIDArray) => {
+    return Comment.Model
+        .find({
+            '_id': { $in: commentIDArray }
+        }, Helper.resultCallback)
+        .lean();
+}
+
 module.exports = {
+    deleteCommentsByID,
+    retrieveCommentByID,
+    findComments,
     retrieveIndexUserByID,
+    retrieveIndexUserByList,
     retrieveIndexUserByUsername,
     retrieveCompleteUserByID,
     retrieveCompleteUserByUsername,
-    retriveUserPreviewByUsername,
-    retrievePostInList
+    retrieveUserByID,
+    retrieveUserByUsername,
+    retrieveUserPreviewByID,
+    findUserPreviewByIDList,
+    retrieveUserPreviewByUsername,
+    findUserRelations,
+    retrieveUserRelationByID,
+    findProjectsByID,
+    deletePostByID,
+    retrievePostByID,
+    updatePostUserDisplayPhoto,
+    findPostInList
 }
 

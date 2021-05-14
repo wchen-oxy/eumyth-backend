@@ -29,9 +29,6 @@ const imageFields = [
   { name: "tinyCroppedImage" }
 ];
 
-
-
-
 router.route('/')
   .get(validateQueryUsername, doesValidationErrorExist, (req, res, next) => {
     const username = req.query.username;
@@ -45,7 +42,7 @@ router.route('/')
     validateBodyFullNames,
     validateBodyPursuitArray,
     doesValidationErrorExist,
-    (req, res) => {
+    (req, res, next) => {
       const username = req.body.username;
       const firstName = req.body.firstName;
       const lastName = req.body.lastName;
@@ -141,54 +138,62 @@ router.route('/')
     });
 
 router.route('/account-settings-info')
-  .get(validateQueryUsername, doesValidationErrorExist, (req, res) => {
-    const username = req.query.username;
-    return retrieveIndexUserByUsername(username)
-      .then((result) => {
-        let pursuitsJSON = {};
-        for (const pursuit of result.pursuits) {
-          pursuitsJSON[pursuit.name] = pursuit.meta_template ?
-            pursuit.meta_template : "";
-        }
-        return res.status(200).json({
-          _id: result.index_user_id,
-          bio: result.bio,
-          private: result.private,
-          pursuits: pursuitsJSON,
-          cropped_display_photo_key: result.cropped_display_photo_key
-        });
-      })
-      .catch(next);
-  });
+  .get(validateQueryUsername,
+    doesValidationErrorExist,
+    (req, res, next) => {
+      const username = req.query.username;
+      return retrieveIndexUserByUsername(username)
+        .then((result) => {
+          let pursuitsJSON = {};
+          for (const pursuit of result.pursuits) {
+            pursuitsJSON[pursuit.name] = pursuit.meta_template ?
+              pursuit.meta_template : "";
+          }
+          return res.status(200).json({
+            _id: result.index_user_id,
+            bio: result.bio,
+            private: result.private,
+            pursuits: pursuitsJSON,
+            cropped_display_photo_key: result.cropped_display_photo_key
+          });
+        })
+        .catch(next);
+    });
 
 router.route('/template')
-  .put(validateBodyIndexUserID, validateBodyText, validateBodyPursuitArray, doesValidationErrorExist, (req, res) => {
-    const userID = req.body.indexUserID;
-    const templateText = req.body.text;
-    const selectedPursuit = req.body.pursuitCategory;
-    return retrieveIndexUserByID(userID)
-      .then((result) => {
-        let indexUser = result;
-        for (let pursuit of indexUser.pursuits) {
-          if (pursuit.name === selectedPursuit) {
-            pursuit.meta_template = templateText;
+  .put(validateBodyIndexUserID,
+    validateBodyText,
+    validateBodyPursuitArray,
+    doesValidationErrorExist,
+    (req, res, next) => {
+      const userID = req.body.indexUserID;
+      const templateText = req.body.text;
+      const selectedPursuit = req.body.pursuitCategory;
+      return retrieveIndexUserByID(userID)
+        .then((result) => {
+          let indexUser = result;
+          for (let pursuit of indexUser.pursuits) {
+            if (pursuit.name === selectedPursuit) {
+              pursuit.meta_template = templateText;
+            }
           }
-        }
-        return indexUser.save();
-      })
-      .then(() => res.status(200).send())
-      .catch(next);
-  })
+          return indexUser.save();
+        })
+        .then(() => res.status(200).send())
+        .catch(next);
+    })
 
 router.route('/bio')
-  .get(validateQueryUsername, doesValidationErrorExist, (req, res) => {
-    const username = req.query.username;
-    return retrieveCompleteUserByUsername(username)
-      .then((result) => {
-        return res.status(200).json({ bio: result.bio });
-      })
-      .catch(next)
-  })
+  .get(validateQueryUsername,
+    doesValidationErrorExist,
+    (req, res, next) => {
+      const username = req.query.username;
+      return retrieveCompleteUserByUsername(username)
+        .then((result) => {
+          return res.status(200).json({ bio: result.bio });
+        })
+        .catch(next)
+    })
   .put(validateBodyUsername, validateBodyBio, (req, res) => {
     const username = req.body.username;
     const bio = req.body.bio;
@@ -210,7 +215,7 @@ router.route('/private')
   .put(validateBodyUsername,
     validateBodyIsPrivate,
     doesValidationErrorExist,
-    (req, res) => {
+    (req, res, next) => {
       const username = req.body.username;
       const isPrivate = req.body.private;
       return retrieveCompleteUserByUsername(username)

@@ -3,30 +3,27 @@ const mongoose = require('mongoose');
 const router = express.Router();
 const Comment = require("../../models/comment.model");
 const ImageAnnotation = require('../../models/image.annotation.model');
-const Post = require("../../models/post.model");
-const UserPreview = require('../../models/user.preview.model');
-const Helper = require('../../constants/helper');
 const {
+    doesValidationErrorExist,
     validateQueryRootCommentIDArray,
     validateQueryViewingMode,
     validateBodyPostID,
     validateBodyProfilePreviewID,
-    doesValidationErrorExist,
     validateBodyAncestors,
-    validateBodyComment, 
+    validateBodyComment,
     validateBodyCommentID,
-    validateBodyVoteValue} = require('../../utils/validators');
+    validateBodyVoteValue } = require('../../utils/validators');
+const {
+    retrieveCommentByID,
+    findComments,
+    retrievePostByID,
+    findUserPreviewByIDList,
+    retrieveUserPreviewByID
+} = require('../../data_access/dal');
 
 const COLLAPSED = "COLLAPSED";
 const EXPANDED = "EXPANDED";
 
-const returnComments = (commentIDArray) => (
-    Comment.Model
-        .find({
-            '_id': { $in: commentIDArray }
-        }, Helper.resultCallback)
-        .lean()
-);
 
 const processRootAndTopComments = (rootComments) => {
     let topComment = null;
@@ -120,7 +117,7 @@ const nestCompleteComments = (rootCommentArray, userProfileHashTable, repliesArr
 
 const returnCollapsedComments = (rootCommentIDArray) => {
     let commentArray = null;
-    return returnComments(rootCommentIDArray)
+    return findComments(rootCommentIDArray)
         .then((rawComments) => {
             const processedRootComments = processRootAndTopComments(rawComments);
             let slicedCommentIDArray = [];
@@ -131,10 +128,7 @@ const returnCollapsedComments = (rootCommentIDArray) => {
                 slicedCommentIDArray.push(comment.commenter_user_id.toString());
             }
 
-            return UserPreview.Model.find({
-                '_id': { $in: slicedCommentIDArray }
-            },
-                Helper.resultCallback)
+            return findUserPreviewByIDList(slicedCommentIDArray);
         })
         .then((results) => {
             let userProfileHashTable = {}
@@ -157,7 +151,7 @@ const returnExpandedComments = (rootCommentIDArray) => {
     let transformedRootCommentIDArray = null;
     let replies = null;
 
-    return returnComments(rootCommentIDArray)
+    return findComments(rootCommentIDArray)
         .then(
             (rawComments) => {
                 const processedRootComments =
@@ -201,9 +195,7 @@ const returnExpandedComments = (rootCommentIDArray) => {
                 commentUserProfileIDArray.concat(replyingUserProfileIDArray);
                 commentUserProfileIDArray = [... new Set(commentUserProfileIDArray)];
             }
-            return UserPreview.Model.find({
-                '_id': { $in: commentUserProfileIDArray }
-            }, Helper.resultCallback)
+            return findUserPreviewByIDList(commentUserProfileIDArray)
         })
         .then((results) => {
             let userProfileHashTable = {}
@@ -233,16 +225,13 @@ router.route('/')
         validateQueryRootCommentIDArray,
         validateQueryViewingMode,
         doesValidationErrorExist,
-        (req, res) => {
+        (req, res, next) => {
             const rootCommentIDArray = JSON.parse(req.query.rootCommentIDArray);
             const viewingMode = req.query.viewingMode;
             if (viewingMode === COLLAPSED) {
                 return returnCollapsedComments(rootCommentIDArray)
                     .then((result) => res.status(200).send(result))
-                    .catch((error) => {
-                        console.log(error);
-                        return res.status(500).json({ error: error })
-                    });
+                    .catch(next);
             }
             else if (viewingMode === EXPANDED) {
                 return returnExpandedComments(rootCommentIDArray)
@@ -269,7 +258,7 @@ router.route('/reply')
         validateBodyAncestors,
         validateBodyComment,
         doesValidationErrorExist,
-        (req, res) => {
+        (req, res, next) => {
             const postID = req.body.postID;
             const commenterID = req.body.profilePreviewID;
             const ancestors = JSON.parse(req.body.ancestors);
@@ -284,10 +273,7 @@ router.route('/reply')
             return newReply
                 .save()
                 .then(() => res.status(200).send())
-                .catch((error) => {
-                    console.log(error);
-                    return res.status(500).json({ error: error });
-                });
+                .catch(next);
         })
 
 router.route('/root')
@@ -296,77 +282,70 @@ router.route('/root')
         validateBodyProfilePreviewID,
         validateBodyComment,
         doesValidationErrorExist,
-        (req, res) => {
-        const postID = req.body.postID;
-        const commenterID = req.body.profilePreviewID;
-        const comment = req.body.comment;
-        const annotationData = req.body.annotationData;
-        const annotationGeometry = req.body.annotationGeometry;
-        const imagePageNumber = req.body.imagePageNumber;
-        const resolvedPost = Post.Model.findById(postID);
-        const resolvedUser = UserPreview.Model.findById(commenterID);
-        let newRootCommentJSON = null;
-        let rootCommentArray = null;
+        (req, res, next) => {
+            const postID = req.body.postID;
+            const commenterID = req.body.profilePreviewID;
+            const comment = req.body.comment;
+            const annotationData = req.body.annotationData;
+            const annotationGeometry = req.body.annotationGeometry;
+            const imagePageNumber = req.body.imagePageNumber;
+            const resolvedPost = retrievePostByID(postID);
+            const resolvedUser = retrieveUserPreviewByID(commenterID);
+            let newRootCommentJSON = null;
+            let rootCommentArray = null;
 
-        return Promise.all([resolvedPost, resolvedUser])
-            .then((result) => {
-                if (!result[0] || !result[1]) throw new Error(204);
+            return Promise.all([resolvedPost, resolvedUser])
+                .then((result) => {
+                    if (!result[0] || !result[1]) throw new Error(204);
 
-                const annotationPayload = annotationData
-                    ? new ImageAnnotation.Model({
-                        image_page_number: imagePageNumber,
-                        data: annotationData,
-                        geometry: annotationGeometry
-                    })
-                    : null;
+                    const annotationPayload = annotationData
+                        ? new ImageAnnotation.Model({
+                            image_page_number: imagePageNumber,
+                            data: annotationData,
+                            geometry: annotationGeometry
+                        })
+                        : null;
 
-                const commentData = {
-                    parent_post_id: postID,
-                    ancestor_post_ids: [],
-                    commenter_user_id: result[1]._id,
-                    comment: comment,
-                    annotation: annotationPayload
-                }
-                const newRootComment = new Comment.Model(commentData)
-                console.log(result[1].tiny_cropped_display_photo_key);
-                newRootCommentJSON = {
-                    ...commentData,
-                    _id: newRootComment._id,
-                    display_photo_key: result[1].tiny_cropped_display_photo_key,
-                    likes: [],
-                    dislikes: [],
-                    score: 0
-                }
-                result[0].comments.unshift(newRootComment._id);
-                rootCommentArray = result[0].comments;
+                    const commentData = {
+                        parent_post_id: postID,
+                        ancestor_post_ids: [],
+                        commenter_user_id: result[1]._id,
+                        comment: comment,
+                        annotation: annotationPayload
+                    }
+                    const newRootComment = new Comment.Model(commentData)
+                    console.log(result[1].tiny_cropped_display_photo_key);
+                    newRootCommentJSON = {
+                        ...commentData,
+                        _id: newRootComment._id,
+                        display_photo_key: result[1].tiny_cropped_display_photo_key,
+                        likes: [],
+                        dislikes: [],
+                        score: 0
+                    }
+                    result[0].comments.unshift(newRootComment._id);
+                    rootCommentArray = result[0].comments;
 
-                return Promise.all([result[0].save(), newRootComment.save()]);
-            })
-            .then(() => {
-                console.log(newRootCommentJSON);
-                return res.status(200).json({
-                    rootCommentIDArray: rootCommentArray,
-                    newRootComment: newRootCommentJSON
-                });
-            })
-            .catch((error) => {
-                if (error.status === 204) console.log("No user or original post found");
-                console.log(error);
-                return res.status(500).json({ error: error });
-            });
-    });
+                    return Promise.all([result[0].save(), newRootComment.save()]);
+                })
+                .then(() => {
+                    console.log(newRootCommentJSON);
+                    return res.status(200).json({
+                        rootCommentIDArray: rootCommentArray,
+                        newRootComment: newRootCommentJSON
+                    });
+                })
+                .catch(next);
+        });
 
 router.route('/refresh')
-    .get((req, res) => {
+    .get((req, res, next) => {
         const rootCommentIDArray = JSON.parse(req.query.rootCommentIDArray);
         return returnExpandedComments(rootCommentIDArray)
             .then((results) => {
                 return res.status(200).json({ rootComments: results });
             })
-            .catch((error) => {
-                console.log(error);
-                return res.status(500).json({ error: error });
-            })
+            .catch(next)
     })
 
 
@@ -376,48 +355,41 @@ router.route('/vote')
         validateBodyVoteValue,
         validateBodyProfilePreviewID,
         doesValidationErrorExist,
-        (req, res) => {
-        const commentID = req.body.commentID;
-        const voteValue = req.body.voteValue;
-        const visitorProfilePreviewID = req.body.profilePreviewID;
-        return Promise.all([
-            UserPreview.Model.findById(visitorProfilePreviewID),
-            Comment.Model.findById(commentID)
-        ])
-            .then((results) => {
-                if (!results[0] || !results[1]) throw new Error(204);
+        (req, res, next) => {
+            const commentID = req.body.commentID;
+            const voteValue = req.body.voteValue;
+            const visitorProfilePreviewID = req.body.profilePreviewID;
+            return Promise.all([
+                retrieveUserPreviewByID(visitorProfilePreviewID),
+                retrieveCommentByID(commentID)
+            ])
+                .then((results) => {
+                    if (!results[0] || !results[1]) throw new Error(204);
 
-                switch (voteValue) {
-                    case (-1):
-                        results[1].dislikes.push(results[0]._id);
-                        results[1].likes = removeVote(results[1].likes, visitorProfilePreviewID);
-                        break;
-                    case (1):
-                        results[1].likes.push(results[0]._id);
-                        results[1].dislikes = removeVote(results[1].dislikes, visitorProfilePreviewID);
-                        break;
-                    case (-2):
-                        results[1].dislikes = removeVote(results[1].dislikes, visitorProfilePreviewID);
-                        break;
-                    case (2):
-                        results[1].likes = removeVote(results[1].likes, visitorProfilePreviewID);
-                        break;
-                    default:
-                        console.log("Nothing matched?");
-                        throw new Error("Nothing matched for vote value");
-                }
+                    switch (voteValue) {
+                        case (-1):
+                            results[1].dislikes.push(results[0]._id);
+                            results[1].likes = removeVote(results[1].likes, visitorProfilePreviewID);
+                            break;
+                        case (1):
+                            results[1].likes.push(results[0]._id);
+                            results[1].dislikes = removeVote(results[1].dislikes, visitorProfilePreviewID);
+                            break;
+                        case (-2):
+                            results[1].dislikes = removeVote(results[1].dislikes, visitorProfilePreviewID);
+                            break;
+                        case (2):
+                            results[1].likes = removeVote(results[1].likes, visitorProfilePreviewID);
+                            break;
+                        default:
+                            console.log("Nothing matched?");
+                            throw new Error("Nothing matched for vote value");
+                    }
 
-                return results[1].save();
-            })
-            .then(() => res.status(200).send("Success!"))
-            .catch((error) => {
-                if (error.status === 204) {
-                    console.log("No user or no comment found");
-                    return res.status(204).json({ error: error });
-                }
-                console.log(error);
-                return res.status(500).json({ error: error });
-            })
-    })
+                    return results[1].save();
+                })
+                .then(() => res.status(200).send("Success!"))
+                .catch(next)
+        })
 
 module.exports = router;

@@ -12,49 +12,40 @@ const {
 
 }
     = require('../../utils/validators');
+const { retrieveIndexUserByUsername } = require('../../data_access/dal');
 
 router.route('/')
     .get(
         validateQueryUsername,
         doesValidationErrorExist,
-        (req, res) => {
+        (req, res, next) => {
             const username = req.query.username;
-            return IndexUser.Model
-                .findOne({ username: username }, Helper.resultCallback)
+            return retrieveIndexUserByUsername(username)
                 .then((user) => {
-                    if (!user) {
-                        const findUserError = "No user found with that username.";
-                        return res.status(204).json({ error: findUserError });
-                    }
                     if (!user.draft)
                         return res.status(200).send({
                             smallDisplayPhoto: user.small_cropped_display_photo_key,
                             draft: null
                         });
-
                     return res.status(200).send({
                         smallDisplayPhoto: user.tiny_cropped_display_photo_key,
                         draft: user.draft.text ? user.draft.text : null
                     });
                 })
-                .catch((error) => {
-                    console.log(error);
-                    return res.status(500).json({ error: error });
-                });
+                .catch(next);
         })
     .put(
         validateBodyUsername,
         validateBodyDraft,
         validateBodyDraftTitle,
         doesValidationErrorExist,
-        (req, res) => {
+        (req, res, next) => {
             const username = req.body.username;
             const draft = req.body.draft;
             const draftTitle = req.body.draftTitle;
             const parsedDraft = JSON.parse(draft).blocks;
 
-            return IndexUser.Model
-                .findOne({ username: username }, Helper.resultCallback)
+            return retrieveIndexUserByUsername(username)
                 .then(indexUser => {
                     const previousURLs = indexUser.draft.links;
                     let toDeleteURLs = [];
@@ -91,51 +82,45 @@ router.route('/')
                     }
                 })
                 .then(() => res.sendStatus(200))
-                .catch((error) => {
-                    console.log(error);
-                    return res.status(500).json({ error: error });
-                });
+                .catch(next);
         })
-    // .delete(
-    //     validateQueryUsername,
-    //     doesValidationErrorExist,
-    //     (req, res) => {
-    //         const username = req.query.username;
-    //         return IndexUser.Model
-    //             .findOne({ username: username }, Helper.resultCallback)
-    //             .then(indexUser => {
-    //                 indexUser.draft = null;
-    //                 indexuser.save();
-    //             })
-    //             .then(() => res.sendStatus(201))
-    //             .catch((error) => {
-    //                 console.log(error);
-    //                 return res.status(500).json({ error: error });
-    //             });
+// .delete(
+//     validateQueryUsername,
+//     doesValidationErrorExist,
+//     (req, res) => {
+//         const username = req.query.username;
+//         return IndexUser.Model
+//             .findOne({ username: username }, Helper.resultCallback)
+//             .then(indexUser => {
+//                 indexUser.draft = null;
+//                 indexuser.save();
+//             })
+//             .then(() => res.sendStatus(201))
+//             .catch((error) => {
+//                 console.log(error);
+//                 return res.status(500).json({ error: error });
+//             });
 
-    //     })
+//     })
 
 router.route('/title')
     .put(
         validateBodyUsername,
         validateBodyDraftTitle,
         doesValidationErrorExist,
-        (req, res) => {
-        const username = req.body.username;
-        const draftTitle = req.body.draftTitle;
-        return IndexUser.Model.findOne({ username: username })
-            .then(
-                (indexUser) => {
-                    indexUser.draft.title = draftTitle;
-                    return indexUser.save();
-                }
-            )
-            .then(() => res.sendStatus(201))
-            .catch(err => {
-                console.log(err);
-                return res.status(500).send();
-            });
-    })
+        (req, res, next) => {
+            const username = req.body.username;
+            const draftTitle = req.body.draftTitle;
+            return retrieveIndexUserByUsername(username)
+                .then(
+                    (indexUser) => {
+                        indexUser.draft.title = draftTitle;
+                        return indexUser.save();
+                    }
+                )
+                .then(() => res.sendStatus(201))
+                .catch(next);
+        })
 
 // router.route('/desc').put((req, res) => {
 //     const username = req.body.username;

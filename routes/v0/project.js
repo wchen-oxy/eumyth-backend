@@ -1,7 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../../models/user.model');
-const IndexUser = require('../../models/index.user.model');
 const MulterHelper = require('../../constants/multer');
 const Project = require('../../models/project.model');
 const {
@@ -13,6 +11,7 @@ const {
     validateBodyTitle,
     doesValidationErrorExist,
 } = require('../../utils/validators');
+const { retrieveIndexUserByID, retrieveUserByID, findProjectsByID } = require('../../data_access/dal');
 
 router.route('/').post(
     MulterHelper.contentImageUpload.single({ name: "coverPhoto", maxCount: 1 }),
@@ -22,10 +21,10 @@ router.route('/').post(
     validateBodySelectedPosts,
     validateBodyTitle,
     doesValidationErrorExist,
-    (req, res) => {
+    (req, res, next) => {
         const username = req.body.username;
         const displayPhoto = req.body.displayPhoto;
-        const userId = req.body.userID;
+        const userID = req.body.userID;
         const indexUserID = req.body.indexUserID;
         const selectedPosts = req.body.selectedPosts ? JSON.parse(req.body.selectedPosts) : [];
         const title = req.body.title ? req.body.title : null;
@@ -52,26 +51,31 @@ router.route('/').post(
             post_ids: selectedPosts,
         });
 
-        const resolvedIndexUser = IndexUser.Model.findById(indexUserID).then(result => {
-            let user = result;
-            for (const pursuit of user.pursuits) {
-                if (pursuit.name === newProject.pursuit) {
-                    pursuit.num_projects++;
-                }
-            }
+        const resolvedIndexUser =
+            retrieveIndexUserByID(indexUserID)
+                .then(result => {
+                    let user = result;
+                    for (const pursuit of user.pursuits) {
+                        if (pursuit.name === newProject.pursuit) {
+                            pursuit.num_projects++;
+                        }
+                    }
 
-            return user;
-        });
-        const resolvedUser = User.Model.findById(userId).then((result => {
-            let user = result;
-            for (const pursuit of user.pursuits) {
-                if (pursuit.name === newProject.pursuit) {
-                    pursuit.projects.unshift(newProject._id);
-                }
-            }
-            return user;
+                    return user;
+                });
 
-        }));
+        const resolvedUser =
+            retrieveUserByID(userID)
+                .then((result => {
+                    let user = result;
+                    for (const pursuit of user.pursuits) {
+                        if (pursuit.name === newProject.pursuit) {
+                            pursuit.projects.unshift(newProject._id);
+                        }
+                    }
+                    return user;
+
+                }));
 
         return Promise.all([resolvedIndexUser, resolvedUser])
             .then((result) => {
@@ -83,36 +87,23 @@ router.route('/').post(
             .then((result) => {
                 return res.status(201).send();
             })
-            .catch(error => {
-                console.log(error);
-                return res.status(500).send();
-            })
+            .catch(next)
 
     });
 
 router.route('/multiple').get(
     validateQueryProjectIDList,
     doesValidationErrorExist,
-    (req, res) => {
+    (req, res, next) => {
         const projectIDList = req.query.projectIDList;
-        return Project.Model.find({
-            '_id': { $in: projectIDList }, function(err, docs) {
-                if (err) console.log(err);
-                else {
-                    console.log(docs);
-                }
-            }
-        })
+        return findProjectsByID(projectIDList)
             .then(
                 (results) => {
                     console.log(results);
                     return res.status(200).send(results);
                 }
             )
-            .catch(error => {
-                console.log(error);
-                return res.status(500).send();
-            })
+            .catch(next)
     }
 );
 module.exports = router;

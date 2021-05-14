@@ -2,9 +2,6 @@ const express = require('express');
 const router = express.Router();
 const AWSConstants = require('../../constants/aws');
 const MulterHelper = require('../../constants/multer');
-const User = require('../../models/user.model');
-const IndexUser = require('../../models/index.user.model');
-const UserPreview = require('../../models/user.preview.model');
 const {
   validateQueryImageKey,
   validateBodyImageKey,
@@ -14,6 +11,7 @@ const {
   doesValidationErrorExist,
 }
   = require('../../utils/validators');
+const { retrieveIndexUserByUsername, retrieveUserByID, retrieveUserPreviewByID, retrieveUserByUsername } = require('../../data_access/dal');
 
 const imageUpload = MulterHelper.contentImageUpload.single('file');
 
@@ -42,12 +40,11 @@ router.route('/')
         })
         .catch(next)
     })
-  .post(imageUpload, (req, res, next) => {
+  .post(imageUpload, (req, res) => {
     return res.status(200).json({
       'url': req.file.location,
       'file': req.file.key
-    })
-      .catch(next);
+    });
   })
   .delete(
     validateBodyImageKey,
@@ -82,7 +79,7 @@ router.route('/navbar-display-photo')
   .get(
     validateQueryUsername,
     doesValidationErrorExist,
-    (req, res, next) => IndexUser.Model.findOne({ username: req.query.username })
+    (req, res, next) => retrieveIndexUserByUsername(req.query.username)
       .then((result) => {
         if (result) return res.status(200).send(result.tiny_cropped_display_photo_key);
         else {
@@ -97,7 +94,7 @@ router.route('/display-photo')
     MulterHelper.profileImageUpload.fields(displayPhotoUploadFields),
     validateBodyUsername,
     doesValidationErrorExist,
-    (req, res) => {
+    (req, res, next) => {
       const username = req.body.username;
       const croppedImage = req.files.croppedImage ? req.files.croppedImage[0].key : null;
       const smallCroppedImage = req.files.smallCroppedImage ? req.files.smallCroppedImage[0].key : null;
@@ -108,20 +105,16 @@ router.route('/display-photo')
         console.log("No image here");
         return res.status(500).json({ error: "Something went wrong during image upload." });
       }
-      console.log(username);
-      return IndexUser.Model.findOne({ username: username })
+      return retrieveIndexUserByUsername(username)
         .then((result) => {
-          console.log(result);
-          if (!result) throw new Error(204);
-
           returnedIndexUser = result;
           returnedIndexUser.cropped_display_photo_key = croppedImage;
           returnedIndexUser.small_cropped_display_photo_key = smallCroppedImage;
           returnedIndexUser.tiny_cropped_display_photo_key = tinyCroppedImage;
 
           return Promise.all([
-            User.Model.findById(result.user_profile_id),
-            UserPreview.Model.findById(returnedIndexUser.user_preview_id)
+            retrieveUserByID(result.user_profile_id),
+            retrieveUserPreviewByID(returnedIndexUser.user_preview_id)
           ]);
         })
         .then((result) => {
@@ -137,178 +130,149 @@ router.route('/display-photo')
             result[1].save()]);
         })
         .then(() => res.status(201).json({ imageKey: smallCroppedImage }))
-        .catch((error) => {
-          console.log(error);
-          if (error.status === 204) return res.status(204).json({ error: error })
-          return res.status(500).json({ error: error });
-        });
+        .catch(next);
     })
   .delete(
     validateBodyUsername,
     doesValidationErrorExist,
-    (req, res) => {
-    const username = req.body.username;
-    let returnedIndexUser = null;
-    return IndexUser.Model.findOne({ username: username })
-      .then((result) => {
-        returnedIndexUser = result;
-        if (returnedIndexUser.cropped_display_photo_key === '') {
-          throw new Error(204);
-        }
-        const displayPhotoKeys = [
-          { Key: returnedIndexUser.cropped_display_photo_key },
-          { Key: returnedIndexUser.small_cropped_display_photo_key },
-          { Key: returnedIndexUser.tiny_cropped_display_photo_key }
-        ];
+    (req, res, next) => {
+      const username = req.body.username;
+      let returnedIndexUser = null;
+      return retrieveIndexUserByUsername(username)
+        .then((result) => {
+          returnedIndexUser = result;
+          if (returnedIndexUser.cropped_display_photo_key === '') {
+            throw new Error("No Cropped Display Photo");
+          }
+          const displayPhotoKeys = [
+            { Key: returnedIndexUser.cropped_display_photo_key },
+            { Key: returnedIndexUser.small_cropped_display_photo_key },
+            { Key: returnedIndexUser.tiny_cropped_display_photo_key }
+          ];
 
-        return Promise.all([
-          User.Model.findById(returnedIndexUser.user_profile_id),
-          AWSConstants
-            .S3_INTERFACE
-            .deleteObjects({
-              Bucket: AWSConstants.BUCKET_NAME,
-              Delete: { Objects: displayPhotoKeys }
-            }, function (error, data) {
-              if (error) {
-                console.log("Something bad happened");
-                console.log(error, error.stack);
-                throw new Error(error);
-              }
-              else { console.log("Success", data); }
-            })
-            .promise(),
-          UserPreview.Model.findById(returnedIndexUser.user_preview_id)])
-      })
-      .then((results) => {
-        results[0].cropped_display_photo_key = "";
-        results[0].small_cropped_display_photo_key = "";
-        results[0].tiny_cropped_display_photo_key = "";
-        returnedIndexUser.cropped_display_photo_key = "";
-        returnedIndexUser.small_cropped_display_photo_key = "";
-        returnedIndexUser.tiny_cropped_display_photo_key = "";
-        results[2].small_cropped_display_photo_key = "";
-        results[2].tiny_cropped_display_photo_key = "";
+          return Promise.all([
+            retrieveUserByID(returnedIndexUser.user_profile_id),
+            AWSConstants
+              .S3_INTERFACE
+              .deleteObjects({
+                Bucket: AWSConstants.BUCKET_NAME,
+                Delete: { Objects: displayPhotoKeys }
+              }, function (error, data) {
+                if (error) {
+                  console.log("Something bad happened");
+                  console.log(error, error.stack);
+                  throw new Error(error);
+                }
+                else { console.log("Success", data); }
+              })
+              .promise(),
+            retrieveUserPreviewByID(returnedIndexUser.user_preview_id)])
+        })
+        .then((results) => {
+          results[0].cropped_display_photo_key = "";
+          results[0].small_cropped_display_photo_key = "";
+          results[0].tiny_cropped_display_photo_key = "";
+          returnedIndexUser.cropped_display_photo_key = "";
+          returnedIndexUser.small_cropped_display_photo_key = "";
+          returnedIndexUser.tiny_cropped_display_photo_key = "";
+          results[2].small_cropped_display_photo_key = "";
+          results[2].tiny_cropped_display_photo_key = "";
 
-        return Promise.all([
-          results[0].save(),
-          returnedIndexUser.save(),
-          results[2].save()]);
-      })
-      .then(() => (
-        res.status(201).json({ userId: returnedIndexUser.user_profile_id }))
-      )
-      .catch((error) => {
-        console.log(error.message);
-        console.log("thing");
-        if (error.message === "204") {
-          console.log("werewr");
-          return res.status(204).json({ result: "No Content" });
-        }
-        else {
-          return res.status(500).json({ error: error });
-        }
-      });
-  });
+          return Promise.all([
+            results[0].save(),
+            returnedIndexUser.save(),
+            results[2].save()]);
+        })
+        .then(() => (
+          res.status(201).json({ userId: returnedIndexUser.user_profile_id }))
+        )
+        .catch(next);
+    });
 
 router.route('/cover')
   .post(
-    MulterHelper.profileImageUpload.single("coverPhoto"), 
+    MulterHelper.profileImageUpload.single("coverPhoto"),
     validateBodyUsername,
     doesValidationErrorExist,
-    (req, res) => {
-    const username = req.body.username;
-    const coverPhoto = req.file.key;
-    let returnedUser = null;
+    (req, res, next) => {
+      const username = req.body.username;
+      const coverPhoto = req.file.key;
+      let returnedUser = null;
 
-    if (!coverPhoto) {
-      return res.status(500).json({
-        error: "Something went wrong when uploading cover image."
-      });
-    }
+      if (!coverPhoto) {
+        return new Error("Something went wrong when uploading cover image.");
+      }
 
-    return User.Model.findOne({ username: username })
-      .then((user) => {
-        if (!user) throw new Error(204);
-
-        returnedUser = user;
-        user.cover_photo_key = coverPhoto;
-
-        return returnedUser.save();
-      })
-      .then(() => res.status(200).send())
-      .catch(error => {
-        console.log(error);
-        if (error.status === 204) return res.status(204).json({ error: "No user found." })
-        return res.status(500).send();
-      })
-  })
+      return retrieveUserByUsername(username)
+        .then((user) => {
+          returnedUser = user;
+          user.cover_photo_key = coverPhoto;
+          return returnedUser.save();
+        })
+        .then(() => res.status(200).send())
+        .catch(next)
+    })
   .delete(
     validateBodyUsername,
     doesValidationErrorExist,
-    (req, res) => {
-    const username = req.body.username;
-    let returnedUser = null;
-    return User.Model.findOne({ username: username })
-      .then((user) => {
-        returnedUser = user;
-        if (!returnedUser.cover_photo_key || returnedUser.cover_photo_key === "")
-          return res.status(204).json("No Content");
-        return AWSConstants
-          .S3_INTERFACE
-          .deleteObject({
-            Bucket: AWSConstants.BUCKET_NAME,
-            Key: user.cover_photo_key,
-          }, function (error, data) {
-            console.log(error);
-            console.log(data);
-            if (error) {
-              console.log(error, error.stack);
-              throw new Error("Something went wrong while deleting the file from Amazon.", error)
-            };
-          })
-          .promise()
-          .then(() => {
-            returnedUser.cover_photo_key = "";
-            return returnedUser.save();
-          })
-          .then(() => (res.status(204).send()));
-      })
-      .catch((error) => {
-        console.log(error);
-        return res.status(500).json({ error: error })
-      });
-  });
+    (req, res, next) => {
+      const username = req.body.username;
+      let returnedUser = null;
+      return retrieveUserByUsername(username)
+        .then((user) => {
+          returnedUser = user;
+          if (!returnedUser.cover_photo_key || returnedUser.cover_photo_key === "")
+            return res.status(204).json("No Content");
+          return AWSConstants
+            .S3_INTERFACE
+            .deleteObject({
+              Bucket: AWSConstants.BUCKET_NAME,
+              Key: user.cover_photo_key,
+            }, function (error, data) {
+              console.log(error);
+              console.log(data);
+              if (error) {
+                console.log(error, error.stack);
+                throw new Error("Something went wrong while deleting the file from Amazon.", error)
+              };
+            })
+            .promise()
+            .then(() => {
+              returnedUser.cover_photo_key = "";
+              return returnedUser.save();
+            })
+            .then(() => (res.status(204).send()));
+        })
+        .catch(next);
+    });
 
 router.route('/multiple')
   .delete(
     validateBodyKeys,
     doesValidationErrorExist,
-    (req, res) => {
-    const photoKeys = req.body.keys;
-    let transformedKeys = [];
-    for (const key of photoKeys) {
-      transformedKeys.push({ Key: key })
-    }
-    return AWSConstants
-      .S3_INTERFACE
-      .deleteObjects({
-        Bucket: AWSConstants.BUCKET_NAME,
-        Delete: { Objects: transformedKeys }
-      }, function (error, data) {
-        if (error) {
-          console.log("Something bad happened");
-          console.log(error, error.stack);
-          throw new Error(error);
-        }
-        else { console.log("Success", data); }
-      })
-      .promise()
-      .then((result) => res.status(204).send())
-      .catch((error) => {
-        console.log(error);
-        return res.status(500).json({ error: error })
-      });
-  })
+    (req, res, next) => {
+      const photoKeys = req.body.keys;
+      let transformedKeys = [];
+      for (const key of photoKeys) {
+        transformedKeys.push({ Key: key })
+      }
+      return AWSConstants
+        .S3_INTERFACE
+        .deleteObjects({
+          Bucket: AWSConstants.BUCKET_NAME,
+          Delete: { Objects: transformedKeys }
+        }, function (error, data) {
+          if (error) {
+            console.log("Something bad happened");
+            console.log(error, error.stack);
+            throw new Error(error);
+          }
+          else { console.log("Success", data); }
+        })
+        .promise()
+        .then((result) => res.status(204).send())
+        .catch(next);
+    })
 
 const compressor = (req, res, next) => {
   console.log(req);

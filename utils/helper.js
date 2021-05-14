@@ -1,5 +1,5 @@
 let { NoContentError } = require("./errors");
-let { NO_USER_FOUND } = require('../constants/messages');
+let { NO_COMMENT_FOUND, NO_POST_FOUND, NO_USER_FOUND, NO_USER_PREVIEW_FOUND, NO_USER_RELATION_FOUND } = require('../constants/messages');
 
 const isEmpty = (...input) => {
     let testString = [...input];
@@ -19,17 +19,44 @@ const isEmpty = (...input) => {
 //     }
 // }
 
-const checkStringBoolean = (string) => string.trim().toLowerCase() === 'true'; 
+const checkStringBoolean = (string) => string.trim().toLowerCase() === 'true';
 
+const doesCommentExist = (result) => {
+    if (!result) {
+        throw new NoContentError(NO_COMMENT_FOUND);
+    };
+}
+
+const doesUserPreviewExist = (result) => {
+    if (!result) {
+        throw new NoContentError(NO_USER_PREVIEW_FOUND);
+    };
+}
+
+const doesUserRelationExist = (result) => {
+    if (!result) {
+        throw new NoContentError(NO_USER_RELATION_FOUND);
+    };
+}
 const doesUserExist = (result) => {
     if (!result) {
         throw new NoContentError(NO_USER_FOUND);
     };
 };
 
+const doesPostExist = (result) => {
+    if (!result) {
+        throw new NoContentError(NO_POST_FOUND);
+    };
+}
+
 module.exports = {
     checkStringBoolean,
     isEmpty,
-    doesUserExist
+    doesCommentExist,
+    doesPostExist,
+    doesUserExist,
+    doesUserPreviewExist,
+    doesUserRelationExist
     // validateUsername: validateUsername
 }

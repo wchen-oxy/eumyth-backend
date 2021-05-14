@@ -1,18 +1,21 @@
 const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
-const User = require('../../models/user.model');
-const IndexUser = require('../../models/index.user.model');
 const Post = require("../../models/post.model");
 const PostPreview = require("../../models/post.preview.model");
-const UserPreview = require("../../models/user.preview.model");
 const Comment = require("../../models/comment.model");
-const UserRelation = require('../../models/user.relation.model');
 const MulterHelper = require('../../constants/multer');
 const {
-  retrievePostInList,
-  retriveUserPreviewByUsername,
-  retrieveIndexUserByID
+  findPostInList,
+  retrieveUserPreviewByUsername,
+  retrieveIndexUserByID,
+  retrieveUserByID,
+  retrieveUserRelationByID,
+  findUserPreviewByIDList,
+  retrieveIndexUserByList,
+  deletePostByID,
+  deleteCommentsByID,
+  retrievePostByID
 } = require('../../data_access/dal');
 const RECENT_POSTS_LIMIT = 5;
 const { SHORT, LONG } = require("../../constants/flags");
@@ -37,8 +40,6 @@ const { checkStringBoolean } = require('../../utils/helper');
 const postImageFields = [
   { name: "images" },
   { name: "coverPhoto", maxCount: 1 }];
-
-
 
 const setRecentPosts = (post, inputRecentPosts) => {
   let newRecentPosts = inputRecentPosts;
@@ -116,7 +117,7 @@ const makeTextSnippet = (postType, isPaginated, textData) => {
 
 
 const findPosts = (postIDList, includePostText) => {
-  return retrievePostInList(postIDList)
+  return findPostInList(postIDList)
     .then(
       (results) => {
         let coverInfoArray = results;
@@ -166,7 +167,7 @@ const countComments = (postIDList) => {
 }
 
 const retrieveRelevantUserInfo = (req, res, next) => {
-  return retriveUserPreviewByUsername(req.body.username)
+  return retrieveUserPreviewByUsername(req.body.username)
     .then((resolvedUserPrevew) =>
       retrieveIndexUserByID(resolvedUserPrevew.parent_index_user_id))
     .then((result) => {
@@ -174,8 +175,9 @@ const retrieveRelevantUserInfo = (req, res, next) => {
     })
     .then(() =>
       Promise.all([
-        User.Model.findById(req.indexUser.user_profile_id),
-        UserRelation.Model.findById(req.indexUser.user_relation_id)])
+        retrieveUserByID(req.indexUser.user_profile_id),
+        retrieveUserRelationByID(req.indexUser.user_relation_id)
+      ])
     )
     .then((results) => {
       req.completeUser = results[0];
@@ -334,32 +336,19 @@ router.route('/').post(
     for (const user of req.userRelation.followers) {
       followersIDArray.push(user.user_preview_id);
     }
-    return UserPreview.Model.find({
-      '_id': { $in: followersIDArray }, function(error, docs) {
-        if (error) console.log(error);
-        else {
-          console.log(docs);
-        }
-      }
-    }).then((result) => {
-      if (result) {
-        let indexUserIDArray = []
-        for (const previewedUser of result) {
-          indexUserIDArray.push(previewedUser.parent_index_user_id);
-        }
-        return IndexUser.Model.find({
-          '_id': { $in: indexUserIDArray }, function(error, docs) {
-            if (error) console.log(error);
-            else {
-              console.log(docs);
-            }
+    return findUserPreviewByIDList(followersIDArray)
+      .then((result) => {
+        if (result) {
+          let indexUserIDArray = []
+          for (const previewedUser of result) {
+            indexUserIDArray.push(previewedUser.parent_index_user_id);
           }
-        });
-      }
-      else {
-        throw new Error(500);
-      }
-    })
+          return retrieveIndexUserByList(indexUserIDArray);
+        }
+        else {
+          throw new Error(500);
+        }
+      })
       .then(
         (userArray) => {
           const promisedUpdatedFollowerArray = userArray.map(
@@ -389,7 +378,7 @@ router.route('/').post(
     validateBodyIsPaginated,
     validateBodyRemoveCoverPhoto,
     doesValidationErrorExist,
-    (req, res) => {
+    (req, res, next) => {
       const postID = req.body.postID;
       const postType = req.body.postType;
       const username = req.body.username;
@@ -404,7 +393,7 @@ router.route('/').post(
       const minDuration = !!req.body.minDuration ? parseInt(req.body.minDuration) : null;
       const coverPhotoKey = req.file ? req.file.key : null;
       const removeCoverPhoto = checkStringBoolean(req.body.removeCoverPhoto);
-      return Post.Model.findById(postID)
+      return retrievePostByID(postID)
         .then(
           (result) => {
             let post = result;
@@ -432,40 +421,34 @@ router.route('/').post(
         .then(() => {
           return res.status(200).send();
         })
-        .catch(error => {
-          console.log(error);
-          return res.status(500).json({ error: error })
-        })
+        .catch(next)
     })
   .delete(
     validateBodyIndexUserID,
     validateBodyUserID,
     validateBodyPostID,
     doesValidationErrorExist,
-    (req, res) => {
+    (req, res, next) => {
       const indexUserID = req.body.indexUserID;
       const userID = req.body.userID;
       const postID = req.body.postID;
       let returnedUser = null;
-      const resolvedIndexUser = IndexUser.Model.findById(indexUserID)
-        .then((user) => {
-          if (!user) throw new Error(500, "no user found");
-          let updatedRecentPosts = [];
-          for (const post of user.recent_posts) {
-            if (post._id.toString() !== postID) {
-              updatedRecentPosts.unshift(post);
+      const resolvedIndexUser =
+        retrieveIndexUserByID(indexUserID)
+          .then((user) => {
+            let updatedRecentPosts = [];
+            for (const post of user.recent_posts) {
+              if (post._id.toString() !== postID) {
+                updatedRecentPosts.unshift(post);
+              }
             }
-          }
-          user.recent_posts = updatedRecentPosts;
-          return user.save();
-        })
-        .catch((error) => {
-          throw new Error(error, "Something went wrong resolving index user")
-        });
+            user.recent_posts = updatedRecentPosts;
+            return user.save();
+          })
+          .catch(next);
 
-      const resolvedUser = User.Model.findById(userID)
+      const resolvedUser = retrieveUserByID(userID)
         .then((user) => {
-          if (!user) throw new Error(500, "no user found");
           returnedUser = user;
           let updatedAllPosts = [];
           for (const post of user.all_posts) {
@@ -476,39 +459,26 @@ router.route('/').post(
           returnedUser.all_posts = updatedAllPosts;
           return returnedUser.save();
         })
-        .catch(
-          (error) => { throw new Error(error, "Something went wrong resolving user") }
-        );
+        .catch((error) => {
+          throw new Error(error, "Something went wrong resolving user")
+        });
 
       return Promise.all([resolvedIndexUser, resolvedUser, Post.Model.findById(postID)])
         .then((results) => {
           return Promise.all([
-            Post.Model.deleteOne({ _id: postID }),
-            Comment.Model.deleteMany({
-              _id: {
-                $in: results[2].comments
-              }
-            },
-              (err) => {
-                if (err) {
-                  throw new Error(500, err);
-                }
-              })
+            deletePostByID(postID),
+            deleteCommentsByID(results[2].comments)
           ])
         })
         .then(() => res.status(204).send())
-        .catch(error => {
-          console.log(error);
-          return res.status(500).json({ error: error });
-        }
-        );
+        .catch(next);
     });
 
 router.route('/multiple').get(
   validateQueryPostIDList,
   validateQueryIncludePostText,
   doesValidationErrorExist,
-  (req, res) => {
+  (req, res, next) => {
     const postIDList = req.query.postIDList;
     const includePostText = req.query.includePostText;
     return Promise.all([
@@ -529,20 +499,17 @@ router.route('/multiple').get(
         }
         return res.status(200).json({ posts: posts });
       })
-      .catch((error) => {
-        console.log(error);
-        return res.status(500).json({ error: error });
-      })
+      .catch(next)
   });
 
 router.route('/single').get(
   validateQueryTextOnly,
   validateQueryPostID,
   doesValidationErrorExist,
-  (req, res) => {
+  (req, res, next) => {
     const textOnly = req.query.textOnly.toUpperCase();
     const postID = req.query.postID;
-    return Post.Model.findById(postID)
+    return retrievePostByID(postID)
       .then(result => {
         if (textOnly === "TRUE") {
           return res.status(200).send(result.text_data);
@@ -551,14 +518,7 @@ router.route('/single').get(
           return res.status(200).send(result);
         }
       })
-      .catch(error => {
-        console.log(error);
-        if (error.name === 'CastError') {
-          return res.status(500).json({ error: "Malformed Object ID" });
-        }
-        return res.status(500).json({ error: "No Post Found" });
-      });
-
+      .catch(next);
   })
 
 router.route('/display-photo')
@@ -566,16 +526,13 @@ router.route('/display-photo')
     validateBodyUsername,
     validateBodyImageKey,
     doesValidationErrorExist,
-    (req, res) => {
+    (req, res, next) => {
       const username = req.body.username;
       const imageKey = req.body.imageKey;
-      return Post.Model.updateMany({ username: username }, { display_photo_key: imageKey })
+      return updatePostUserDisplayPhoto(username, imageKey)
         .then(() => {
           return res.status(200).send();
         })
-        .catch((error) => {
-          console.log(error);
-          return res.status(500).send();
-        })
+        .catch(next)
     })
 module.exports = router;
