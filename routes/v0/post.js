@@ -15,7 +15,8 @@ const {
   retrieveIndexUserByList,
   deletePostByID,
   deleteCommentsByID,
-  retrievePostByID
+  retrievePostByID,
+  updatePostUserDisplayPhoto
 } = require('../../data_access/dal');
 const RECENT_POSTS_LIMIT = 5;
 const { SHORT, LONG } = require("../../constants/flags");
@@ -50,6 +51,17 @@ const setRecentPosts = (post, inputRecentPosts) => {
   }
 
   return newRecentPosts;
+}
+
+const updateAllPostsInfo = (pursuits, pursuitCategory, minDuration, isMilestone) => {
+  if (!pursuitCategory) return;
+  for (const pursuit of pursuits) {
+    if (pursuit.name === pursuitCategory) {
+      if (isMilestone) { pursuit.num_milestones -= 1; }
+      if (minDuration) { pursuit.total_min -= pursuit.minDuration; }
+      pursuit.num_posts -= 1;
+    }
+  }
 }
 
 const setPursuitAttributes = (isMilestone, pursuit, minDuration, postID, date) => {
@@ -249,7 +261,7 @@ router.route('/').post(
     const displayPhoto = req.body.displayPhoto;
     const title = req.body.title ? req.body.title : null;
     const subtitle = req.body.subtitle ? req.body.subtitle : null;
-    const pursuitCategory = req.body.pursuitCategory ? req.body.pursuitCategory : null;
+    const pursuitCategory = req.body.pursuit ? req.body.pursuit : null;
     const date = req.body.date ? new Date(req.body.date) : null;
     const textData = req.body.textData ? req.body.textData : null;
     const minDuration = !!req.body.minDuration ? parseInt(req.body.minDuration) : null;
@@ -427,37 +439,43 @@ router.route('/').post(
     validateBodyIndexUserID,
     validateBodyUserID,
     validateBodyPostID,
+    validateBodyIsMilestone,
     doesValidationErrorExist,
     (req, res, next) => {
       const indexUserID = req.body.indexUserID;
       const userID = req.body.userID;
       const postID = req.body.postID;
-      let returnedUser = null;
+      const pursuitCategory = req.body.pursuit;
+      const minDuration = req.body.minDuration;
+      const isMilestone = checkStringBoolean(req.body.isMilestone);
       const resolvedIndexUser =
         retrieveIndexUserByID(indexUserID)
-          .then((user) => {
+          .then((indexUser) => {
             let updatedRecentPosts = [];
-            for (const post of user.recent_posts) {
+            for (const post of indexUser.recent_posts) {
               if (post._id.toString() !== postID) {
                 updatedRecentPosts.unshift(post);
               }
             }
-            user.recent_posts = updatedRecentPosts;
-            return user.save();
+            indexUser.recent_posts = updatedRecentPosts;
+            updateAllPostsInfo(indexUser.pursuits, pursuitCategory, minDuration, isMilestone)
+
+            return indexUser.save();
           })
           .catch(next);
 
       const resolvedUser = retrieveUserByID(userID)
         .then((user) => {
-          returnedUser = user;
           let updatedAllPosts = [];
           for (const post of user.all_posts) {
             if (post.toString() !== postID) {
               updatedAllPosts.unshift(post);
             }
           }
-          returnedUser.all_posts = updatedAllPosts;
-          return returnedUser.save();
+          user.all_posts = updatedAllPosts;
+          updateAllPostsInfo(user.pursuits, pursuitCategory, minDuration, isMilestone)
+
+          return user.save();
         })
         .catch((error) => {
           throw new Error(error, "Something went wrong resolving user")
@@ -465,6 +483,7 @@ router.route('/').post(
 
       return Promise.all([resolvedIndexUser, resolvedUser, Post.Model.findById(postID)])
         .then((results) => {
+          if (!results[2].comments) return deletePostByID(postID);
           return Promise.all([
             deletePostByID(postID),
             deleteCommentsByID(results[2].comments)

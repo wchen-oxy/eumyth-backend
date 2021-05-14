@@ -138,7 +138,8 @@ router.route('/')
     });
 
 router.route('/account-settings-info')
-  .get(validateQueryUsername,
+  .get(
+    validateQueryUsername,
     doesValidationErrorExist,
     (req, res, next) => {
       const username = req.query.username;
@@ -150,7 +151,7 @@ router.route('/account-settings-info')
               pursuit.meta_template : "";
           }
           return res.status(200).json({
-            _id: result.index_user_id,
+            _id: result._id,
             bio: result.bio,
             private: result.private,
             pursuits: pursuitsJSON,
@@ -194,22 +195,27 @@ router.route('/bio')
         })
         .catch(next)
     })
-  .put(validateBodyUsername, validateBodyBio, (req, res) => {
-    const username = req.body.username;
-    const bio = req.body.bio;
-    return Promise.all([
-      retrieveCompleteUserByUsername(username),
-      retrieveIndexUserByUsername(username)])
-      .then((results) => {
-        results[0].bio = bio;
-        results[1].bio = bio;
-        return Promise.all([
-          results[0].save(),
-          results[1].save()]);
-      })
-      .then(() => res.status(201).send())
-      .catch(next);
-  })
+  .put(
+    validateBodyUsername,
+    validateBodyBio,
+    doesValidationErrorExist,
+    (req, res, next) => {
+      const username = req.body.username;
+      const bio = req.body.bio;
+      console.log(req.body.username);
+      return Promise.all([
+        retrieveCompleteUserByUsername(username),
+        retrieveIndexUserByUsername(username)])
+        .then((results) => {
+          results[0].bio = bio;
+          results[1].bio = bio;
+          return Promise.all([
+            results[0].save(),
+            results[1].save()]);
+        })
+        .then(() => res.status(201).send())
+        .catch(next);
+    })
 
 router.route('/private')
   .put(validateBodyUsername,

@@ -1,7 +1,8 @@
 const { doesCommentExist,
     doesUserExist,
     doesUserPreviewExist,
-    doesPostExist } = require("../utils/helper");
+    doesPostExist, 
+    doesUserRelationExist} = require("../utils/helper");
 const IndexUser = require('../models/index.user.model');
 const User = require('../models/user.model');
 const Post = require('../models/post.model');
@@ -123,7 +124,7 @@ const retrieveUserByID = (userID) => {
 
 
 const retrieveUserByUsername = (username) => {
-    return User.Model.findById(username)
+    return User.Model.findOne({ username: username })
         .then(result => {
             doesUserExist(result);
             return result;
