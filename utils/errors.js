@@ -12,6 +12,13 @@ class NoContentError extends Error {
     }
 }
 
+class TypeError extends Error {
+    constructor(error) {
+        super(error);
+        this.statusCode = 500;
+    }
+}
+
 class OperationalError extends Error {
     constructor(error) {
         super(error);
@@ -22,5 +29,6 @@ class OperationalError extends Error {
 module.exports = {
     BadRequestError: BadRequestError,
     NoContentError: NoContentError,
-    OperationalError: OperationalError
+    OperationalError: OperationalError,
+    TypeError: TypeError
 };

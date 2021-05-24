@@ -310,7 +310,7 @@ router.route('/').post(
       insertIntoDatedPosts(user.dated_posts, post._id, date);
     }
     else {
-      user.undated_posts.unshift(post._id);
+      throw new BadRequestError(NO_DATE_FOUND)
     }
 
     if (pursuitCategory) {
@@ -321,12 +321,14 @@ router.route('/').post(
         }
       }
     }
-    const savedIndexUser = indexUser.save().catch(error => {
-      if (error) {
-        console.log(error);
-        res.status(500).json('Error: ' + error);
-      }
-    });
+    const savedIndexUser = indexUser
+      .save()
+      .catch(error => {
+        if (error) {
+          console.log(error);
+          res.status(500).json('Error: ' + error);
+        }
+      });
     const savedUser = user.save().catch(error => {
       if (error) {
         console.log(error);
@@ -442,6 +444,7 @@ router.route('/').post(
     validateBodyIsMilestone,
     doesValidationErrorExist,
     (req, res, next) => {
+      console.log(req.body.isMilestone)
       const indexUserID = req.body.indexUserID;
       const userID = req.body.userID;
       const postID = req.body.postID;
@@ -483,7 +486,8 @@ router.route('/').post(
 
       return Promise.all([resolvedIndexUser, resolvedUser, Post.Model.findById(postID)])
         .then((results) => {
-          if (!results[2].comments) return deletePostByID(postID);
+          console.log(results[2]);
+          if (results[2].comments.length === 0) return deletePostByID(postID);
           return Promise.all([
             deletePostByID(postID),
             deleteCommentsByID(results[2].comments)

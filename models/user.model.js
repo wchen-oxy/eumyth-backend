@@ -77,10 +77,6 @@ const UserSchema = new Schema({
     type: [PostPreview.Schema]
   },
 
-  undated_posts: {
-    type: [mongoose.Types.ObjectId]
-  }
-
 }, {
   timestamps: true,
 });

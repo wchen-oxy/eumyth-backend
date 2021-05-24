@@ -1,5 +1,5 @@
-let { NoContentError } = require("./errors");
-let { NO_COMMENT_FOUND, NO_POST_FOUND, NO_USER_FOUND, NO_USER_PREVIEW_FOUND, NO_USER_RELATION_FOUND } = require('../constants/messages');
+let { NoContentError, TypeError } = require("./errors");
+let { NO_COMMENT_FOUND, NO_POST_FOUND, NO_USER_FOUND, NO_USER_PREVIEW_FOUND, NO_USER_RELATION_FOUND, WRONG_TYPE } = require('../constants/messages');
 
 const isEmpty = (...input) => {
     let testString = [...input];
@@ -19,7 +19,17 @@ const isEmpty = (...input) => {
 //     }
 // }
 
-const checkStringBoolean = (string) => string.trim().toLowerCase() === 'true';
+const checkStringBoolean = (string) => {
+    if (typeof string === 'string' || string instanceof String) {
+        return string.trim().toLowerCase() === 'true'
+    }
+    else if (typeof string === 'boolean' || string instanceof Boolean) {
+        return string;
+    }
+    else {
+        return new TypeError(WRONG_TYPE);
+    }
+}
 
 const doesCommentExist = (result) => {
     if (!result) {

@@ -3,6 +3,7 @@ const { doesCommentExist,
     doesUserPreviewExist,
     doesPostExist, 
     doesUserRelationExist} = require("../utils/helper");
+const Comment = require('../models/comment.model');
 const IndexUser = require('../models/index.user.model');
 const User = require('../models/user.model');
 const Post = require('../models/post.model');
