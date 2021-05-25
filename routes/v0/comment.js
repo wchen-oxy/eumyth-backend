@@ -210,8 +210,6 @@ const returnExpandedComments = (rootCommentIDArray) => {
         });
 }
 
-
-
 const removeVote = (array, voteID) => {
     let index = array.indexOf(voteID);
     if (index > -1) {

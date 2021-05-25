@@ -18,6 +18,10 @@ const PostSchema = new Schema({
     type: Date
   },
 
+  difficulty: {
+    type: Number,
+  },
+
   subtitle: {
     type: String,
     required: false,

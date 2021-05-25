@@ -10,7 +10,7 @@ router.route("/id").get(
         const username = req.query.username;
         return retrieveUserPreviewByUsername(username)
             .then(result => {
-                return res.status(200).json({ userPreviewId: result._id });
+                return res.status(200).json({ userPreviewID: result._id });
             })
             .catch((error) => {
                 console.log(error);

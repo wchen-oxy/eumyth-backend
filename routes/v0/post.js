@@ -201,7 +201,7 @@ const retrieveRelevantUserInfo = (req, res, next) => {
 
 const createPost = (postType, username, title, subtitle, postPrivacyType, date, authorID,
   pursuitCategory, displayPhoto, coverPhotoKey, postFormat, isPaginated, isMilestone,
-  imageData, textSnippet, textData, minDuration) => {
+  imageData, textSnippet, textData, minDuration, difficulty) => {
   switch (postType) {
     case (SHORT):
       return new Post.Model({
@@ -219,7 +219,8 @@ const createPost = (postType, username, title, subtitle, postPrivacyType, date, 
         image_data: imageData,
         text_snippet: textSnippet,
         text_data: textData,
-        min_duration: minDuration
+        min_duration: minDuration,
+        difficulty: difficulty
       });
     case (LONG):
       return new Post.Model({
@@ -236,7 +237,8 @@ const createPost = (postType, username, title, subtitle, postPrivacyType, date, 
         is_milestone: isMilestone,
         text_snippet: textSnippet,
         text_data: textData,
-        min_duration: minDuration
+        min_duration: minDuration,
+        difficulty: difficulty
       });
     default:
       throw new Error("No post type matched.");
@@ -259,6 +261,7 @@ router.route('/').post(
     const isMilestone = checkStringBoolean(req.body.isMilestone);
     const isPaginated = checkStringBoolean(req.body.isPaginated);
     const displayPhoto = req.body.displayPhoto;
+    const difficulty = req.body.difficulty ? req.body.difficulty : null;
     const title = req.body.title ? req.body.title : null;
     const subtitle = req.body.subtitle ? req.body.subtitle : null;
     const pursuitCategory = req.body.pursuit ? req.body.pursuit : null;
@@ -286,7 +289,8 @@ router.route('/').post(
       imageData,
       textSnippet,
       textData,
-      minDuration
+      minDuration,
+      difficulty
     );
 
     if (indexUser.preferred_post_privacy !== postPrivacyType) {
@@ -398,6 +402,7 @@ router.route('/').post(
       const username = req.body.username;
       const isMilestone = checkStringBoolean(req.body.isMilestone);
       const isPaginated = checkStringBoolean(req.body.isPaginated);
+      const difficulty = req.body.difficulty ? req.body.difficulty : null;
       const postPrivacyType = req.body.postPrivacyType ? req.body.postPrivacyType : null;
       const title = !!req.body.title ? req.body.title : null;
       const subtitle = !!req.body.subtitle ? req.body.subtitle : null;
@@ -420,6 +425,7 @@ router.route('/').post(
             else if (coverPhotoKey) {
               post.cover_photo_key = coverPhotoKey;
             }
+            post.difficulty = difficulty;
             post.username = username;
             post.title = title;
             post.subtitle = subtitle;
@@ -444,7 +450,6 @@ router.route('/').post(
     validateBodyIsMilestone,
     doesValidationErrorExist,
     (req, res, next) => {
-      console.log(req.body.isMilestone)
       const indexUserID = req.body.indexUserID;
       const userID = req.body.userID;
       const postID = req.body.postID;
