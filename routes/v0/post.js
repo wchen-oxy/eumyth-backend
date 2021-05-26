@@ -35,6 +35,7 @@ const { validateBodyUsername,
   validateQueryPostIDList,
   doesValidationErrorExist,
   validateBodyRemoveCoverPhoto,
+  validateBodyProgression,
 } = require('../../utils/validators');
 const { checkStringBoolean } = require('../../utils/helper');
 
@@ -64,8 +65,8 @@ const updateAllPostsInfo = (pursuits, pursuitCategory, minDuration, isMilestone)
   }
 }
 
-const setPursuitAttributes = (isMilestone, pursuit, minDuration, postID, date) => {
-  if (isMilestone) {
+const setPursuitAttributes = (progression, pursuit, minDuration, postID, date) => {
+  if (progression === 2) {
     pursuit.num_milestones = Number(pursuit.num_milestones) + 1;
   }
 
@@ -200,7 +201,7 @@ const retrieveRelevantUserInfo = (req, res, next) => {
 };
 
 const createPost = (postType, username, title, subtitle, postPrivacyType, date, authorID,
-  pursuitCategory, displayPhoto, coverPhotoKey, postFormat, isPaginated, isMilestone,
+  pursuitCategory, displayPhoto, coverPhotoKey, postFormat, isPaginated, progression,
   imageData, textSnippet, textData, minDuration, difficulty) => {
   switch (postType) {
     case (SHORT):
@@ -215,7 +216,7 @@ const createPost = (postType, username, title, subtitle, postPrivacyType, date, 
         cover_photo_key: coverPhotoKey,
         post_format: postFormat,
         is_paginated: isPaginated,
-        is_milestone: isMilestone,
+        progression: progression,
         image_data: imageData,
         text_snippet: textSnippet,
         text_data: textData,
@@ -234,7 +235,7 @@ const createPost = (postType, username, title, subtitle, postPrivacyType, date, 
         cover_photo_key: coverPhotoKey,
         post_format: postFormat,
         is_paginated: isPaginated,
-        is_milestone: isMilestone,
+        progression: progression,
         text_snippet: textSnippet,
         text_data: textData,
         min_duration: minDuration,
@@ -250,7 +251,7 @@ router.route('/').post(
   validateBodyUsername,
   validateBodyPostPrivacy,
   validateBodyPostType,
-  validateBodyIsMilestone,
+  validateBodyProgression,
   validateBodyIsPaginated,
   doesValidationErrorExist,
   retrieveRelevantUserInfo,
@@ -258,7 +259,7 @@ router.route('/').post(
     const postType = req.body.postType;
     const username = req.body.username;
     const postPrivacyType = req.body.postPrivacyType;
-    const isMilestone = checkStringBoolean(req.body.isMilestone);
+    const progression = req.body.progression;
     const isPaginated = checkStringBoolean(req.body.isPaginated);
     const displayPhoto = req.body.displayPhoto;
     const difficulty = req.body.difficulty ? req.body.difficulty : null;
@@ -285,7 +286,7 @@ router.route('/').post(
       coverPhotoKey,
       postType,
       isPaginated,
-      isMilestone,
+      progression,
       imageData,
       textSnippet,
       textData,
@@ -300,7 +301,7 @@ router.route('/').post(
     if (minDuration) {
       for (const pursuit of indexUser.pursuits) {
         if (pursuit.name === pursuitCategory) {
-          setPursuitAttributes(isMilestone, pursuit, minDuration);
+          setPursuitAttributes(progression, pursuit, minDuration);
           break;
         }
       }
@@ -320,7 +321,7 @@ router.route('/').post(
     if (pursuitCategory) {
       for (const pursuit of user.pursuits) {
         if (pursuit.name === pursuitCategory) {
-          setPursuitAttributes(isMilestone, pursuit, minDuration, post._id, date);
+          setPursuitAttributes(progression, pursuit, minDuration, post._id, date);
           break;
         }
       }
@@ -392,7 +393,7 @@ router.route('/').post(
     validateBodyPostID,
     validateBodyUsername,
     validateBodyPostType,
-    validateBodyIsMilestone,
+    validateBodyProgression,
     validateBodyIsPaginated,
     validateBodyRemoveCoverPhoto,
     doesValidationErrorExist,
@@ -400,7 +401,7 @@ router.route('/').post(
       const postID = req.body.postID;
       const postType = req.body.postType;
       const username = req.body.username;
-      const isMilestone = checkStringBoolean(req.body.isMilestone);
+      const progression = checkStringBoolean(req.body.progression);
       const isPaginated = checkStringBoolean(req.body.isPaginated);
       const difficulty = req.body.difficulty ? req.body.difficulty : null;
       const postPrivacyType = req.body.postPrivacyType ? req.body.postPrivacyType : null;
@@ -432,7 +433,7 @@ router.route('/').post(
             post.pursuit_category = pursuitCategory;
             post.date = date;
             post.min_duration = minDuration;
-            post.is_milestone = isMilestone;
+            post.progression = progression;
             post.is_paginated = isPaginated;
             post.text_data = textData;
             post.text_snippet = textData ? makeTextSnippet(postType, isPaginated, textData) : null;
@@ -447,7 +448,7 @@ router.route('/').post(
     validateBodyIndexUserID,
     validateBodyUserID,
     validateBodyPostID,
-    validateBodyIsMilestone,
+    validateBodyProgression,
     doesValidationErrorExist,
     (req, res, next) => {
       const indexUserID = req.body.indexUserID;
@@ -455,7 +456,7 @@ router.route('/').post(
       const postID = req.body.postID;
       const pursuitCategory = req.body.pursuit;
       const minDuration = req.body.minDuration;
-      const isMilestone = checkStringBoolean(req.body.isMilestone);
+      const progression = (req.body.progression === 2);
       const resolvedIndexUser =
         retrieveIndexUserByID(indexUserID)
           .then((indexUser) => {
@@ -466,7 +467,7 @@ router.route('/').post(
               }
             }
             indexUser.recent_posts = updatedRecentPosts;
-            updateAllPostsInfo(indexUser.pursuits, pursuitCategory, minDuration, isMilestone)
+            updateAllPostsInfo(indexUser.pursuits, pursuitCategory, minDuration, progression)
 
             return indexUser.save();
           })
@@ -481,7 +482,7 @@ router.route('/').post(
             }
           }
           user.all_posts = updatedAllPosts;
-          updateAllPostsInfo(user.pursuits, pursuitCategory, minDuration, isMilestone)
+          updateAllPostsInfo(user.pursuits, pursuitCategory, minDuration, progression)
 
           return user.save();
         })

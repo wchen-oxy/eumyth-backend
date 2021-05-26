@@ -37,12 +37,11 @@ router.route('/')
     .put(
         validateBodyUsername,
         validateBodyDraft,
-        validateBodyDraftTitle,
         doesValidationErrorExist,
         (req, res, next) => {
             const username = req.body.username;
             const draft = req.body.draft;
-            const draftTitle = req.body.draftTitle;
+            const draftTitle = req.body.draftTitle ? req.body.draftTitle : null;
             const parsedDraft = JSON.parse(draft).blocks;
 
             return retrieveIndexUserByUsername(username)

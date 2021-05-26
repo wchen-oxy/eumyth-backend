@@ -278,7 +278,6 @@ router.route('/root')
     .post(
         validateBodyPostID,
         validateBodyProfilePreviewID,
-        validateBodyComment,
         doesValidationErrorExist,
         (req, res, next) => {
             const postID = req.body.postID;

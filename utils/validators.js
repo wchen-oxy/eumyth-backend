@@ -83,7 +83,7 @@ const validateBodyCompressedImageSet = [
 const validateBodyID = [body('ID').exists()];
 const validateBodyPostID = [body('postID').exists()];
 const validateBodyRemoveCoverPhoto = [body('removeCoverPhoto').exists()];
-const validateBodyIsMilestone = [body('isMilestone').exists()];
+const validateBodyProgression = [body('progression').exists()];
 const validateBodyIsPaginated = [body('isPaginated').exists()];
 const validateBodyIsPrivate = [body('IsPrivate').exists()];
 
@@ -120,8 +120,8 @@ module.exports = {
     validateBodyID,
     validateBodyPostID,
     validateBodyRemoveCoverPhoto,
-    validateBodyIsMilestone,
     validateBodyIsPaginated,
+    validateBodyProgression,
     validateBodyPursuitArray,
     validateBodyPostPrivacy,
     validateBodyIsPrivate,
