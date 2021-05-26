@@ -91,7 +91,7 @@ router.route('/')
       const newIndexUser = new IndexUser.Model({
         username: username,
         user_profile_id: newUser._id,
-        preferredPostType: "public-feed",
+        preferred_post_privacy: "public-feed",
         cropped_display_photo_key: croppedImage,
         small_cropped_display_photo_key: smallCroppedImage,
         tiny_cropped_display_photo_key: tinyCroppedImage,

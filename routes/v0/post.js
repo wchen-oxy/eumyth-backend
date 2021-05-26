@@ -18,12 +18,13 @@ const {
   retrievePostByID,
   updatePostUserDisplayPhoto
 } = require('../../data_access/dal');
+
+const { BadRequestError } = require("../../utils/errors");
 const RECENT_POSTS_LIMIT = 5;
 const { SHORT, LONG } = require("../../constants/flags");
 const { validateBodyUsername,
   validateBodyPostPrivacy,
   validateBodyPostType,
-  validateBodyIsMilestone,
   validateBodyIsPaginated,
   validateBodyPostID,
   validateBodyIndexUserID,
