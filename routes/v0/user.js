@@ -22,6 +22,7 @@ const {
   validateBodyBio,
   validateBodyPursuitArray
 } = require("../../utils/validators");
+const { PUBLIC_FEED } = require('../../constants/flags');
 
 const imageFields = [
   { name: "croppedImage" },
@@ -91,7 +92,7 @@ router.route('/')
       const newIndexUser = new IndexUser.Model({
         username: username,
         user_profile_id: newUser._id,
-        preferred_post_privacy: "public-feed",
+        preferred_post_privacy: PUBLIC_FEED,
         cropped_display_photo_key: croppedImage,
         small_cropped_display_photo_key: smallCroppedImage,
         tiny_cropped_display_photo_key: tinyCroppedImage,

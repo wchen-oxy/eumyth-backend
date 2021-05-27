@@ -3,11 +3,11 @@ const LONG = "LONG";
 
 //API FIELDS
 const USERNAME = 'username';
-
+const PUBLIC_FEED = "PUBLIC_FEED";
 
 module.exports = {
-    SHORT: SHORT,
-    LONG: LONG,
-
-    USERNAME: USERNAME
+    SHORT,
+    LONG,
+    PUBLIC_FEED,
+    USERNAME
 }
