@@ -48,6 +48,12 @@ const PostSchema = new Schema({
     required: false,
   },
 
+  progression: {
+    type: String,
+    required: false,
+    trim: true
+  },
+
   pursuit_category: {
     type: String,
     required: false,
