@@ -1,5 +1,4 @@
-const postPreview = require('./post.preview.model');
-const Project = require('./project.model');
+const ContentPreview = require('./content.preview.model');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
@@ -30,34 +29,20 @@ const PursuitSchema = new Schema({
     type: Number,
     required: false,
   },
-  num_posts: {
-    type: Number,
-    required: false
-  },
 
   num_milestones: {
     type: Number,
     required: false
   },
 
-  all_posts: {
-    type: [mongoose.Types.ObjectId]
-  },
-
-  dated_posts: {
-    type: [postPreview.Schema]
-  },
-
-  undated_posts: {
-    type: [mongoose.Types.ObjectId]
+  posts: {
+    type: [ContentPreview.Schema]
   },
 
   projects: {
-    type: [mongoose.Types.ObjectId]
-  }
+    type: [ContentPreview.Schema]
+  },
 
-}, {
-  timestamps: true,
 });
 
 const PursuitModel = mongoose.model('pursuit', PursuitSchema);

@@ -20,6 +20,7 @@ const PostSchema = new Schema({
 
   difficulty: {
     type: Number,
+    required: false,
   },
 
   subtitle: {

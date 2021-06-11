@@ -55,10 +55,15 @@ router.route('/').post(
             retrieveIndexUserByID(indexUserID)
                 .then(result => {
                     let user = result;
-                    for (const pursuit of user.pursuits) {
-                        if (pursuit.name === newProject.pursuit) {
-                            pursuit.num_projects++;
+                    if (pursuit) {
+                        for (const pursuit of user.pursuits) {
+                            if (pursuit.name === newProject.pursuit) {
+                                pursuit.num_projects++;
+                            }
                         }
+                    }
+                    else {
+                        user.pursuits[0].num_projects++;
                     }
 
                     return user;
@@ -68,6 +73,7 @@ router.route('/').post(
             retrieveUserByID(userID)
                 .then((result => {
                     let user = result;
+                    user.all_projects.unshift(newProject._id);
                     for (const pursuit of user.pursuits) {
                         if (pursuit.name === newProject.pursuit) {
                             pursuit.projects.unshift(newProject._id);
@@ -100,7 +106,7 @@ router.route('/multiple').get(
             .then(
                 (results) => {
                     console.log(results);
-                    return res.status(200).send(results);
+                    return res.status(200).json({ projects: results });
                 }
             )
             .catch(next)

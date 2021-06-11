@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
 const Post = require("../../models/post.model");
-const PostPreview = require("../../models/post.preview.model");
+const ContentPreview = require("../../models/content.preview.model");
 const Comment = require("../../models/comment.model");
 const MulterHelper = require('../../constants/multer');
 const {
@@ -85,7 +85,7 @@ const setPursuitAttributes = (progression, pursuit, minDuration, postID, date) =
 }
 
 const insertIntoDatedPosts = (datedPosts, postID, date) => {
-  datedPosts.unshift(new PostPreview.Model({
+  datedPosts.unshift(new ContentPreview.Model({
     post_id: postID,
     date: date
   }));
@@ -527,7 +527,10 @@ router.route('/multiple').get(
             post.comment_count = 0;
           }
         }
-        return res.status(200).json({ posts: posts });
+        return res.status(200).json({
+          posts: posts,
+          isMissingPosts: posts.length !== postIDList.length ? true : false
+        });
       })
       .catch(next)
   });

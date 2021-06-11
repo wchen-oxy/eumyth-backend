@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 const Pursuits = require('./pursuit.model');
 const Post = require('./post.model');
 const Project = require('./project.model');
-const PostPreview = require('./post.preview.model');
-const userPreview = require('./user.preview.model');
+const ContentPreview = require('./content.preview.model');
+const UserPreview = require('./user.preview.model');
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
@@ -63,7 +63,7 @@ const UserSchema = new Schema({
     trim: true
   },
 
-  requests: [userPreview.Schema],
+  requests: [UserPreview.Schema],
 
   pinned_posts: [Post.Schema],
 
@@ -71,10 +71,12 @@ const UserSchema = new Schema({
 
   pursuits: [Pursuits.Schema],
 
-  all_posts: [mongoose.Types.ObjectId], //all posts including the most recent posts. ID only
+  posts: {
+    type: [ContentPreview.Schema]
+  }, //all posts including the most recent posts. ID only
 
-  dated_posts: {
-    type: [PostPreview.Schema]
+  projects: {
+    type: [ContentPreview.Schema]
   },
 
 }, {

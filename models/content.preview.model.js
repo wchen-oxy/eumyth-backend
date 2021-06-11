@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const PostPreviewSchema = new Schema({
+const ContentPreviewSchema = new Schema({
   _id: false,
 
   post_id: {
@@ -21,11 +21,15 @@ const PostPreviewSchema = new Schema({
     type: mongoose.Types.ObjectId
   }
 
-});
+},
+  {
+    timestamps: true,
+  }
+);
 
-const PostPreviewModel = mongoose.model('post_preview', PostPreviewSchema);
+const ContentPreviewModel = mongoose.model('content_preview', ContentPreviewSchema);
 
 module.exports = {
-  Schema: PostPreviewSchema,
-  Model: PostPreviewModel
+  Schema: ContentPreviewSchema,
+  Model: ContentPreviewModel
 }
