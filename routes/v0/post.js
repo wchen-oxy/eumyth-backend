@@ -44,9 +44,9 @@ const postImageFields = [
   { name: "images" },
   { name: "coverPhoto", maxCount: 1 }];
 
-const updatePostLists = (post, user, indexUser, date) => {
-  setRecentPosts(post, indexUser.recent_posts);
-
+const updatePostLists = (post, userAllPosts, recentPosts) => {
+  setRecentPosts(post, recentPosts);
+  insertAndSortIntoList(userAllPosts, createContentPreview(post._id, post.date));
 }
 
 const setRecentPosts = (post, inputRecentPosts) => {
@@ -79,22 +79,25 @@ const createContentPreview = (postID, date, labels, branch) => (
 );
 
 const insertAndSortIntoList = (postList, postPreview) => {
+  console.log("insertandsort");
+  console.log(postList);
   postList.unshift(postPreview);
-
   if (postList.length > 1) {
-    if (!b.date && !a.date) {
-      postList.sort((a, b) => b.createdAt - a.createdAt);
-    }
-    else if (!b.date) {
-      postList.sort((a, b) => b.createdAt - a.date);
-    }
+    postList.sort((a, b) => {
+      if (!b.date && !a.date) {
+        b.createdAt - a.createdAt;
+      }
+      else if (!b.date) {
+        postList.sort((a, b) => b.createdAt - a.date);
+      }
+      else if (!a.date) {
+        postList.sort((a, b) => b.date - a.createdAt);
+      }
+      else {
+        postList.sort((a, b) => b.date - a.date);
+      }
 
-    else if (!a.date) {
-      postList.sort((a, b) => b.date - a.createdAt);
-    }
-    else {
-      postList.sort((a, b) => b.date - a.date);
-    }
+    });
   }
 
   return postList;
@@ -107,7 +110,7 @@ const setPursuitAttributes = (isIndexUser, progression, pursuit, minDuration, po
   if (progression === 2) {
     pursuit.num_milestones = Number(pursuit.num_milestones) + 1;
   }
-
+  console.log("SEtPursuitAttributes");
   insertAndSortIntoList(pursuit.posts, createContentPreview(postID, date));
   pursuit.total_min = Number(pursuit.total_min) + minDuration;
 
@@ -313,11 +316,10 @@ router.route('/').post(
       minDuration,
       difficulty
     );
+    console.log("ASDFASDF");
+    updatePostLists(post, user.posts, indexUser.recent_posts);
+    console.log("322", user.posts);
 
-
-    updatePostLists(post, user, indexUser, date);
-    user.posts.unshift(post._id);
-    insertAndSortIntoList(user.posts, createContentPreview(post._id, date));
 
     if (minDuration) {
       for (const pursuit of indexUser.pursuits) {
@@ -336,8 +338,6 @@ router.route('/').post(
         }
       }
     }
-
-
 
     if (indexUser.preferred_post_privacy !== postPrivacyType) {
       indexUser.preferred_post_privacy = postPrivacyType;

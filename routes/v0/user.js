@@ -106,7 +106,13 @@ router.route('/')
           small_cropped_display_photo_key: smallCroppedImage,
           tiny_cropped_display_photo_key: tinyCroppedImage,
           pursuits: mainPursuitsHolder,
-          private: false
+          private: false,
+          posts: [],
+          projects: [],
+          pinned_posts: [],
+          pinned_projects: [],
+          pursuits: [],
+          requests: []
         });
 
       const newIndexUser = new IndexUser.Model({
@@ -121,7 +127,10 @@ router.route('/')
           text: null,
           links: []
         }),
-        pursuits: indexPursuitsHolder
+        notifications: [],
+        pursuits: indexPursuitsHolder,
+        following_feed: [],
+        recent_posts: [],
       });
 
       const newUserRelation = new UserRelation.Model({
