@@ -55,7 +55,28 @@ router.route('/')
       let mainPursuitsHolder = [];
       let indexPursuitsHolder = [];
 
+      mainPursuitsHolder.push(
+        new Pursuit.Model({
+          name: "ALL",
+          display_photo_key: null,
+          private: false,
+          total_min: 0,
+          num_milestones: 0,
+        }));
+
+
+      indexPursuitsHolder.push(
+        new IndexPursuit.Model({
+          name: "ALL",
+          num_posts: 0,
+          num_milestones: 0,
+          num_projects: 0,
+          total_min: 0,
+        })
+      );
+
       for (const pursuit of pursuitsArray) {
+
         mainPursuitsHolder.push(
           new Pursuit.Model({
             name: pursuit.name,
@@ -63,7 +84,6 @@ router.route('/')
             private: false,
             experience_level: pursuit.experience,
             total_min: 0,
-            num_posts: 0,
             num_milestones: 0,
           }));
 
@@ -203,7 +223,6 @@ router.route('/bio')
     (req, res, next) => {
       const username = req.body.username;
       const bio = req.body.bio;
-      console.log(req.body.username);
       return Promise.all([
         retrieveCompleteUserByUsername(username),
         retrieveIndexUserByUsername(username)])

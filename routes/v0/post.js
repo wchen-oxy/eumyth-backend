@@ -44,6 +44,11 @@ const postImageFields = [
   { name: "images" },
   { name: "coverPhoto", maxCount: 1 }];
 
+const updatePostLists = (post, user, indexUser, date) => {
+  setRecentPosts(post, indexUser.recent_posts);
+
+}
+
 const setRecentPosts = (post, inputRecentPosts) => {
   let newRecentPosts = inputRecentPosts;
   newRecentPosts.unshift(post);
@@ -51,51 +56,63 @@ const setRecentPosts = (post, inputRecentPosts) => {
   if (newRecentPosts.length > RECENT_POSTS_LIMIT) {
     newRecentPosts.pop();
   }
-
-  return newRecentPosts;
 }
 
-const updateAllPostsInfo = (pursuits, pursuitCategory, minDuration, isMilestone) => {
+const updateAllPostsInfo = (pursuits, pursuitCategory, minDuration, isMilestone, isIndexUser) => {
   if (!pursuitCategory) return;
   for (const pursuit of pursuits) {
     if (pursuit.name === pursuitCategory) {
       if (isMilestone) { pursuit.num_milestones -= 1; }
       if (minDuration) { pursuit.total_min -= pursuit.minDuration; }
-      pursuit.num_posts -= 1;
+      if (isIndexUser) { pursuit.num_posts -= 1; }
     }
   }
 }
 
-const setPursuitAttributes = (progression, pursuit, minDuration, postID, date) => {
+const createContentPreview = (postID, date, labels, branch) => (
+  new ContentPreview.Model({
+    post_id: postID,
+    date: date,
+    labels: labels,
+    branch: branch,
+  })
+);
+
+const insertAndSortIntoList = (postList, postPreview) => {
+  postList.unshift(postPreview);
+
+  if (postList.length > 1) {
+    if (!b.date && !a.date) {
+      postList.sort((a, b) => b.createdAt - a.createdAt);
+    }
+    else if (!b.date) {
+      postList.sort((a, b) => b.createdAt - a.date);
+    }
+
+    else if (!a.date) {
+      postList.sort((a, b) => b.date - a.createdAt);
+    }
+    else {
+      postList.sort((a, b) => b.date - a.date);
+    }
+  }
+
+  return postList;
+}
+
+const setPursuitAttributes = (isIndexUser, progression, pursuit, minDuration, postID, date) => {
+  if (isIndexUser) {
+    pursuit.num_posts = Number(pursuit.num_posts) + 1;
+  }
   if (progression === 2) {
     pursuit.num_milestones = Number(pursuit.num_milestones) + 1;
   }
 
-  if (postID) {
-    date ? (
-      insertIntoDatedPosts(pursuit.dated_posts, postID, date))
-      :
-      (pursuit.undated_posts.unshift(postID));
-
-    pursuit.all_posts.unshift(postID);
-  }
-
+  insertAndSortIntoList(pursuit.posts, createContentPreview(postID, date));
   pursuit.total_min = Number(pursuit.total_min) + minDuration;
-  pursuit.num_posts = Number(pursuit.num_posts) + 1;
+
 }
 
-const insertIntoDatedPosts = (datedPosts, postID, date) => {
-  datedPosts.unshift(new ContentPreview.Model({
-    post_id: postID,
-    date: date
-  }));
-
-  if (datedPosts.length > 1) {
-    datedPosts.sort((a, b) => b.date - a.date);
-  }
-
-  return datedPosts;
-}
 
 const getImageUrls = (array) => {
   let imageArray = [];
@@ -274,6 +291,8 @@ router.route('/').post(
     const imageData = req.files && req.files.images ? getImageUrls(req.files.images) : [];
     const textSnippet = textData ? makeTextSnippet(postType, isPaginated, textData) : null;
     const indexUser = req.indexUser;
+    const user = req.completeUser;
+
     let post = createPost(
       postType,
       username,
@@ -295,38 +314,35 @@ router.route('/').post(
       difficulty
     );
 
-    if (indexUser.preferred_post_privacy !== postPrivacyType) {
-      indexUser.preferred_post_privacy = postPrivacyType;
-    }
+
+    updatePostLists(post, user, indexUser, date);
+    user.posts.unshift(post._id);
+    insertAndSortIntoList(user.posts, createContentPreview(post._id, date));
 
     if (minDuration) {
       for (const pursuit of indexUser.pursuits) {
         if (pursuit.name === pursuitCategory) {
-          setPursuitAttributes(progression, pursuit, minDuration);
+          setPursuitAttributes(true, progression, pursuit, minDuration);
           break;
         }
       }
-    }
-
-    indexUser.recent_posts = setRecentPosts(post, indexUser.recent_posts);
-
-    const user = req.completeUser;
-    user.all_posts.unshift(post._id);
-    if (date) {
-      insertIntoDatedPosts(user.dated_posts, post._id, date);
-    }
-    else {
-      throw new BadRequestError(NO_DATE_FOUND)
     }
 
     if (pursuitCategory) {
       for (const pursuit of user.pursuits) {
         if (pursuit.name === pursuitCategory) {
-          setPursuitAttributes(progression, pursuit, minDuration, post._id, date);
+          setPursuitAttributes(false, progression, pursuit, minDuration, post._id, date);
           break;
         }
       }
     }
+
+
+
+    if (indexUser.preferred_post_privacy !== postPrivacyType) {
+      indexUser.preferred_post_privacy = postPrivacyType;
+    }
+
     const savedIndexUser = indexUser
       .save()
       .catch(error => {
@@ -468,7 +484,7 @@ router.route('/').post(
               }
             }
             indexUser.recent_posts = updatedRecentPosts;
-            updateAllPostsInfo(indexUser.pursuits, pursuitCategory, minDuration, progression)
+            updateAllPostsInfo(indexUser.pursuits, pursuitCategory, minDuration, progression, true)
 
             return indexUser.save();
           })
@@ -477,13 +493,13 @@ router.route('/').post(
       const resolvedUser = retrieveUserByID(userID)
         .then((user) => {
           let updatedAllPosts = [];
-          for (const post of user.all_posts) {
+          for (const post of user.posts) {
             if (post.toString() !== postID) {
               updatedAllPosts.unshift(post);
             }
           }
-          user.all_posts = updatedAllPosts;
-          updateAllPostsInfo(user.pursuits, pursuitCategory, minDuration, progression)
+          user.posts = updatedAllPosts;
+          updateAllPostsInfo(user.pursuits, pursuitCategory, minDuration, progression, false)
 
           return user.save();
         })
