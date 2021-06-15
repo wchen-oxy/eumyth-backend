@@ -21,7 +21,7 @@ const {
 
 const { BadRequestError } = require("../../utils/errors");
 const RECENT_POSTS_LIMIT = 5;
-const { SHORT, LONG } = require("../../constants/flags");
+const { SHORT, LONG, ALL } = require("../../constants/flags");
 const { validateBodyUsername,
   validateBodyPostPrivacy,
   validateBodyPostType,
@@ -44,21 +44,24 @@ const postImageFields = [
   { name: "images" },
   { name: "coverPhoto", maxCount: 1 }];
 
-const updatePostLists = (post, userAllPosts, recentPosts) => {
-  setRecentPosts(post, recentPosts);
-  insertAndSortIntoList(userAllPosts, createContentPreview(post._id, post.date));
-}
-
-const setRecentPosts = (post, inputRecentPosts) => {
-  let newRecentPosts = inputRecentPosts;
-  newRecentPosts.unshift(post);
-
-  if (newRecentPosts.length > RECENT_POSTS_LIMIT) {
-    newRecentPosts.pop();
+const updatePostLists = (post, pursuitCategory, pursuits, recentPosts) => {
+  setRecentPosts(post.post_id, recentPosts);
+  insertAndSortIntoList(pursuits[0].posts, post);
+  for (let i = 1; i < pursuits.length; i++) {
+    if (pursuitCategory === pursuits[i].name) {
+      insertAndSortIntoList(pursuits[i].posts,);
+    }
   }
 }
 
-const updateAllPostsInfo = (pursuits, pursuitCategory, minDuration, isMilestone, isIndexUser) => {
+const setRecentPosts = (post, inputRecentPosts) => {
+  inputRecentPosts.unshift(post);
+  if (inputRecentPosts.length > RECENT_POSTS_LIMIT) {
+    inputRecentPosts.pop();
+  }
+}
+
+const updateDeletedPostMeta = (pursuits, pursuitCategory, minDuration, isMilestone, isIndexUser) => {
   if (!pursuitCategory) return;
   for (const pursuit of pursuits) {
     if (pursuit.name === pursuitCategory) {
@@ -79,8 +82,6 @@ const createContentPreview = (postID, date, labels, branch) => (
 );
 
 const insertAndSortIntoList = (postList, postPreview) => {
-  console.log("insertandsort");
-  console.log(postList);
   postList.unshift(postPreview);
   if (postList.length > 1) {
     postList.sort((a, b) => {
@@ -103,17 +104,28 @@ const insertAndSortIntoList = (postList, postPreview) => {
   return postList;
 }
 
-const setPursuitAttributes = (isIndexUser, progression, pursuit, minDuration, postID, date) => {
-  if (isIndexUser) {
-    pursuit.num_posts = Number(pursuit.num_posts) + 1;
+const setPursuitAttributes = (isIndexUser, pursuits, pursuitCategory, progression, minDuration) => {
+  for (const pursuit of pursuits) {
+    if (pursuit.name === ALL) {
+      if (isIndexUser) {
+        pursuit.num_posts = Number(pursuit.num_posts) + 1;
+      }
+      if (progression === 2) {
+        pursuit.num_milestones = Number(pursuit.num_milestones) + 1;
+      }
+      if (minDuration) {
+        pursuit.total_min = Number(pursuit.total_min) + minDuration;
+      }
+    }
+    else if (pursuit.name === pursuitCategory) {
+      if (progression === 2) {
+        pursuit.num_milestones = Number(pursuit.num_milestones) + 1;
+      }
+      if (minDuration) {
+        pursuit.total_min = Number(pursuit.total_min) + minDuration;
+      }
+    }
   }
-  if (progression === 2) {
-    pursuit.num_milestones = Number(pursuit.num_milestones) + 1;
-  }
-  console.log("SEtPursuitAttributes");
-  insertAndSortIntoList(pursuit.posts, createContentPreview(postID, date));
-  pursuit.total_min = Number(pursuit.total_min) + minDuration;
-
 }
 
 
@@ -296,7 +308,7 @@ router.route('/').post(
     const indexUser = req.indexUser;
     const user = req.completeUser;
 
-    let post = createPost(
+    const post = createPost(
       postType,
       username,
       title,
@@ -316,32 +328,13 @@ router.route('/').post(
       minDuration,
       difficulty
     );
-    console.log("ASDFASDF");
-    updatePostLists(post, user.posts, indexUser.recent_posts);
-    console.log("322", user.posts);
-
-
-    if (minDuration) {
-      for (const pursuit of indexUser.pursuits) {
-        if (pursuit.name === pursuitCategory) {
-          setPursuitAttributes(true, progression, pursuit, minDuration);
-          break;
-        }
-      }
-    }
-
-    if (pursuitCategory) {
-      for (const pursuit of user.pursuits) {
-        if (pursuit.name === pursuitCategory) {
-          setPursuitAttributes(false, progression, pursuit, minDuration, post._id, date);
-          break;
-        }
-      }
-    }
-
     if (indexUser.preferred_post_privacy !== postPrivacyType) {
       indexUser.preferred_post_privacy = postPrivacyType;
     }
+
+    updatePostLists(createContentPreview(post._id, post.date), post.pursuit_category, user.pursuits, indexUser.recent_posts);
+    setPursuitAttributes(true, indexUser.pursuits, pursuitCategory, progression, minDuration);
+    setPursuitAttributes(false, user.pursuits, pursuitCategory, progression, minDuration, post._id, date)
 
     const savedIndexUser = indexUser
       .save()
@@ -484,7 +477,7 @@ router.route('/').post(
               }
             }
             indexUser.recent_posts = updatedRecentPosts;
-            updateAllPostsInfo(indexUser.pursuits, pursuitCategory, minDuration, progression, true)
+            updateDeletedPostMeta(indexUser.pursuits, pursuitCategory, minDuration, progression, true)
 
             return indexUser.save();
           })
@@ -499,7 +492,7 @@ router.route('/').post(
             }
           }
           user.posts = updatedAllPosts;
-          updateAllPostsInfo(user.pursuits, pursuitCategory, minDuration, progression, false)
+          updateDeletedPostMeta(user.pursuits, pursuitCategory, minDuration, progression, false)
 
           return user.save();
         })

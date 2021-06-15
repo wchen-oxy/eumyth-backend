@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const PursuitSchema = new Schema({
   name: {
     type: String,
-    required: false,
+    required: true,
     trim: true
 
   },

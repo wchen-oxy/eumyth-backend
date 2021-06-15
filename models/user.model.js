@@ -71,14 +71,6 @@ const UserSchema = new Schema({
 
   pursuits: [Pursuits.Schema],
 
-  posts: {
-    type: [ContentPreview.Schema]
-  }, //all posts including the most recent posts. ID only
-
-  projects: {
-    type: [ContentPreview.Schema]
-  },
-
 }, {
   timestamps: true,
 });

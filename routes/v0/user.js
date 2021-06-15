@@ -58,12 +58,13 @@ router.route('/')
       mainPursuitsHolder.push(
         new Pursuit.Model({
           name: "ALL",
-          display_photo_key: null,
+          display_photo_key: "",
           private: false,
           total_min: 0,
           num_milestones: 0,
+          posts: [],
+          projects: [],
         }));
-
 
       indexPursuitsHolder.push(
         new IndexPursuit.Model({
@@ -76,7 +77,6 @@ router.route('/')
       );
 
       for (const pursuit of pursuitsArray) {
-
         mainPursuitsHolder.push(
           new Pursuit.Model({
             name: pursuit.name,
@@ -85,6 +85,8 @@ router.route('/')
             experience_level: pursuit.experience,
             total_min: 0,
             num_milestones: 0,
+            posts: [],
+            projects: [],
           }));
 
         indexPursuitsHolder.push(
@@ -107,11 +109,8 @@ router.route('/')
           tiny_cropped_display_photo_key: tinyCroppedImage,
           pursuits: mainPursuitsHolder,
           private: false,
-          posts: [],
-          projects: [],
           pinned_posts: [],
           pinned_projects: [],
-          pursuits: [],
           requests: []
         });
 
