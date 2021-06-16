@@ -235,7 +235,7 @@ const retrieveRelevantUserInfo = (req, res, next) => {
 
 const createPost = (postType, username, title, subtitle, postPrivacyType, date, authorID,
   pursuitCategory, displayPhoto, coverPhotoKey, postFormat, isPaginated, progression,
-  imageData, textSnippet, textData, minDuration, difficulty) => {
+  imageData, textSnippet, textData, minDuration, difficulty, labels) => {
   switch (postType) {
     case (SHORT):
       return new Post.Model({
@@ -254,7 +254,8 @@ const createPost = (postType, username, title, subtitle, postPrivacyType, date, 
         text_snippet: textSnippet,
         text_data: textData,
         min_duration: minDuration,
-        difficulty: difficulty
+        difficulty: difficulty,
+        labels: labels,
       });
     case (LONG):
       return new Post.Model({
@@ -272,7 +273,8 @@ const createPost = (postType, username, title, subtitle, postPrivacyType, date, 
         text_snippet: textSnippet,
         text_data: textData,
         min_duration: minDuration,
-        difficulty: difficulty
+        difficulty: difficulty,
+        labels: labels,
       });
     default:
       throw new Error("No post type matched.");
@@ -299,6 +301,9 @@ router.route('/').post(
     const title = req.body.title ? req.body.title : null;
     const subtitle = req.body.subtitle ? req.body.subtitle : null;
     const pursuitCategory = req.body.pursuit ? req.body.pursuit : null;
+    console.log(req.body.labels);
+
+    const labels = req.body.labels ? req.body.labels : [];
     const date = req.body.date ? new Date(req.body.date) : null;
     const textData = req.body.textData ? req.body.textData : null;
     const minDuration = !!req.body.minDuration ? parseInt(req.body.minDuration) : null;
@@ -326,7 +331,8 @@ router.route('/').post(
       textSnippet,
       textData,
       minDuration,
-      difficulty
+      difficulty,
+      labels
     );
     if (indexUser.preferred_post_privacy !== postPrivacyType) {
       indexUser.preferred_post_privacy = postPrivacyType;
