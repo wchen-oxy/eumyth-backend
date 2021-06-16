@@ -49,7 +49,7 @@ const updatePostLists = (post, pursuitCategory, pursuits, recentPosts) => {
   insertAndSortIntoList(pursuits[0].posts, post);
   for (let i = 1; i < pursuits.length; i++) {
     if (pursuitCategory === pursuits[i].name) {
-      insertAndSortIntoList(pursuits[i].posts,);
+      insertAndSortIntoList(pursuits[i].posts, post);
     }
   }
 }
