@@ -50,7 +50,7 @@ const PostSchema = new Schema({
   },
 
   progression: {
-    type: String,
+    type: Number,
     required: false,
     trim: true
   },

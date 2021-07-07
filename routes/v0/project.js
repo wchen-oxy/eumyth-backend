@@ -12,6 +12,7 @@ const {
     doesValidationErrorExist,
 } = require('../../utils/validators');
 const { retrieveIndexUserByID, retrieveUserByID, findProjectsByID } = require('../../data_access/dal');
+const ContentPreview = require('../../models/content.preview.model');
 
 router.route('/').post(
     MulterHelper.contentImageUpload.single({ name: "coverPhoto", maxCount: 1 }),
@@ -73,10 +74,13 @@ router.route('/').post(
             retrieveUserByID(userID)
                 .then((result => {
                     let user = result;
-                    user.all_projects.unshift(newProject._id);
                     for (const pursuit of user.pursuits) {
                         if (pursuit.name === newProject.pursuit) {
-                            pursuit.projects.unshift(newProject._id);
+                            pursuit.projects.unshift(
+                                new ContentPreview.Model({
+                                    post_id: newProject._id,
+                                })
+                            );
                         }
                     }
                     return user;

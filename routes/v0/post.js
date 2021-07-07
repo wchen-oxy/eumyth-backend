@@ -310,7 +310,6 @@ router.route('/').post(
     const textSnippet = textData ? makeTextSnippet(postType, isPaginated, textData) : null;
     const indexUser = req.indexUser;
     const user = req.completeUser;
-
     const post = createPost(
       postType,
       username,
@@ -415,7 +414,7 @@ router.route('/').post(
       const postID = req.body.postID;
       const postType = req.body.postType;
       const username = req.body.username;
-      const progression = checkStringBoolean(req.body.progression);
+      const progression = req.body.progression;
       const isPaginated = checkStringBoolean(req.body.isPaginated);
       const difficulty = req.body.difficulty ? req.body.difficulty : null;
       const postPrivacyType = req.body.postPrivacyType ? req.body.postPrivacyType : null;
@@ -427,6 +426,7 @@ router.route('/').post(
       const minDuration = !!req.body.minDuration ? parseInt(req.body.minDuration) : null;
       const coverPhotoKey = req.file ? req.file.key : null;
       const removeCoverPhoto = checkStringBoolean(req.body.removeCoverPhoto);
+      console.log(progression);
       return retrievePostByID(postID)
         .then(
           (result) => {
