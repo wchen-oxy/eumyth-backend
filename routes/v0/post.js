@@ -310,6 +310,7 @@ router.route('/').post(
     const textSnippet = textData ? makeTextSnippet(postType, isPaginated, textData) : null;
     const indexUser = req.indexUser;
     const user = req.completeUser;
+
     const post = createPost(
       postType,
       username,
@@ -331,6 +332,10 @@ router.route('/').post(
       difficulty,
       labels
     );
+
+    res.locals.post_id = post._id;
+
+
     if (indexUser.preferred_post_privacy !== postPrivacyType) {
       indexUser.preferred_post_privacy = postPrivacyType;
     }
@@ -362,8 +367,9 @@ router.route('/').post(
     return Promise.all([savedIndexUser, savedUser, savedPost])
       .then(() => next());
 
-  }, (req, res, next) => {
-
+  },
+  (req, res, next) => {
+    console.log(res.locals);
     let followersIDArray = [];
     for (const user of req.userRelation.followers) {
       followersIDArray.push(user.user_preview_id);
@@ -385,7 +391,7 @@ router.route('/').post(
         (userArray) => {
           const promisedUpdatedFollowerArray = userArray.map(
             indexUser => new Promise((resolve) => {
-              indexUser.following_feed.unshift(post._id);
+              indexUser.following_feed.unshift(res.locals.post_id);
               if (indexUser.following_feed.length > 50) {
                 indexUser.following_feed.shift();
                 console.log("Removed oldest post from a user's following feed");
@@ -426,7 +432,6 @@ router.route('/').post(
       const minDuration = !!req.body.minDuration ? parseInt(req.body.minDuration) : null;
       const coverPhotoKey = req.file ? req.file.key : null;
       const removeCoverPhoto = checkStringBoolean(req.body.removeCoverPhoto);
-      console.log(progression);
       return retrievePostByID(postID)
         .then(
           (result) => {

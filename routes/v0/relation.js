@@ -3,14 +3,14 @@ const express = require('express');
 const router = express.Router();
 const UserPreview = require('../../models/user.preview.model');
 const UserRelationStatus = require("../../models/user.relation.status.model");
-const { validateQueryUsername, validateQueryUserRelationArrayID, validateBodyUserRelationArrayID, validateBodyUsername, doesValidationErrorExist, validateBodyVisitorUsername, validateBodyTargetProfilePreviewID, validateBodyIsPrivate, validateBodyAction, validateBodyID, validateBodyTargetUsername, validateBodyCurrentUsername, } = require('../../utils/validators');
+const { validateQueryVisitorUsername, validateQueryUsername, validateQueryUserRelationArrayID, validateBodyUserRelationArrayID, validateBodyUsername, doesValidationErrorExist, validateBodyVisitorUsername, validateBodyTargetProfilePreviewID, validateBodyIsPrivate, validateBodyAction, validateBodyID, validateBodyTargetUsername, validateBodyCurrentUsername, } = require('../../utils/validators');
 const { findUserRelations,
   retrieveUserPreviewByUsername,
   retrieveUserRelationByID } = require('../../data_access/dal');
 const NOT_A_FOLLOWER_STATE = "NOT_A_FOLLOWER";
 
 router.route('/').get(
-  validateQueryUsername,
+  validateQueryVisitorUsername,
   validateQueryUserRelationArrayID,
   doesValidationErrorExist,
   (req, res, next) => {
@@ -144,7 +144,6 @@ router.route('/status').put(
     const targetUserRelationID = req.body.userRelationArrayID;
     const targetUserPreviewID = req.body.targetProfilePreviewID;
     let visitorUserPreview = null;
-
     const isPrivate = req.body.isPrivate;
     const action = req.body.action;
     let resultStatus = "";
@@ -191,7 +190,6 @@ router.route('/status').put(
               }
             }
             if (isPrivate === true) {
-
               targetFollowersArray.push(new UserRelationStatus.Model({
                 status: FOLLOW_REQUESTED,
                 user_preview_id: visitorUserPreview._id,

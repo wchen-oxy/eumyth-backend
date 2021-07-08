@@ -11,7 +11,7 @@ const relationRouter = require('./relation');
 const projectRouter = require('./project');
 const commentRouter = require('./comment');
 const userPreviewRouter = require('./userPreview');
-console.log("INDEX HIT");
+
 // router.use('/pursuit', pursuitsRouter);
 router.use('/index-user', indexUserRouter);
 router.use('/user', usersRouter);

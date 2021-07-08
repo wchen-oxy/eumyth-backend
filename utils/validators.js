@@ -36,6 +36,7 @@ const imageFileWrapper = (value, { req }) => {
 };
 
 const validateQueryUsername = [query("username").exists()];
+const validateQueryVisitorUsername = [query("visitorUsername").exists()];
 const validateQueryFullNames = [query("firstName").exists(), query("lastName").exists()];
 const validateQueryPostID = [query('postID').exists()];
 const validateQueryPostIDList = [query('postIDList').exists()];
@@ -44,7 +45,7 @@ const validateQueryImageKey = [query('imageKey').exists()];
 const validateQueryIncludePostText = [query('includePostText').exists()];
 const validateQueryProjectIDList = [query('projectIDList').exists()];
 const validateQueryRootCommentIDArray = [query('rootCommentIDArray').exists()];
-const validateQueryUserRelationArrayID = [query('userRelationArrayId').exists()];
+const validateQueryUserRelationArrayID = [query('userRelationArrayID').exists()];
 const validateQueryViewingMode = [query('viewingMode').exists()];
 
 const validateBodyAction = [body('action').exists()];
@@ -85,12 +86,13 @@ const validateBodyPostID = [body('postID').exists()];
 const validateBodyRemoveCoverPhoto = [body('removeCoverPhoto').exists()];
 const validateBodyProgression = [body('progression').exists()];
 const validateBodyIsPaginated = [body('isPaginated').exists()];
-const validateBodyIsPrivate = [body('IsPrivate').exists()];
+const validateBodyIsPrivate = [body('isPrivate').exists()];
 
 
 module.exports = {
     doesValidationErrorExist,
     validateQueryUsername,
+    validateQueryVisitorUsername,
     validateQueryFullNames,
     validateQueryPostID,
     validateQueryPostIDList,
