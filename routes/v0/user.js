@@ -130,6 +130,7 @@ router.route('/')
         pursuits: indexPursuitsHolder,
         following_feed: [],
         recent_posts: [],
+        labels: "",
       });
 
       const newUserRelation = new UserRelation.Model({

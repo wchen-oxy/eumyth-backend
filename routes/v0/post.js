@@ -5,6 +5,7 @@ const Post = require("../../models/post.model");
 const ContentPreview = require("../../models/content.preview.model");
 const Comment = require("../../models/comment.model");
 const MulterHelper = require('../../constants/multer');
+
 const {
   findPostInList,
   retrieveUserPreviewByUsername,
@@ -40,6 +41,12 @@ const { validateBodyUsername,
 } = require('../../utils/validators');
 const { checkStringBoolean } = require('../../utils/helper');
 
+const verifyArray = (value) => {
+  if (Array.isArray(value)) return value;
+  else {
+    return [value];
+  }
+}
 const postImageFields = [
   { name: "images" },
   { name: "coverPhoto", maxCount: 1 }];
@@ -281,6 +288,23 @@ const createPost = (postType, username, title, subtitle, postPrivacyType, date, 
   }
 }
 
+const updateLabels = (indexUser, labels) => {
+  const formattedNewLabels = labels.map(item => { return { value: item, label: item } });
+  if (indexUser.labels.length === 0) {
+    indexUser.labels = JSON.stringify(formattedNewLabels);
+  }
+  else {
+    console.log("This is a new update to existing stuff");
+    const parsedCurrentLabels = JSON.parse(indexUser.labels);
+    const currentLabelSet = new Set(parsedCurrentLabels.map(item => item.label));
+    console.log(currentLabelSet);
+    const newLabels = parsedCurrentLabels.concat(formattedNewLabels);
+    const combinedLabels = [...parsedCurrentLabels, ...newLabels.filter(item => !currentLabelSet.has(item.label))]
+    console.log(combinedLabels);
+    indexUser.labels = JSON.stringify(combinedLabels);
+  }
+}
+
 router.route('/').post(
   MulterHelper.contentImageUpload.fields(postImageFields),
   validateBodyUsername,
@@ -301,7 +325,7 @@ router.route('/').post(
     const title = req.body.title ? req.body.title : null;
     const subtitle = req.body.subtitle ? req.body.subtitle : null;
     const pursuitCategory = req.body.pursuit ? req.body.pursuit : null;
-    const labels = req.body.labels ? req.body.labels : [];
+    const labels = req.body.labels ? verifyArray(req.body.labels) : [];
     const date = req.body.date ? new Date(req.body.date) : null;
     const textData = req.body.textData ? req.body.textData : null;
     const minDuration = !!req.body.minDuration ? parseInt(req.body.minDuration) : null;
@@ -310,7 +334,7 @@ router.route('/').post(
     const textSnippet = textData ? makeTextSnippet(postType, isPaginated, textData) : null;
     const indexUser = req.indexUser;
     const user = req.completeUser;
-
+    console.log(labels, "as11df");
     const post = createPost(
       postType,
       username,
@@ -343,7 +367,7 @@ router.route('/').post(
     updatePostLists(createContentPreview(post._id, post.date), post.pursuit_category, user.pursuits, indexUser.recent_posts);
     setPursuitAttributes(true, indexUser.pursuits, pursuitCategory, progression, minDuration);
     setPursuitAttributes(false, user.pursuits, pursuitCategory, progression, minDuration, post._id, date)
-
+    updateLabels(indexUser, labels);
     const savedIndexUser = indexUser
       .save()
       .catch(error => {
@@ -366,10 +390,8 @@ router.route('/').post(
     });
     return Promise.all([savedIndexUser, savedUser, savedPost])
       .then(() => next());
-
   },
   (req, res, next) => {
-    console.log(res.locals);
     let followersIDArray = [];
     for (const user of req.userRelation.followers) {
       followersIDArray.push(user.user_preview_id);
@@ -396,11 +418,14 @@ router.route('/').post(
                 indexUser.following_feed.shift();
                 console.log("Removed oldest post from a user's following feed");
               }
+              console.log("asf");
               indexUser.save().then(() => resolve("saved"));
             })
           );
           return Promise.all(promisedUpdatedFollowerArray)
             .then((result) => {
+              console.log("asf3");
+
               res.status(201).send("Feel Free to continue browsing as we push updates")
             });
         }
