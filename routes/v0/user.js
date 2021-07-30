@@ -252,11 +252,17 @@ router.route('/private')
     doesValidationErrorExist,
     (req, res, next) => {
       const username = req.body.username;
-      const isPrivate = req.body.private;
-      return retrieveCompleteUserByUsername(username)
+      const isPrivate = req.body.isPrivate;
+      return Promise.all([
+        retrieveCompleteUserByUsername(username),
+        retrieveIndexUserByUsername(username),
+      ])
         .then((result) => {
-          result.private = isPrivate;
-          return result.save()
+          const completeUser = result[0];
+          const indexUser = result[1];
+          completeUser.private = isPrivate;
+          indexUser.private = isPrivate;
+          return Promise.all([result[0].save(), result[1].save()])
         })
         .then(() => res.status(200).send())
         .catch(next)
