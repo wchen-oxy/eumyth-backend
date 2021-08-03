@@ -289,19 +289,24 @@ const createPost = (postType, username, title, subtitle, postPrivacyType, date, 
 }
 
 const updateLabels = (indexUser, labels) => {
-  const formattedNewLabels = labels.map(item => { return { value: item, label: item } });
+
   if (indexUser.labels.length === 0) {
-    indexUser.labels = JSON.stringify(formattedNewLabels);
+    indexUser.labels = labels;
   }
   else {
     console.log("This is a new update to existing stuff");
-    const parsedCurrentLabels = JSON.parse(indexUser.labels);
-    const currentLabelSet = new Set(parsedCurrentLabels.map(item => item.label));
-    console.log(currentLabelSet);
-    const newLabels = parsedCurrentLabels.concat(formattedNewLabels);
-    const combinedLabels = [...parsedCurrentLabels, ...newLabels.filter(item => !currentLabelSet.has(item.label))]
-    console.log(combinedLabels);
-    indexUser.labels = JSON.stringify(combinedLabels);
+    let parsedCurrentLabels = indexUser.labels;
+    parsedCurrentLabels.concat(labels);
+    console.log(parsedCurrentLabels);
+    parsedCurrentLabels = [...new Set(parsedCurrentLabels)];
+    console.log(parsedCurrentLabels);
+    return parsedCurrentLabels;
+    // const currentLabelSet = new Set(parsedCurrentLabels.map(item => item.label));
+    // console.log(currentLabelSet);
+    // const newLabels = parsedCurrentLabels.concat(formattedNewLabels);
+    // const combinedLabels = [...parsedCurrentLabels, ...newLabels.filter(item => !currentLabelSet.has(item.label))]
+    // console.log(combinedLabels);
+    // indexUser.labels = JSON.stringify(combinedLabels);
   }
 }
 

@@ -79,7 +79,7 @@ const IndexUserSchema = new Schema(
             type: [String],
         },
         labels: {
-            type: String,
+            type: [String],
         },
         pursuits: [IndexPursuit.Schema],
         following_feed: [mongoose.Types.ObjectId], //feed from others
