@@ -111,7 +111,9 @@ router.route('/')
           private: false,
           pinned_posts: [],
           pinned_projects: [],
-          requests: []
+          requests: [],
+          labels: [],
+
         });
 
       const newIndexUser = new IndexUser.Model({

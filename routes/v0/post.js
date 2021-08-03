@@ -288,25 +288,18 @@ const createPost = (postType, username, title, subtitle, postPrivacyType, date, 
   }
 }
 
-const updateLabels = (indexUser, labels) => {
+const updateLabels = (completeUser, indexUser, labels) => {
 
   if (indexUser.labels.length === 0) {
     indexUser.labels = labels;
+    completeUser.labels = labels;
   }
   else {
-    console.log("This is a new update to existing stuff");
     let parsedCurrentLabels = indexUser.labels;
-    parsedCurrentLabels.concat(labels);
-    console.log(parsedCurrentLabels);
-    parsedCurrentLabels = [...new Set(parsedCurrentLabels)];
-    console.log(parsedCurrentLabels);
-    return parsedCurrentLabels;
-    // const currentLabelSet = new Set(parsedCurrentLabels.map(item => item.label));
-    // console.log(currentLabelSet);
-    // const newLabels = parsedCurrentLabels.concat(formattedNewLabels);
-    // const combinedLabels = [...parsedCurrentLabels, ...newLabels.filter(item => !currentLabelSet.has(item.label))]
-    // console.log(combinedLabels);
-    // indexUser.labels = JSON.stringify(combinedLabels);
+    parsedCurrentLabels.push(...labels);
+    indexUser.labels = [...new Set(parsedCurrentLabels)];
+    completeUser.labels = [...new Set(parsedCurrentLabels)];
+
   }
 }
 
@@ -372,7 +365,7 @@ router.route('/').post(
     updatePostLists(createContentPreview(post._id, post.date), post.pursuit_category, user.pursuits, indexUser.recent_posts);
     setPursuitAttributes(true, indexUser.pursuits, pursuitCategory, progression, minDuration);
     setPursuitAttributes(false, user.pursuits, pursuitCategory, progression, minDuration, post._id, date)
-    updateLabels(indexUser, labels);
+    updateLabels(user, indexUser, labels);
     const savedIndexUser = indexUser
       .save()
       .catch(error => {
@@ -423,14 +416,11 @@ router.route('/').post(
                 indexUser.following_feed.shift();
                 console.log("Removed oldest post from a user's following feed");
               }
-              console.log("asf");
               indexUser.save().then(() => resolve("saved"));
             })
           );
           return Promise.all(promisedUpdatedFollowerArray)
             .then((result) => {
-              console.log("asf3");
-
               res.status(201).send("Feel Free to continue browsing as we push updates")
             });
         }
@@ -454,6 +444,8 @@ router.route('/').post(
       const isPaginated = checkStringBoolean(req.body.isPaginated);
       const difficulty = req.body.difficulty ? req.body.difficulty : null;
       const postPrivacyType = req.body.postPrivacyType ? req.body.postPrivacyType : null;
+      const labels = req.body.labels ? verifyArray(req.body.labels) : [];
+      const indexUserID = req.body.indexUserID ? req.body.indexUserID : null;
       const title = !!req.body.title ? req.body.title : null;
       const subtitle = !!req.body.subtitle ? req.body.subtitle : null;
       const pursuitCategory = !!req.body.pursuitCategory ? req.body.pursuitCategory : null;
@@ -462,6 +454,8 @@ router.route('/').post(
       const minDuration = !!req.body.minDuration ? parseInt(req.body.minDuration) : null;
       const coverPhotoKey = req.file ? req.file.key : null;
       const removeCoverPhoto = checkStringBoolean(req.body.removeCoverPhoto);
+      let shouldUpdateLabels = false;
+      let completeUserID = null;
       return retrievePostByID(postID)
         .then(
           (result) => {
@@ -475,6 +469,9 @@ router.route('/').post(
             else if (coverPhotoKey) {
               post.cover_photo_key = coverPhotoKey;
             }
+            shouldUpdateLabels = labels !== post.labels;
+            completeUserID = post.author_id;
+            post.labels = labels;
             post.difficulty = difficulty;
             post.username = username;
             post.title = title;
@@ -489,7 +486,21 @@ router.route('/').post(
             return post.save()
           })
         .then(() => {
-          return res.status(200).send();
+          if (shouldUpdateLabels) {
+            console.log(completeUserID, indexUserID);
+            return Promise.all([retrieveUserByID(completeUserID), retrieveIndexUserByID(indexUserID)])
+              .then(
+                results => {
+                  const completeUser = results[0];
+                  const indexUser = results[1];
+                  updateLabels(completeUser, indexUser, labels);
+                  return Promise.all([completeUser.save(), indexUser.save()]);
+                }
+              )
+              .then(() => res.status(200).send());
+          }
+          else
+            return res.status(200).send();
         })
         .catch(next)
     })

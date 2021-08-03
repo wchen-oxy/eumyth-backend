@@ -71,6 +71,9 @@ const UserSchema = new Schema({
 
   pursuits: [Pursuits.Schema],
 
+  labels: {
+    type: [String],
+  },
 }, {
   timestamps: true,
 });
