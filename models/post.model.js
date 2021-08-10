@@ -105,8 +105,13 @@ const PostSchema = new Schema({
     type: [String]
   },
 
-  branch: {
+  parent: {
     type: mongoose.Types.ObjectId
+  },
+
+  children: {
+    type: [mongoose.Types.ObjectId],
+    default: []
   }
 
 

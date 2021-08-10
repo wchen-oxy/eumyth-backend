@@ -20,7 +20,6 @@ const {
   updatePostUserDisplayPhoto
 } = require('../../data_access/dal');
 
-const { BadRequestError } = require("../../utils/errors");
 const RECENT_POSTS_LIMIT = 5;
 const { SHORT, LONG, ALL } = require("../../constants/flags");
 const { validateBodyUsername,
