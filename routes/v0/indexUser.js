@@ -9,13 +9,11 @@ router.get('/',
   validateQueryUsername,
   doesValidationErrorExist,
   (req, res, next) => {
-    console.log(req.query);
     const username = req.query.username;
     const isTruncated = req.query.isTruncated;
     return retrieveIndexUserByUsername(username)
       .then(result => {
         if (isTruncated) {
-          console.log("asdfad");
           const truncatedUser = {
             labels: result.labels,
             username: result.username,
@@ -24,8 +22,10 @@ router.get('/',
             smallCroppedDisplayPhotoKey: result.small_cropped_display_photo_key,
             tinyCroppedDisplayPhotoKey: result.tiny_cropped_display_photo_key,
             userPreviewID: result.user_preview_id,
+            indexProfileID: result._id,
             profileID: result.user_profile_id,
-            userRelationID: result.user_relation_id
+            userRelationID: result.user_relation_id,
+            pursuits: result.pursuits
           }
           return res.status(200).json(truncatedUser);
         }

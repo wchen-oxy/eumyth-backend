@@ -331,7 +331,6 @@ router.route('/').post(
     const textSnippet = textData ? makeTextSnippet(postType, isPaginated, textData) : null;
     const indexUser = req.indexUser;
     const user = req.completeUser;
-    console.log(labels, "as11df");
     const post = createPost(
       postType,
       username,
@@ -486,7 +485,6 @@ router.route('/').post(
           })
         .then(() => {
           if (shouldUpdateLabels) {
-            console.log(completeUserID, indexUserID);
             return Promise.all([retrieveUserByID(completeUserID), retrieveIndexUserByID(indexUserID)])
               .then(
                 results => {
@@ -551,8 +549,7 @@ router.route('/').post(
 
       return Promise.all([resolvedIndexUser, resolvedUser, Post.Model.findById(postID)])
         .then((results) => {
-          console.log(results[2]);
-          if (results[2].comments.length === 0) return deletePostByID(postID);
+           if (results[2].comments.length === 0) return deletePostByID(postID);
           return Promise.all([
             deletePostByID(postID),
             deleteCommentsByID(results[2].comments)
