@@ -2,6 +2,7 @@ const { doesCommentExist,
     doesUserExist,
     doesUserPreviewExist,
     doesPostExist, 
+    doesProjectExist,
     doesUserRelationExist} = require("../utils/helper");
 const Comment = require('../models/comment.model');
 const IndexUser = require('../models/index.user.model');
@@ -72,6 +73,13 @@ const retrieveCompleteUserByID = (id) => {
         });
 }
 
+const findProjectByID = (projectID) => {
+    return Project.Model.findById(projectID)
+    .then(result => {
+        doesProjectExist(result);
+        return result;
+    });
+}
 const findProjectsByID = (projectIDArray) => {
     return Project.Model.find({
         '_id': { $in: projectIDArray }, function(err, docs) {
@@ -206,6 +214,7 @@ module.exports = {
     retrieveUserPreviewByUsername,
     findUserRelations,
     retrieveUserRelationByID,
+    findProjectByID,
     findProjectsByID,
     deletePostByID,
     retrievePostByID,

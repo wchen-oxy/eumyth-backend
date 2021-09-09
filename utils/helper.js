@@ -1,5 +1,5 @@
 let { NoContentError, TypeError } = require("./errors");
-let { NO_COMMENT_FOUND, NO_POST_FOUND, NO_USER_FOUND, NO_USER_PREVIEW_FOUND, NO_USER_RELATION_FOUND, WRONG_TYPE } = require('../constants/messages');
+let { NO_COMMENT_FOUND, NO_POST_FOUND, NO_USER_FOUND, NO_USER_PREVIEW_FOUND, NO_USER_RELATION_FOUND, WRONG_TYPE, NO_PROJECT_FOUND } = require('../constants/messages');
 
 const isEmpty = (...input) => {
     let testString = [...input];
@@ -59,12 +59,18 @@ const doesPostExist = (result) => {
         throw new NoContentError(NO_POST_FOUND);
     };
 }
+const doesProjectExist = (result) => {
+    if (!result) {
+        throw new NoContentError(NO_PROJECT_FOUND);
+    };
+}
 
 module.exports = {
     checkStringBoolean,
     isEmpty,
     doesCommentExist,
     doesPostExist,
+    doesProjectExist,
     doesUserExist,
     doesUserPreviewExist,
     doesUserRelationExist

@@ -43,6 +43,7 @@ const validateQueryPostIDList = [query('postIDList').exists()];
 const validateQueryTextOnly = [query('textOnly').exists()];
 const validateQueryImageKey = [query('imageKey').exists()];
 const validateQueryIncludePostText = [query('includePostText').exists()];
+const validateQueryProjectID = [query('projectID').exists()];
 const validateQueryProjectIDList = [query('projectIDList').exists()];
 const validateQueryRootCommentIDArray = [query('rootCommentIDArray').exists()];
 const validateQueryUserRelationArrayID = [query('userRelationArrayID').exists()];
@@ -98,6 +99,7 @@ module.exports = {
     validateQueryPostIDList,
     validateQueryImageKey,
     validateQueryIncludePostText,
+    validateQueryProjectID,
     validateQueryProjectIDList,
     validateQueryRootCommentIDArray,
     validateQueryUserRelationArrayID,

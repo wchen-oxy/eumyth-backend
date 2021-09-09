@@ -8,11 +8,12 @@ const ProjectSchema = new Schema({
     trim: true
   },
 
-  author_id: {
+  index_user_id: {
     type: mongoose.Types.ObjectId,
     required: true,
     trim: true
   },
+
   display_photo_key: {
     type: String,
     required: false,
@@ -69,7 +70,12 @@ const ProjectSchema = new Schema({
 
   post_ids: {
     type: [mongoose.Types.ObjectId]
+  },
+
+  labels: {
+    type: [String]
   }
+
 });
 
 const ProjectModel = mongoose.model('project', ProjectSchema);
