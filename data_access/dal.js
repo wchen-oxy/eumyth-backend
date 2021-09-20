@@ -1,9 +1,9 @@
 const { doesCommentExist,
     doesUserExist,
     doesUserPreviewExist,
-    doesPostExist, 
+    doesPostExist,
     doesProjectExist,
-    doesUserRelationExist} = require("../utils/helper");
+    doesUserRelationExist } = require("../utils/helper");
 const Comment = require('../models/comment.model');
 const IndexUser = require('../models/index.user.model');
 const User = require('../models/user.model');
@@ -75,10 +75,10 @@ const retrieveCompleteUserByID = (id) => {
 
 const findProjectByID = (projectID) => {
     return Project.Model.findById(projectID)
-    .then(result => {
-        doesProjectExist(result);
-        return result;
-    });
+        .then(result => {
+            doesProjectExist(result);
+            return result;
+        });
 }
 const findProjectsByID = (projectIDArray) => {
     return Project.Model.find({
@@ -112,16 +112,29 @@ const updatePostUserDisplayPhoto = (username, imageKey) => {
     );
 }
 
-const findPostInList = (postIDList) => {
-    return Post.Model.find({
-        '_id': { $in: postIDList }, function(error, docs) {
-            if (error) console.log(error);
-            else {
-                console.log(docs);
+const findPostInList = (postIDList, isOrganized) => {
+    if (isOrganized) {
+        return Post.Model.find({
+            '_id': { $in: postIDList }, function(error, docs) {
+                if (error) console.log(error);
+                else {
+                    console.log(docs);
+                }
             }
-        }
-    }).sort({ createdAt: -1 }).lean()
+        }).sort({ createdAt: -1 }).lean();
+    }
+    else {
+        return Post.Model.find({
+            '_id': { $in: postIDList }, function(error, docs) {
+                if (error) console.log(error);
+                else {
+                    console.log(docs);
+                }
+            }
+        })
+    }
 }
+
 
 const retrieveUserByID = (userID) => {
     return User.Model.findById(userID)

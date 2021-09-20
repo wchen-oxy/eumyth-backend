@@ -74,8 +74,16 @@ const ProjectSchema = new Schema({
 
   labels: {
     type: [String]
-  }
+  },
 
+  parent: {
+    type: mongoose.Types.ObjectId
+  },
+
+  ancestors: {
+    type: [mongoose.Types.ObjectId],
+    default: []
+  }
 });
 
 const ProjectModel = mongoose.model('project', ProjectSchema);

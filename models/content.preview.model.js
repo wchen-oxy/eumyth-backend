@@ -17,10 +17,6 @@ const ContentPreviewSchema = new Schema({
     type: [String]
   },
 
-  branch: {
-    type: mongoose.Types.ObjectId
-  }
-
 },
   {
     timestamps: true,

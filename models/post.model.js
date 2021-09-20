@@ -1,3 +1,4 @@
+const Ref = require('./ref.model');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
@@ -14,6 +15,16 @@ const PostSchema = new Schema({
     required: true
   },
 
+  username: {
+    type: String,
+    required: false,
+  },
+
+  display_photo_key: {
+    type: String,
+    required: false,
+  },
+
   date: {
     type: Date
   },
@@ -23,6 +34,11 @@ const PostSchema = new Schema({
     required: false,
   },
 
+  min_duration: {
+    type: Number,
+    required: false
+  },
+
   subtitle: {
     type: String,
     required: false,
@@ -30,16 +46,6 @@ const PostSchema = new Schema({
   },
 
   post_privacy_type: {
-    type: String,
-    required: false,
-  },
-
-  username: {
-    type: String,
-    required: false,
-  },
-
-  display_photo_key: {
     type: String,
     required: false,
   },
@@ -91,28 +97,25 @@ const PostSchema = new Schema({
     required: false,
   },
 
-  min_duration: {
-    type: Number,
+  internal_ref: {
+    type: Ref.Schema,
     required: false
+  },
+
+  external_ref: {
+    type: Ref.Schema,
+    required: false
+  },
+
+  labels: {
+    type: [String],
+    default: []
   },
 
   comments: {
     type: [mongoose.Types.ObjectId],
     default: []
   },
-
-  labels: {
-    type: [String]
-  },
-
-  parent: {
-    type: mongoose.Types.ObjectId
-  },
-
-  children: {
-    type: [mongoose.Types.ObjectId],
-    default: []
-  }
 
 
 }, {

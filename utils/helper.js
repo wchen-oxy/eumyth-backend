@@ -1,5 +1,7 @@
 let { NoContentError, TypeError } = require("./errors");
+const AWSConstants = require('../constants/aws');
 let { NO_COMMENT_FOUND, NO_POST_FOUND, NO_USER_FOUND, NO_USER_PREVIEW_FOUND, NO_USER_RELATION_FOUND, WRONG_TYPE, NO_PROJECT_FOUND } = require('../constants/messages');
+const uuid = require('uuid');
 
 const isEmpty = (...input) => {
     let testString = [...input];
@@ -65,6 +67,36 @@ const doesProjectExist = (result) => {
     };
 }
 
+const copyObject = (key) => {
+    const newFileKey = "images/content/" + uuid.v1();
+    const copySource = AWSConstants.BUCKET_NAME + '/' + key;
+    return new Promise((resolve, reject) => {
+        AWSConstants.S3_INTERFACE.copyObject(
+            {
+                Bucket: AWSConstants.BUCKET_NAME,
+                CopySource: copySource,
+                Key: newFileKey,
+            },
+            (err, res) => {
+                res.Key = newFileKey;
+                if (err) {
+                    console.log(err, err.stack);
+                    reject(err);
+                }
+                resolve(res)
+            });
+        // )
+        // axios.put(url, {
+        //     Host: AWSConstants.BUCKET_NAME + '.s3.amazonaws.com',
+        //     Key: key,
+        // },
+        //     (err, res, body) => {
+        //         if (err) reject(err)
+        //         resolve(body)
+        //     });
+    })
+}
+
 module.exports = {
     checkStringBoolean,
     isEmpty,
@@ -73,6 +105,7 @@ module.exports = {
     doesProjectExist,
     doesUserExist,
     doesUserPreviewExist,
-    doesUserRelationExist
+    doesUserRelationExist,
+    copyObject,
     // validateUsername: validateUsername
 }

@@ -36,6 +36,12 @@ const contentImageUpload = multer({
     })
 });
 
+// const contentImageDuplicate = multer({
+//     storage: multerS3({
+//         s3: AWSConstants
+//     })
+// })
+
 module.exports = {
     profileImageUpload: profileImageUpload,
     contentImageUpload: contentImageUpload

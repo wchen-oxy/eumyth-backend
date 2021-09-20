@@ -1,5 +1,6 @@
 require('dotenv').config();
 const AWS = require('aws-sdk');
+
 // Enter copied or downloaded access ID and secret key here
 const ID = process.env.AWS_ID;
 const SECRET = process.env.AWS_KEY;

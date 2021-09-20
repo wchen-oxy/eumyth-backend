@@ -72,6 +72,7 @@ const validateBodyCurrentUsername = [body('currentUsername').exists()];
 const validateBodyTargetUsername = [body('targetUsername').exists()];
 const validateBodyText = [body('text').exists()];
 const validateBodyPursuit = [body('pursuit').exists()];
+const validateBodyProjectData = [body('projectData').exists()];
 const validateBodyBio = [body('bio').exists()];
 const validateBodySelectedPosts = [body('selectedPosts').exists()];
 const validateBodyTitle = [body('title').exists()];
@@ -122,6 +123,7 @@ module.exports = {
     validateBodyCompressedImageSet,
     validateBodyDisplayPhoto,
     validateBodyID,
+    validateBodyProjectData,
     validateBodyPostID,
     validateBodyRemoveCoverPhoto,
     validateBodyIsPaginated,

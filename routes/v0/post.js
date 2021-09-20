@@ -134,7 +134,6 @@ const setPursuitAttributes = (isIndexUser, pursuits, pursuitCategory, progressio
   }
 }
 
-
 const getImageUrls = (array) => {
   let imageArray = [];
 
@@ -169,7 +168,7 @@ const makeTextSnippet = (postType, isPaginated, textData) => {
 
 
 const findPosts = (postIDList, includePostText) => {
-  return findPostInList(postIDList)
+  return findPostInList(postIDList, true)
     .then(
       (results) => {
         let coverInfoArray = results;
@@ -360,10 +359,30 @@ router.route('/').post(
       indexUser.preferred_post_privacy = postPrivacyType;
     }
 
-    updatePostLists(createContentPreview(post._id, post.date), post.pursuit_category, user.pursuits, indexUser.recent_posts);
-    setPursuitAttributes(true, indexUser.pursuits, pursuitCategory, progression, minDuration);
-    setPursuitAttributes(false, user.pursuits, pursuitCategory, progression, minDuration, post._id, date)
-    updateLabels(user, indexUser, labels);
+    updatePostLists(
+      createContentPreview(post._id, post.date),
+      post.pursuit_category,
+      user.pursuits,
+      indexUser.recent_posts
+    );
+    setPursuitAttributes(
+      true,
+      indexUser.pursuits,
+      pursuitCategory,
+      progression,
+      minDuration);
+    setPursuitAttributes(
+      false,
+      user.pursuits,
+      pursuitCategory,
+      progression,
+      minDuration,
+      post._id,
+      date)
+    updateLabels(
+      user,
+      indexUser,
+      labels);
     const savedIndexUser = indexUser
       .save()
       .catch(error => {
@@ -549,7 +568,7 @@ router.route('/').post(
 
       return Promise.all([resolvedIndexUser, resolvedUser, Post.Model.findById(postID)])
         .then((results) => {
-           if (results[2].comments.length === 0) return deletePostByID(postID);
+          if (results[2].comments.length === 0) return deletePostByID(postID);
           return Promise.all([
             deletePostByID(postID),
             deleteCommentsByID(results[2].comments)
