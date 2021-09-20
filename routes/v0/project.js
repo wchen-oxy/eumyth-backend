@@ -272,7 +272,7 @@ router.route('/fork').put(
                     if (result.pursuits[i].name === project.pursuit) {
                         result.pursuits[i].projects.unshift(new ContentPreview.Model({
                             post_id: project._id,
-                            date: new Date().toISOString(),
+                            date: new Date().toISOString().substr(0, 10),
                             labels: project.labels,
                         }))
                     }
@@ -285,7 +285,7 @@ router.route('/fork').put(
                 return result.save();
             }
         )
-        .then(result => res.status(200).send())
+            .then(result => res.status(200).send())
     }
 )
 module.exports = router;
