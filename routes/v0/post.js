@@ -301,6 +301,17 @@ const updateLabels = (completeUser, indexUser, labels) => {
   }
 }
 
+const spliceArray = (postID, array) => {
+  let index = null;
+  for (let i = 0; i < array.length; i++) {
+    if (array[i].toString() === postID) {
+      index = i;
+      break;
+    }
+  }
+  array.splice(index, 1);
+}
+
 router.route('/').post(
   MulterHelper.contentImageUpload.fields(postImageFields),
   validateBodyUsername,
@@ -536,13 +547,7 @@ router.route('/').post(
       const resolvedIndexUser =
         retrieveIndexUserByID(indexUserID)
           .then((indexUser) => {
-            let updatedRecentPosts = [];
-            for (const post of indexUser.recent_posts) {
-              if (post._id.toString() !== postID) {
-                updatedRecentPosts.unshift(post);
-              }
-            }
-            indexUser.recent_posts = updatedRecentPosts;
+            spliceArray(postID, indexUser.recent_posts);
             updateDeletedPostMeta(indexUser.pursuits, pursuitCategory, minDuration, progression, true)
 
             return indexUser.save();
@@ -551,15 +556,8 @@ router.route('/').post(
 
       const resolvedUser = retrieveUserByID(userID)
         .then((user) => {
-          let updatedAllPosts = [];
-          for (const post of user.posts) {
-            if (post.toString() !== postID) {
-              updatedAllPosts.unshift(post);
-            }
-          }
-          user.posts = updatedAllPosts;
+          spliceArray(postID, user.pursuits[0].posts);
           updateDeletedPostMeta(user.pursuits, pursuitCategory, minDuration, progression, false)
-
           return user.save();
         })
         .catch((error) => {

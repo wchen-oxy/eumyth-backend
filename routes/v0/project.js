@@ -247,7 +247,7 @@ router.route('/fork').put(
             })
             .then(response => {
                 refreshPostImageData(projectPosts, imageKeyMap);
-                return Promise.all([Post.Model.insertMany(projectPosts), newProject.save()])
+                return Promise.all([Post.Model.insertMany(projectPosts, { ordered: true }), newProject.save()])
             })
             .then(() => {
                 res.locals.project = newProject;
@@ -261,7 +261,6 @@ router.route('/fork').put(
             });
     },
     (req, res, next) => {
-        console.log(res.locals.pursuits);
         const project = res.locals.project;
         // const promisedUserInfo = Promise.all([retrieveIndexUserByID(res.locals.indexUserID), retrieveUserByID(res.locals.userID)]);
         const promisedUserInfo = retrieveUserByID(res.locals.userID);
@@ -279,7 +278,7 @@ router.route('/fork').put(
                 }
                 result.pursuits[0].projects.unshift(new ContentPreview.Model({
                     post_id: project._id,
-                    date: new Date().toISOString(),
+                    date: new Date().toISOString().substr(0, 10),
                     labels: project.labels,
                 }));
                 return result.save();
