@@ -9,7 +9,7 @@ const Draft = require("../../models/draft.model");
 const MulterHelper = require('../../constants/multer').profileImageUpload;
 const UserPreview = require('../../models/user.preview.model');
 
-const { retrieveCompleteUserByUsername, retrieveIndexUser, retrieveIndexUserByUsername, } = require('../../data_access/dal');
+const { retrieveCompleteUserByUsername, retrieveIndexUserByUsername, } = require('../../data_access/dal');
 
 const {
   doesValidationErrorExist,

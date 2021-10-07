@@ -17,6 +17,8 @@ const {
     validateQueryProjectID,
     validateBodyProjectData,
     validateBodyDisplayPhoto,
+    validateBodyRemoveCoverPhoto,
+    validateBodyProjectID,
 } = require('../../utils/validators');
 const { retrieveIndexUserByID, retrieveUserByID, findProjectByID, findProjectsByID, findPostInList } = require('../../data_access/dal');
 
@@ -105,6 +107,24 @@ router.route('/')
                     return res.status(201).send();
                 })
                 .catch(next)
+
+        })
+    .put(
+        MulterHelper.contentImageUpload.single({ name: "coverPhoto", maxCount: 1 }),
+        validateBodyProjectID,
+        validateBodyTitle,
+        validateBodyRemoveCoverPhoto,
+        doesValidationErrorExist,
+        (req, res, next) => {
+            const coverPhotoKey = req.file ? req.file.key : null;
+            const pursuitCategory = req.body.pursuitCategory ? req.body.pursuitCategory : null;
+            const startDate = req.body.startDate ? req.body.startDate : null;
+            const endDate = req.body.endDate ? req.body.endDate : null;
+            const isComplete = req.body.isComplete ? req.body.isComplete : null;
+            const minDuration = req.body.minDuration ? req.body.minDuration : null;
+            const selectedPosts = req.body.selectedPosts ? req.body.selectedPosts : null;
+             
+
 
         });
 

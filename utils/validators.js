@@ -35,6 +35,7 @@ const imageFileWrapper = (value, { req }) => {
     return true;
 };
 
+const validateQueryProfileID = [query("profileID").exists()];
 const validateQueryUsername = [query("username").exists()];
 const validateQueryVisitorUsername = [query("visitorUsername").exists()];
 const validateQueryFullNames = [query("firstName").exists(), query("lastName").exists()];
@@ -73,6 +74,7 @@ const validateBodyTargetUsername = [body('targetUsername').exists()];
 const validateBodyText = [body('text').exists()];
 const validateBodyPursuit = [body('pursuit').exists()];
 const validateBodyProjectData = [body('projectData').exists()];
+const validateBodyProjectID = [body('projectID').exists()];
 const validateBodyBio = [body('bio').exists()];
 const validateBodySelectedPosts = [body('selectedPosts').exists()];
 const validateBodyTitle = [body('title').exists()];
@@ -93,6 +95,7 @@ const validateBodyIsPrivate = [body('isPrivate').exists()];
 
 module.exports = {
     doesValidationErrorExist,
+    validateQueryProfileID,
     validateQueryUsername,
     validateQueryVisitorUsername,
     validateQueryFullNames,
@@ -124,6 +127,7 @@ module.exports = {
     validateBodyDisplayPhoto,
     validateBodyID,
     validateBodyProjectData,
+    validateBodyProjectID,
     validateBodyPostID,
     validateBodyRemoveCoverPhoto,
     validateBodyIsPaginated,

@@ -583,6 +583,7 @@ router.route('/multiple').get(
   (req, res, next) => {
     const postIDList = req.query.postIDList;
     const includePostText = req.query.includePostText;
+    console.log(postIDList);
     return Promise.all([
       findPosts(postIDList, includePostText),
       countComments(postIDList)])
