@@ -1,9 +1,7 @@
 var router = require('express').Router();
-let User = require('../../models/user.model');
 let { NoContentError } = require("../../utils/errors");
 let { NO_USER_FOUND } = require("../../constants/messages");
-const { validateQueries, doesValidationErrorExist, validateQueryProfileID } = require("../../utils/validators");
-const { USERNAME } = require("../../constants/messages");
+const { doesValidationErrorExist, validateQueryProfileID } = require("../../utils/validators");
 const { retrieveCompleteUserByID } = require('../../data_access/dal');
 
 router.route('/all-posts')

@@ -123,7 +123,7 @@ router.route('/')
             const isComplete = req.body.isComplete ? req.body.isComplete : null;
             const minDuration = req.body.minDuration ? req.body.minDuration : null;
             const selectedPosts = req.body.selectedPosts ? req.body.selectedPosts : null;
-             
+
 
 
         });
@@ -201,7 +201,6 @@ router.route('/fork').put(
         const imageKeyMap = new Map();
         let projectPosts = null;
         res.locals.indexUserID = authorID;
-        console.log(userID);
         res.locals.userID = userID;
 
         delete projectData._id;
@@ -252,11 +251,6 @@ router.route('/fork').put(
                     });
                     newPostIDList.push(duplicate._id);
                     projectPosts[i] = duplicate;
-                    // console.log(post._id);
-                    // duplicate.authorID = authorID;
-                    // duplicate.username = username;
-                    // duplicate.display_photo_key = displayPhoto;
-
                 }
                 newProject.post_ids = newPostIDList;
 
@@ -272,7 +266,6 @@ router.route('/fork').put(
             .then(() => {
                 res.locals.project = newProject;
                 next();
-                // return res.status(201).json()
             })
             .catch(err => {
                 console.log(err);
