@@ -16,11 +16,10 @@ const {
     doesValidationErrorExist,
     validateQueryProjectID,
     validateBodyProjectData,
-    validateBodyDisplayPhoto,
-    validateBodyRemoveCoverPhoto,
     validateBodyProjectID,
+    validateQueryShouldDeletePosts,
 } = require('../../utils/validators');
-const { retrieveIndexUserByID, retrieveUserByID, findProjectByID, findProjectsByID, findPostInList } = require('../../data_access/dal');
+const { retrieveIndexUserByID, retrieveUserByID, findProjectByID, findProjectByIDAndUpdate, findProjectsByID, findPostInList, deletePostsByID } = require('../../data_access/dal');
 
 router.route('/')
     .post(
@@ -113,20 +112,43 @@ router.route('/')
         MulterHelper.contentImageUpload.single({ name: "coverPhoto", maxCount: 1 }),
         validateBodyProjectID,
         validateBodyTitle,
-        validateBodyRemoveCoverPhoto,
         doesValidationErrorExist,
         (req, res, next) => {
-            const coverPhotoKey = req.file ? req.file.key : null;
-            const pursuitCategory = req.body.pursuitCategory ? req.body.pursuitCategory : null;
-            const startDate = req.body.startDate ? req.body.startDate : null;
-            const endDate = req.body.endDate ? req.body.endDate : null;
-            const isComplete = req.body.isComplete ? req.body.isComplete : null;
-            const minDuration = req.body.minDuration ? req.body.minDuration : null;
-            const selectedPosts = req.body.selectedPosts ? req.body.selectedPosts : null;
-
-
-
-        });
+            const updates = {};
+            req.file ? updates.cover_photo_key = req.file.key : null;
+            req.body.title ? updates.title = req.body.title : null;
+            req.body.overview ? updates.overview = req.body.overview : null;
+            req.body.pursuitCategory ? updates.pursuit = req.body.pursuitCategory : null;
+            req.body.startDate ? updates.start_date = req.body.startDate : null;
+            req.body.endDate ? updates.end_date = req.body.endDate : null;
+            req.body.isComplete ? updates.is_complete = req.body.isComplete : null;
+            console.log(req.body.isComplete);
+            console.log(req.body.isComplete === 'true');
+            req.body.minDuration ? updates.min_duration = req.body.minDuration : null;
+            req.body.selectedPosts ? updates.post_ids = req.body.selectedPosts : null;
+            req.body.labels ? updates.labels = req.body.labels : null;
+            return findProjectByIDAndUpdate(req.body.projectID, updates)
+                .then((result) => {
+                    console.log(result);
+                    return res.status(200).send();
+                });
+        })
+    .delete(
+        validateQueryProjectID,
+        validateQueryShouldDeletePosts,
+        doesValidationErrorExist,
+        (req, res, next) => {
+            const projectID = req.query.projectID;
+            const shouldDeletePosts = req.query.shouldDeletePosts === 'true'
+                || req.query.shouldDeletePost === true;
+            if (shouldDeletePosts) {
+                // return deletePostsByID(projectID.post_ids)
+                //     .then((result) => {
+                //         // return deleteProjectBy
+                //     })
+            }
+        }
+    );
 
 router.route('/single').get(
     validateQueryProjectID,

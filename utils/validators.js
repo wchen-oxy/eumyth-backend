@@ -49,6 +49,7 @@ const validateQueryProjectIDList = [query('projectIDList').exists()];
 const validateQueryRootCommentIDArray = [query('rootCommentIDArray').exists()];
 const validateQueryUserRelationArrayID = [query('userRelationArrayID').exists()];
 const validateQueryViewingMode = [query('viewingMode').exists()];
+const validateQueryShouldDeletePosts = [query('shouldDeletePosts').exists()];
 
 const validateBodyAction = [body('action').exists()];
 const validateBodyAncestors = [body('ancestors').exists()];
@@ -73,8 +74,9 @@ const validateBodyCurrentUsername = [body('currentUsername').exists()];
 const validateBodyTargetUsername = [body('targetUsername').exists()];
 const validateBodyText = [body('text').exists()];
 const validateBodyPursuit = [body('pursuit').exists()];
-const validateBodyProjectData = [body('projectData').exists()];
 const validateBodyProjectID = [body('projectID').exists()];
+
+const validateBodyProjectData = [body('projectData').exists()];
 const validateBodyBio = [body('bio').exists()];
 const validateBodySelectedPosts = [body('selectedPosts').exists()];
 const validateBodyTitle = [body('title').exists()];
@@ -101,6 +103,9 @@ module.exports = {
     validateQueryFullNames,
     validateQueryPostID,
     validateQueryPostIDList,
+    validateQueryProjectID,
+    validateQueryShouldDeletePosts,
+
     validateQueryImageKey,
     validateQueryIncludePostText,
     validateQueryProjectID,
@@ -126,8 +131,8 @@ module.exports = {
     validateBodyCompressedImageSet,
     validateBodyDisplayPhoto,
     validateBodyID,
-    validateBodyProjectData,
     validateBodyProjectID,
+    validateBodyProjectData,
     validateBodyPostID,
     validateBodyRemoveCoverPhoto,
     validateBodyIsPaginated,

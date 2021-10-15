@@ -80,6 +80,11 @@ const findProjectByID = (projectID) => {
             return result;
         });
 }
+
+const findProjectByIDAndUpdate = (projectID, update) => {
+    return Project.Model.findByIdAndUpdate(projectID, update);
+}
+
 const findProjectsByID = (projectIDArray) => {
     return Project.Model.find({
         '_id': { $in: projectIDArray }, function(err, docs) {
@@ -92,6 +97,23 @@ const findProjectsByID = (projectIDArray) => {
 }
 
 //Post
+
+const deletePostsByID = (postIDList) => {
+    return Post.Model.deleteMany(
+        {
+            _id: {
+                $in: postIDList
+            }
+        },
+        function (err, result) {
+            if (err) {
+                res.send(err);
+            } else {
+                res.send(result);
+            }
+        }
+    );
+}
 
 const deletePostByID = (postID) => {
     return Post.Model.deleteOne({ _id: postID });
@@ -213,6 +235,7 @@ const findComments = (commentIDArray) => {
 
 module.exports = {
     deleteCommentsByID,
+    deletePostsByID,
     retrieveCommentByID,
     findComments,
     retrieveIndexUserByID,
@@ -228,6 +251,7 @@ module.exports = {
     findUserRelations,
     retrieveUserRelationByID,
     findProjectByID,
+    findProjectByIDAndUpdate,
     findProjectsByID,
     deletePostByID,
     retrievePostByID,
