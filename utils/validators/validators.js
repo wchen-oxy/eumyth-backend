@@ -1,19 +1,58 @@
 const { custom, body, query, validationResult } = require('express-validator');
-const { BadRequestError } = require('./errors');
+const { BadRequestError } = require('../errors');
 
-const CROPPED_IMAGE = "croppedImage";
-const SMALL_CROPPED_IMAGE = "smallCroppedImage";
-const TINY_CROPPED_IMAGE = "tinyCroppedImage";
+const PARAM_CONSTANTS = {
+    ACTION: 'action',
+    ANCESTORS: 'ancestors',
+    COMMENT: 'comment',
+    COMMENT_ID: 'commentID',
+    DRAFT: 'draft',
+    DRAFT_TITLE: 'draftTitle',
+    DISPLAY_PHOTO: 'displayPhoto',
+    TARGET_PROFILE_PREVIEW: 'targetProfilePreview',
+    FIRST_NAME: 'firstname',
+    IMAGE_KEY: 'imageKey',
+    KEYS: 'keys',
+    PURSUIT_ARRAY: 'pursuitArray',
+    PROFILE_PREVIEW_ID: 'profilePreviewID',
+    VOTE_VALUE: 'voteValue',
+    INDEX_USER_ID: 'indexUserID',
+    USER_ID: 'userID',
+    USER_RELATION_ARRAY_ID: 'userRelationArrayID',
+    CURRENT_USERNAME: 'currentUsername',
+    TARGET_USERNAME: 'targetUsername',
+    TEXT: 'text',
+    PURSUIT: 'pursuit',
+    PROJECT_ID: 'projectID',
+    PROJECT_DATA: 'projectData',
+    BIO: 'bio',
+    SELECTED_POSTS: 'selectedPosts',
+    TITLE: 'title',
+    POST_PRIVACY: 'postPrivacyType',
+    POST_TYPE: 'postType',
+    CROPPED_IMAGE: 'croppedImage',
+    SMALL_CROPPED_IMAGE: 'smallCroppedImage',
+    TINY_CROPPED_IMAGE: 'tinyCroppedImage',
+    ID: 'ID',
+    POST_ID: 'postID',
+    REMOVE_COVER_PHOTO: 'removeCoverPhoto',
+    PROGRESSION: 'progression',
+    IS_PAGINATED: 'isPaginated',
+    IS_PRIVATE: 'isPrivate',
 
-const checkBodyExists = (type) => {
-    if (type === "HEAD" ||
-        type === "GET" ||
-        type === "DELETE") {
-        return false;
-    }
-    else {
-        return true;
-    }
+    PROFILE_ID: 'profileID',
+    USERNAME: 'username',
+    VISITOR_USERNAME: 'visitorUsername',
+    LAST_NAME: 'lastName',
+    POST_ID: 'postID',
+    TEXT_ONLY: 'textOnly',
+    IMAGE_KEY: 'imageKey',
+    INCLUDE_POST_TEXT: 'includePostText',
+    PROJECT_ID: 'projectID',
+    ROOT_COMMENT_ID_ARRAY: 'rootCommentIDArray',
+    USER_RELATION_ARRAY_ID: 'userRelationArrayID',
+    VIEWING_MODE: 'viewingMode',
+    SHOULD_DELETE_POSTS: 'shouldDeletePosts'
 }
 
 
@@ -35,10 +74,26 @@ const imageFileWrapper = (value, { req }) => {
     return true;
 };
 
+
+const buildQueryValidationChain = (...params) => {
+    const chain = [];
+    for (const param of params) {
+        chain.push(query(param).exists());
+    }
+    return chain;
+}
+const buildBodyValidationChain = (...params) => {
+    const chain = [];
+    for (const param of params) {
+        chain.push(body(param).exists());
+    }
+    return chain;
+}
+
 const validateQueryProfileID = [query("profileID").exists()];
 const validateQueryUsername = [query("username").exists()];
 const validateQueryVisitorUsername = [query("visitorUsername").exists()];
-const validateQueryFullNames = [query("firstName").exists(), query("lastName").exists()];
+const validateQueryFullNames = [query("visitorUsername").exists(), query("lastName").exists()];
 const validateQueryPostID = [query('postID').exists()];
 const validateQueryPostIDList = [query('postIDList').exists()];
 const validateQueryTextOnly = [query('textOnly').exists()];
@@ -83,9 +138,9 @@ const validateBodyTitle = [body('title').exists()];
 const validateBodyPostPrivacy = [body('postPrivacyType').exists()];
 const validateBodyPostType = [body('postType').exists()];
 const validateBodyCompressedImageSet = [
-    body(CROPPED_IMAGE).custom(imageFileWrapper),
-    body(SMALL_CROPPED_IMAGE).custom(imageFileWrapper),
-    body(TINY_CROPPED_IMAGE).custom(imageFileWrapper)
+    body(PARAM_CONSTANTS.CROPPED_IMAGE).custom(imageFileWrapper),
+    body(PARAM_CONSTANTS.SMALL_CROPPED_IMAGE).custom(imageFileWrapper),
+    body(PARAM_CONSTANTS.TINY_CROPPED_IMAGE).custom(imageFileWrapper)
 ];
 const validateBodyID = [body('ID').exists()];
 const validateBodyPostID = [body('postID').exists()];
@@ -97,6 +152,9 @@ const validateBodyIsPrivate = [body('isPrivate').exists()];
 
 module.exports = {
     doesValidationErrorExist,
+    buildQueryValidationChain,
+    buildBodyValidationChain
+    PARAM_CONSTANTS,
     validateQueryProfileID,
     validateQueryUsername,
     validateQueryVisitorUsername,

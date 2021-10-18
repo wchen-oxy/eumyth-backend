@@ -1,10 +1,14 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
-const Comment = require("../../models/comment.model");
+const Comment = require('../../models/comment.model');
 const ImageAnnotation = require('../../models/image.annotation.model');
+
 const {
+    PARAM_CONSTANTS,
     doesValidationErrorExist,
+    buildQueryValidationChain,
+    buildBodyValidationChain,
     validateQueryRootCommentIDArray,
     validateQueryViewingMode,
     validateBodyPostID,
@@ -12,7 +16,8 @@ const {
     validateBodyAncestors,
     validateBodyComment,
     validateBodyCommentID,
-    validateBodyVoteValue } = require('../../utils/validators');
+    validateBodyVoteValue } = require('../../utils/validators/validators');
+
 const {
     retrieveCommentByID,
     findComments,
@@ -23,7 +28,6 @@ const {
 
 const COLLAPSED = "COLLAPSED";
 const EXPANDED = "EXPANDED";
-
 
 const processRootAndTopComments = (rootComments) => {
     let topComment = null;
@@ -220,8 +224,10 @@ const removeVote = (array, voteID) => {
 
 router.route('/')
     .get(
-        validateQueryRootCommentIDArray,
-        validateQueryViewingMode,
+        buildQueryValidationChain(
+            PARAM_CONSTANTS.ROOT_COMMENT_ID_ARRAY,
+            PARAM_CONSTANTS.VIEWING_MODE
+        ),
         doesValidationErrorExist,
         (req, res, next) => {
             const rootCommentIDArray = JSON.parse(req.query.rootCommentIDArray);
@@ -251,10 +257,12 @@ router.route('/')
 
 router.route('/reply')
     .post(
-        validateBodyPostID,
-        validateBodyProfilePreviewID,
-        validateBodyAncestors,
-        validateBodyComment,
+        buildBodyValidationChain(
+            PARAM_CONSTANTS.POST_ID,
+            PARAM_CONSTANTS.PROFILE_PREVIEW_ID,
+            PARAM_CONSTANTS.ANCESTORS,
+            PARAM_CONSTANTS.COMMENT
+        ),
         doesValidationErrorExist,
         (req, res, next) => {
             const postID = req.body.postID;
@@ -276,8 +284,10 @@ router.route('/reply')
 
 router.route('/root')
     .post(
-        validateBodyPostID,
-        validateBodyProfilePreviewID,
+        buildBodyValidationChain(
+            PARAM_CONSTANTS.POST_ID,
+            PARAM_CONSTANTS.PROFILE_PREVIEW_ID,
+        ),
         doesValidationErrorExist,
         (req, res, next) => {
             const postID = req.body.postID;
@@ -336,7 +346,10 @@ router.route('/root')
         });
 
 router.route('/refresh')
-    .get((req, res, next) => {
+    .get(
+        buildQueryValidationChain(PARAM_CONSTANTS.ROOT_COMMENT_ID_ARRAY),
+        doesValidationErrorExist,
+            (req, res, next) => {
         const rootCommentIDArray = JSON.parse(req.query.rootCommentIDArray);
         return returnExpandedComments(rootCommentIDArray)
             .then((results) => {

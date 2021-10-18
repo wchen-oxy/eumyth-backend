@@ -3,7 +3,7 @@ const { retrieveIndexUserByUsername } = require('../../data_access/dal');
 const {
   validateQueryUsername,
   doesValidationErrorExist
-} = require("../../utils/validators");
+} = require("../../utils/validators/validators");
 
 router.get('/',
   validateQueryUsername,

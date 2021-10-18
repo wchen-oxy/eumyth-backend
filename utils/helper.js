@@ -1,6 +1,6 @@
 let { NoContentError, TypeError } = require("./errors");
-const AWSConstants = require('../constants/aws');
-let { NO_COMMENT_FOUND, NO_POST_FOUND, NO_USER_FOUND, NO_USER_PREVIEW_FOUND, NO_USER_RELATION_FOUND, WRONG_TYPE, NO_PROJECT_FOUND } = require('../constants/messages');
+const AWSConstants = require('./shared/aws');
+let { NO_COMMENT_FOUND, NO_POST_FOUND, NO_USER_FOUND, NO_USER_PREVIEW_FOUND, NO_USER_RELATION_FOUND, WRONG_TYPE, NO_PROJECT_FOUND } = require('./shared/messages');
 const uuid = require('uuid');
 
 const isEmpty = (...input) => {

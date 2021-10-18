@@ -6,7 +6,7 @@ let Pursuit = require('../../models/pursuit.model');
 let IndexPursuit = require('../../models/index.pursuit.model');
 const UserRelation = require('../../models/user.relation.model');
 const Draft = require("../../models/draft.model");
-const MulterHelper = require('../../constants/multer').profileImageUpload;
+const MulterHelper = require('../../utils/shared/multer').profileImageUpload;
 const UserPreview = require('../../models/user.preview.model');
 
 const { retrieveCompleteUserByUsername, retrieveIndexUserByUsername, } = require('../../data_access/dal');
@@ -21,8 +21,8 @@ const {
   validateBodyIsPrivate,
   validateBodyBio,
   validateBodyPursuitArray
-} = require("../../utils/validators");
-const { PUBLIC_FEED } = require('../../constants/flags');
+} = require("../../utils/validators/validators");
+const { PUBLIC_FEED } = require('../../utils/shared/flags');
 
 const imageFields = [
   { name: "croppedImage" },

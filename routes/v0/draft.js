@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
-let IndexUser = require('../../models/index.user.model');
-const AWSConstants = require('../../constants/aws');
-const Helper = require('../../constants/helper');
+const AWSConstants = require('../../utils/shared/aws');
+const Helper = require('../../utils/shared/helper');
 const {
     validateQueryUsername,
     validateBodyDraft,
@@ -11,7 +10,7 @@ const {
     validateBodyDraftTitle,
 
 }
-    = require('../../utils/validators');
+    = require('../../utils/validators/validators');
 const { retrieveIndexUserByUsername } = require('../../data_access/dal');
 
 router.route('/')

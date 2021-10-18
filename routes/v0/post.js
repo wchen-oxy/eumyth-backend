@@ -4,7 +4,7 @@ const router = express.Router();
 const Post = require("../../models/post.model");
 const ContentPreview = require("../../models/content.preview.model");
 const Comment = require("../../models/comment.model");
-const MulterHelper = require('../../constants/multer');
+const MulterHelper = require('../../utils/shared/multer');
 
 const {
   findPostInList,
@@ -21,7 +21,7 @@ const {
 } = require('../../data_access/dal');
 
 const RECENT_POSTS_LIMIT = 5;
-const { SHORT, LONG, ALL } = require("../../constants/flags");
+const { SHORT, LONG, ALL } = require("../../utils/shared/flags");
 const { validateBodyUsername,
   validateBodyPostPrivacy,
   validateBodyPostType,
@@ -37,7 +37,7 @@ const { validateBodyUsername,
   doesValidationErrorExist,
   validateBodyRemoveCoverPhoto,
   validateBodyProgression,
-} = require('../../utils/validators');
+} = require('../../utils/validators/validators');
 const { checkStringBoolean } = require('../../utils/helper');
 
 const verifyArray = (value) => {
@@ -532,6 +532,7 @@ router.route('/').post(
         .catch(next)
     })
   .delete(
+    
     validateBodyIndexUserID,
     validateBodyUserID,
     validateBodyPostID,

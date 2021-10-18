@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const AWSConstants = require('../../constants/aws');
-const MulterHelper = require('../../constants/multer');
+const AWSConstants = require('../../utils/shared/aws');
+const MulterHelper = require('../../utils/shared/multer');
 const {
   validateQueryImageKey,
   validateBodyImageKey,
@@ -10,7 +10,7 @@ const {
   validateBodyUsername,
   doesValidationErrorExist,
 }
-  = require('../../utils/validators');
+  = require('../../utils/validators/validators');
 const { retrieveIndexUserByUsername, retrieveUserByID, retrieveUserPreviewByID, retrieveUserByUsername } = require('../../data_access/dal');
 
 const imageUpload = MulterHelper.contentImageUpload.single('file');

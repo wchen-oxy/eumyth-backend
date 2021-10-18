@@ -1,7 +1,7 @@
 const express = require('express');
 const { retrieveUserPreviewByUsername } = require('../../data_access/dal');
 const router = express.Router();
-const { validateQueryUsername } = require('../../utils/validators');
+const { validateQueryUsername } = require('../../utils/validators/validators');
 
 router.route("/id").get(
     validateQueryUsername,

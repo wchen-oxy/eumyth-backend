@@ -3,7 +3,20 @@ const express = require('express');
 const router = express.Router();
 const UserPreview = require('../../models/user.preview.model');
 const UserRelationStatus = require("../../models/user.relation.status.model");
-const { validateQueryVisitorUsername, validateQueryUsername, validateQueryUserRelationArrayID, validateBodyUserRelationArrayID, validateBodyUsername, doesValidationErrorExist, validateBodyVisitorUsername, validateBodyTargetProfilePreviewID, validateBodyIsPrivate, validateBodyAction, validateBodyID, validateBodyTargetUsername, validateBodyCurrentUsername, } = require('../../utils/validators');
+const { validateQueryVisitorUsername,
+   validateQueryUsername,
+    validateQueryUserRelationArrayID,
+     validateBodyUserRelationArrayID,
+      validateBodyUsername, 
+      doesValidationErrorExist,
+       validateBodyVisitorUsername, 
+       validateBodyTargetProfilePreviewID,
+        validateBodyIsPrivate, 
+        validateBodyAction,
+         validateBodyID, 
+         validateBodyTargetUsername,
+          validateBodyCurrentUsername,
+         } = require('../../utils/validators/validators');
 const { findUserRelations,
   retrieveUserPreviewByUsername,
   retrieveUserRelationByID } = require('../../data_access/dal');

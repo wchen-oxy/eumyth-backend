@@ -11,7 +11,7 @@ const Post = require('../models/post.model');
 const UserPreview = require("../models/user.preview.model");
 const UserRelation = require("../models/user.relation.model");
 const Project = require("../models/project.model");
-const Helper = require('../constants/helper');
+const Helper = require('../utils/shared/helper');
 
 const deleteCommentsByID = (commentIDArray) => {
     return Comment.Model.deleteMany({

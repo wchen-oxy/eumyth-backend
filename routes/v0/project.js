@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const MulterHelper = require('../../constants/multer');
+const MulterHelper = require('../../utils/shared/multer');
 const Project = require('../../models/project.model');
 const ContentPreview = require('../../models/content.preview.model');
 const Post = require('../../models/post.model');
@@ -18,7 +18,7 @@ const {
     validateBodyProjectData,
     validateBodyProjectID,
     validateQueryShouldDeletePosts,
-} = require('../../utils/validators');
+} = require('../../utils/validators/validators');
 const { retrieveIndexUserByID, retrieveUserByID, findProjectByID, findProjectByIDAndUpdate, findProjectsByID, findPostInList, deletePostsByID } = require('../../data_access/dal');
 
 router.route('/')
