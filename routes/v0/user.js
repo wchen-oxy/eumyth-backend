@@ -12,15 +12,10 @@ const UserPreview = require('../../models/user.preview.model');
 const { retrieveCompleteUserByUsername, retrieveIndexUserByUsername, } = require('../../data_access/dal');
 
 const {
+  PARAM_CONSTANTS,
+  buildQueryValidationChain,
+  buildBodyValidationChain,
   doesValidationErrorExist,
-  validateQueryUsername,
-  validateBodyUsername,
-  validateBodyFullNames,
-  validateBodyIndexUserID,
-  validateBodyText,
-  validateBodyIsPrivate,
-  validateBodyBio,
-  validateBodyPursuitArray
 } = require("../../utils/validators/validators");
 const { PUBLIC_FEED } = require('../../utils/shared/flags');
 
@@ -31,17 +26,23 @@ const imageFields = [
 ];
 
 router.route('/')
-  .get(validateQueryUsername, doesValidationErrorExist, (req, res, next) => {
-    const username = req.query.username;
-    retrieveCompleteUserByUsername(username)
-      .then(user => res.status(200).json(user))
-      .catch(next)
-  })
+  .get(
+    buildQueryValidationChain(PARAM_CONSTANTS.USERNAME),
+    doesValidationErrorExist,
+    (req, res, next) => {
+      const username = req.query.username;
+      retrieveCompleteUserByUsername(username)
+        .then(user => res.status(200).json(user))
+        .catch(next)
+    })
   .post(
     MulterHelper.fields(imageFields),
-    validateBodyUsername,
-    validateBodyFullNames,
-    validateBodyPursuitArray,
+    buildBodyValidationChain(
+      PARAM_CONSTANTS.USERNAME,
+      PARAM_CONSTANTS.FIRST_NAME,
+      PARAM_CONSTANTS.LAST_NAME,
+      PARAM_CONSTANTS.PURSUIT_ARRAY
+    ),
     doesValidationErrorExist,
     (req, res, next) => {
       const username = req.body.username;
@@ -171,7 +172,7 @@ router.route('/')
 
 router.route('/account-settings-info')
   .get(
-    validateQueryUsername,
+    buildQueryValidationChain(PARAM_CONSTANTS.USERNAME),
     doesValidationErrorExist,
     (req, res, next) => {
       const username = req.query.username;
@@ -194,9 +195,12 @@ router.route('/account-settings-info')
     });
 
 router.route('/template')
-  .put(validateBodyIndexUserID,
-    validateBodyText,
-    validateBodyPursuitArray,
+  .put(
+    buildBodyValidationChain(
+      PARAM_CONSTANTS.INDEX_USER_ID,
+      PARAM_CONSTANTS.TEXT,
+      PARAM_CONSTANTS.PURSUIT_ARRAY
+    ),
     doesValidationErrorExist,
     (req, res, next) => {
       const userID = req.body.indexUserID;
@@ -217,7 +221,10 @@ router.route('/template')
     })
 
 router.route('/bio')
-  .get(validateQueryUsername,
+  .get(
+    buildQueryValidationChain(
+      PARAM_CONSTANTS.USERNAME
+    ),
     doesValidationErrorExist,
     (req, res, next) => {
       const username = req.query.username;
@@ -228,8 +235,10 @@ router.route('/bio')
         .catch(next)
     })
   .put(
-    validateBodyUsername,
-    validateBodyBio,
+    buildBodyValidationChain(
+      PARAM_CONSTANTS.USERNAME,
+      PARAM_CONSTANTS.BIO
+    ),
     doesValidationErrorExist,
     (req, res, next) => {
       const username = req.body.username;
@@ -249,8 +258,11 @@ router.route('/bio')
     })
 
 router.route('/private')
-  .put(validateBodyUsername,
-    validateBodyIsPrivate,
+  .put(
+    buildBodyValidationChain(
+      PARAM_CONSTANTS.USERNAME,
+      PARAM_CONSTANTS.IS_PRIVATE
+    ),
     doesValidationErrorExist,
     (req, res, next) => {
       const username = req.body.username;
@@ -269,7 +281,5 @@ router.route('/private')
         .then(() => res.status(200).send())
         .catch(next)
     })
-
-
 
 module.exports = router;

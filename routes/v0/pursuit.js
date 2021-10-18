@@ -1,13 +1,20 @@
 var router = require('express').Router();
 let { NoContentError } = require("../../utils/errors");
 let { NO_USER_FOUND } = require("../../utils/shared/messages");
-const { doesValidationErrorExist, validateQueryProfileID } = require("../../utils/validators/validators");
+const {
+    PARAM_CONSTANTS,
+    buildQueryValidationChain,
+    doesValidationErrorExist,
+} = require("../../utils/validators/validators");
 const { retrieveCompleteUserByID } = require('../../data_access/dal');
 
 router.route('/all-posts')
     .get(
-        validateQueryProfileID,
-        doesValidationErrorExist, (req, res, next) => {
+        buildQueryValidationChain(
+            PARAM_CONSTANTS.PROFILE_ID
+        ),
+        doesValidationErrorExist,
+        (req, res, next) => {
             const profileID = req.query.profileID;
             return retrieveCompleteUserByID(profileID)
                 .then(result => {

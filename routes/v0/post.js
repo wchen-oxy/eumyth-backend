@@ -22,21 +22,11 @@ const {
 
 const RECENT_POSTS_LIMIT = 5;
 const { SHORT, LONG, ALL } = require("../../utils/shared/flags");
-const { validateBodyUsername,
-  validateBodyPostPrivacy,
-  validateBodyPostType,
-  validateBodyIsPaginated,
-  validateBodyPostID,
-  validateBodyIndexUserID,
-  validateBodyUserID,
-  validateQueryPostID,
-  validateQueryIncludePostText,
-  validateQueryTextOnly,
-  validateBodyImageKey,
-  validateQueryPostIDList,
+const {
+  PARAM_CONSTANTS,
+  buildQueryValidationChain,
+  buildBodyValidationChain,
   doesValidationErrorExist,
-  validateBodyRemoveCoverPhoto,
-  validateBodyProgression,
 } = require('../../utils/validators/validators');
 const { checkStringBoolean } = require('../../utils/helper');
 
@@ -314,11 +304,13 @@ const spliceArray = (postID, array) => {
 
 router.route('/').post(
   MulterHelper.contentImageUpload.fields(postImageFields),
-  validateBodyUsername,
-  validateBodyPostPrivacy,
-  validateBodyPostType,
-  validateBodyProgression,
-  validateBodyIsPaginated,
+  buildBodyValidationChain(
+    PARAM_CONSTANTS.USERNAME,
+    PARAM_CONSTANTS.POST_PRIVACY,
+    PARAM_CONSTANTS.POST_TYPE,
+    PARAM_CONSTANTS.PROGRESSION,
+    PARAM_CONSTANTS.IS_PAGINATED
+  ),
   doesValidationErrorExist,
   retrieveRelevantUserInfo,
   (req, res, next) => {
@@ -457,12 +449,14 @@ router.route('/').post(
   })
   .put(
     MulterHelper.contentImageUpload.single("coverPhoto"),
-    validateBodyPostID,
-    validateBodyUsername,
-    validateBodyPostType,
-    validateBodyProgression,
-    validateBodyIsPaginated,
-    validateBodyRemoveCoverPhoto,
+    buildBodyValidationChain(
+      PARAM_CONSTANTS.POST_ID,
+      PARAM_CONSTANTS.USERNAME,
+      PARAM_CONSTANTS.POST_TYPE,
+      PARAM_CONSTANTS.PROGRESSION,
+      PARAM_CONSTANTS.IS_PAGINATED,
+      PARAM_CONSTANTS.REMOVE_COVER_PHOTO
+    ),
     doesValidationErrorExist,
     (req, res, next) => {
       const postID = req.body.postID;
@@ -532,11 +526,12 @@ router.route('/').post(
         .catch(next)
     })
   .delete(
-    
-    validateBodyIndexUserID,
-    validateBodyUserID,
-    validateBodyPostID,
-    validateBodyProgression,
+    buildBodyValidationChain(
+      PARAM_CONSTANTS.INDEX_USER_ID,
+      PARAM_CONSTANTS.USER_ID,
+      PARAM_CONSTANTS.POST_ID,
+      PARAM_CONSTANTS.PROGRESSION,
+    ),
     doesValidationErrorExist,
     (req, res, next) => {
       const indexUserID = req.body.indexUserID;
@@ -578,8 +573,10 @@ router.route('/').post(
     });
 
 router.route('/multiple').get(
-  validateQueryPostIDList,
-  validateQueryIncludePostText,
+  buildQueryValidationChain(
+    PARAM_CONSTANTS.POST_ID_LIST,
+    PARAM_CONSTANTS.INCLUDE_POST_TEXT
+  ),
   doesValidationErrorExist,
   (req, res, next) => {
     const postIDList = req.query.postIDList;
@@ -610,8 +607,10 @@ router.route('/multiple').get(
   });
 
 router.route('/single').get(
-  validateQueryTextOnly,
-  validateQueryPostID,
+  buildQueryValidationChain(
+    PARAM_CONSTANTS.TEXT_ONLY,
+    PARAM_CONSTANTS.POST_ID,
+  ),
   doesValidationErrorExist,
   (req, res, next) => {
     const textOnly = req.query.textOnly.toUpperCase();
@@ -630,8 +629,10 @@ router.route('/single').get(
 
 router.route('/display-photo')
   .patch(
-    validateBodyUsername,
-    validateBodyImageKey,
+    buildBodyValidationChain(
+      PARAM_CONSTANTS.USERNAME,
+      PARAM_CONSTANTS.IMAGE_KEY
+    ),
     doesValidationErrorExist,
     (req, res, next) => {
       const username = req.body.username;

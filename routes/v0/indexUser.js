@@ -1,12 +1,13 @@
 const router = require('express').Router();
 const { retrieveIndexUserByUsername } = require('../../data_access/dal');
 const {
-  validateQueryUsername,
-  doesValidationErrorExist
+  PARAM_CONSTANTS,
+  buildQueryValidationChain,
+  doesValidationErrorExist,
 } = require("../../utils/validators/validators");
 
 router.get('/',
-  validateQueryUsername,
+  buildQueryValidationChain(PARAM_CONSTANTS.USERNAME),
   doesValidationErrorExist,
   (req, res, next) => {
     const username = req.query.username;
@@ -36,7 +37,7 @@ router.get('/',
   })
 
 router.get('/pursuits',
-  validateQueryUsername,
+  buildQueryValidationChain(PARAM_CONSTANTS.USERNAME),
   doesValidationErrorExist,
   (req, res, next) => {
     const username = req.query.username;
@@ -46,7 +47,7 @@ router.get('/pursuits',
   })
 
 router.get('/username',
-  validateQueryUsername,
+  buildQueryValidationChain(PARAM_CONSTANTS.USERNAME),
   doesValidationErrorExist,
   (req, res, next) => {
     const username = req.query.username;

@@ -1,30 +1,23 @@
-
 const express = require('express');
 const router = express.Router();
 const UserPreview = require('../../models/user.preview.model');
 const UserRelationStatus = require("../../models/user.relation.status.model");
-const { validateQueryVisitorUsername,
-   validateQueryUsername,
-    validateQueryUserRelationArrayID,
-     validateBodyUserRelationArrayID,
-      validateBodyUsername, 
-      doesValidationErrorExist,
-       validateBodyVisitorUsername, 
-       validateBodyTargetProfilePreviewID,
-        validateBodyIsPrivate, 
-        validateBodyAction,
-         validateBodyID, 
-         validateBodyTargetUsername,
-          validateBodyCurrentUsername,
-         } = require('../../utils/validators/validators');
+const {
+  PARAM_CONSTANTS,
+  buildQueryValidationChain,
+  buildBodyValidationChain,
+  doesValidationErrorExist,
+} = require('../../utils/validators/validators');
 const { findUserRelations,
   retrieveUserPreviewByUsername,
   retrieveUserRelationByID } = require('../../data_access/dal');
 const NOT_A_FOLLOWER_STATE = "NOT_A_FOLLOWER";
 
 router.route('/').get(
-  validateQueryVisitorUsername,
-  validateQueryUserRelationArrayID,
+  buildQueryValidationChain(
+    PARAM_CONSTANTS.VISITOR_USERNAME,
+    PARAM_CONSTANTS.USER_RELATION_ARRAY_ID
+  ),
   doesValidationErrorExist,
   (req, res, next) => {
     const visitorUsername = req.query.visitorUsername;
@@ -55,7 +48,7 @@ router.route('/').get(
   });
 
 router.route('/info').get(
-  validateQueryUsername,
+  buildQueryValidationChain(PARAM_CONSTANTS.USERNAME),
   doesValidationErrorExist,
   (req, res, next) => {
     const username = req.query.username;
@@ -146,11 +139,13 @@ router.route('/info').get(
   })
 
 router.route('/status').put(
-  validateBodyVisitorUsername,
-  validateBodyUserRelationArrayID,
-  validateBodyTargetProfilePreviewID,
-  validateBodyIsPrivate,
-  validateBodyAction,
+  buildBodyValidationChain(
+    PARAM_CONSTANTS.VISITOR_USERNAME,
+    PARAM_CONSTANTS.USER_RELATION_ARRAY_ID,
+    PARAM_CONSTANTS.PROFILE_PREVIEW_ID,
+    PARAM_CONSTANTS.IS_PRIVATE,
+    PARAM_CONSTANTS.ACTION
+  ),
   doesValidationErrorExist,
   (req, res, next) => {
     const visitorUsername = req.body.visitorUsername;
@@ -281,10 +276,12 @@ router.route('/status').put(
   });
 
 router.route('/set').put(
-  validateBodyID,
-  validateBodyTargetUsername,
-  validateBodyCurrentUsername,
-  validateBodyAction,
+  buildBodyValidationChain(
+    PARAM_CONSTANTS.ID,
+    PARAM_CONSTANTS.TARGET_USERNAME,
+    PARAM_CONSTANTS.CURRENT_USERNAME,
+    PARAM_CONSTANTS.ACTION
+  ),
   doesValidationErrorExist,
   (req, res, next) => {
     const ID = req.body.ID;

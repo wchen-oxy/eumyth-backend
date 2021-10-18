@@ -7,28 +7,23 @@ const Post = require('../../models/post.model');
 const Ref = require('../../models/ref.model');
 const Helper = require('../../utils/helper');
 const {
-    validateQueryProjectIDList,
-    validateBodyUsername,
-    validateBodyUserID,
-    validateBodyIndexUserID,
-    validateBodySelectedPosts,
-    validateBodyTitle,
+    PARAM_CONSTANTS,
+    buildQueryValidationChain,
+    buildBodyValidationChain,
     doesValidationErrorExist,
-    validateQueryProjectID,
-    validateBodyProjectData,
-    validateBodyProjectID,
-    validateQueryShouldDeletePosts,
 } = require('../../utils/validators/validators');
 const { retrieveIndexUserByID, retrieveUserByID, findProjectByID, findProjectByIDAndUpdate, findProjectsByID, findPostInList, deletePostsByID } = require('../../data_access/dal');
 
 router.route('/')
     .post(
         MulterHelper.contentImageUpload.single({ name: "coverPhoto", maxCount: 1 }),
-        validateBodyUsername,
-        validateBodyUserID,
-        validateBodyIndexUserID,
-        validateBodySelectedPosts,
-        validateBodyTitle,
+        buildBodyValidationChain(
+            PARAM_CONSTANTS.USERNAME,
+            PARAM_CONSTANTS.USER_ID,
+            PARAM_CONSTANTS.INDEX_USER_ID,
+            PARAM_CONSTANTS.SELECTED_POSTS,
+            PARAM_CONSTANTS.TITLE
+        ),
         doesValidationErrorExist,
         (req, res, next) => {
             const username = req.body.username;
@@ -110,8 +105,10 @@ router.route('/')
         })
     .put(
         MulterHelper.contentImageUpload.single({ name: "coverPhoto", maxCount: 1 }),
-        validateBodyProjectID,
-        validateBodyTitle,
+        buildBodyValidationChain(
+            PARAM_CONSTANTS.PROJECT_ID,
+            PARAM_CONSTANTS.TITLE
+        ),
         doesValidationErrorExist,
         (req, res, next) => {
             const updates = {};
@@ -134,8 +131,10 @@ router.route('/')
                 });
         })
     .delete(
-        validateQueryProjectID,
-        validateQueryShouldDeletePosts,
+        buildQueryValidationChain(
+            PARAM_CONSTANTS.PROJECT_ID,
+            PARAM_CONSTANTS.SHOULD_DELETE_POSTS
+        ),
         doesValidationErrorExist,
         (req, res, next) => {
             const projectID = req.query.projectID;
@@ -151,7 +150,9 @@ router.route('/')
     );
 
 router.route('/single').get(
-    validateQueryProjectID,
+    buildQueryValidationChain(
+        PARAM_CONSTANTS.PROJECT_ID,
+    ),
     doesValidationErrorExist,
     (req, res, next) => {
         const projectID = req.query.projectID;
@@ -167,7 +168,9 @@ router.route('/single').get(
 
 
 router.route('/multiple').get(
-    validateQueryProjectIDList,
+    buildQueryValidationChain(
+        PARAM_CONSTANTS.PROJECT_ID_LIST,
+    ),
     doesValidationErrorExist,
     (req, res, next) => {
         const projectIDList = req.query.projectIDList;
@@ -205,11 +208,12 @@ const refreshPostImageData = (posts, imageKeyMap) => {
     }
 }
 router.route('/fork').put(
-    validateBodyProjectData,
-    validateBodyUsername,
-    validateBodyIndexUserID,
-    validateBodyUserID,
-    // validateBodyDisplayPhoto,
+    buildBodyValidationChain(
+        PARAM_CONSTANTS.PROJECT_DATA,
+        PARAM_CONSTANTS.USERNAME,
+        PARAM_CONSTANTS.INDEX_USER_ID,
+        PARAM_CONSTANTS.USER_ID
+    ),
     doesValidationErrorExist,
     (req, res, next) => {
         const projectData = req.body.projectData;

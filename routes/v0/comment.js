@@ -6,17 +6,10 @@ const ImageAnnotation = require('../../models/image.annotation.model');
 
 const {
     PARAM_CONSTANTS,
-    doesValidationErrorExist,
     buildQueryValidationChain,
     buildBodyValidationChain,
-    validateQueryRootCommentIDArray,
-    validateQueryViewingMode,
-    validateBodyPostID,
-    validateBodyProfilePreviewID,
-    validateBodyAncestors,
-    validateBodyComment,
-    validateBodyCommentID,
-    validateBodyVoteValue } = require('../../utils/validators/validators');
+    doesValidationErrorExist,
+} = require('../../utils/validators/validators');
 
 const {
     retrieveCommentByID,
@@ -349,21 +342,23 @@ router.route('/refresh')
     .get(
         buildQueryValidationChain(PARAM_CONSTANTS.ROOT_COMMENT_ID_ARRAY),
         doesValidationErrorExist,
-            (req, res, next) => {
-        const rootCommentIDArray = JSON.parse(req.query.rootCommentIDArray);
-        return returnExpandedComments(rootCommentIDArray)
-            .then((results) => {
-                return res.status(200).json({ rootComments: results });
-            })
-            .catch(next)
-    })
+        (req, res, next) => {
+            const rootCommentIDArray = JSON.parse(req.query.rootCommentIDArray);
+            return returnExpandedComments(rootCommentIDArray)
+                .then((results) => {
+                    return res.status(200).json({ rootComments: results });
+                })
+                .catch(next)
+        })
 
 
 router.route('/vote')
     .put(
-        validateBodyCommentID,
-        validateBodyVoteValue,
-        validateBodyProfilePreviewID,
+        buildBodyValidationChain(
+            PARAM_CONSTANTS.COMMENT_ID,
+            PARAM_CONSTANTS.VOTE_VALUE,
+            PARAM_CONSTANTS.PROFILE_PREVIEW_ID,
+        ),
         doesValidationErrorExist,
         (req, res, next) => {
             const commentID = req.body.commentID;

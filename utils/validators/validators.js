@@ -23,6 +23,8 @@ const PARAM_CONSTANTS = {
     TARGET_USERNAME: 'targetUsername',
     TEXT: 'text',
     PURSUIT: 'pursuit',
+    POST_ID_LIST: 'postIDList',
+    PROJECT_ID_LIST: 'projectIDList',
     PROJECT_ID: 'projectID',
     PROJECT_DATA: 'projectData',
     BIO: 'bio',
@@ -34,7 +36,7 @@ const PARAM_CONSTANTS = {
     SMALL_CROPPED_IMAGE: 'smallCroppedImage',
     TINY_CROPPED_IMAGE: 'tinyCroppedImage',
     ID: 'ID',
-    POST_ID: 'postID',
+
     REMOVE_COVER_PHOTO: 'removeCoverPhoto',
     PROGRESSION: 'progression',
     IS_PAGINATED: 'isPaginated',
@@ -46,7 +48,6 @@ const PARAM_CONSTANTS = {
     LAST_NAME: 'lastName',
     POST_ID: 'postID',
     TEXT_ONLY: 'textOnly',
-    IMAGE_KEY: 'imageKey',
     INCLUDE_POST_TEXT: 'includePostText',
     PROJECT_ID: 'projectID',
     ROOT_COMMENT_ID_ARRAY: 'rootCommentIDArray',
@@ -153,7 +154,7 @@ const validateBodyIsPrivate = [body('isPrivate').exists()];
 module.exports = {
     doesValidationErrorExist,
     buildQueryValidationChain,
-    buildBodyValidationChain
+    buildBodyValidationChain,
     PARAM_CONSTANTS,
     validateQueryProfileID,
     validateQueryUsername,

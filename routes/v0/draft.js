@@ -3,19 +3,17 @@ const router = express.Router();
 const AWSConstants = require('../../utils/shared/aws');
 const Helper = require('../../utils/shared/helper');
 const {
-    validateQueryUsername,
-    validateBodyDraft,
-    validateBodyUsername,
+    PARAM_CONSTANTS,
+    buildQueryValidationChain,
+    buildBodyValidationChain,
     doesValidationErrorExist,
-    validateBodyDraftTitle,
-
 }
     = require('../../utils/validators/validators');
 const { retrieveIndexUserByUsername } = require('../../data_access/dal');
 
 router.route('/')
     .get(
-        validateQueryUsername,
+        buildQueryValidationChain(PARAM_CONSTANTS.USERNAME),
         doesValidationErrorExist,
         (req, res, next) => {
             const username = req.query.username;
@@ -34,8 +32,9 @@ router.route('/')
                 .catch(next);
         })
     .put(
-        validateBodyUsername,
-        validateBodyDraft,
+        buildBodyValidationChain(
+            PARAM_CONSTANTS.USERNAME,
+            PARAM_CONSTANTS.DRAFT),
         doesValidationErrorExist,
         (req, res, next) => {
             const username = req.body.username;
@@ -81,30 +80,14 @@ router.route('/')
                 })
                 .then(() => res.sendStatus(200))
                 .catch(next);
-        })
-// .delete(
-//     validateQueryUsername,
-//     doesValidationErrorExist,
-//     (req, res) => {
-//         const username = req.query.username;
-//         return IndexUser.Model
-//             .findOne({ username: username }, Helper.resultCallback)
-//             .then(indexUser => {
-//                 indexUser.draft = null;
-//                 indexuser.save();
-//             })
-//             .then(() => res.sendStatus(201))
-//             .catch((error) => {
-//                 console.log(error);
-//                 return res.status(500).json({ error: error });
-//             });
-
-//     })
+        });
 
 router.route('/title')
     .put(
-        validateBodyUsername,
-        validateBodyDraftTitle,
+        buildBodyValidationChain(
+            PARAM_CONSTANTS.USERNAME,
+            PARAM_CONSTANTS.DRAFT_TITLE
+        ),
         doesValidationErrorExist,
         (req, res, next) => {
             const username = req.body.username;
@@ -120,31 +103,5 @@ router.route('/title')
                 .catch(next);
         })
 
-// router.route('/desc').put((req, res) => {
-//     const username = req.body.username;
-//     const desc = req.body.desc;
-//     IndexUser.Model.findOne({ username: username },
-//         (err, indexUserProfile) => {
-//             if (err) {
-//                 console.log(err);
-//                 res.status(500).json("Error: " + err)
-//             }
-//         }
-//     )
-//         .then(
-//             (indexUser) => {
-//                 indexUser.draft.desc = req.body.desc;
-//                 return indexUser.save((err) => {
-//                     if (err) {
-//                         console.error('ERROR: ' + err);
-//                         res.status(500).json(err);
-//                     }
-//                 });
-//             }
-//         ).then(
-//             () => res.sendStatus(201)).catch(err => console.log(err)
-//             );
-// }
-// );
 
 module.exports = router;

@@ -3,12 +3,10 @@ const router = express.Router();
 const AWSConstants = require('../../utils/shared/aws');
 const MulterHelper = require('../../utils/shared/multer');
 const {
-  validateQueryImageKey,
-  validateBodyImageKey,
-  validateBodyKeys,
-  validateQueryUsername,
-  validateBodyUsername,
+  PARAM_CONSTANTS,
   doesValidationErrorExist,
+  buildQueryValidationChain,
+  buildBodyValidationChain,
 }
   = require('../../utils/validators/validators');
 const { retrieveIndexUserByUsername, retrieveUserByID, retrieveUserPreviewByID, retrieveUserByUsername } = require('../../data_access/dal');
@@ -23,7 +21,7 @@ const displayPhotoUploadFields = [
 
 router.route('/')
   .get(
-    validateQueryImageKey,
+    buildQueryValidationChain(PARAM_CONSTANTS.IMAGE_KEY),
     doesValidationErrorExist,
     (req, res, next) => {
       return AWSConstants
@@ -47,7 +45,7 @@ router.route('/')
     });
   })
   .delete(
-    validateBodyImageKey,
+    buildBodyValidationChain(PARAM_CONSTANTS.IMAGE_KEY),
     doesValidationErrorExist,
     (req, res, next) => {
       const imageKey = req.body.imageKey;
@@ -77,7 +75,7 @@ router.route('/')
 
 router.route('/navbar-display-photo')
   .get(
-    validateQueryUsername,
+    buildQueryValidationChain(PARAM_CONSTANTS.USERNAME),
     doesValidationErrorExist,
     (req, res, next) => retrieveIndexUserByUsername(req.query.username)
       .then((result) => {
@@ -92,7 +90,7 @@ router.route('/navbar-display-photo')
 router.route('/display-photo')
   .post(
     MulterHelper.profileImageUpload.fields(displayPhotoUploadFields),
-    validateBodyUsername,
+    buildBodyValidationChain(PARAM_CONSTANTS.USERNAME),
     doesValidationErrorExist,
     (req, res, next) => {
       const username = req.body.username;
@@ -133,7 +131,7 @@ router.route('/display-photo')
         .catch(next);
     })
   .delete(
-    validateBodyUsername,
+    buildBodyValidationChain(PARAM_CONSTANTS.USERNAME),
     doesValidationErrorExist,
     (req, res, next) => {
       const username = req.body.username;
@@ -192,7 +190,7 @@ router.route('/display-photo')
 router.route('/cover')
   .post(
     MulterHelper.profileImageUpload.single("coverPhoto"),
-    validateBodyUsername,
+    buildBodyValidationChain(PARAM_CONSTANTS.USERNAME),
     doesValidationErrorExist,
     (req, res, next) => {
       const username = req.body.username;
@@ -213,7 +211,7 @@ router.route('/cover')
         .catch(next)
     })
   .delete(
-    validateBodyUsername,
+    buildBodyValidationChain(PARAM_CONSTANTS.USERNAME),
     doesValidationErrorExist,
     (req, res, next) => {
       const username = req.body.username;
@@ -248,7 +246,7 @@ router.route('/cover')
 
 router.route('/multiple')
   .delete(
-    validateBodyKeys,
+    buildBodyValidationChain(PARAM_CONSTANTS.KEYS),
     doesValidationErrorExist,
     (req, res, next) => {
       const photoKeys = req.body.keys;

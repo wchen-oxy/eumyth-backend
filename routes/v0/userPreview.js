@@ -1,10 +1,15 @@
 const express = require('express');
 const { retrieveUserPreviewByUsername } = require('../../data_access/dal');
 const router = express.Router();
-const { validateQueryUsername } = require('../../utils/validators/validators');
+const {
+    PARAM_CONSTANTS,
+    buildQueryValidationChain,
+    doesValidationErrorExist
+} = require('../../utils/validators/validators');
 
 router.route("/id").get(
-    validateQueryUsername,
+    buildQueryValidationChain(PARAM_CONSTANTS.USERNAME),
+    doesValidationErrorExist,
     (req, res, next) => {
         const username = req.query.username;
         return retrieveUserPreviewByUsername(username)
