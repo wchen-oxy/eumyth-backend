@@ -1,10 +1,11 @@
 const router = require('express').Router();
-const { retrieveIndexUserByUsername } = require('../../data_access/dal');
+const { findOne } = require('../../../data-access/dal');
+const ModelConstants = require('../../../models/constants');
 const {
   PARAM_CONSTANTS,
   buildQueryValidationChain,
   doesValidationErrorExist,
-} = require("../../utils/validators/validators");
+} = require("../../../shared/validators/validators");
 
 router.get('/',
   buildQueryValidationChain(PARAM_CONSTANTS.USERNAME),
@@ -12,7 +13,7 @@ router.get('/',
   (req, res, next) => {
     const username = req.query.username;
     const isTruncated = req.query.isTruncated;
-    return retrieveIndexUserByUsername(username)
+    return findOne(ModelConstants.INDEX_USER, { username: username })
       .then(result => {
         if (isTruncated) {
           const truncatedUser = {
@@ -41,7 +42,7 @@ router.get('/pursuits',
   doesValidationErrorExist,
   (req, res, next) => {
     const username = req.query.username;
-    return retrieveIndexUserByUsername(username)
+    return findOne(ModelConstants.INDEX_USER, { username: username })
       .then(result => res.status(200).json(result.pursuits))
       .catch(next)
   })
@@ -51,7 +52,7 @@ router.get('/username',
   doesValidationErrorExist,
   (req, res, next) => {
     const username = req.query.username;
-    return retrieveIndexUserByUsername(username)
+    return findOne(ModelConstants.INDEX_USER, { username: username })
       .then(() => res.status(200).send())
       .catch(next)
   })

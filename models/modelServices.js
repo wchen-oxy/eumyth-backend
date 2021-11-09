@@ -1,0 +1,52 @@
+const Comment = require('./comment.model');
+const ContentPreview = require('./content.preview.model');
+const ImageAnnotation = require('./image.annotation.model');
+const IndexPursuit = require('./index.pursuit.model');
+const IndexUser = require('./index.user.model');
+const Post = require('./post.model');
+const PostTree = require('./post.tree.model');
+const Project = require('./project.model');
+const Pursuit = require('./pursuit.model');
+const Ref = require('./ref.model');
+const User = require('./user.model');
+const UserPreview = require('./user.preview.model');
+const UserRelation = require('./user.relation.model');
+const UserRelationStatus = require('./user.relation.status.model');
+const ModelConstants = require('./constants');
+
+const selectModel = (type) => {
+    switch (type) {
+        case (ModelConstants.COMMENT):
+            return Comment.Model;
+        case (ModelConstants.CONTENT_PREVIEW):
+            return ContentPreview.Model;
+        case (ModelConstants.IMAGE_ANNOTATION):
+            return ImageAnnotation.Model;
+        case (ModelConstants.INDEX_PURSUIT):
+            return IndexPursuit.Model;
+        case (ModelConstants.INDEX_USER):
+            return IndexUser.Model;
+        case (ModelConstants.POST):
+            return Post.Model;
+        case (ModelConstants.POST_TREE):
+            return PostTree.Model;
+        case (ModelConstants.PROJECT):
+            return Project.Model;
+        case (ModelConstants.PURSUIT):
+            return Pursuit.Model;
+        case (ModelConstants.REF):
+            return Ref.Model;
+        case (ModelConstants.USER):
+            return User.Model;
+        case (ModelConstants.USER_PREVIEW):
+            return UserPreview.Model;
+        case (ModelConstants.USER_RELATION):
+            return UserRelation.Model;
+        case (ModelConstants.USER_RELATION_STATUS):
+            return UserRelationStatus.Model;
+        default:
+            throw new Error('No Model Type matched');
+    }
+}
+
+module.exports = selectModel;

@@ -9,6 +9,7 @@ const PursuitSchema = new Schema({
     trim: true
 
   },
+
   display_photo_key: {
     type: String,
     required: false,
@@ -36,7 +37,7 @@ const PursuitSchema = new Schema({
   },
 
   posts: {
-    type: [ContentPreview.Schema]
+    type: [ContentPreview.Schema] // limit 20
   },
 
   projects: {

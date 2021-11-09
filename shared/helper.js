@@ -1,6 +1,13 @@
 let { NoContentError, TypeError } = require("./errors");
-const AWSConstants = require('./shared/aws');
-let { NO_COMMENT_FOUND, NO_POST_FOUND, NO_USER_FOUND, NO_USER_PREVIEW_FOUND, NO_USER_RELATION_FOUND, WRONG_TYPE, NO_PROJECT_FOUND } = require('./shared/messages');
+const AWSConstants = require('./utils/aws');
+let { NO_CONTENT,
+    NO_COMMENT_FOUND,
+    NO_POST_FOUND,
+    NO_USER_FOUND,
+    NO_USER_PREVIEW_FOUND,
+    NO_USER_RELATION_FOUND,
+    WRONG_TYPE,
+    NO_PROJECT_FOUND } = require('./utils/messages');
 const uuid = require('uuid');
 
 const isEmpty = (...input) => {
@@ -11,6 +18,13 @@ const isEmpty = (...input) => {
         }
     }
     return false;
+}
+
+const verifyArray = (value) => {
+    if (Array.isArray(value)) return value;
+    else {
+        return [value];
+    }
 }
 
 // const validateUsername = (username) => {
@@ -31,6 +45,12 @@ const checkStringBoolean = (string) => {
     else {
         return new TypeError(WRONG_TYPE);
     }
+}
+
+const doesContentExist = (result) => {
+    if (!result) {
+        throw new NoContentError(NO_CONTENT);
+    };
 }
 
 const doesCommentExist = (result) => {
@@ -100,6 +120,7 @@ const copyObject = (key) => {
 module.exports = {
     checkStringBoolean,
     isEmpty,
+    doesContentExist,
     doesCommentExist,
     doesPostExist,
     doesProjectExist,
@@ -107,5 +128,6 @@ module.exports = {
     doesUserPreviewExist,
     doesUserRelationExist,
     copyObject,
+    verifyArray,
     // validateUsername: validateUsername
 }

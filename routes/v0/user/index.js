@@ -1,23 +1,16 @@
 const express = require('express');
 const router = express.Router();
-let User = require('../../models/user.model');
-let IndexUser = require('../../models/index.user.model');
-let Pursuit = require('../../models/pursuit.model');
-let IndexPursuit = require('../../models/index.pursuit.model');
-const UserRelation = require('../../models/user.relation.model');
-const Draft = require("../../models/draft.model");
-const MulterHelper = require('../../utils/shared/multer').profileImageUpload;
-const UserPreview = require('../../models/user.preview.model');
-
-const { retrieveCompleteUserByUsername, retrieveIndexUserByUsername, } = require('../../data_access/dal');
-
+const MulterHelper = require('../../../shared/utils/multer').profileImageUpload;
+const { findOne, findByID } = require('../../../data-access/dal');
+const ModelConstants = require('../../../models/constants');
 const {
   PARAM_CONSTANTS,
   buildQueryValidationChain,
   buildBodyValidationChain,
   doesValidationErrorExist,
-} = require("../../utils/validators/validators");
-const { PUBLIC_FEED } = require('../../utils/shared/flags');
+} = require("../../../shared/validators/validators");
+const { PUBLIC_FEED } = require('../../../shared/utils/flags');
+const selectModel = require('../../../models/modelServices');
 
 const imageFields = [
   { name: "croppedImage" },
@@ -31,7 +24,7 @@ router.route('/')
     doesValidationErrorExist,
     (req, res, next) => {
       const username = req.query.username;
-      retrieveCompleteUserByUsername(username)
+      findOne(ModelConstants.USER, { username: username })
         .then(user => res.status(200).json(user))
         .catch(next)
     })
@@ -57,7 +50,7 @@ router.route('/')
       let indexPursuitsHolder = [];
 
       mainPursuitsHolder.push(
-        new Pursuit.Model({
+        new selectModel(ModelConstants.PURSUIT)({
           name: "ALL",
           display_photo_key: "",
           private: false,
@@ -68,7 +61,7 @@ router.route('/')
         }));
 
       indexPursuitsHolder.push(
-        new IndexPursuit.Model({
+        new selectModel(ModelConstants.INDEX_PURSUIT)({
           name: "ALL",
           num_posts: 0,
           num_milestones: 0,
@@ -79,76 +72,86 @@ router.route('/')
 
       for (const pursuit of pursuitsArray) {
         mainPursuitsHolder.push(
-          new Pursuit.Model({
-            name: pursuit.name,
-            display_photo_key: "",
-            private: false,
-            experience_level: pursuit.experience,
-            total_min: 0,
-            num_milestones: 0,
-            posts: [],
-            projects: [],
-          }));
+          new selectModel(ModelConstants.PURSUIT)
+            ({
+              name: pursuit.name,
+              display_photo_key: "",
+              private: false,
+              experience_level: pursuit.experience,
+              total_min: 0,
+              num_milestones: 0,
+              posts: [],
+              projects: [],
+            }));
 
         indexPursuitsHolder.push(
-          new IndexPursuit.Model({
-            name: pursuit.name,
-            experience_level: pursuit.experience,
-            num_posts: 0,
-            num_milestones: 0,
-            num_projects: 0,
-            total_min: 0,
-          })
+          new selectModel(ModelConstants.INDEX_PURSUIT)
+            ({
+              name: pursuit.name,
+              experience_level: pursuit.experience,
+              num_posts: 0,
+              num_milestones: 0,
+              num_projects: 0,
+              total_min: 0,
+            })
         );
       }
 
       const newUser =
-        new User.Model({
-          username: username,
-          cropped_display_photo_key: croppedImage,
-          small_cropped_display_photo_key: smallCroppedImage,
-          tiny_cropped_display_photo_key: tinyCroppedImage,
-          pursuits: mainPursuitsHolder,
-          private: false,
-          pinned_posts: [],
-          pinned_projects: [],
-          requests: [],
-          labels: [],
+        new selectModel(ModelConstants.USER)
+          ({
+            username: username,
+            cropped_display_photo_key: croppedImage,
+            small_cropped_display_photo_key: smallCroppedImage,
+            tiny_cropped_display_photo_key: tinyCroppedImage,
+            pursuits: mainPursuitsHolder,
+            private: false,
+            pinned_posts: [],
+            pinned_projects: [],
+            requests: [],
+            labels: [],
 
-        });
+          });
 
-      const newIndexUser = new IndexUser.Model({
-        username: username,
-        user_profile_id: newUser._id,
-        preferred_post_privacy: PUBLIC_FEED,
-        cropped_display_photo_key: croppedImage,
-        small_cropped_display_photo_key: smallCroppedImage,
-        tiny_cropped_display_photo_key: tinyCroppedImage,
-        private: false,
-        draft: new Draft.Model({
-          text: null,
-          links: []
-        }),
-        notifications: [],
-        pursuits: indexPursuitsHolder,
-        following_feed: [],
-        recent_posts: [],
-        labels: [],
-      });
+      const newIndexUser =
+        new selectModel(ModelConstants.INDEX_USER)
+          ({
+            username: username,
+            user_profile_id: newUser._id,
+            preferred_post_privacy: PUBLIC_FEED,
+            cropped_display_photo_key: croppedImage,
+            small_cropped_display_photo_key: smallCroppedImage,
+            tiny_cropped_display_photo_key: tinyCroppedImage,
+            private: false,
+            draft: new selectModel(ModelConstants.DRAFT)
+              ({
+                text: null,
+                links: []
+              }),
+            notifications: [],
+            pursuits: indexPursuitsHolder,
+            following_feed: [],
+            recent_posts: [],
+            labels: [],
+          });
 
-      const newUserRelation = new UserRelation.Model({
-        parent_index_user_id: newIndexUser._id,
-      });
+      const newUserRelation =
+        new selectModel(ModelConstants.USER_RELATION)
+          ({
+            parent_index_user_id: newIndexUser._id,
+          });
 
-      const newUserPreview = new UserPreview.Model({
-        parent_index_user_id: newIndexUser._id,
-        user_relation_id: newUserRelation._id,
-        username: username,
-        first_name: firstName,
-        last_name: lastName,
-        small_cropped_display_photo_key: smallCroppedImage,
-        tiny_cropped_display_photo_key: tinyCroppedImage,
-      })
+      const newUserPreview =
+        new selectModel(ModelConstants.USER_PREVIEW)
+          ({
+            parent_index_user_id: newIndexUser._id,
+            user_relation_id: newUserRelation._id,
+            username: username,
+            first_name: firstName,
+            last_name: lastName,
+            small_cropped_display_photo_key: smallCroppedImage,
+            tiny_cropped_display_photo_key: tinyCroppedImage,
+          })
 
       newUser.user_preview_id = newUserPreview._id;
       newUser.user_relation_id = newUserRelation._id;
@@ -176,7 +179,7 @@ router.route('/account-settings-info')
     doesValidationErrorExist,
     (req, res, next) => {
       const username = req.query.username;
-      return retrieveIndexUserByUsername(username)
+      return findOne(ModelConstants.INDEX_USER, { username: username })
         .then((result) => {
           let pursuitsJSON = {};
           for (const pursuit of result.pursuits) {
@@ -206,7 +209,7 @@ router.route('/template')
       const userID = req.body.indexUserID;
       const templateText = req.body.text;
       const selectedPursuit = req.body.pursuitCategory;
-      return retrieveIndexUserByID(userID)
+      return findByID(ModelConstants.INDEX_USER, userID)
         .then((result) => {
           let indexUser = result;
           for (let pursuit of indexUser.pursuits) {
@@ -228,7 +231,7 @@ router.route('/bio')
     doesValidationErrorExist,
     (req, res, next) => {
       const username = req.query.username;
-      return retrieveCompleteUserByUsername(username)
+      return findOne(ModelConstants.USER, { username: username })
         .then((result) => {
           return res.status(200).json({ bio: result.bio });
         })
@@ -244,8 +247,8 @@ router.route('/bio')
       const username = req.body.username;
       const bio = req.body.bio;
       return Promise.all([
-        retrieveCompleteUserByUsername(username),
-        retrieveIndexUserByUsername(username)])
+        findOne(ModelConstants.USER, { username: username }),
+        findOne(ModelConstants.INDEX_USER, { username: username })])
         .then((results) => {
           results[0].bio = bio;
           results[1].bio = bio;
@@ -268,8 +271,8 @@ router.route('/private')
       const username = req.body.username;
       const isPrivate = req.body.isPrivate;
       return Promise.all([
-        retrieveCompleteUserByUsername(username),
-        retrieveIndexUserByUsername(username),
+        findOne(ModelConstants.USER, { username: username }),
+        findOne(ModelConstants.INDEX_USER, { username: username })
       ])
         .then((result) => {
           const completeUser = result[0];

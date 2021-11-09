@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const Pursuits = require('./pursuit.model');
 const Post = require('./post.model');
 const Project = require('./project.model');
-const ContentPreview = require('./content.preview.model');
 const UserPreview = require('./user.preview.model');
 const Schema = mongoose.Schema;
 

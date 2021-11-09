@@ -1,15 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const AWSConstants = require('../../utils/shared/aws');
-const Helper = require('../../utils/shared/helper');
+const AWSConstants = require('../../../shared/utils/aws');
+const Helper = require('../../../shared/utils/helper');
 const {
     PARAM_CONSTANTS,
     buildQueryValidationChain,
     buildBodyValidationChain,
     doesValidationErrorExist,
 }
-    = require('../../utils/validators/validators');
-const { retrieveIndexUserByUsername } = require('../../data_access/dal');
+    = require('../../../shared/validators/validators');
+const { retrieveIndexUserByUsername } = require('../../../data-access/dal');
 
 router.route('/')
     .get(
@@ -35,13 +35,13 @@ router.route('/')
         buildBodyValidationChain(
             PARAM_CONSTANTS.USERNAME,
             PARAM_CONSTANTS.DRAFT),
+
         doesValidationErrorExist,
         (req, res, next) => {
             const username = req.body.username;
             const draft = req.body.draft;
             const draftTitle = req.body.draftTitle ? req.body.draftTitle : null;
             const parsedDraft = JSON.parse(draft).blocks;
-
             return retrieveIndexUserByUsername(username)
                 .then(indexUser => {
                     const previousURLs = indexUser.draft.links;

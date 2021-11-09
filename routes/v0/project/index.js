@@ -1,22 +1,32 @@
 const express = require('express');
 const router = express.Router();
-const MulterHelper = require('../../utils/shared/multer');
-const Project = require('../../models/project.model');
-const ContentPreview = require('../../models/content.preview.model');
-const Post = require('../../models/post.model');
-const Ref = require('../../models/ref.model');
-const Helper = require('../../utils/helper');
+const MulterHelper = require('../../../shared/utils/multer');
+const Helper = require('../../../shared/helper');
+const selectModel = require('../../../models/modelServices');
+const imageServices = require('../image/services');
 const {
     PARAM_CONSTANTS,
     buildQueryValidationChain,
     buildBodyValidationChain,
     doesValidationErrorExist,
-} = require('../../utils/validators/validators');
-const { retrieveIndexUserByID, retrieveUserByID, findProjectByID, findProjectByIDAndUpdate, findProjectsByID, findPostInList, deletePostsByID } = require('../../data_access/dal');
+} = require('../../../shared/validators/validators');
+const {
+    findByID,
+    findManyByID,
+    insertMany
+} = require('../../../data-access/dal');
+const ModelConstants = require('../../../models/constants');
+const { findAndUpdateIndexUserMeta } = require('./services');
 
 router.route('/')
     .post(
-        MulterHelper.contentImageUpload.single({ name: "coverPhoto", maxCount: 1 }),
+        MulterHelper
+            .contentImageUpload
+            .single(
+                {
+                    name: "coverPhoto",
+                    maxCount: 1
+                }),
         buildBodyValidationChain(
             PARAM_CONSTANTS.USERNAME,
             PARAM_CONSTANTS.USER_ID,
@@ -30,7 +40,8 @@ router.route('/')
             const displayPhoto = req.body.displayPhoto;
             const userID = req.body.userID;
             const indexUserID = req.body.indexUserID;
-            const selectedPosts = req.body.selectedPosts ? JSON.parse(req.body.selectedPosts) : [];
+            const selectedPosts = req.body.selectedPosts ?
+                JSON.parse(req.body.selectedPosts) : [];
             const title = req.body.title ? req.body.title : null;
             const overview = req.body.overview ? req.body.overview : null;
             const pursuit = req.body.pursuit ? req.body.pursuit : null;
@@ -40,54 +51,39 @@ router.route('/')
             const minDuration = req.body.minDuration ? req.body.minDuration : null;
             const coverPhotoURL = req.files ? req.files.coverPhoto[0].key : null;
 
-            const newProject = new Project.Model({
-                username: username,
-                author_id: indexUserID,
-                display_photo_key: displayPhoto,
-                title: title,
-                overview: overview,
-                pursuit: pursuit,
-                start_date: startDate,
-                end_date: endDate,
-                is_complete: isComplete,
-                min_duration: minDuration,
-                cover_photo_key: coverPhotoURL,
-                post_ids: selectedPosts,
-            });
-
-            const resolvedIndexUser =
-                retrieveIndexUserByID(indexUserID)
-                    .then(result => {
-                        let user = result;
-                        if (pursuit) {
-                            for (const pursuit of user.pursuits) {
-                                if (pursuit.name === newProject.pursuit) {
-                                    pursuit.num_projects++;
-                                }
-                            }
-                        }
-                        else {
-                            user.pursuits[0].num_projects++;
-                        }
-
-                        return user;
+            const newProject = selectModel(ModelConstants.PROJECT)
+                (
+                    {
+                        username: username,
+                        author_id: indexUserID,
+                        display_photo_key: displayPhoto,
+                        title: title,
+                        overview: overview,
+                        pursuit: pursuit,
+                        start_date: startDate,
+                        end_date: endDate,
+                        is_complete: isComplete,
+                        min_duration: minDuration,
+                        cover_photo_key: coverPhotoURL,
+                        post_ids: selectedPosts,
                     });
 
+            const resolvedIndexUser = findAndUpdateIndexUserMeta(indexUserID);
             const resolvedUser =
-                retrieveUserByID(userID)
+                findByID(ModelConstants.USER, userID)
                     .then((result => {
                         let user = result;
                         for (const pursuit of user.pursuits) {
                             if (pursuit.name === newProject.pursuit) {
                                 pursuit.projects.unshift(
-                                    new ContentPreview.Model({
-                                        post_id: newProject._id,
-                                    })
+                                    selectModel(
+                                        ModelConstants.CONTENT_PREVIEW)(
+                                            { post_id: newProject._id }
+                                        )
                                 );
                             }
                         }
                         return user;
-
                     }));
 
             return Promise.all([resolvedIndexUser, resolvedUser])
@@ -119,33 +115,71 @@ router.route('/')
             req.body.startDate ? updates.start_date = req.body.startDate : null;
             req.body.endDate ? updates.end_date = req.body.endDate : null;
             req.body.isComplete ? updates.is_complete = req.body.isComplete : null;
-            console.log(req.body.isComplete);
-            console.log(req.body.isComplete === 'true');
             req.body.minDuration ? updates.min_duration = req.body.minDuration : null;
             req.body.selectedPosts ? updates.post_ids = req.body.selectedPosts : null;
             req.body.labels ? updates.labels = req.body.labels : null;
-            return findProjectByIDAndUpdate(req.body.projectID, updates)
+            return findByID(
+                ModelConstants.PROJECT,
+                req.body.projectID,
+                updates)
                 .then((result) => {
-                    console.log(result);
                     return res.status(200).send();
                 });
         })
     .delete(
         buildQueryValidationChain(
             PARAM_CONSTANTS.PROJECT_ID,
-            PARAM_CONSTANTS.SHOULD_DELETE_POSTS
+            PARAM_CONSTANTS.SHOULD_DELETE_POSTS,
+            PARAM_CONSTANTS.INDEX_USER_ID,
+            PARAM_CONSTANTS.USER_ID,
         ),
         doesValidationErrorExist,
         (req, res, next) => {
             const projectID = req.query.projectID;
-            const shouldDeletePosts = req.query.shouldDeletePosts === 'true'
+            let toBeDeletedImages = [];
+            let toBeDeletedPosts = [];
+            res.locals.shouldDeletePosts = req.query.shouldDeletePosts === 'true'
                 || req.query.shouldDeletePost === true;
-            if (shouldDeletePosts) {
-                // return deletePostsByID(projectID.post_ids)
-                //     .then((result) => {
-                //         // return deleteProjectBy
-                //     })
+            // return findProjectByID(projectID)
+            //     .then((result) => {
+            //         if (result.cover_photo_key) {
+            //             toBeDeletedImages.push(result.cover_photo_key);
+            //         }
+            //         for (const postID of result.)
+            //             return findPostInList(result.post_ids)
+            //     })
+            //     .then((results) => {
+            //         for (const post of results) {
+            //             if (post.cover_photo_key) {
+            //                 toBeDeletedImages.push(post.cover_photo_key);
+            //             }
+            //             if (post.image_data) {
+            //                 toBeDeletedImages = toBeDeletedImages.concat(post.image_data)
+            //             }
+            //         }
+            //         res.locals.toBeDeletedImages = toBeDeletedImages;
+            //         return next();
+            //     })
+        },
+        (req, res, next) => {
+            if (res.locals.shouldDeletePosts) {
+                return imageServices.deleteMultiple(res.locals.toBeDeletedImages);
             }
+            return;
+        },
+        (req, res, next) => {
+            // return Promise.all([
+            //     retrieveUserByID(req.query.userID),
+            //     retrieveIndexUserByID(req.query.indexUserID)
+            // ])
+            //     .then(results => {
+            //         results.
+            //     })
+
+            //fixme
+            //delete posts from each respective area
+            //retrieve user profiles and update
+            //
         }
     );
 
@@ -156,7 +190,7 @@ router.route('/single').get(
     doesValidationErrorExist,
     (req, res, next) => {
         const projectID = req.query.projectID;
-        return findProjectByID(projectID)
+        return findByID(ModelConstants.PROJECT, projectID)
             .then(
                 (result) => {
                     return res.status(200).json({ project: result });
@@ -174,7 +208,7 @@ router.route('/multiple').get(
     doesValidationErrorExist,
     (req, res, next) => {
         const projectIDList = req.query.projectIDList;
-        return findProjectsByID(projectIDList)
+        return findManyByID(ModelConstants.PROJECT, projectIDList)
             .then(
                 (results) => {
                     return res.status(200).json({ projects: results });
@@ -233,14 +267,14 @@ router.route('/fork').put(
         delete projectData.username;
         delete projectData.index_user_id;
         ancestors.push(oldProjectID);
-        const newProject = new Project.Model({
+        const newProject = new selectModel(ModelConstants.PROJECT)({
             ...projectData,
             index_user_id: authorID,
             username: username,
             parent: oldProjectID,
             ancestors: ancestors
         });
-        return findPostInList(projectData.post_ids, true)
+        return findManyByID(ModelConstants.POST, projectData.post_ids, true)
             .then((results) => {
                 projectPosts = results;
                 projectPosts.sort((a, b) =>
@@ -258,23 +292,25 @@ router.route('/fork').put(
                     delete post.date;
                     delete post.createdAt;
                     delete post.updatedAt;
-                    const duplicate = new Post.Model({
-                        ...post,
-                        author_id: authorID,
-                        username: username,
-                        display_photo_key: displayPhoto,
-                        post_format: "SHORT",
-                        internal_ref: {
-                            id: newProject._id,
-                            title: newProject.title
-                        },
-                        external_ref: {
-                            id: oldPostID,
-                            title: projectData.title
-                        },
-                        labels: [],
-                        comments: []
-                    });
+                    const duplicate = selectModel(
+                        ModelConstants.POST)(
+                            {
+                                ...post,
+                                author_id: authorID,
+                                username: username,
+                                display_photo_key: displayPhoto,
+                                post_format: "SHORT",
+                                internal_ref: {
+                                    id: newProject._id,
+                                    title: newProject.title
+                                },
+                                external_ref: {
+                                    id: oldPostID,
+                                    title: projectData.title
+                                },
+                                labels: [],
+                                comments: []
+                            });
                     newPostIDList.push(duplicate._id);
                     projectPosts[i] = duplicate;
                 }
@@ -287,7 +323,9 @@ router.route('/fork').put(
             })
             .then(response => {
                 refreshPostImageData(projectPosts, imageKeyMap);
-                return Promise.all([Post.Model.insertMany(projectPosts, { ordered: true }), newProject.save()])
+                return Promise.all([
+                    insertMany(ModelConstants.POST, projectPosts, { ordered: true }),
+                    newProject.save()])
             })
             .then(() => {
                 res.locals.project = newProject;
@@ -302,24 +340,30 @@ router.route('/fork').put(
     (req, res, next) => {
         const project = res.locals.project;
         // const promisedUserInfo = Promise.all([retrieveIndexUserByID(res.locals.indexUserID), retrieveUserByID(res.locals.userID)]);
-        const promisedUserInfo = retrieveUserByID(res.locals.userID);
+        const promisedUserInfo = findByID(ModelConstants.USER, res.locals.userID);
         return promisedUserInfo.then(
             result => {
                 console.log(result);
                 for (let i = 1; i < result.pursuits.length; i++) {
                     if (result.pursuits[i].name === project.pursuit) {
-                        result.pursuits[i].projects.unshift(new ContentPreview.Model({
-                            post_id: project._id,
-                            date: new Date().toISOString().substr(0, 10),
-                            labels: project.labels,
-                        }))
+                        result.pursuits[i].projects.unshift(
+                            selectModel(
+                                ModelConstants.CONTENT_PREVIEW)(
+                                    {
+                                        post_id: project._id,
+                                        date: new Date().toISOString().substr(0, 10),
+                                        labels: project.labels,
+                                    }))
                     }
                 }
-                result.pursuits[0].projects.unshift(new ContentPreview.Model({
-                    post_id: project._id,
-                    date: new Date().toISOString().substr(0, 10),
-                    labels: project.labels,
-                }));
+                result.pursuits[0].projects.unshift(
+                    selectModel(
+                        ModelConstants.CONTENT_PREVIEW)(
+                            {
+                                post_id: project._id,
+                                date: new Date().toISOString().substr(0, 10),
+                                labels: project.labels,
+                            }));
                 return result.save();
             }
         )

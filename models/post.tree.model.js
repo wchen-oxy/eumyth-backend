@@ -14,7 +14,7 @@ const PostTreeSchema = new Schema({
 
 });
 
-const PostTreeModel = mongoose.model('post', PostTreeSchema);
+const PostTreeModel = mongoose.model('post_tree', PostTreeSchema);
 
 module.exports = {
     Schema: PostTreeSchema,

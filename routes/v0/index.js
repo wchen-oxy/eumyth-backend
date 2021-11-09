@@ -10,7 +10,7 @@ const draftRouter = require('./draft');
 const relationRouter = require('./relation');
 const projectRouter = require('./project');
 const commentRouter = require('./comment');
-const userPreviewRouter = require('./userPreview');
+const userPreviewRouter = require('./user-preview');
 
 router.use('/pursuit', pursuitRouter);
 router.use('/index-user', indexUserRouter);

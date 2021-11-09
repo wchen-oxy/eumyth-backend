@@ -1,12 +1,13 @@
 var router = require('express').Router();
-let { NoContentError } = require("../../utils/errors");
-let { NO_USER_FOUND } = require("../../utils/shared/messages");
+let { NoContentError } = require("../../../shared/errors");
+let { NO_USER_FOUND } = require("../../../shared/utils/messages");
 const {
     PARAM_CONSTANTS,
     buildQueryValidationChain,
     doesValidationErrorExist,
-} = require("../../utils/validators/validators");
-const { retrieveCompleteUserByID } = require('../../data_access/dal');
+} = require("../../../shared/validators/validators");
+const { findByID } = require('../../../data-access/dal');
+const ModelConstants = require('../../../models/constants');
 
 router.route('/all-posts')
     .get(
@@ -16,7 +17,7 @@ router.route('/all-posts')
         doesValidationErrorExist,
         (req, res, next) => {
             const profileID = req.query.profileID;
-            return retrieveCompleteUserByID(profileID)
+            return findByID(ModelConstants.USER, profileID)
                 .then(result => {
                     if (!result) throw new NoContentError(NO_USER_FOUND);
                     const posts = result.pursuits[0].posts ? result.pursuits[0].posts : [];
