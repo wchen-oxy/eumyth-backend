@@ -44,7 +44,7 @@ exports.deleteSingle = (imageKey) => AWSConstants
     })
     .promise();
 
-exports.deleteMultiple = (imageKeyArray) => AWSConstants
+exports.deleteMultiple = (imageKeyArray) => (AWSConstants
     .S3_INTERFACE
     .deleteObjects({
         Bucket: AWSConstants.BUCKET_NAME,
@@ -63,11 +63,11 @@ exports.deleteMultiple = (imageKeyArray) => AWSConstants
         }
         else { console.log("Success", data); }
     })
-    .promise();
+    .promise())
 
 exports.setAllCroppedImages = (user, normal, small, tiny) => {
     if (normal) { user.cropped_display_photo_key = normal }
     if (small) { user.small_cropped_display_photo_key = small }
-    if (tiny) { user.tiny_cropped_display_photo_key}
+    if (tiny) { user.tiny_cropped_display_photo_key }
 
 }

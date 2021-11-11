@@ -51,22 +51,30 @@ const findManyByID = (model, IDList, isOrganized) => {
     }
 }
 
-const deleteByID = (model, ID) => {
-    selectModel(model).deleteOne({ _id: postID });
-}
+const deleteByID = (model, ID) => (
+    selectModel(model).deleteOne({ _id: ID },
+        (err, result) => {
+            if (err) {
+                throw new Error(500, err);
+            }
+            return result;
+        }))
 
-const deleteManyByID = (model, IDArray) => {
+
+const deleteManyByID = (model, IDArray) => (
     selectModel(model).deleteMany({
         _id: {
             $in: IDArray
         }
     },
-        (err) => {
+        (err, result) => {
             if (err) {
                 throw new Error(500, err);
             }
-        });
-}
+            return result;
+
+        }))
+
 
 module.exports = {
     insertMany,

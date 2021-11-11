@@ -13,10 +13,13 @@ const {
 const {
     findByID,
     findManyByID,
-    insertMany
+    insertMany,
+    deleteManyByID,
+    deleteByID
 } = require('../../../data-access/dal');
 const ModelConstants = require('../../../models/constants');
-const { findAndUpdateIndexUserMeta } = require('./services');
+const { findAndUpdateIndexUserMeta, adjustEntryLength } = require('./services');
+const { EMBEDDED_FEED_LIMIT } = require('../../../shared/constants/settings');
 
 router.route('/')
     .post(
@@ -41,7 +44,7 @@ router.route('/')
             const userID = req.body.userID;
             const indexUserID = req.body.indexUserID;
             const selectedPosts = req.body.selectedPosts ?
-                JSON.parse(req.body.selectedPosts) : [];
+                req.body.selectedPosts : [];
             const title = req.body.title ? req.body.title : null;
             const overview = req.body.overview ? req.body.overview : null;
             const pursuit = req.body.pursuit ? req.body.pursuit : null;
@@ -55,7 +58,7 @@ router.route('/')
                 (
                     {
                         username: username,
-                        author_id: indexUserID,
+                        index_user_id: indexUserID,
                         display_photo_key: displayPhoto,
                         title: title,
                         overview: overview,
@@ -68,19 +71,17 @@ router.route('/')
                         post_ids: selectedPosts,
                     });
 
-            const resolvedIndexUser = findAndUpdateIndexUserMeta(indexUserID);
+            const resolvedIndexUser = findAndUpdateIndexUserMeta(indexUserID, pursuit);
             const resolvedUser =
                 findByID(ModelConstants.USER, userID)
                     .then((result => {
                         let user = result;
+                        const newContent = selectModel(ModelConstants.CONTENT_PREVIEW)({ post_id: newProject._id });
+                        adjustEntryLength(user.pursuits[0].projects, EMBEDDED_FEED_LIMIT)
+                        user.pursuits[0].projects.unshift(newContent);
                         for (const pursuit of user.pursuits) {
                             if (pursuit.name === newProject.pursuit) {
-                                pursuit.projects.unshift(
-                                    selectModel(
-                                        ModelConstants.CONTENT_PREVIEW)(
-                                            { post_id: newProject._id }
-                                        )
-                                );
+                                pursuit.projects.unshift(newContent);
                             }
                         }
                         return user;
@@ -136,50 +137,52 @@ router.route('/')
         doesValidationErrorExist,
         (req, res, next) => {
             const projectID = req.query.projectID;
+            console.log(projectID);
             let toBeDeletedImages = [];
-            let toBeDeletedPosts = [];
             res.locals.shouldDeletePosts = req.query.shouldDeletePosts === 'true'
                 || req.query.shouldDeletePost === true;
-            // return findProjectByID(projectID)
-            //     .then((result) => {
-            //         if (result.cover_photo_key) {
-            //             toBeDeletedImages.push(result.cover_photo_key);
-            //         }
-            //         for (const postID of result.)
-            //             return findPostInList(result.post_ids)
-            //     })
-            //     .then((results) => {
-            //         for (const post of results) {
-            //             if (post.cover_photo_key) {
-            //                 toBeDeletedImages.push(post.cover_photo_key);
-            //             }
-            //             if (post.image_data) {
-            //                 toBeDeletedImages = toBeDeletedImages.concat(post.image_data)
-            //             }
-            //         }
-            //         res.locals.toBeDeletedImages = toBeDeletedImages;
-            //         return next();
-            //     })
+            return findByID(ModelConstants.PROJECT, projectID)
+                .then((result) => {
+                    if (result.cover_photo_key) {
+                        toBeDeletedImages.push(result.cover_photo_key);
+                    }
+                    res.locals.toBeDeletedPosts = result.post_ids;
+                    return findManyByID(ModelConstants.POST, result.post_ids)
+                })
+                .then((results) => {
+                    for (const post of results) {
+                        if (post.cover_photo_key) {
+                            toBeDeletedImages.push(post.cover_photo_key);
+                        }
+                        if (post.image_data) {
+                            toBeDeletedImages = toBeDeletedImages.concat(post.image_data)
+                        }
+                    }
+                    res.locals.toBeDeletedImages = toBeDeletedImages;
+                    return next();
+                })
         },
         (req, res, next) => {
-            if (res.locals.shouldDeletePosts) {
-                return imageServices.deleteMultiple(res.locals.toBeDeletedImages);
+            console.log(res.locals.toBeDeletedPosts);
+            console.log(req.query.projectID);
+            const deleteProject = deleteByID(ModelConstants.PROJECT, req.query.projectID);
+            const deletePosts = deleteManyByID(ModelConstants.POST, res.locals.toBeDeletedPosts);
+            const promisedDeletion = Promise.all([deleteProject, deletePosts]).then(next);
+            if (res.locals.shouldDeletePosts && res.locals.toBeDeletedImages.length > 0) {
+                console.log(res.locals.toBeDeletedImages);
+                return imageServices.deleteMultiple(res.locals.toBeDeletedImages)
+                    .then(() => {
+                        console.log("adsf111");
+                        return promisedDeletion;
+                    });
             }
-            return;
+            console.log("adsf112");
+            return promisedDeletion;
         },
         (req, res, next) => {
-            // return Promise.all([
-            //     retrieveUserByID(req.query.userID),
-            //     retrieveIndexUserByID(req.query.indexUserID)
-            // ])
-            //     .then(results => {
-            //         results.
-            //     })
+            console.log("aDSFADF");
+            return res.status(200).send();
 
-            //fixme
-            //delete posts from each respective area
-            //retrieve user profiles and update
-            //
         }
     );
 
