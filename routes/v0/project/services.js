@@ -11,19 +11,28 @@ const adjustEntryLength = (array, max) => {
     }
 }
 
-const findAndUpdateIndexUserMeta = (indexUserID, pursuit) => {
+const findAndUpdateIndexUserMeta = (indexUserID, pursuit, updateType) => {
+    const _numProjectSetter = (count, updateType) => {
+        if (updateType === "ADD") {
+            count++;
+        }
+        else if (updateType === "SUBTRACT") {
+            count--;
+        }
+    }
+
     return findByID(ModelConstants.INDEX_USER, indexUserID)
         .then(result => {
             let user = result;
             if (pursuit) {
                 for (const pursuit of user.pursuits) {
                     if (pursuit.name === pursuit) {
-                        pursuit.num_projects++;
+                        _numProjectSetter(pursuit.num_projects, updateType);
                     }
                 }
             }
             else {
-                user.pursuits[0].num_projects++;
+                _numProjectSetter(user.pursuits[0].num_projects, updateType);
             }
 
             return user;

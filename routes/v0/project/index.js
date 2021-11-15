@@ -20,6 +20,7 @@ const {
 const ModelConstants = require('../../../models/constants');
 const { findAndUpdateIndexUserMeta, adjustEntryLength } = require('./services');
 const { EMBEDDED_FEED_LIMIT } = require('../../../shared/constants/settings');
+const { ADD, SUBTRACT } = require('./constants');
 
 router.route('/')
     .post(
@@ -71,14 +72,14 @@ router.route('/')
                         post_ids: selectedPosts,
                     });
 
-            const resolvedIndexUser = findAndUpdateIndexUserMeta(indexUserID, pursuit);
+            const resolvedIndexUser = findAndUpdateIndexUserMeta(indexUserID, pursuit, ADD);
             const resolvedUser =
                 findByID(ModelConstants.USER, userID)
                     .then((result => {
                         let user = result;
                         const newContent = selectModel(ModelConstants.CONTENT_PREVIEW)({ post_id: newProject._id });
-                        adjustEntryLength(user.pursuits[0].projects, EMBEDDED_FEED_LIMIT)
                         user.pursuits[0].projects.unshift(newContent);
+                        adjustEntryLength(user.pursuits[0].projects, EMBEDDED_FEED_LIMIT)
                         for (const pursuit of user.pursuits) {
                             if (pursuit.name === newProject.pursuit) {
                                 pursuit.projects.unshift(newContent);
@@ -137,7 +138,6 @@ router.route('/')
         doesValidationErrorExist,
         (req, res, next) => {
             const projectID = req.query.projectID;
-            console.log(projectID);
             let toBeDeletedImages = [];
             res.locals.shouldDeletePosts = req.query.shouldDeletePosts === 'true'
                 || req.query.shouldDeletePost === true;
@@ -147,6 +147,7 @@ router.route('/')
                         toBeDeletedImages.push(result.cover_photo_key);
                     }
                     res.locals.toBeDeletedPosts = result.post_ids;
+                    res.locals.pursuit = result.pursuit;
                     return findManyByID(ModelConstants.POST, result.post_ids)
                 })
                 .then((results) => {
@@ -169,20 +170,43 @@ router.route('/')
             const deletePosts = deleteManyByID(ModelConstants.POST, res.locals.toBeDeletedPosts);
             const promisedDeletion = Promise.all([deleteProject, deletePosts]).then(next);
             if (res.locals.shouldDeletePosts && res.locals.toBeDeletedImages.length > 0) {
-                console.log(res.locals.toBeDeletedImages);
+                console.log(123);
                 return imageServices.deleteMultiple(res.locals.toBeDeletedImages)
                     .then(() => {
                         console.log("adsf111");
                         return promisedDeletion;
                     });
             }
-            console.log("adsf112");
             return promisedDeletion;
         },
         (req, res, next) => {
-            console.log("aDSFADF");
-            return res.status(200).send();
+            const indexUserID = req.query.indexUserID;
+            const userID = req.query.userID;
+            const promisedUserInfo = Promise.all([
+                findAndUpdateIndexUserMeta(indexUserID, res.locals.pursuit, SUBTRACT),
+                findByID(ModelConstants.USER, userID)
+            ]);
+            console.log("Here");
+            const _removeProject = (array, ID) => {
+                for (const i = 0; i < array.length; i++) {
+                    if (array[i] === ID) {
+                        array.splice(i, 1)
+                    }
+                }
+            }
+            return promisedUserInfo
+                .then((results => {
+                    const userPursuits = results[1].pursuits;
+                    _removeProject(userPursuits[0].projects);
+                    for (const i = 1; i < userPursuits.length; i++) {
+                        if (userPursuits[i].name === res.locals.pursuit) {
+                            _removeProject(userPursuits[i].projects)
+                        }
+                    }
+                    return Promise.all([results[0].save(), results[1].save()])
 
+                }))
+                .then(() => res.status(200).send());
         }
     );
 

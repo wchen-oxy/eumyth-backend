@@ -55,6 +55,7 @@ const deleteByID = (model, ID) => (
     selectModel(model).deleteOne({ _id: ID },
         (err, result) => {
             if (err) {
+                console.log(err);
                 throw new Error(500, err);
             }
             return result;
@@ -69,6 +70,7 @@ const deleteManyByID = (model, IDArray) => (
     },
         (err, result) => {
             if (err) {
+                console.log(err);
                 throw new Error(500, err);
             }
             return result;
