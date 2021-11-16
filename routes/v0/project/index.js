@@ -164,18 +164,14 @@ router.route('/')
                 })
         },
         (req, res, next) => {
-            console.log(res.locals.toBeDeletedPosts);
-            console.log(req.query.projectID);
             const deleteProject = deleteByID(ModelConstants.PROJECT, req.query.projectID);
             const deletePosts = deleteManyByID(ModelConstants.POST, res.locals.toBeDeletedPosts);
-            const promisedDeletion = Promise.all([deleteProject, deletePosts]).then(next);
+            const promisedDeletion = Promise.all([deleteProject, deletePosts])
+                .then(next).catch(err => { console.log(err); return res.status(500).send(err); });
             if (res.locals.shouldDeletePosts && res.locals.toBeDeletedImages.length > 0) {
-                console.log(123);
                 return imageServices.deleteMultiple(res.locals.toBeDeletedImages)
-                    .then(() => {
-                        console.log("adsf111");
-                        return promisedDeletion;
-                    });
+                    .then(() => promisedDeletion);
+
             }
             return promisedDeletion;
         },
@@ -186,7 +182,6 @@ router.route('/')
                 findAndUpdateIndexUserMeta(indexUserID, res.locals.pursuit, SUBTRACT),
                 findByID(ModelConstants.USER, userID)
             ]);
-            console.log("Here");
             const _removeProject = (array, ID) => {
                 for (const i = 0; i < array.length; i++) {
                     if (array[i] === ID) {
@@ -198,15 +193,15 @@ router.route('/')
                 .then((results => {
                     const userPursuits = results[1].pursuits;
                     _removeProject(userPursuits[0].projects);
-                    for (const i = 1; i < userPursuits.length; i++) {
+                    for (let i = 1; i < userPursuits.length; i++) {
                         if (userPursuits[i].name === res.locals.pursuit) {
                             _removeProject(userPursuits[i].projects)
                         }
                     }
                     return Promise.all([results[0].save(), results[1].save()])
-
                 }))
-                .then(() => res.status(200).send());
+                .then(() => res.status(200).send())
+                .catch(err => { console.log(err); return res.status(500).send(err); });
         }
     );
 
