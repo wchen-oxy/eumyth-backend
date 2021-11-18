@@ -24,6 +24,7 @@ const findAndUpdateIndexUserMeta = (indexUserID, pursuit, updateType) => {
     return findByID(ModelConstants.INDEX_USER, indexUserID)
         .then(result => {
             let user = result;
+            _numProjectSetter(user.pursuits[0].num_projects, updateType);
             if (pursuit) {
                 for (const pursuit of user.pursuits) {
                     if (pursuit.name === pursuit) {
@@ -31,11 +32,11 @@ const findAndUpdateIndexUserMeta = (indexUserID, pursuit, updateType) => {
                     }
                 }
             }
-            else {
-                _numProjectSetter(user.pursuits[0].num_projects, updateType);
-            }
-
             return user;
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).send(err)
         });
 }
 

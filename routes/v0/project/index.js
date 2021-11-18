@@ -96,7 +96,7 @@ router.route('/')
                     return (Promise.all([savedIndexUser, savedUser, savedProject]));
                 })
                 .then((result) => {
-                    return res.status(201).send();
+                    return res.status(201).send(newProject._id);
                 })
                 .catch(next)
 
@@ -164,43 +164,52 @@ router.route('/')
                 })
         },
         (req, res, next) => {
+            const imagesExist = res.locals.toBeDeletedImages.length > 0;
             const deleteProject = deleteByID(ModelConstants.PROJECT, req.query.projectID);
             const deletePosts = deleteManyByID(ModelConstants.POST, res.locals.toBeDeletedPosts);
-            const promisedDeletion = Promise.all([deleteProject, deletePosts])
-                .then(next).catch(err => { console.log(err); return res.status(500).send(err); });
-            if (res.locals.shouldDeletePosts && res.locals.toBeDeletedImages.length > 0) {
+            if (res.locals.shouldDeletePosts && imagesExist) {
                 return imageServices.deleteMultiple(res.locals.toBeDeletedImages)
-                    .then(() => promisedDeletion);
-
+                    .then(() => Promise.all([deleteProject, deletePosts]))
+                    .then((results) => {
+                        return next()
+                    })
+                    .catch(err => { console.log(err); return res.status(500).send(err); });
             }
-            return promisedDeletion;
+            return deleteProject
+                .then(() => next())
+                .catch(err => {
+                    console.log(err);
+                    return res.status(500).send(err);
+                });
         },
         (req, res, next) => {
             const indexUserID = req.query.indexUserID;
             const userID = req.query.userID;
-            const promisedUserInfo = Promise.all([
-                findAndUpdateIndexUserMeta(indexUserID, res.locals.pursuit, SUBTRACT),
-                findByID(ModelConstants.USER, userID)
-            ]);
             const _removeProject = (array, ID) => {
-                for (const i = 0; i < array.length; i++) {
-                    if (array[i] === ID) {
+                for (let i = 0; i < array.length; i++) {
+                    if (array[i].post_id.toString() === ID) {
                         array.splice(i, 1)
                     }
                 }
             }
-            return promisedUserInfo
+            return Promise.all([
+                findAndUpdateIndexUserMeta(indexUserID, res.locals.pursuit, SUBTRACT),
+                findByID(ModelConstants.USER, userID)
+            ])
                 .then((results => {
-                    const userPursuits = results[1].pursuits;
-                    _removeProject(userPursuits[0].projects);
-                    for (let i = 1; i < userPursuits.length; i++) {
-                        if (userPursuits[i].name === res.locals.pursuit) {
-                            _removeProject(userPursuits[i].projects)
+                    const indexUser = results[0];
+                    const completeUser = results[1];
+                    _removeProject(completeUser.pursuits[0].projects, req.query.projectID);
+                    for (let i = 1; i < completeUser.pursuits.length; i++) {
+                        if (completeUser.pursuits[i].name === res.locals.pursuit) {
+                            _removeProject(completeUser.pursuits[i].projects, req.query.projectID)
                         }
                     }
-                    return Promise.all([results[0].save(), results[1].save()])
+                    return Promise.all([indexUser.save(), completeUser.save()])
                 }))
-                .then(() => res.status(200).send())
+                .then(() => {
+                    return res.status(200).send('Success');
+                })
                 .catch(err => { console.log(err); return res.status(500).send(err); });
         }
     );

@@ -12,6 +12,7 @@ const findByID = (model, ID) => (
             return result;
         }))
 
+
 const findOne = (model, criteria) => (
     selectModel(model).findOne(criteria)
         .then(result => {
@@ -40,6 +41,7 @@ const findManyByID = (model, IDList, isOrganized) => {
         }).sort({ createdAt: -1 }).lean();
     }
     else {
+        console.log('asdfadf');
         return selectModel(model).find({
             '_id': { $in: IDList }, function(error, docs) {
                 if (error) console.log(error);
@@ -54,6 +56,7 @@ const findManyByID = (model, IDList, isOrganized) => {
 const deleteByID = (model, ID) => (
     selectModel(model).deleteOne({ _id: ID },
         (err, result) => {
+            console.log
             if (err) {
                 console.log('deleteBYID', err);
                 throw new Error(500, err);

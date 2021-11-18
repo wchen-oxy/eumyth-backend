@@ -161,7 +161,7 @@ router.route('/').post(
           );
           return Promise.all(promisedUpdatedFollowerArray)
             .then((result) => {
-              res.status(201).send("Feel Free to continue browsing as we push updates")
+              res.status(201).send(res.locals.post_id)
             });
         }
       )
