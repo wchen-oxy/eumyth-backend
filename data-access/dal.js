@@ -41,8 +41,7 @@ const findManyByID = (model, IDList, isOrganized) => {
         }).sort({ createdAt: -1 }).lean();
     }
     else {
-        console.log('asdfadf');
-        return selectModel(model).find({
+         return selectModel(model).find({
             '_id': { $in: IDList }, function(error, docs) {
                 if (error) console.log(error);
                 else {
@@ -58,7 +57,7 @@ const deleteByID = (model, ID) => (
         (err, result) => {
             console.log
             if (err) {
-                console.log('deleteBYID', err);
+                console.log(err);
                 throw new Error(500, err);
             }
             return result;
@@ -73,7 +72,7 @@ const deleteManyByID = (model, IDArray) => (
     },
         (err, result) => {
             if (err) {
-                console.log('deleteMany', err);
+                console.log(err);
                 throw new Error(500, err);
             }
             return result;

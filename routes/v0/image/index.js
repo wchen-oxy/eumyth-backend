@@ -132,7 +132,7 @@ router.route('/display-photo')
     (req, res, next) => {
       const username = req.body.username;
       let returnedIndexUser = null;
-      return findOne(ModelConsants.INDEX_USER, { username: username })
+      return findOne(ModelConstants.INDEX_USER, { username: username })
         .then((result) => {
           returnedIndexUser = result;
           if (returnedIndexUser.cropped_display_photo_key === '') {
@@ -145,9 +145,9 @@ router.route('/display-photo')
               returnedIndexUser.tiny_cropped_display_photo_key
             ]
           return Promise.all([
-            findByID(ModelConsants.INDEX_USER, returnedIndexUser.user_profile_id),
+            findByID(ModelConstants.USER, returnedIndexUser.user_profile_id),
             imageService.deleteMultiple(displayPhotoKeys),
-            findByID(ModelConsants.USER_PREVIEW, returnedIndexUser.user_preview_id)])
+            findByID(ModelConstants.USER_PREVIEW, returnedIndexUser.user_preview_id)])
         })
         .then((results) => {
           results[0].cropped_display_photo_key = "";
@@ -184,7 +184,7 @@ router.route('/cover')
         return new Error("Something went wrong when uploading cover image.");
       }
 
-      return findOne(ModelConsants.USER, { username: username })
+      return findOne(ModelConstants.USER, { username: username })
         .then((user) => {
           returnedUser = user;
           user.cover_photo_key = coverPhoto;
@@ -199,7 +199,7 @@ router.route('/cover')
     (req, res, next) => {
       const username = req.body.username;
       let returnedUser = null;
-      return findOne(ModelConsants.USER, { username: username })
+      return findOne(ModelConstants.USER, { username: username })
         .then((user) => {
           returnedUser = user;
           if (!returnedUser.cover_photo_key || returnedUser.cover_photo_key === "")

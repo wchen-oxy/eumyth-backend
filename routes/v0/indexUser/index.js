@@ -31,7 +31,6 @@ router.get('/',
           }
           return res.status(200).json(truncatedUser);
         }
-        console.log("ADSFADF");
         return res.status(200).json(result);
       })
       .catch(next)

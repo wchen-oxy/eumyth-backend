@@ -83,7 +83,10 @@ const IndexUserSchema = new Schema({
     },
     pursuits: [IndexPursuit.Schema],
     following_feed: [mongoose.Types.ObjectId], //feed from others
-    recent_posts: [mongoose.Types.ObjectId] // 4 most recent posts
+    recent_posts: {
+        type: [mongoose.Types.ObjectId],
+        default: []
+    } // 4 most recent posts
 }
 );
 

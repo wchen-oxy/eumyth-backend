@@ -40,7 +40,7 @@ const _insertAndSortIntoList = (postList, postPreview) => {
 }
 
 const updatePostLists = (post, pursuitCategory, pursuits, recentPosts) => {
-    _setRecentPosts(post.post_id, recentPosts);
+    _setRecentPosts(post.content_id, recentPosts);
     _insertAndSortIntoList(pursuits[0].posts, post);
     for (let i = 1; i < pursuits.length; i++) {
         if (pursuitCategory === pursuits[i].name) {
@@ -70,7 +70,7 @@ const createContentPreview = (postID, date, labels, branch) => (
     selectModel(
         ModelConstants.CONTENT_PREVIEW)
         ({
-            post_id: postID,
+            content_id: postID,
             date: date,
             labels: labels,
             branch: branch,

@@ -26,17 +26,13 @@ const findAndUpdateIndexUserMeta = (indexUserID, pursuit, updateType) => {
             let user = result;
             _numProjectSetter(user.pursuits[0].num_projects, updateType);
             if (pursuit) {
-                for (const pursuit of user.pursuits) {
-                    if (pursuit.name === pursuit) {
-                        _numProjectSetter(pursuit.num_projects, updateType);
+                for (const pursuitMeta of user.pursuits) {
+                    if (pursuitMeta.name === pursuit) {
+                        _numProjectSetter(pursuitMeta.num_projects, updateType);
                     }
                 }
             }
             return user;
-        })
-        .catch(err => {
-            console.log(err);
-            res.status(500).send(err)
         });
 }
 

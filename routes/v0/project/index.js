@@ -77,7 +77,7 @@ router.route('/')
                 findByID(ModelConstants.USER, userID)
                     .then((result => {
                         let user = result;
-                        const newContent = selectModel(ModelConstants.CONTENT_PREVIEW)({ post_id: newProject._id });
+                        const newContent = selectModel(ModelConstants.CONTENT_PREVIEW)({ content_id: newProject._id });
                         user.pursuits[0].projects.unshift(newContent);
                         adjustEntryLength(user.pursuits[0].projects, EMBEDDED_FEED_LIMIT)
                         for (const pursuit of user.pursuits) {
@@ -177,10 +177,7 @@ router.route('/')
             }
             return deleteProject
                 .then(() => next())
-                .catch(err => {
-                    console.log(err);
-                    return res.status(500).send(err);
-                });
+                .catch(next);
         },
         (req, res, next) => {
             const indexUserID = req.query.indexUserID;
@@ -210,7 +207,7 @@ router.route('/')
                 .then(() => {
                     return res.status(200).send('Success');
                 })
-                .catch(err => { console.log(err); return res.status(500).send(err); });
+                .catch(next);
         }
     );
 
@@ -277,7 +274,8 @@ router.route('/fork').put(
         PARAM_CONSTANTS.PROJECT_DATA,
         PARAM_CONSTANTS.USERNAME,
         PARAM_CONSTANTS.INDEX_USER_ID,
-        PARAM_CONSTANTS.USER_ID
+        PARAM_CONSTANTS.USER_ID,
+        PARAM_CONSTANTS.SHOULD_COPY_POSTS
     ),
     doesValidationErrorExist,
     (req, res, next) => {
@@ -286,6 +284,7 @@ router.route('/fork').put(
         const authorID = req.body.indexUserID;
         const userID = req.body.userID;
         const displayPhoto = req.body.displayPhoto;
+        const shouldCopyPosts = req.body.shouldCopyPosts;
         const oldProjectID = projectData._id;
         const ancestors = projectData.ancestors;
         const newPostIDList = [];
@@ -293,112 +292,112 @@ router.route('/fork').put(
         let projectPosts = null;
         res.locals.indexUserID = authorID;
         res.locals.userID = userID;
-
         delete projectData._id;
         delete projectData.username;
         delete projectData.index_user_id;
         ancestors.push(oldProjectID);
-        const newProject = new selectModel(ModelConstants.PROJECT)({
+        let newProject = new (selectModel(ModelConstants.PROJECT))({
             ...projectData,
             index_user_id: authorID,
             username: username,
             parent: oldProjectID,
             ancestors: ancestors
         });
-        return findManyByID(ModelConstants.POST, projectData.post_ids, true)
-            .then((results) => {
-                projectPosts = results;
-                projectPosts.sort((a, b) =>
-                    projectData.post_ids.findIndex(id => a._id.equals(id)) -
-                    projectData.post_ids.findIndex(id => b._id.equals(id)));
-                //sort posts to order of postIDs
-                //dupe to the new list
-                // first duplicate posts
-                for (let i = 0; i < projectPosts.length; i++) {
-                    const post = projectPosts[i];
-                    const oldPostID = post._id;
+        if (shouldCopyPosts) {
+            return findManyByID(ModelConstants.POST, projectData.post_ids, true)
+                .then((results) => {
+                    projectPosts = results;
+                    projectPosts.sort((a, b) =>
+                        projectData.post_ids.findIndex(id => a._id.equals(id)) -
+                        projectData.post_ids.findIndex(id => b._id.equals(id)));
+                    for (let i = 0; i < projectPosts.length; i++) {
+                        const post = projectPosts[i];
+                        const oldPostID = post._id;
+                        delete post._id;
+                        delete post.comments;
+                        delete post.date;
+                        delete post.createdAt;
+                        delete post.updatedAt;
+                        const duplicate = selectModel(
+                            ModelConstants.POST)(
+                                {
+                                    ...post,
+                                    author_id: authorID,
+                                    username: username,
+                                    display_photo_key: displayPhoto,
+                                    post_format: "SHORT",
+                                    internal_ref: {
+                                        id: newProject._id,
+                                        title: newProject.title
+                                    },
+                                    external_ref: {
+                                        id: oldPostID,
+                                        title: projectData.title
+                                    },
+                                    labels: [],
+                                    comments: []
+                                });
+                        newPostIDList.push(duplicate._id);
+                        projectPosts[i] = duplicate;
+                    }
+                    newProject.post_ids = newPostIDList;
 
-                    delete post._id;
-                    delete post.comments;
-                    delete post.date;
-                    delete post.createdAt;
-                    delete post.updatedAt;
-                    const duplicate = selectModel(
-                        ModelConstants.POST)(
-                            {
-                                ...post,
-                                author_id: authorID,
-                                username: username,
-                                display_photo_key: displayPhoto,
-                                post_format: "SHORT",
-                                internal_ref: {
-                                    id: newProject._id,
-                                    title: newProject.title
-                                },
-                                external_ref: {
-                                    id: oldPostID,
-                                    title: projectData.title
-                                },
-                                labels: [],
-                                comments: []
-                            });
-                    newPostIDList.push(duplicate._id);
-                    projectPosts[i] = duplicate;
-                }
-                newProject.post_ids = newPostIDList;
-
-                const imageURLs = extractImageURLs(projectPosts);
-                const promisedDuplicates = imageURLs.map(url => returnMappedDuplicate(url, imageKeyMap));
-                // throw new Error();
-                return Promise.all(promisedDuplicates);
-            })
-            .then(response => {
-                refreshPostImageData(projectPosts, imageKeyMap);
-                return Promise.all([
-                    insertMany(ModelConstants.POST, projectPosts, { ordered: true }),
-                    newProject.save()])
-            })
-            .then(() => {
-                res.locals.project = newProject;
-                next();
-            })
-            .catch(err => {
-                console.log(err);
-                return res.status(400);
-
-            });
+                    const imageURLs = extractImageURLs(projectPosts);
+                    const promisedDuplicates = imageURLs.map(url => returnMappedDuplicate(url, imageKeyMap));
+                    return Promise.all(promisedDuplicates);
+                })
+                .then(response => {
+                    refreshPostImageData(projectPosts, imageKeyMap);
+                    return Promise.all([
+                        insertMany(ModelConstants.POST, projectPosts, { ordered: true }),
+                        newProject.save()])
+                })
+                .then(() => {
+                    res.locals.project = newProject;
+                    next();
+                })
+                .catch(next);
+        }
+        else {
+            newProject.post_ids = [];
+            res.locals.project = newProject;
+            return newProject
+                .save()
+                .then(() => next())
+                .catch(next)
+        }
     },
     (req, res, next) => {
         const project = res.locals.project;
-        // const promisedUserInfo = Promise.all([retrieveIndexUserByID(res.locals.indexUserID), retrieveUserByID(res.locals.userID)]);
         const promisedUserInfo = findByID(ModelConstants.USER, res.locals.userID);
-        return promisedUserInfo.then(
-            result => {
-                console.log(result);
-                for (let i = 1; i < result.pursuits.length; i++) {
-                    if (result.pursuits[i].name === project.pursuit) {
-                        result.pursuits[i].projects.unshift(
-                            selectModel(
-                                ModelConstants.CONTENT_PREVIEW)(
-                                    {
-                                        post_id: project._id,
-                                        date: new Date().toISOString().substr(0, 10),
-                                        labels: project.labels,
-                                    }))
+        return promisedUserInfo
+            .then(
+                result => {
+                    for (let i = 1; i < result.pursuits.length; i++) {
+                        if (result.pursuits[i].name === project.pursuit) {
+                            result.pursuits[i].projects.unshift(
+                                selectModel(ModelConstants.CONTENT_PREVIEW)
+                                    (
+                                        {
+                                            content_id: project._id,
+                                            date: new Date().toISOString().substr(0, 10),
+                                            labels: project.labels,
+                                        })
+                            )
+                        }
                     }
-                }
-                result.pursuits[0].projects.unshift(
-                    selectModel(
-                        ModelConstants.CONTENT_PREVIEW)(
+                    result.pursuits[0].projects.unshift(
+                        selectModel(ModelConstants.CONTENT_PREVIEW)(
                             {
-                                post_id: project._id,
+                                content_id: project._id,
                                 date: new Date().toISOString().substr(0, 10),
                                 labels: project.labels,
                             }));
-                return result.save();
-            }
-        )
+                    return result.save();
+                }
+            )
             .then(result => res.status(200).send())
+            .catch(next);
     }
 )
 module.exports = router;

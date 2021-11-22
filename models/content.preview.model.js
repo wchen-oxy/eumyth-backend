@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const ContentPreviewSchema = new Schema({
   _id: false,
 
-  post_id: {
+  content_id: {
     type: mongoose.Types.ObjectId,
     required: true,
   },

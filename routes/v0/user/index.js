@@ -50,7 +50,7 @@ router.route('/')
       let indexPursuitsHolder = [];
 
       mainPursuitsHolder.push(
-        new selectModel(ModelConstants.PURSUIT)({
+        new (selectModel(ModelConstants.PURSUIT))({
           name: "ALL",
           display_photo_key: "",
           private: false,
@@ -61,7 +61,7 @@ router.route('/')
         }));
 
       indexPursuitsHolder.push(
-        new selectModel(ModelConstants.INDEX_PURSUIT)({
+        new (selectModel(ModelConstants.INDEX_PURSUIT))({
           name: "ALL",
           num_posts: 0,
           num_milestones: 0,
@@ -72,7 +72,7 @@ router.route('/')
 
       for (const pursuit of pursuitsArray) {
         mainPursuitsHolder.push(
-          new selectModel(ModelConstants.PURSUIT)
+          new (selectModel(ModelConstants.PURSUIT))
             ({
               name: pursuit.name,
               display_photo_key: "",
@@ -85,7 +85,7 @@ router.route('/')
             }));
 
         indexPursuitsHolder.push(
-          new selectModel(ModelConstants.INDEX_PURSUIT)
+          new (selectModel(ModelConstants.INDEX_PURSUIT))
             ({
               name: pursuit.name,
               experience_level: pursuit.experience,
@@ -98,7 +98,7 @@ router.route('/')
       }
 
       const newUser =
-        new selectModel(ModelConstants.USER)
+        new (selectModel(ModelConstants.USER))
           ({
             username: username,
             cropped_display_photo_key: croppedImage,
@@ -114,7 +114,7 @@ router.route('/')
           });
 
       const newIndexUser =
-        new selectModel(ModelConstants.INDEX_USER)
+        new (selectModel(ModelConstants.INDEX_USER))
           ({
             username: username,
             user_profile_id: newUser._id,
@@ -123,26 +123,20 @@ router.route('/')
             small_cropped_display_photo_key: smallCroppedImage,
             tiny_cropped_display_photo_key: tinyCroppedImage,
             private: false,
-            draft: new selectModel(ModelConstants.DRAFT)
-              ({
-                text: null,
-                links: []
-              }),
             notifications: [],
             pursuits: indexPursuitsHolder,
             following_feed: [],
-            recent_posts: [],
             labels: [],
           });
 
       const newUserRelation =
-        new selectModel(ModelConstants.USER_RELATION)
+        new (selectModel(ModelConstants.USER_RELATION))
           ({
             parent_index_user_id: newIndexUser._id,
           });
 
       const newUserPreview =
-        new selectModel(ModelConstants.USER_PREVIEW)
+        new (selectModel(ModelConstants.USER_PREVIEW))
           ({
             parent_index_user_id: newIndexUser._id,
             user_relation_id: newUserRelation._id,
