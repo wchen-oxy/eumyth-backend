@@ -1,5 +1,6 @@
 const Comment = require('./comment.model');
 const ContentPreview = require('./content.preview.model');
+const DraftPreview = require('./draft.preview.model');
 const ImageAnnotation = require('./image.annotation.model');
 const IndexPursuit = require('./index.pursuit.model');
 const IndexUser = require('./index.user.model');
@@ -20,6 +21,8 @@ const selectModel = (type) => {
             return Comment.Model;
         case (ModelConstants.CONTENT_PREVIEW):
             return ContentPreview.Model;
+        case (ModelConstants.DRAFT_PREVIEW):
+            return DraftPreview.Model
         case (ModelConstants.IMAGE_ANNOTATION):
             return ImageAnnotation.Model;
         case (ModelConstants.INDEX_PURSUIT):

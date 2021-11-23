@@ -58,8 +58,8 @@ const ProjectSchema = new Schema({
     type: Date
   },
 
-  is_complete: {
-    type: Boolean,
+  status: {
+    type: String,
     required: false,
   },
 

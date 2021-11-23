@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const IndexPursuit = require("./index.pursuit.model");
-const Draft = require("./draft.model");
+const DraftPreview = require("./draft.preview.model");
 
 const IndexUserSchema = new Schema({
     username: {
@@ -65,9 +65,8 @@ const IndexUserSchema = new Schema({
         required: false,
     },
 
-    draft: {
-        type: Draft.Schema,
-        required: false,
+    drafts: {
+        type: [DraftPreview.Schema]
     },
 
     user_relation_id: {

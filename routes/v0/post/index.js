@@ -36,6 +36,17 @@ router.route('/').post(
   doesValidationErrorExist,
   postServices.retrieveRelevantUserInfo,
   (req, res, next) => {
+    const selectedDraft = req.body.selectedDraftID ?  req.body.selectedDraftID : null;
+    console.log(req.body.selectedDraftID);
+    if (!selectedDraft) return next();
+    return findByID(ModelConstants.PROJECT, selectedDraft)
+      .then((result) => {
+        console.log(result);
+        res.locals.project = result;
+        return next();
+      });
+  },
+  (req, res, next) => {
     const postType = req.body.postType;
     const username = req.body.username;
     const postPrivacyType = req.body.postPrivacyType;
@@ -55,6 +66,7 @@ router.route('/').post(
     const textSnippet = textData ? postServices.makeTextSnippet(postType, isPaginated, textData) : null;
     const indexUser = req.indexUser;
     const user = req.completeUser;
+    const project = res.locals.project;
     const post = postServices.createPost(
       postType,
       username,
@@ -78,7 +90,7 @@ router.route('/').post(
     );
 
     res.locals.post_id = post._id;
-
+    if (project) project.post_ids.unshift(post._id);
     if (indexUser.preferred_post_privacy !== postPrivacyType) {
       indexUser.preferred_post_privacy = postPrivacyType;
     }
@@ -107,6 +119,7 @@ router.route('/').post(
       user,
       indexUser,
       labels);
+
     const savedIndexUser = indexUser
       .save()
       .catch(error => {
@@ -127,8 +140,20 @@ router.route('/').post(
         res.status(500).json('Error: ' + error);
       }
     });
-    return Promise.all([savedIndexUser, savedUser, savedPost])
+    const savedProject = project.save().catch(error => {
+      if (error) {
+        console.log(error);
+        res.status(500).json('Error: ' + error);
+      }
+    });
+    if (project) {
+      return Promise.all([savedIndexUser, savedUser, savedPost, savedProject])
       .then(() => next());
+    }
+    else{
+      return Promise.all([savedIndexUser, savedUser, savedPost])
+      .then(() => next());
+    }
   },
   (req, res, next) => {
     let followersIDArray = [];
@@ -156,7 +181,7 @@ router.route('/').post(
               if (indexUser.following_feed.length > 50) {
                 indexUser.following_feed.shift();
               }
-              indexUser.save().then(() => resolve("saved"));
+              indexUser.save().then(() => resolve("saved")).catch(next);
             })
           );
           return Promise.all(promisedUpdatedFollowerArray)

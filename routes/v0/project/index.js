@@ -51,7 +51,7 @@ router.route('/')
             const pursuit = req.body.pursuit ? req.body.pursuit : null;
             const startDate = req.body.startDate ? req.body.startDate : null;
             const endDate = req.body.endDate ? req.body.endDate : null;
-            const isComplete = req.body.isComplete ? req.body.isComplete : null;
+            const status = req.body.status ? req.body.status : null;
             const minDuration = req.body.minDuration ? req.body.minDuration : null;
             const coverPhotoURL = req.files ? req.files.coverPhoto[0].key : null;
 
@@ -66,7 +66,7 @@ router.route('/')
                         pursuit: pursuit,
                         start_date: startDate,
                         end_date: endDate,
-                        is_complete: isComplete,
+                        status: status,
                         min_duration: minDuration,
                         cover_photo_key: coverPhotoURL,
                         post_ids: selectedPosts,
@@ -116,7 +116,7 @@ router.route('/')
             req.body.pursuitCategory ? updates.pursuit = req.body.pursuitCategory : null;
             req.body.startDate ? updates.start_date = req.body.startDate : null;
             req.body.endDate ? updates.end_date = req.body.endDate : null;
-            req.body.isComplete ? updates.is_complete = req.body.isComplete : null;
+            req.body.status ? updates.status = req.body.status : null;
             req.body.minDuration ? updates.min_duration = req.body.minDuration : null;
             req.body.selectedPosts ? updates.post_ids = req.body.selectedPosts : null;
             req.body.labels ? updates.labels = req.body.labels : null;
@@ -282,7 +282,6 @@ router.route('/fork').put(
         const projectData = req.body.projectData;
         const username = req.body.username;
         const authorID = req.body.indexUserID;
-        const userID = req.body.userID;
         const displayPhoto = req.body.displayPhoto;
         const shouldCopyPosts = req.body.shouldCopyPosts;
         const oldProjectID = projectData._id;
@@ -290,8 +289,6 @@ router.route('/fork').put(
         const newPostIDList = [];
         const imageKeyMap = new Map();
         let projectPosts = null;
-        res.locals.indexUserID = authorID;
-        res.locals.userID = userID;
         delete projectData._id;
         delete projectData.username;
         delete projectData.index_user_id;
@@ -301,8 +298,11 @@ router.route('/fork').put(
             index_user_id: authorID,
             username: username,
             parent: oldProjectID,
-            ancestors: ancestors
+            ancestors: ancestors,
+            status: 'DRAFT'
         });
+        res.locals.title = newProject.title;
+        res.locals.id = newProject._id;
         if (shouldCopyPosts) {
             return findManyByID(ModelConstants.POST, projectData.post_ids, true)
                 .then((results) => {
@@ -318,25 +318,24 @@ router.route('/fork').put(
                         delete post.date;
                         delete post.createdAt;
                         delete post.updatedAt;
-                        const duplicate = selectModel(
-                            ModelConstants.POST)(
-                                {
-                                    ...post,
-                                    author_id: authorID,
-                                    username: username,
-                                    display_photo_key: displayPhoto,
-                                    post_format: "SHORT",
-                                    internal_ref: {
-                                        id: newProject._id,
-                                        title: newProject.title
-                                    },
-                                    external_ref: {
-                                        id: oldPostID,
-                                        title: projectData.title
-                                    },
-                                    labels: [],
-                                    comments: []
-                                });
+                        const duplicate = selectModel(ModelConstants.POST)
+                            ({
+                                ...post,
+                                author_id: authorID,
+                                username: username,
+                                display_photo_key: displayPhoto,
+                                post_format: "SHORT",
+                                internal_ref: {
+                                    id: newProject._id,
+                                    title: newProject.title
+                                },
+                                external_ref: {
+                                    id: oldPostID,
+                                    title: projectData.title
+                                },
+                                labels: [],
+                                comments: []
+                            });
                         newPostIDList.push(duplicate._id);
                         projectPosts[i] = duplicate;
                     }
@@ -369,33 +368,41 @@ router.route('/fork').put(
     },
     (req, res, next) => {
         const project = res.locals.project;
-        const promisedUserInfo = findByID(ModelConstants.USER, res.locals.userID);
-        return promisedUserInfo
-            .then(
-                result => {
-                    for (let i = 1; i < result.pursuits.length; i++) {
-                        if (result.pursuits[i].name === project.pursuit) {
-                            result.pursuits[i].projects.unshift(
-                                selectModel(ModelConstants.CONTENT_PREVIEW)
-                                    (
-                                        {
-                                            content_id: project._id,
-                                            date: new Date().toISOString().substr(0, 10),
-                                            labels: project.labels,
-                                        })
-                            )
-                        }
+        const promisedUserInfo = findByID(ModelConstants.USER, req.body.userID);
+        const promisedIndexUser = findByID(ModelConstants.INDEX_USER, req.body.indexUserID)
+        return Promise.all([promisedUserInfo, promisedIndexUser])
+            .then(results => {
+                const user = results[0];
+                const indexUser = results[1];
+                user.pursuits[0].projects.unshift(
+                    selectModel(ModelConstants.CONTENT_PREVIEW)(
+                        {
+                            content_id: project._id,
+                            date: new Date().toISOString().substr(0, 10),
+                            labels: project.labels,
+                        }));
+                for (let i = 1; i < user.pursuits.length; i++) {
+                    if (user.pursuits[i].name === project.pursuit) {
+                        user.pursuits[i].projects.unshift(
+                            selectModel(ModelConstants.CONTENT_PREVIEW)
+                                (
+                                    {
+                                        content_id: project._id,
+                                        date: new Date().toISOString().substr(0, 10),
+                                        labels: project.labels,
+                                    })
+                        )
                     }
-                    result.pursuits[0].projects.unshift(
-                        selectModel(ModelConstants.CONTENT_PREVIEW)(
-                            {
-                                content_id: project._id,
-                                date: new Date().toISOString().substr(0, 10),
-                                labels: project.labels,
-                            }));
-                    return result.save();
                 }
-            )
+                indexUser.drafts.unshift(
+                    (selectModel(ModelConstants.DRAFT_PREVIEW)
+                        ({
+                            title: res.locals.title,
+                            content_id: res.locals.id
+                        }))
+                )
+                return Promise.all([user.save(), indexUser.save()]);
+            })
             .then(result => res.status(200).send())
             .catch(next);
     }

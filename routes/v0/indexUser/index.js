@@ -17,6 +17,7 @@ router.get('/',
       .then(result => {
         if (isTruncated) {
           const truncatedUser = {
+            drafts: result.drafts,
             labels: result.labels,
             username: result.username,
             preferredPostType: result.preferred_post_privacy,
