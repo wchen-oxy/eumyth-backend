@@ -99,8 +99,14 @@ router.route('/info').get(
         let following = [];
         let followers = [];
         let requested = [];
+        let requester = [];
         for (const profile of result.following) {
-          following.push(profile.user_preview_id);
+          if (profile.status === "FOLLOW_REQUESTED") {
+            requester.push(profile.user_preview_id);
+          }
+          else if (profile.status === "FOLLOWING") {
+            following.push(profile.user_preview_id);
+          }
         }
         for (const profile of result.followers) {
           if (profile.status === "FOLLOW_REQUESTED") {
@@ -113,20 +119,27 @@ router.route('/info').get(
         const resolvedFollowing = findManyByID(ModelConstants.USER_PREVIEW, following);
         const resolvedFollowers = findManyByID(ModelConstants.USER_PREVIEW, followers);
         const resolvedRequested = findManyByID(ModelConstants.USER_PREVIEW, requested);
+        const resolvedRequester = findManyByID(ModelConstants.USER_PREVIEW, requester);
+        
         return Promise.all([
           resolvedFollowing,
           resolvedFollowers,
-          resolvedRequested]);
+          resolvedRequested,
+          resolvedRequester
+        ]);
       })
       .then((profiles) => {
         const finalFollowing = rowDataSetter(profiles[0]);
         const finalFollowers = rowDataSetter(profiles[1]);
         const finalRequested = rowDataSetter(profiles[2]);
+        const finalRequester = rowDataSetter(profiles[3]);
+
         return res.status(200).json({
           _id: ID,
           following: finalFollowing,
           followers: finalFollowers,
-          requested: finalRequested
+          requested: finalRequested,
+          requester: finalRequester
         });
       })
       .catch(next)
@@ -171,57 +184,5 @@ router.route('/status').put(
     resolvedUpdate.then(() => res.status(200).json({ success: "DONE" }))
       .catch(next);
   });
-
-router.route('/set').put(
-  buildBodyValidationChain(
-    PARAM_CONSTANTS.CURRENT_USER_RELATION_ID,
-    PARAM_CONSTANTS.TARGET_USER_PREVIEW_ID,
-    PARAM_CONSTANTS.TARGET_USER_RELATION_ID,
-    PARAM_CONSTANTS.ACTION
-  ),
-  doesValidationErrorExist,
-  (req, res, next) => {
-    const currentUserRelationID = req.body.currentUserRelationID;
-    const targetUserPreviewID = req.body.targetUserPreviewID;
-    const targetUserRelationID = req.body.targetUserRelationID;
-    const action = req.body.action;
-    if (action === "UNFOLLOW") {
-      //REMOVE FROM SELF FOLLOWING
-      return findByID(ModelConstants.USER_RELATION, currentUserRelationID)
-        .then(result => {
-          result.following = result.following
-            .filter(profile => profile.user_preview_id === targetUserPreviewID)
-          // return profile.user_preview_id !== targetUserPreviewID
-
-          return result.save();
-        })
-        .then(() => res.status(200).send())
-        .catch((error) => {
-          console.log(error);
-          if (204) res.status(204).send("No User Found");
-          return res.status(500).json({ error: error });
-        });
-    }
-    else {
-      return findManyByID(ModelConstants.USER_RELATION, [currentUserRelationID, targetUserRelationID])
-        .then((result) => {
-          const currentUserRelation = result[0]._id.toString() === currentUserRelationID ?
-            result[0] : result[1];
-          const targetUserRelation = result[1]._id.toString() === targetUserRelationID ?
-            result[1] : result[0];
-          if (action === 'ACCEPT') {
-            statusChanger(action, targetUserPreviewID, currentUserRelation.following);
-            statusChanger(action, currentUserRelation.user_preview_id, targetUserRelation.followers);
-          }
-          else {
-            statusChanger(action, targetUserPreviewID, currentUserRelation.followers);
-            statusChanger(action, currentUserRelation.user_preview_id, targetUserRelation.following);
-          }
-          return Promise.all([currentUserRelation.save(), targetUserRelation.save()])
-        })
-        .then(() => res.status(200).send())
-        .catch(next)
-    }
-  })
 
 module.exports = router;
