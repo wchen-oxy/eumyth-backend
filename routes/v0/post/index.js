@@ -36,7 +36,7 @@ router.route('/').post(
   doesValidationErrorExist,
   postServices.retrieveRelevantUserInfo,
   (req, res, next) => {
-    const selectedDraft = req.body.selectedDraftID ?  req.body.selectedDraftID : null;
+    const selectedDraft = req.body.selectedDraftID ? req.body.selectedDraftID : null;
     console.log(req.body.selectedDraftID);
     if (!selectedDraft) return next();
     return findByID(ModelConstants.PROJECT, selectedDraft)
@@ -140,19 +140,20 @@ router.route('/').post(
         res.status(500).json('Error: ' + error);
       }
     });
-    const savedProject = project.save().catch(error => {
-      if (error) {
-        console.log(error);
-        res.status(500).json('Error: ' + error);
-      }
-    });
+
     if (project) {
+      const savedProject = project.save().catch(error => {
+        if (error) {
+          console.log(error);
+          res.status(500).json('Error: ' + error);
+        }
+      });
       return Promise.all([savedIndexUser, savedUser, savedPost, savedProject])
-      .then(() => next());
+        .then(() => next());
     }
-    else{
+    else {
       return Promise.all([savedIndexUser, savedUser, savedPost])
-      .then(() => next());
+        .then(() => next());
     }
   },
   (req, res, next) => {

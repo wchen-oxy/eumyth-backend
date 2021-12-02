@@ -129,12 +129,6 @@ router.route('/')
             labels: [],
           });
 
-      const newUserRelation =
-        new (selectModel(ModelConstants.USER_RELATION))
-          ({
-            parent_index_user_id: newIndexUser._id,
-          });
-
       const newUserPreview =
         new (selectModel(ModelConstants.USER_PREVIEW))
           ({
@@ -146,6 +140,13 @@ router.route('/')
             small_cropped_display_photo_key: smallCroppedImage,
             tiny_cropped_display_photo_key: tinyCroppedImage,
           })
+
+      const newUserRelation =
+        new (selectModel(ModelConstants.USER_RELATION))
+          ({
+            parent_index_user_id: newIndexUser._id,
+            user_preview_id: newUserPreview._id
+          });
 
       newUser.user_preview_id = newUserPreview._id;
       newUser.user_relation_id = newUserRelation._id;

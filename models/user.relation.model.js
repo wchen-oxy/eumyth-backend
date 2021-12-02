@@ -7,6 +7,11 @@ const UserRelationSchema = new Schema({
         required: true
     },
 
+    user_preview_id: {
+        type: mongoose.Types.ObjectId,
+        required: true
+    },
+
     following: [UserRelationStatus.Schema],
 
     followers: [UserRelationStatus.Schema]

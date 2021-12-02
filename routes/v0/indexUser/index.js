@@ -28,7 +28,9 @@ router.get('/',
             indexProfileID: result._id,
             profileID: result.user_profile_id,
             userRelationID: result.user_relation_id,
-            pursuits: result.pursuits
+            pursuits: result.pursuits,
+            followingFeed: result.following_feed,
+            recentPosts: result.recent_posts
           }
           return res.status(200).json(truncatedUser);
         }

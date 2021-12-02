@@ -12,20 +12,56 @@ const {
   findOne,
 } = require('../../../data-access/dal');
 const NOT_A_FOLLOWER_STATE = "NOT_A_FOLLOWER";
+const relationServices = require('./services');
 const ModelConstants = require('../../../models/constants');
+
+const FOLLOW = "FOLLOW";
+const ACCEPT_REQUEST = "ACCEPT_REQUEST";
+const UNFOLLOW = "UNFOLLOW";
+const FOLLOW_REQUESTED = "FOLLOW_REQUESTED";
+const FOLLOWING = "FOLLOWING";
+const REQUEST_ACCEPTED = "REQUEST_ACCEPTED";
+const UNFOLLOWED = "UNFOLLOWED";
+
+const rowDataSetter = (userPreviewArray) => {
+  return userPreviewArray.map(profile => {
+    return {
+      username: profile.username,
+      user_preview_id: profile._id,
+      user_relation_id: profile.user_relation_id,
+      display_photo: profile.tiny_cropped_display_photo_key
+    }
+  })
+};
+
+const statusChanger = (action, targetID, array) => {
+  if (action === "DECLINED") {
+    return array.filter(item => item.user_preview_id.toString() !== targetID)
+  }
+  else {
+    for (let i = 0; i < array.length; i++) {
+      if (array[i].user_preview_id.toString() === targetID) {
+        console.log(array[i]);
+        array[i].status = 'FOLLOWING';
+        return null;
+      }
+    }
+  }
+}
 
 router.route('/').get(
   buildQueryValidationChain(
     PARAM_CONSTANTS.VISITOR_USERNAME,
-    PARAM_CONSTANTS.USER_RELATION_ARRAY_ID
+    PARAM_CONSTANTS.USER_RELATION_ID
   ),
   doesValidationErrorExist,
   (req, res, next) => {
     const visitorUsername = req.query.visitorUsername;
-    const followerArrayId = req.query.userRelationArrayID;
+    const followerArrayId = req.query.userRelationID;
     let resolvedVistorPreviewId = findOne(ModelConstants.USER_PREVIEW, { username: visitorUsername });
     return resolvedVistorPreviewId
       .then((visitorUserPreview) => {
+        console.log(visitorUserPreview)
         return findByID(ModelConstants.USER_RELATION, followerArrayId)
           .then(
             (userRelationInfo) => {
@@ -83,30 +119,9 @@ router.route('/info').get(
           resolvedRequested]);
       })
       .then((profiles) => {
-        let finalFollowing = [];
-        let finalFollowers = [];
-        let finalRequested = [];
-        for (const profile of profiles[0]) {
-          const username = profile.username;
-          finalFollowing.push({
-            username: username,
-            display_photo: profile.tiny_cropped_display_photo_key
-          });
-        }
-        for (const profile of profiles[1]) {
-          const username = profile.username;
-          finalFollowers.push({
-            username: username,
-            display_photo: profile.tiny_cropped_display_photo_key
-          });
-        }
-        for (const profile of profiles[2]) {
-          const username = profile.username;
-          finalRequested.push({
-            username: username,
-            display_photo: profile.tiny_cropped_display_photo_key
-          });
-        }
+        const finalFollowing = rowDataSetter(profiles[0]);
+        const finalFollowers = rowDataSetter(profiles[1]);
+        const finalRequested = rowDataSetter(profiles[2]);
         return res.status(200).json({
           _id: ID,
           following: finalFollowing,
@@ -119,184 +134,66 @@ router.route('/info').get(
 
 router.route('/status').put(
   buildBodyValidationChain(
-    PARAM_CONSTANTS.VISITOR_USERNAME,
-    PARAM_CONSTANTS.USER_RELATION_ARRAY_ID,
-    PARAM_CONSTANTS.PROFILE_PREVIEW_ID,
-    PARAM_CONSTANTS.IS_PRIVATE,
+    PARAM_CONSTANTS.VISITOR_USER_RELATION_ID,
+    PARAM_CONSTANTS.TARGET_USER_RELATION_ID,
     PARAM_CONSTANTS.ACTION
   ),
   doesValidationErrorExist,
   (req, res, next) => {
-    const visitorUsername = req.body.visitorUsername;
-    const targetUserRelationID = req.body.userRelationArrayID;
-    const targetUserPreviewID = req.body.targetProfilePreviewID;
-    let visitorUserPreview = null;
+    const visitorUserRelationID = req.body.visitorUserRelationID;
+    const targetUserRelationID = req.body.targetUserRelationID;
     const isPrivate = req.body.isPrivate;
     const action = req.body.action;
-    let resultStatus = "";
-
-    const FOLLOW = "FOLLOW";
-    const ACCEPT_REQUEST = "ACCEPT_REQUEST";
-    const UNFOLLOW = "UNFOLLOW";
-    const FOLLOW_REQUESTED = "FOLLOW_REQUESTED";
-    const FOLLOWING = "FOLLOWING";
-    const REQUEST_ACCEPTED = "REQUEST_ACCEPTED";
-    const UNFOLLOWED = "UNFOLLOWED";
-
-    const resolvedVisitor = findOne(ModelConstants.USER_PREVIEW, { username: visitorUsername });
-
-    const resolvedUserRelation = resolvedVisitor
-      .then((result) => {
-        visitorUserPreview = result;
-        const userRelationArray = [
-          targetUserRelationID,
-          visitorUserPreview.user_relation_id];
-        return findManyByID(ModelConstants.USER_RELATION, userRelationArray)
-      });
-
-    const resolvedUpdate = resolvedUserRelation
+    const resolvedUpdate = findManyByID(
+      ModelConstants.USER_RELATION,
+      [targetUserRelationID, visitorUserRelationID])
       .then((userRelation) => {
         const targetUserRelation =
-          userRelation[0]._id.toString() === targetUserRelationID.toString()
+          userRelation[0]._id.toString() === targetUserRelationID
             ? userRelation[0]
             : userRelation[1];
         const visitorUserRelation =
-          userRelation[1]._id.toString() === visitorUserPreview
-            .user_relation_id.toString()
+          userRelation[1]._id.toString() === visitorUserRelationID
             ? userRelation[1]
             : userRelation[0];
-        let targetFollowersArray = targetUserRelation.followers;
-        let visitorFollowingArray = visitorUserRelation.following;
-        let user = null;
-        switch (action) {
-          case (FOLLOW):
-            for (const follower of targetFollowersArray) {
-              if (follower.user_preview_id.toString()
-                === visitorUserPreview._id.toString()) {
-                return Promise.reject("Already Following User");
-              }
-            }
-            if (isPrivate === true) {
-              targetFollowersArray.push(selectModel(ModelConstants.USER_RELATION_STATUS)({
-                status: FOLLOW_REQUESTED,
-                user_preview_id: visitorUserPreview._id,
-              }));
 
-              visitorFollowingArray.push(selectModel(ModelConstants.USER_RELATION_STATUS)({
-                status: FOLLOW_REQUESTED,
-                user_preview_id: targetUserPreviewID,
-              }));
-
-              resultStatus = FOLLOW_REQUESTED;
-            }
-            else {
-              targetFollowersArray.push(selectModel(ModelConstants.USER_RELATION_STATUS)({
-                status: FOLLOWING,
-                user_preview_id: visitorUserPreview._id,
-              }));
-
-              visitorFollowingArray.push(selectModel(ModelConstants.USER_RELATION_STATUS)({
-                status: FOLLOWING,
-                user_preview_id: targetUserPreviewID,
-              }));
-
-              resultStatus = FOLLOWING;
-            }
-            break;
-          case (ACCEPT_REQUEST):
-            for (const follower of targetFollowersArray) {
-              if (follower.user_preview_id.toString()
-                === visitorUserPreview._id.toString()) {
-                user = follower;
-                break;
-              }
-            }
-            user.status = FOLLOWING;
-            resultStatus = REQUEST_ACCEPTED;
-            break;
-          case (UNFOLLOW):
-            let updatedTargetFollowers = [];
-            let updatedVisitorFollowing = [];
-            for (const follower of targetFollowersArray) {
-              if (follower.user_preview_id.toString()
-                !== visitorUserPreview._id.toString()) {
-                updatedTargetFollowers.push(follower);
-              }
-            }
-
-            for (const followingPerson of visitorFollowingArray) {
-              if (followingPerson.user_preview_id.toString()
-                !== targetUserPreviewID.toString()) {
-                updatedVisitorFollowing.push(followingPerson);
-              }
-            }
-            targetUserRelation.followers = updatedTargetFollowers;
-            visitorUserRelation.following = updatedVisitorFollowing;
-            resultStatus = UNFOLLOWED;
-            break;
-          default:
-            break;
-        }
-        const savedTargetFollowers = targetUserRelation.save();
-        const savedVisitorFollowing = visitorUserRelation.save();
-
-        return (Promise.all([savedTargetFollowers, savedVisitorFollowing]));
+        relationServices.setAction(
+          targetUserRelation,
+          visitorUserRelation,
+          action,
+          isPrivate)
+        return Promise.all([
+          targetUserRelation.save(),
+          visitorUserRelation.save()]);
       })
 
-    resolvedUpdate.then(() => {
-      if (resultStatus === UNFOLLOWED) {
-        return res.status(200).json({ error: NOT_A_FOLLOWER_STATE });
-      }
-      else {
-        return res.status(200).json({ success: resultStatus });
-      }
-    })
+
+    resolvedUpdate.then(() => res.status(200).json({ success: "DONE" }))
       .catch(next);
   });
 
 router.route('/set').put(
   buildBodyValidationChain(
-    PARAM_CONSTANTS.ID,
-    PARAM_CONSTANTS.TARGET_USERNAME,
-    PARAM_CONSTANTS.CURRENT_USERNAME,
+    PARAM_CONSTANTS.CURRENT_USER_RELATION_ID,
+    PARAM_CONSTANTS.TARGET_USER_PREVIEW_ID,
+    PARAM_CONSTANTS.TARGET_USER_RELATION_ID,
     PARAM_CONSTANTS.ACTION
   ),
   doesValidationErrorExist,
   (req, res, next) => {
-    const ID = req.body.ID;
-    const targetUsername = req.body.targetUsername;
-    const currentUsername = req.body.currentUsername;
+    const currentUserRelationID = req.body.currentUserRelationID;
+    const targetUserPreviewID = req.body.targetUserPreviewID;
+    const targetUserRelationID = req.body.targetUserRelationID;
     const action = req.body.action;
-    let userRelation = null;
-
     if (action === "UNFOLLOW") {
-      return findByID(ModelConstants.USER_RELATION, ID)
+      //REMOVE FROM SELF FOLLOWING
+      return findByID(ModelConstants.USER_RELATION, currentUserRelationID)
         .then(result => {
-          userRelation = result;
-          let updatedFollowing = [];
-          let followingUserRelationID = null;
-          for (const profile of userRelation.following) {
-            if (profile.username === targetUsername) {
-              followingUserRelationID = profile.user_relation_id;
-            }
-            else if (profile.username !== targetUsername) {
-              updatedFollowing.push(profile);
-            }
-          }
-          userRelation.following = updatedFollowing;
-          userRelation.save();
-          return findByID(ModelConstants.USER_RELATION, followingUserRelationID);
-        })
-        .then((result) => {
-          let followerUserRelation = result;
-          let updatedFollowers = [];
-          for (const profile of followerUserRelation.followers) {
-            if (profile.username !== currentUsername) {
-              updatedFollowers.push(profile);
-            }
-          }
-          followerUserRelation.followers = updatedFollowers;
-          return followerUserRelation.save();
+          result.following = result.following
+            .filter(profile => profile.user_preview_id === targetUserPreviewID)
+          // return profile.user_preview_id !== targetUserPreviewID
+
+          return result.save();
         })
         .then(() => res.status(200).send())
         .catch((error) => {
@@ -306,25 +203,21 @@ router.route('/set').put(
         });
     }
     else {
-      return findByID(ModelConstants.USER_RELATION, ID)
+      return findManyByID(ModelConstants.USER_RELATION, [currentUserRelationID, targetUserRelationID])
         .then((result) => {
-          userRelation = result;
-          for (const profile of userRelation.followers) {
-            if (profile.username === targetUsername) {
-              profile.status = action === 'ACCEPT' ? "FOLLOWING" : "DECLINED";
-              userRelation.save();
-              return findByID(ModelConstants.USER_RELATION, profile.user_relation_id);
-            }
+          const currentUserRelation = result[0]._id.toString() === currentUserRelationID ?
+            result[0] : result[1];
+          const targetUserRelation = result[1]._id.toString() === targetUserRelationID ?
+            result[1] : result[0];
+          if (action === 'ACCEPT') {
+            statusChanger(action, targetUserPreviewID, currentUserRelation.following);
+            statusChanger(action, currentUserRelation.user_preview_id, targetUserRelation.followers);
           }
-        })
-        .then((result) => {
-          for (const profile of result.followers) {
-            if (profile.user_relation_id === ID) {
-              profile.status = action === 'ACCEPT' ? "FOLLOWING" : "DECLINED";
-              result.save();
-              return findByID(ModelConstants.USER_RELATION, profile.user_relation_id);
-            }
+          else {
+            statusChanger(action, targetUserPreviewID, currentUserRelation.followers);
+            statusChanger(action, currentUserRelation.user_preview_id, targetUserRelation.following);
           }
+          return Promise.all([currentUserRelation.save(), targetUserRelation.save()])
         })
         .then(() => res.status(200).send())
         .catch(next)
