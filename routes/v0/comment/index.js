@@ -73,10 +73,11 @@ router.route('/reply')
                 commenter_user_id: commenterID,
                 comment: comment
             };
+            const newComment = selectModel(ModelConstants.COMMENT)(attributes);
 
-            return selectModel(ModelConstants.COMMENT)({ attributes })
+            return newComment
                 .save()
-                .then(() => res.status(200).send())
+                .then(() => res.status(200).send(newComment))
                 .catch(next);
         })
 
@@ -121,7 +122,7 @@ router.route('/root')
                             });
 
                     newRootCommentJSON = {
-                        ...commentData,
+                        ...newRootComment,
                         _id: newRootComment._id,
                         display_photo_key: result[1].tiny_cropped_display_photo_key,
                         likes: [],

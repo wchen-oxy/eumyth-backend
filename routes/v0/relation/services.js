@@ -12,10 +12,9 @@ const _statusChanger = (action, targetID, array, isPrivate) => {
                 user_preview_id: targetID,
             }));
         case ("DECLINE"):
-            return array.filter(item => item.user_preview_id.toString() !== stringID)
+            return array.filter(item => item.user_preview_id.toString() !== stringID);
         case ("UNFOLLOW"):
-            return array.filter(item => item.user_preview_id.toString() !== stringID)
-
+            return array.filter(item => item.user_preview_id.toString() !== stringID);
         case ('ACCEPT'):
             for (let i = 0; i < array.length; i++) {
                 if (array[i].user_preview_id.toString() === stringID) {
@@ -35,6 +34,7 @@ exports.setAction = (
     visitorUserRelation,
     action,
     isPrivate) => {
+    console.log(action);
     if (action === "FOLLOW" || action === "ACCEPT") {
         _statusChanger(action, targetUserRelation.user_preview_id, visitorUserRelation.following, isPrivate);
         _statusChanger(action, visitorUserRelation.user_preview_id, targetUserRelation.followers, isPrivate);
@@ -42,7 +42,6 @@ exports.setAction = (
     else if ("UNFOLLOW" || 'DECLINE') {
         visitorUserRelation.following = _statusChanger(action, targetUserRelation.user_preview_id, visitorUserRelation.following);
         targetUserRelation.followers = _statusChanger(action, visitorUserRelation.user_preview_id, targetUserRelation.followers);
-        console.log( targetUserRelation.followers);
     }
     else {
         throw new Error('invalid action')
