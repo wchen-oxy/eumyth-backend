@@ -228,7 +228,7 @@ router.route('/').post(
         .then(
           (result) => {
             let post = result;
-            if (post.post_privacy_type) {
+            if (postPrivacyType) {
               post.post_privacy_type = postPrivacyType;
             }
             if (removeCoverPhoto) {
