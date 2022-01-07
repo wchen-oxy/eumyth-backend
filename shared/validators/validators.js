@@ -45,6 +45,7 @@ const PARAM_CONSTANTS = {
     TEXT_ONLY: 'textOnly',
     TITLE: 'title',
     USER_ID: 'userID',
+    USER_PREVIEW_ID: 'userPreviewID',
     USER_RELATION_ID: 'userRelationID',
     VISITOR_USERNAME: 'visitorUsername',
     VISITOR_USER_PREVIEW_ID: 'visitorUserPreviewID',

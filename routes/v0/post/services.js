@@ -11,12 +11,6 @@ const { SHORT, LONG, ALL } = require("../../../shared/utils/flags");
 const ModelConstants = require('../../../models/constants');
 const RECENT_POSTS_LIMIT = 5;
 
-const _setRecentPosts = (post, inputRecentPosts) => {
-    inputRecentPosts.unshift(post);
-    if (inputRecentPosts.length > RECENT_POSTS_LIMIT) {
-        inputRecentPosts.pop();
-    }
-}
 
 const _insertAndSortIntoList = (postList, postPreview) => {
     postList.unshift(postPreview);
@@ -39,8 +33,7 @@ const _insertAndSortIntoList = (postList, postPreview) => {
     return postList;
 }
 
-const updatePostLists = (post, pursuitCategory, pursuits, recentPosts) => {
-    _setRecentPosts(post.content_id, recentPosts);
+const updatePostLists = (post, pursuitCategory, pursuits) => {
     _insertAndSortIntoList(pursuits[0].posts, post);
     for (let i = 1; i < pursuits.length; i++) {
         if (pursuitCategory === pursuits[i].name) {
@@ -49,21 +42,24 @@ const updatePostLists = (post, pursuitCategory, pursuits, recentPosts) => {
     }
 }
 
+
+const setRecentPosts = (post, inputRecentPosts) => {
+    inputRecentPosts.unshift(post);
+    if (inputRecentPosts.length > RECENT_POSTS_LIMIT) {
+        inputRecentPosts.pop();
+    }
+}
+
 const updateDeletedPostMeta = (
-    pursuits,
-    pursuitCategory,
+    pursuit,
     minDuration,
     isMilestone,
     isIndexUser
 ) => {
-    if (!pursuitCategory) return;
-    for (const pursuit of pursuits) {
-        if (pursuit.name === pursuitCategory) {
-            if (isMilestone) { pursuit.num_milestones -= 1; }
-            if (minDuration) { pursuit.total_min -= pursuit.minDuration; }
-            if (isIndexUser) { pursuit.num_posts -= 1; }
-        }
-    }
+    if (isMilestone) { pursuit.num_milestones -= 1; }
+    if (minDuration) { pursuit.total_min -= pursuit.minDuration; }
+    if (isIndexUser) { pursuit.num_posts -= 1; }
+
 }
 
 const createContentPreview = (postID, date, labels, branch) => (
@@ -114,7 +110,6 @@ const getImageUrls = (array) => {
     return imageArray;
 }
 
-
 const makeTextSnippet = (postType, isPaginated, textData) => {
     if (postType === SHORT) {
         if (isPaginated) {
@@ -137,7 +132,6 @@ const makeTextSnippet = (postType, isPaginated, textData) => {
     }
 }
 
-
 const findPosts = (postIDList, includePostText) => {
     return findManyByID(ModelConstants.POST, postIDList, true)
         .then(
@@ -152,7 +146,6 @@ const findPosts = (postIDList, includePostText) => {
                 return coverInfoArray;
             })
 }
-
 
 const countComments = (postIDList) => {
     let transformedPostIDArray = [];
@@ -189,21 +182,23 @@ const countComments = (postIDList) => {
 }
 
 const retrieveRelevantUserInfo = (req, res, next) => {
-    return findOne(ModelConstants.USER_PREVIEW,{username: req.body.username})
-        .then((resolvedUserPrevew) =>
-            findByID(ModelConstants.INDEX_USER, resolvedUserPrevew.parent_index_user_id))
+    return findByID(ModelConstants.USER_PREVIEW, req.body.userPreviewID)
+        .then((resolvedUserPrevew) => {
+            res.locals.userPreview = resolvedUserPrevew;
+            return findByID(ModelConstants.INDEX_USER, resolvedUserPrevew.parent_index_user_id);
+        })
         .then((result) => {
-            req.indexUser = result;
+            res.locals.indexUser = result;
         })
         .then(() =>
             Promise.all([
-                findByID(ModelConstants.USER, req.indexUser.user_profile_id),
-                findByID(ModelConstants.USER_RELATION, req.indexUser.user_relation_id)
+                findByID(ModelConstants.USER, res.locals.indexUser.user_profile_id),
+                findByID(ModelConstants.USER_RELATION, res.locals.indexUser.user_relation_id)
             ])
         )
         .then((results) => {
-            req.completeUser = results[0];
-            req.userRelation = results[1];
+            res.locals.completeUser = results[0];
+            res.locals.userRelation = results[1];
             next();
         })
         .catch(next);
@@ -290,6 +285,7 @@ const spliceArray = (postID, array) => {
 
 
 exports.updatePostLists = updatePostLists;
+exports.setRecentPosts = setRecentPosts;
 exports.updateDeletedPostMeta = updateDeletedPostMeta;
 exports.createContentPreview = createContentPreview;
 exports.setPursuitAttributes = setPursuitAttributes;

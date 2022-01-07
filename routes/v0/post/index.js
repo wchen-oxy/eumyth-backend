@@ -4,7 +4,8 @@ const MulterHelper = require('../../../shared/utils/multer');
 const {
   findManyByID,
   findManyAndUpdate,
-  findByID
+  findByID,
+  deleteByID
 } = require('../../../data-access/dal');
 const {
   PARAM_CONSTANTS,
@@ -64,8 +65,10 @@ router.route('/').post(
     const coverPhotoKey = req.files && req.files.coverPhoto ? req.files.coverPhoto[0].key : null;
     const imageData = req.files && req.files.images ? postServices.getImageUrls(req.files.images) : [];
     const textSnippet = textData ? postServices.makeTextSnippet(postType, isPaginated, textData) : null;
-    const indexUser = req.indexUser;
-    const user = req.completeUser;
+    console.log(res.locals);
+    const indexUser = res.locals.indexUser;
+    const user = res.locals.completeUser;
+    const userPreview = res.locals.userPreview;
     const project = res.locals.project;
     const post = postServices.createPost(
       postType,
@@ -88,25 +91,33 @@ router.route('/').post(
       difficulty,
       labels
     );
-
+    const postPreview = postServices.createContentPreview(post._id, post.date);
     res.locals.post_id = post._id;
     if (project) project.post_ids.unshift(post._id);
     if (indexUser.preferred_post_privacy !== postPrivacyType) {
       indexUser.preferred_post_privacy = postPrivacyType;
     }
+    postServices.setRecentPosts(postPreview.content_id, indexUser.recent_posts);
 
     postServices.updatePostLists(
-      postServices.createContentPreview(post._id, post.date),
+      postPreview,
       post.pursuit_category,
       user.pursuits,
-      indexUser.recent_posts
     );
+
+    postServices.updatePostLists(
+      postPreview,
+      post.pursuit_category,
+      userPreview.pursuits,
+    );
+
     postServices.setPursuitAttributes(
       true,
       indexUser.pursuits,
       pursuitCategory,
       progression,
       minDuration);
+
     postServices.setPursuitAttributes(
       false,
       user.pursuits,
@@ -114,12 +125,29 @@ router.route('/').post(
       progression,
       minDuration,
       post._id,
-      date)
+      date);
+
+    postServices.setPursuitAttributes(
+      false,
+      userPreview.pursuits,
+      pursuitCategory,
+      progression,
+      minDuration,
+      post._id,
+      date);
+
     postServices.updateLabels(
       user,
       indexUser,
       labels);
 
+    const savedUserPreview = userPreview.save()
+      .catch(error => {
+        if (error) {
+          console.log(error);
+          res.status(500).json('Error: ' + error);
+        }
+      });
     const savedIndexUser = indexUser
       .save()
       .catch(error => {
@@ -148,17 +176,17 @@ router.route('/').post(
           res.status(500).json('Error: ' + error);
         }
       });
-      return Promise.all([savedIndexUser, savedUser, savedPost, savedProject])
+      return Promise.all([savedUserPreview, savedIndexUser, savedUser, savedPost, savedProject])
         .then(() => next());
     }
     else {
-      return Promise.all([savedIndexUser, savedUser, savedPost])
+      return Promise.all([savedUserPreview, savedIndexUser, savedUser, savedPost])
         .then(() => next());
     }
   },
   (req, res, next) => {
     let followersIDArray = [];
-    for (const user of req.userRelation.followers) {
+    for (const user of res.locals.userRelation.followers) {
       followersIDArray.push(user.user_preview_id);
     }
     return findManyByID(ModelConstants.USER_PREVIEW, followersIDArray)
@@ -275,6 +303,7 @@ router.route('/').post(
     })
   .delete(
     buildBodyValidationChain(
+      PARAM_CONSTANTS.USER_PREVIEW_ID,
       PARAM_CONSTANTS.INDEX_USER_ID,
       PARAM_CONSTANTS.USER_ID,
       PARAM_CONSTANTS.POST_ID,
@@ -285,11 +314,12 @@ router.route('/').post(
       const indexUserID = req.body.indexUserID;
       const userID = req.body.userID;
       const postID = req.body.postID;
+      const userPreviewID = req.body.userPreviewID;
       const pursuitCategory = req.body.pursuit;
       const minDuration = req.body.minDuration;
       const progression = (req.body.progression === 2);
       const resolvedIndexUser =
-        findByID(ModelConsants.INDEX_USER, indexUserID)
+        findByID(ModelConstants.INDEX_USER, indexUserID)
           .then((indexUser) => {
             postServices.spliceArray(postID, indexUser.recent_posts);
             postServices.updateDeletedPostMeta(indexUser.pursuits, pursuitCategory, minDuration, progression, true)
@@ -300,20 +330,43 @@ router.route('/').post(
 
       const resolvedUser = findByID(ModelConstants.USER, userID)
         .then((user) => {
+          const index = user.pursuits.findIndex((pursuit) => pursuit.name === pursuitCategory);
+          if (index !== -1) {
+            postServices.spliceArray(postID, user.pursuits[index].posts);
+            postServices.updateDeletedPostMeta(user.pursuits[index], minDuration, progression, false);
+
+          }
           postServices.spliceArray(postID, user.pursuits[0].posts);
-          postServices.updateDeletedPostMeta(user.pursuits, pursuitCategory, minDuration, progression, false)
+          postServices.updateDeletedPostMeta(user.pursuits[0], minDuration, progression, false)
           return user.save();
         })
         .catch((error) => {
           throw new Error(error, "Something went wrong resolving user")
         });
 
-      return Promise.all([resolvedIndexUser, resolvedUser, findByID(ModelConstants.POST, postID)])
+      const resolvedUserPrevew = findByID(ModelConstants.USER_PREVIEW, userPreviewID)
+        .then(userPreview => {
+          const index = userPreview.pursuits.findIndex((pursuit) => pursuit.name === pursuitCategory);
+          if (index !== -1) {
+            postServices.spliceArray(postID, userPreview.pursuits[index].posts);
+            postServices.updateDeletedPostMeta(userPreview.pursuits[index], minDuration, progression, false);
+
+          }
+          postServices.spliceArray(postID, userPreview.pursuits[0].posts);
+          postServices.updateDeletedPostMeta(userPreview.pursuits[0], minDuration, progression, false)
+          return userPreview.save();
+        })
+
+      return Promise.all([
+        resolvedIndexUser,
+        resolvedUser,
+        resolvedUserPrevew,
+        findByID(ModelConstants.POST, postID)])
         .then((results) => {
-          if (results[2].comments.length === 0) return deleteByID(ModelConstants.POST, postID);
+          if (results[3].comments.length === 0) return deleteByID(ModelConstants.POST, postID);
           return Promise.all([
             deleteByID(ModelConstants.POST, postID),
-            deleteManyByID(ModelConstants.COMMENT, results[2].comments)
+            deleteManyByID(ModelConstants.COMMENT, results[3].comments)
           ])
         })
         .then(() => res.status(204).send())

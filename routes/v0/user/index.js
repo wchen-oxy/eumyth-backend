@@ -111,6 +111,7 @@ router.route('/')
             requests: [],
             labels: [],
 
+
           });
 
       const newIndexUser =
@@ -133,12 +134,12 @@ router.route('/')
         new (selectModel(ModelConstants.USER_PREVIEW))
           ({
             parent_index_user_id: newIndexUser._id,
-            user_relation_id: newUserRelation._id,
             username: username,
             first_name: firstName,
             last_name: lastName,
             small_cropped_display_photo_key: smallCroppedImage,
             tiny_cropped_display_photo_key: tinyCroppedImage,
+            pursuits: mainPursuitsHolder,
           })
 
       const newUserRelation =
@@ -148,11 +149,14 @@ router.route('/')
             user_preview_id: newUserPreview._id
           });
 
-      newUser.user_preview_id = newUserPreview._id;
-      newUser.user_relation_id = newUserRelation._id;
+
+
       newIndexUser.user_preview_id = newUserPreview._id;
       newIndexUser.user_relation_id = newUserRelation._id;
+      newUserPreview.user_relation_id = newUserRelation._id;
       newUser.index_user_id = newIndexUser._id;
+      newUser.user_relation_id = newUserRelation._id;
+      newUser.user_preview_id = newUserPreview._id;
 
       const savedUser = newUser.save();
       const savedIndexUser = newIndexUser.save();

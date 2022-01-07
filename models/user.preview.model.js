@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const Pursuits = require('./pursuit.model');
 
 const UserPreviewSchema = new Schema({
 
@@ -34,6 +35,9 @@ const UserPreviewSchema = new Schema({
         type: String,
         required: false
     },
+
+    pursuits: [Pursuits.Schema],
+
 
 });
 
