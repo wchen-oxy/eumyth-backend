@@ -112,6 +112,11 @@ const PostSchema = new Schema({
     default: []
   },
 
+  comments: {
+    type: [mongoose.Types.ObjectId],
+    default: []
+  },
+
 }, {
   timestamps: true,
 });

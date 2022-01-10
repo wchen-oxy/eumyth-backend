@@ -26,8 +26,9 @@ router.route('/')
         ),
         doesValidationErrorExist,
         (req, res, next) => {
-            const rootCommentIDArray = JSON.parse(req.query.rootCommentIDArray);
+            const rootCommentIDArray = req.query.rootCommentIDArray;
             const viewingMode = req.query.viewingMode;
+            console.log(rootCommentIDArray);
             if (viewingMode === COLLAPSED) {
                 return commentUtil.returnCollapsedComments(rootCommentIDArray)
                     .then(

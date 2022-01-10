@@ -27,7 +27,7 @@ const CommentSchema = new Schema({
     },
 
     likes: {
-        type: [mongoose.Types.ObjectId,],
+        type: [mongoose.Types.ObjectId],
         required: false,
     },
 

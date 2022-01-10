@@ -6,8 +6,8 @@ const {
 const ModelConstants = require('../../../models/constants');
 const selectModel = require('../../../models/modelServices');
 
-const _getUniqueUserPreview = (replies, commentUserProfileIDArray) => {
-    const transformedReplies = replies.map(reply => reply.commenter_user_id.toString());
+const _getUniqueUserPreview = (comments, commentUserProfileIDArray) => {
+    const transformedReplies = comments.map(comment => comment.commenter_user_id.toString());
     return commentUserProfileIDArray = [
         ... new Set(
             commentUserProfileIDArray
@@ -63,7 +63,62 @@ const _nestCompleteComments = (rootCommentArray, userProfileHashTable, repliesAr
         }
         return 0;
     });
-    console.log(allCommentsArray);
+
+    for (let i = 0; i < allCommentsArray.length; i++) {
+        let nextValueIndex = i + 1;
+        let reply = allCommentsArray[i];
+        const userData = userProfileHashTable[reply.commenter_user_id.toString()];
+        _formatCommentData(reply, userData);
+        //get index of comment on root
+        if (i > 0 &&
+            (allCommentsArray[i].ancestor_post_ids.length !== allCommentsArray[i - 1].ancestor_post_ids.length
+            )) {
+            nearRootCommentsIndex = i;
+        }
+        while (
+            nextValueIndex < allCommentsArray.length
+            && reply.ancestor_post_ids.length > 0
+            && reply.ancestor_post_ids[reply.ancestor_post_ids.length - 1].toString() //last in ancestor comment
+            !== allCommentsArray[nextValueIndex]._id.toString()) { //next comment id
+            nextValueIndex++; //increment until reply finds its parent
+        }
+        console.log(nextValueIndex);
+        if (reply.ancestor_post_ids.length > 0 &&
+            nextValueIndex < allCommentsArray.length
+            && reply
+                .ancestor_post_ids[reply
+                    .ancestor_post_ids.length - 1]
+                .toString() === allCommentsArray[nextValueIndex]._id.toString()) {
+            if (!allCommentsArray[nextValueIndex].replies) {
+                console.log('set');
+                allCommentsArray[nextValueIndex].replies = [];
+            }
+            console.log(allCommentsArray[nextValueIndex]);
+            allCommentsArray[nextValueIndex].replies.push(reply);
+        }
+        else {
+            console.log("Orphaned/Root Comment: ", reply);
+        }
+    }
+    return (allCommentsArray
+        .slice(
+            nearRootCommentsIndex,
+            allCommentsArray.length));
+
+}
+
+const _nestCompleteComments2 = (allCommentsArray, userProfileHashTable) => {
+    let nearRootCommentsIndex = 0;
+    allCommentsArray.sort((a, b) => {
+        if (a.ancestor_post_ids.length < b.ancestor_post_ids.length) {
+            return 1;
+        }
+        if (a.ancestor_post_ids.length > b.ancestor_post_ids.length) {
+            return -1;
+        }
+        return 0;
+    });
+
     for (let i = 0; i < allCommentsArray.length; i++) {
         let nextValueIndex = i + 1;
         let reply = allCommentsArray[i];
@@ -143,7 +198,6 @@ const returnCollapsedComments = (rootCommentIDArray) => {
             );
         });
 };
-
 
 const returnExpandedComments = (rootCommentIDArray) => {
     let rootCommentArray = null;
