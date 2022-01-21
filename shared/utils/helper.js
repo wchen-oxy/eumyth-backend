@@ -1,6 +1,6 @@
 const resultCallback = (err, doc) => {
     if (err) {
-        throw new Error(err);
+        throw new Error(err, doc);
     }
 }
 

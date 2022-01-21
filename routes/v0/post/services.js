@@ -148,10 +148,8 @@ const findPosts = (postIDList, includePostText) => {
 }
 
 const countComments = (postIDList) => {
-    let transformedPostIDArray = [];
-    for (let postID of postIDList) {
-        transformedPostIDArray.push(mongoose.Types.ObjectId(postID));
-    }
+    let transformedPostIDArray = postIDList.map(postID => mongoose.Types.ObjectId(postID));
+
     return Comment.Model.aggregate([
         {
             $match: {

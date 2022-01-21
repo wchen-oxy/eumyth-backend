@@ -11,6 +11,7 @@ const relationRouter = require('./relation');
 const projectRouter = require('./project');
 const commentRouter = require('./comment');
 const userPreviewRouter = require('./user-preview');
+const searchRouter = require('./search');
 
 router.use('/pursuit', pursuitRouter);
 router.use('/index-user', indexUserRouter);
@@ -23,5 +24,6 @@ router.use('/image', imageRouter);
 router.use('/draft', draftRouter);
 router.use('/comment', commentRouter);
 router.use('/user-preview', userPreviewRouter);
+router.use('/search', searchRouter)
 
 module.exports = router;

@@ -28,7 +28,6 @@ router.route('/')
         (req, res, next) => {
             const rootCommentIDArray = req.query.rootCommentIDArray;
             const viewingMode = req.query.viewingMode;
-            console.log(rootCommentIDArray);
             if (viewingMode === COLLAPSED) {
                 return commentUtil.returnCollapsedComments(rootCommentIDArray)
                     .then(

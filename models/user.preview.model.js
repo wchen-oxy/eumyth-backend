@@ -38,7 +38,10 @@ const UserPreviewSchema = new Schema({
 
     pursuits: [Pursuits.Schema],
 
-
+    coordinates: {
+        latitude: Number,
+        longitude: Number
+    },
 });
 
 const UserPreviewModel = mongoose.model('user_preview', UserPreviewSchema);

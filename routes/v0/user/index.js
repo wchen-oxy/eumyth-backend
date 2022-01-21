@@ -284,4 +284,5 @@ router.route('/private')
         .catch(next)
     })
 
+
 module.exports = router;

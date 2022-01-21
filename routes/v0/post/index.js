@@ -350,7 +350,6 @@ router.route('/').post(
           if (index !== -1) {
             postServices.spliceArray(postID, userPreview.pursuits[index].posts);
             postServices.updateDeletedPostMeta(userPreview.pursuits[index], minDuration, progression, false);
-
           }
           postServices.spliceArray(postID, userPreview.pursuits[0].posts);
           postServices.updateDeletedPostMeta(userPreview.pursuits[0], minDuration, progression, false)

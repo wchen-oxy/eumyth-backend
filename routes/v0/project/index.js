@@ -19,7 +19,6 @@ const {
 } = require('../../../data-access/dal');
 const ModelConstants = require('../../../models/constants');
 const { findAndUpdateIndexUserMeta, adjustEntryLength } = require('./services');
-const { EMBEDDED_FEED_LIMIT } = require('../../../shared/constants/settings');
 const { ADD, SUBTRACT } = require('./constants');
 
 router.route('/')
@@ -35,6 +34,7 @@ router.route('/')
             PARAM_CONSTANTS.USERNAME,
             PARAM_CONSTANTS.USER_ID,
             PARAM_CONSTANTS.INDEX_USER_ID,
+            PARAM_CONSTANTS.USER_PREVIEW_ID,
             PARAM_CONSTANTS.SELECTED_POSTS,
             PARAM_CONSTANTS.TITLE
         ),
@@ -44,6 +44,7 @@ router.route('/')
             const displayPhoto = req.body.displayPhoto;
             const userID = req.body.userID;
             const indexUserID = req.body.indexUserID;
+            const userPreviewID = req.body.userPreviewID;
             const selectedPosts = req.body.selectedPosts ?
                 req.body.selectedPosts : [];
             const title = req.body.title ? req.body.title : null;
@@ -73,27 +74,21 @@ router.route('/')
                     });
 
             const resolvedIndexUser = findAndUpdateIndexUserMeta(indexUserID, pursuit, ADD);
-            const resolvedUser =
-                findByID(ModelConstants.USER, userID)
-                    .then((result => {
-                        let user = result;
-                        const newContent = selectModel(ModelConstants.CONTENT_PREVIEW)({ content_id: newProject._id });
-                        user.pursuits[0].projects.unshift(newContent);
-                        adjustEntryLength(user.pursuits[0].projects, EMBEDDED_FEED_LIMIT)
-                        for (const pursuit of user.pursuits) {
-                            if (pursuit.name === newProject.pursuit) {
-                                pursuit.projects.unshift(newContent);
-                            }
-                        }
-                        return user;
-                    }));
+            const resolvedUserPreview = updatePursuitObject(ModelConstants.USER_PREVIEW, userPreviewID, newProject._id)
+            const resolvedUser = updatePursuitObject(ModelConstants.USER, userID, newProject._id);
 
-            return Promise.all([resolvedIndexUser, resolvedUser])
+            return Promise.all([resolvedIndexUser, resolvedUser, resolvedUserPreview])
                 .then((result) => {
                     const savedIndexUser = result[0].save();
                     const savedUser = result[1].save();
+                    const savedUserPreview = result[2].save();
                     const savedProject = newProject.save();
-                    return (Promise.all([savedIndexUser, savedUser, savedProject]));
+                    return Promise.all([
+                        savedIndexUser,
+                        savedUser,
+                        savedUserPreview,
+                        savedProject
+                    ]);
                 })
                 .then((result) => {
                     return res.status(201).send(newProject._id);
@@ -133,6 +128,7 @@ router.route('/')
             PARAM_CONSTANTS.PROJECT_ID,
             PARAM_CONSTANTS.SHOULD_DELETE_POSTS,
             PARAM_CONSTANTS.INDEX_USER_ID,
+            PARAM_CONSTANTS.USER_PREVIEW_ID,
             PARAM_CONSTANTS.USER_ID,
         ),
         doesValidationErrorExist,
@@ -182,6 +178,8 @@ router.route('/')
         (req, res, next) => {
             const indexUserID = req.query.indexUserID;
             const userID = req.query.userID;
+            const userPreviewID = req.query.userPreviewID;
+
             const _removeProject = (array, ID) => {
                 for (let i = 0; i < array.length; i++) {
                     if (array[i].post_id.toString() === ID) {
@@ -191,18 +189,27 @@ router.route('/')
             }
             return Promise.all([
                 findAndUpdateIndexUserMeta(indexUserID, res.locals.pursuit, SUBTRACT),
-                findByID(ModelConstants.USER, userID)
+                findByID(ModelConstants.USER, userID),
+                findByID(ModelConstants.USER_PREVIEW_ID, userPreviewID)
             ])
                 .then((results => {
                     const indexUser = results[0];
                     const completeUser = results[1];
-                    _removeProject(completeUser.pursuits[0].projects, req.query.projectID);
+                    const userPreview = results[2];
+                    _removeProject(userPreview.pursuits[0].projects, req.query.projectID);
                     for (let i = 1; i < completeUser.pursuits.length; i++) {
                         if (completeUser.pursuits[i].name === res.locals.pursuit) {
                             _removeProject(completeUser.pursuits[i].projects, req.query.projectID)
                         }
                     }
-                    return Promise.all([indexUser.save(), completeUser.save()])
+                    _removeProject(userPreview.pursuits[0].projects, req.query.projectID);
+                    for (let i = 1; i < userPreview.pursuits.length; i++) {
+                        if (userPreview.pursuits[i].name === res.locals.pursuit) {
+                            _removeProject(userPreview.pursuits[i].projects, req.query.projectID)
+                        }
+                    }
+
+                    return Promise.all([indexUser.save(), completeUser.save(), userPreview.save()])
                 }))
                 .then(() => {
                     return res.status(200).send('Success');

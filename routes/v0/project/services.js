@@ -1,5 +1,7 @@
 const { findByID } = require('../../../data-access/dal');
 const ModelConstants = require('../../../models/constants');
+const { EMBEDDED_FEED_LIMIT } = require('../../../shared/constants/settings');
+
 
 const adjustEntryLength = (array, max) => {
     if (array.length > max) {
@@ -36,6 +38,22 @@ const findAndUpdateIndexUserMeta = (indexUserID, pursuit, updateType) => {
         });
 }
 
+const updatePursuitObject = (model, modelID, contentID) =>
+    findByID(model, modelID)
+        .then((result => {
+            let user = result;
+            const newContent = selectModel(ModelConstants.CONTENT_PREVIEW)({ content_id: contentID });
+            user.pursuits[0].projects.unshift(newContent);
+            adjustEntryLength(user.pursuits[0].projects, EMBEDDED_FEED_LIMIT)
+            for (const pursuit of user.pursuits) {
+                if (pursuit.name === newProject.pursuit) {
+                    pursuit.projects.unshift(newContent);
+                }
+            }
+            return user;
+        }));
+
 
 exports.adjustEntryLength = adjustEntryLength;
 exports.findAndUpdateIndexUserMeta = findAndUpdateIndexUserMeta;
+exports.updatePursuitObject = updatePursuitObject;
