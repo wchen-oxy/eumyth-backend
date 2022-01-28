@@ -4,13 +4,13 @@ const Schema = mongoose.Schema;
 const ProjectSchema = new Schema({
   username: {
     type: String,
-    required: true,
+    required: false,
     trim: true
   },
 
   index_user_id: {
     type: mongoose.Types.ObjectId,
-    required: true,
+    required: false,
     trim: true
   },
 
@@ -22,7 +22,7 @@ const ProjectSchema = new Schema({
 
   title: {
     type: String,
-    required: true,
+    required: false,
     trim: true
   },
 
@@ -51,11 +51,13 @@ const ProjectSchema = new Schema({
   },
 
   start_date: {
-    type: Date
+    type: Date,
+    required: false
   },
 
   end_date: {
-    type: Date
+    type: Date,
+    required: false
   },
 
   status: {
@@ -69,11 +71,13 @@ const ProjectSchema = new Schema({
   },
 
   post_ids: {
-    type: [mongoose.Types.ObjectId]
+    type: [mongoose.Types.ObjectId],
+    required: false,
   },
 
   labels: {
-    type: [String]
+    type: [String],
+    required: false,
   },
 
   parent: {
@@ -83,6 +87,16 @@ const ProjectSchema = new Schema({
   ancestors: {
     type: [mongoose.Types.ObjectId],
     default: []
+  },
+
+  children: {
+    type: [mongoose.Types.ObjectId],
+    default: []
+  },
+
+  children_length: {
+    type: Number,
+    default: 0
   }
 });
 

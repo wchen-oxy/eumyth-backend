@@ -40,6 +40,7 @@ const PARAM_CONSTANTS = {
     PROJECT_ID_LIST: 'projectIDList',
     PURSUIT: 'pursuit',
     PURSUIT_ARRAY: 'pursuitArray',
+    QUANTITY: 'quantity',
     REMOVE_COVER_PHOTO: 'removeCoverPhoto',
     ROOT_COMMENT_ID_ARRAY: 'rootCommentIDArray',
     SELECTED_POSTS: 'selectedPosts',

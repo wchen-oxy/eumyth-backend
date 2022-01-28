@@ -18,7 +18,7 @@ const {
     deleteByID
 } = require('../../../data-access/dal');
 const ModelConstants = require('../../../models/constants');
-const { findAndUpdateIndexUserMeta, adjustEntryLength } = require('./services');
+const { findAndUpdateIndexUserMeta, partialDelete, updateParentProject } = require('./services');
 const { ADD, SUBTRACT } = require('./constants');
 
 router.route('/')
@@ -142,6 +142,7 @@ router.route('/')
                     if (result.cover_photo_key) {
                         toBeDeletedImages.push(result.cover_photo_key);
                     }
+                    res.locals.project = result;
                     res.locals.toBeDeletedPosts = result.post_ids;
                     res.locals.pursuit = result.pursuit;
                     return findManyByID(ModelConstants.POST, result.post_ids)
@@ -161,42 +162,38 @@ router.route('/')
         },
         (req, res, next) => {
             const imagesExist = res.locals.toBeDeletedImages.length > 0;
-            const deleteProject = deleteByID(ModelConstants.PROJECT, req.query.projectID);
-            const deletePosts = deleteManyByID(ModelConstants.POST, res.locals.toBeDeletedPosts);
             if (res.locals.shouldDeletePosts && imagesExist) {
                 return imageServices.deleteMultiple(res.locals.toBeDeletedImages)
-                    .then(() => Promise.all([deleteProject, deletePosts]))
-                    .then((results) => {
-                        return next()
-                    })
-                    .catch(err => { console.log(err); return res.status(500).send(err); });
+                    .then(next)
+                    .catch(next);
             }
-            return deleteProject
-                .then(() => next())
-                .catch(next);
+            return next();
         },
         (req, res, next) => {
             const indexUserID = req.query.indexUserID;
             const userID = req.query.userID;
             const userPreviewID = req.query.userPreviewID;
-
+            const resolvedDeletion = res.locals.shouldDeletePosts ?
+                deleteManyByID(ModelConstants.POST, res.locals.toBeDeletedPosts) : null;
+            const oldProject = partialDelete(res.locals.project);
             const _removeProject = (array, ID) => {
                 for (let i = 0; i < array.length; i++) {
-                    if (array[i].post_id.toString() === ID) {
+                    if (array[i].content_id.toString() === ID) {
                         array.splice(i, 1)
                     }
                 }
             }
+
             return Promise.all([
                 findAndUpdateIndexUserMeta(indexUserID, res.locals.pursuit, SUBTRACT),
                 findByID(ModelConstants.USER, userID),
-                findByID(ModelConstants.USER_PREVIEW_ID, userPreviewID)
+                findByID(ModelConstants.USER_PREVIEW, userPreviewID)
             ])
                 .then((results => {
                     const indexUser = results[0];
                     const completeUser = results[1];
                     const userPreview = results[2];
-                    _removeProject(userPreview.pursuits[0].projects, req.query.projectID);
+                    _removeProject(completeUser.pursuits[0].projects, req.query.projectID);
                     for (let i = 1; i < completeUser.pursuits.length; i++) {
                         if (completeUser.pursuits[i].name === res.locals.pursuit) {
                             _removeProject(completeUser.pursuits[i].projects, req.query.projectID)
@@ -209,7 +206,7 @@ router.route('/')
                         }
                     }
 
-                    return Promise.all([indexUser.save(), completeUser.save(), userPreview.save()])
+                    return Promise.all([resolvedDeletion, oldProject.save(), indexUser.save(), completeUser.save(), userPreview.save()])
                 }))
                 .then(() => {
                     return res.status(200).send('Success');
@@ -286,19 +283,32 @@ router.route('/fork').put(
     ),
     doesValidationErrorExist,
     (req, res, next) => {
-        const projectData = req.body.projectData;
+        const oldProjectID = req.body.projectData._id;
+        const resolvedProject = findByID(ModelConstants.PROJECT, oldProjectID);
+        return resolvedProject.then(
+            result => {
+                res.locals.oldProject = result;
+                next();
+            }
+        )
+
+    },
+    (req, res, next) => {
+        let projectData = res.locals.oldProject.toObject();
         const username = req.body.username;
         const authorID = req.body.indexUserID;
         const displayPhoto = req.body.displayPhoto;
         const shouldCopyPosts = req.body.shouldCopyPosts;
         const oldProjectID = projectData._id;
-        const ancestors = projectData.ancestors;
+        const ancestors = [...projectData.ancestors];
         const newPostIDList = [];
         const imageKeyMap = new Map();
+
         let projectPosts = null;
         delete projectData._id;
         delete projectData.username;
-        delete projectData.index_user_id;
+        delete projectData.children;
+        delete projectData.children_length;
         ancestors.push(oldProjectID);
         let newProject = new (selectModel(ModelConstants.PROJECT))({
             ...projectData,
@@ -306,7 +316,8 @@ router.route('/fork').put(
             username: username,
             parent: oldProjectID,
             ancestors: ancestors,
-            status: 'DRAFT'
+            status: 'DRAFT',
+            title: projectData.title
         });
         res.locals.title = newProject.title;
         res.locals.id = newProject._id;
@@ -354,12 +365,13 @@ router.route('/fork').put(
                 })
                 .then(response => {
                     refreshPostImageData(projectPosts, imageKeyMap);
-                    return Promise.all([
-                        insertMany(ModelConstants.POST, projectPosts, { ordered: true }),
-                        newProject.save()])
+                    res.locals.project = newProject;
+                    res.locals.oldProject = updateParentProject(res.locals.oldProject, newProject._id);
+                    return insertMany(
+                        ModelConstants.POST, projectPosts, { ordered: true })
                 })
                 .then(() => {
-                    res.locals.project = newProject;
+
                     next();
                 })
                 .catch(next);
@@ -367,13 +379,12 @@ router.route('/fork').put(
         else {
             newProject.post_ids = [];
             res.locals.project = newProject;
-            return newProject
-                .save()
-                .then(() => next())
-                .catch(next)
+            res.locals.oldProject = updateParentProject(res.locals.oldProject, newProject._id);
+            next();
         }
     },
     (req, res, next) => {
+        const oldProject = res.locals.oldProject;
         const project = res.locals.project;
         const promisedUserInfo = findByID(ModelConstants.USER, req.body.userID);
         const promisedIndexUser = findByID(ModelConstants.INDEX_USER, req.body.indexUserID)
@@ -408,11 +419,32 @@ router.route('/fork').put(
                             content_id: res.locals.id
                         }))
                 )
-                return Promise.all([user.save(), indexUser.save()]);
+                return Promise.all([
+                    user.save(),
+                    indexUser.save(),
+                    oldProject.save(),
+                    project.save(),
+                ]);
             })
             .then(result => res.status(200).send())
             .catch(next);
     }
 )
+
+router.route('/spotlight')
+    .get(
+        buildQueryValidationChain(
+            PARAM_CONSTANTS.QUANTITY,
+            PARAM_CONSTANTS.PURSUIT_ARRAY,
+        ),
+        doesValidationErrorExist,
+        (req, res, next) => {
+            const quantity = req.params.quantity;
+            const pursuitArray = req.params.pursuitArray;
+            // return 
+            return res.status(200).send();
+
+        }
+    )
 module.exports = router;
 

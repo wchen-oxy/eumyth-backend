@@ -10,7 +10,7 @@ const findByID = (model, ID) => (
         .then(result => {
             doesContentExist(result);
             return result;
-        }))
+        }));
 
 
 const findOne = (model, criteria) => (
@@ -18,10 +18,11 @@ const findOne = (model, criteria) => (
         .then(result => {
             doesContentExist(result);
             return result;
-        }))
+        }));
 
 const findByIDAndUpdate = (model, ID, update) => (
-    selectModel(model).findByIDandUpdate(ID, update));
+    selectModel(model).findByIdAndUpdate(ID, update)
+);
 
 const findManyAndUpdate = (model, criteria, update) => (
     selectModel(model).updateMany(
@@ -41,7 +42,7 @@ const findManyByID = (model, IDList, isOrganized) => {
         }).sort({ createdAt: -1 }).lean();
     }
     else {
-         return selectModel(model).find({
+        return selectModel(model).find({
             '_id': { $in: IDList }, function(error, docs) {
                 if (error) console.log(error);
                 else {

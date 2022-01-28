@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const MulterHelper = require('../../../shared/utils/multer').profileImageUpload;
-const { findOne, findByID } = require('../../../data-access/dal');
+const { findOne, findByID, findByIDAndUpdate } = require('../../../data-access/dal');
 const ModelConstants = require('../../../models/constants');
 const {
   PARAM_CONSTANTS,
@@ -134,6 +134,7 @@ router.route('/')
         new (selectModel(ModelConstants.USER_PREVIEW))
           ({
             parent_index_user_id: newIndexUser._id,
+            parent_user_id: newUser._id,
             username: username,
             first_name: firstName,
             last_name: lastName,
@@ -238,23 +239,22 @@ router.route('/bio')
     })
   .put(
     buildBodyValidationChain(
-      PARAM_CONSTANTS.USERNAME,
+      PARAM_CONSTANTS.USER_ID,
+      PARAM_CONSTANTS.USER_PREVIEW_ID,
+      PARAM_CONSTANTS.INDEX_USER_ID,
       PARAM_CONSTANTS.BIO
     ),
     doesValidationErrorExist,
     (req, res, next) => {
-      const username = req.body.username;
+      const userID = req.body.userID;
+      const indexUserID = req.body.indexUserID;
+      const userPreviewID = req.body.userPreviewID;
       const bio = req.body.bio;
       return Promise.all([
-        findOne(ModelConstants.USER, { username: username }),
-        findOne(ModelConstants.INDEX_USER, { username: username })])
-        .then((results) => {
-          results[0].bio = bio;
-          results[1].bio = bio;
-          return Promise.all([
-            results[0].save(),
-            results[1].save()]);
-        })
+        findByIDAndUpdate(ModelConstants.USER, userID, { bio }),
+        findByIDAndUpdate(ModelConstants.INDEX_USER, indexUserID, { bio }),
+        findByIDAndUpdate(ModelConstants.USER_PREVIEW, userPreviewID, { bio })
+      ])
         .then(() => res.status(201).send())
         .catch(next);
     })

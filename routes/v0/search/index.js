@@ -41,7 +41,6 @@ router.route('/people')
             PARAM_CONSTANTS.LATITUDE,
             PARAM_CONSTANTS.LONGITUDE
         ),
-
         doesValidationErrorExist,
         (req, res, next) => {
             const distance = req.query.distance;
@@ -49,14 +48,11 @@ router.route('/people')
             const pursuit = req.query.pursuit;
             const lat = req.query.latitude;
             const long = req.query.longitude;
-            console.log(pursuit);
             const limits = searchServices.getBounds(distance, { lat, long });
             return searchServices
                 .searchByBoundedPursuits(userPreviewIDList, limits, pursuit)
-                .then((results => {
-                    console.log(results);
-                    res.status(200).json({ users: results });
-                }))
+                .then(searchServices.appendPostData)
+                .then(results => res.status(200).json({ users: results }))
                 .catch(next)
         }
     );

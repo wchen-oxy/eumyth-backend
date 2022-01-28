@@ -61,7 +61,6 @@ router.route('/').get(
     let resolvedVistorPreviewId = findOne(ModelConstants.USER_PREVIEW, { username: visitorUsername });
     return resolvedVistorPreviewId
       .then((visitorUserPreview) => {
-        console.log(visitorUserPreview)
         return findByID(ModelConstants.USER_RELATION, followerArrayId)
           .then(
             (userRelationInfo) => {
@@ -120,7 +119,7 @@ router.route('/info').get(
         const resolvedFollowers = findManyByID(ModelConstants.USER_PREVIEW, followers);
         const resolvedRequested = findManyByID(ModelConstants.USER_PREVIEW, requested);
         const resolvedRequester = findManyByID(ModelConstants.USER_PREVIEW, requester);
-        
+
         return Promise.all([
           resolvedFollowing,
           resolvedFollowers,

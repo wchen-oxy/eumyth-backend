@@ -4,7 +4,15 @@ const Pursuits = require('./pursuit.model');
 
 const UserPreviewSchema = new Schema({
 
+    bio: {
+        type: String
+    },
+
     parent_index_user_id: {
+        type: mongoose.Types.ObjectId,
+    },
+
+    parent_user_id: {
         type: mongoose.Types.ObjectId,
     },
 
