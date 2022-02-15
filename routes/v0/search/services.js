@@ -4,6 +4,7 @@ const ModelConstants = require('../../../models/constants');
 const mongoose = require('mongoose');
 const selectModel = require('../../../models/modelServices');
 const {
+    find,
     findOne,
     findByID,
     findManyByID,
@@ -80,7 +81,17 @@ const appendPostData = (users, pursuit) => {
         })
 }
 
+const searchProjects = (pursuitList, IDList) => {
+    return find(ModelConstants.PROJECT, {
+        _id: { $nin: IDList },
+        pursuit: { $in: pursuitList }
+    }).then(results => {
+        console.log(results);
+        return results;
+    });
+}
 exports.getBounds = getBounds;
 exports.searchByBounds = searchByBounds;
 exports.searchByBoundedPursuits = searchByBoundedPursuits;
 exports.appendPostData = appendPostData;
+exports.searchProjects = searchProjects;

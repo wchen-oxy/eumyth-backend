@@ -38,7 +38,7 @@ const findAndUpdateIndexUserMeta = (indexUserID, pursuit, updateType) => {
         });
 }
 
-const updatePursuitObject = (model, modelID, contentID) =>
+const updatePursuitObject = (model, modelID, contentID, pursuit) =>
     findByID(model, modelID)
         .then((result => {
             let user = result;
@@ -46,35 +46,41 @@ const updatePursuitObject = (model, modelID, contentID) =>
             user.pursuits[0].projects.unshift(newContent);
             adjustEntryLength(user.pursuits[0].projects, EMBEDDED_FEED_LIMIT)
             for (const pursuit of user.pursuits) {
-                if (pursuit.name === newProject.pursuit) {
+                if (pursuit.name === pursuit) {
                     pursuit.projects.unshift(newContent);
                 }
             }
             return user;
         }));
 
-const retrieveProjects = (model) => {
-    selectModel(ModelConstants.PROJECT)
-        .aggregate(
-            [
-                {
-                    "$project": {
-                        length: { $size: { $gt: 2 } }
-                    }
-                },
-                { "$sort": { "length": -1 } },
-            ],
-            (err, res) => {
-                if (err) console.log(err);
-                else {
-                    console.log(results);
-                }
-            }
+const retrieveSpotlightProjects = (limit) => {
+    return selectModel(ModelConstants.PROJECT)
+        .find(
+            {
+                // children_length: { $gt:  },
+                status: { $ne: 'DELETED' }
+            },
         )
+        .limit(limit);
+    // .aggregate(
+    //     [
+    //         {
+    //             "$project": {
+    //                 children_length: { $gt: 2 }
+    //             }
+    //         },
+    //         { "$sort": { "length": -1 } },
+    //     ],
+    //     (err, res) => {
+    //         if (err) console.log(err);
+    //         else {
+    //             console.log(results);
+    //         }
+    //     }
+    // )
 }
 
 const updateParentProject = (oldProject, newProjectID) => {
-
     oldProject.children.push(newProjectID);
     oldProject.children_length = oldProject.children_length + 1;
     return oldProject;
@@ -98,8 +104,19 @@ const partialDelete = (project) => {
     project.status = 'DELETED';
     return project;
 }
+
+const removeVote = (array, voteID) => {
+    let index = array.indexOf(voteID);
+    if (index > -1) {
+        array.splice(index, 1);
+    }
+    return array;
+}
+
 exports.partialDelete = partialDelete;
 exports.adjustEntryLength = adjustEntryLength;
 exports.findAndUpdateIndexUserMeta = findAndUpdateIndexUserMeta;
 exports.updatePursuitObject = updatePursuitObject;
 exports.updateParentProject = updateParentProject;
+exports.retrieveSpotlightProjects = retrieveSpotlightProjects;
+exports.removeVote = removeVote;

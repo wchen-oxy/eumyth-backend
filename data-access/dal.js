@@ -5,6 +5,16 @@ const insertMany = (model, entries, ...conditions) => {
     return selectModel(model).insertMany(entries, ...conditions)
 }
 
+const find = (model, options) => (
+    selectModel(model).find({ ...options })
+        .then(
+            result => {
+                doesContentExist(result);
+                return result;
+            }
+        ))
+
+
 const findByID = (model, ID) => (
     selectModel(model).findById(ID)
         .then(result => {
@@ -53,6 +63,17 @@ const findManyByID = (model, IDList, isOrganized) => {
     }
 }
 
+const deleteOne = (model, attributes) => {
+    selectModel(model).deleteOne(attributes,
+        (err, result) => {
+            console.log
+            if (err) {
+                console.log(err);
+                throw new Error(500, err);
+            }
+            return result;
+        })
+}
 const deleteByID = (model, ID) => (
     selectModel(model).deleteOne({ _id: ID },
         (err, result) => {
@@ -83,6 +104,7 @@ const deleteManyByID = (model, IDArray) => (
 
 module.exports = {
     insertMany,
+    find,
     findByID,
     findOne,
     findByIDAndUpdate,
@@ -90,5 +112,6 @@ module.exports = {
     findManyByID,
     deleteByID,
     deleteManyByID,
+    deleteOne,
 }
 

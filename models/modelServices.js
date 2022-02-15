@@ -1,3 +1,4 @@
+const Bookmark = require('./bookmark.model');
 const Comment = require('./comment.model');
 const ContentPreview = require('./content.preview.model');
 const DraftPreview = require('./draft.preview.model');
@@ -17,6 +18,8 @@ const ModelConstants = require('./constants');
 
 const selectModel = (type) => {
     switch (type) {
+        case (ModelConstants.BOOKMARK):
+            return Bookmark.Model;
         case (ModelConstants.COMMENT):
             return Comment.Model;
         case (ModelConstants.CONTENT_PREVIEW):
@@ -48,7 +51,7 @@ const selectModel = (type) => {
         case (ModelConstants.USER_RELATION_STATUS):
             return UserRelationStatus.Model;
         default:
-            throw new Error('No Model Type matched');
+            throw new Error('No Model Type matched. Input Was: ' + type);
     }
 }
 

@@ -1,4 +1,5 @@
 const express = require('express');
+const selectModel = require('../../../models/modelServices');
 const { doesValidationErrorExist, PARAM_CONSTANTS, buildQueryValidationChain } = require('../../../shared/validators/validators');
 const router = express.Router();
 const searchServices = require('./services');
@@ -65,13 +66,31 @@ router.route('/posts')
             PARAM_CONSTANTS.PROGRESSION,
             PARAM_CONSTANTS.USER_PREVIEW_ID_LIST),
 
-        doesValidationErrorExist),
-    (req, res, next) => {
-        const difficulty = req.query.difficulty;
-        const progression = req.query.progression;
-        return searchServices
-            .searchByBounds(userPreviewIDList, limits)
-            .then()
-    }
+        doesValidationErrorExist,
+        (req, res, next) => {
+            const difficulty = req.query.difficulty;
+            const progression = req.query.progression;
+            return searchServices
+                .searchByBounds(userPreviewIDList, limits)
+                .then()
+        });
+
+
+//pursuit type, recent, community pick
+router.route('/projects').
+    get(buildQueryValidationChain(
+        PARAM_CONSTANTS.PURSUIT,
+    ),
+        doesValidationErrorExist,
+        (req, res, next) => {
+            const pursuitList = req.query.pursuit;
+            console.log(pursuitList);
+            const projectIDList = req.query.projectIDList ? req.query.projectIDList : [];
+            return searchServices.searchProjects(pursuitList, projectIDList)
+                .then(results => res.status(201).json(results))
+                .catch(next);
+        }
+    );
+
 
 module.exports = router;

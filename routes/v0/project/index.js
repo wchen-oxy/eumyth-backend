@@ -15,10 +15,12 @@ const {
     findManyByID,
     insertMany,
     deleteManyByID,
-    deleteByID
+    deleteByID,
+    findByIDAndUpdate,
+    deleteOne
 } = require('../../../data-access/dal');
 const ModelConstants = require('../../../models/constants');
-const { findAndUpdateIndexUserMeta, partialDelete, updateParentProject } = require('./services');
+const { findAndUpdateIndexUserMeta, partialDelete, updateParentProject, retrieveSpotlightProjects, updatePursuitObject, removeVote } = require('./services');
 const { ADD, SUBTRACT } = require('./constants');
 
 router.route('/')
@@ -35,7 +37,6 @@ router.route('/')
             PARAM_CONSTANTS.USER_ID,
             PARAM_CONSTANTS.INDEX_USER_ID,
             PARAM_CONSTANTS.USER_PREVIEW_ID,
-            PARAM_CONSTANTS.SELECTED_POSTS,
             PARAM_CONSTANTS.TITLE
         ),
         doesValidationErrorExist,
@@ -74,7 +75,12 @@ router.route('/')
                     });
 
             const resolvedIndexUser = findAndUpdateIndexUserMeta(indexUserID, pursuit, ADD);
-            const resolvedUserPreview = updatePursuitObject(ModelConstants.USER_PREVIEW, userPreviewID, newProject._id)
+            const resolvedUserPreview = updatePursuitObject(
+                ModelConstants.USER_PREVIEW,
+                userPreviewID,
+                newProject._id,
+                newProject.pursuit
+            );
             const resolvedUser = updatePursuitObject(ModelConstants.USER, userID, newProject._id);
 
             return Promise.all([resolvedIndexUser, resolvedUser, resolvedUserPreview])
@@ -97,7 +103,7 @@ router.route('/')
 
         })
     .put(
-        MulterHelper.contentImageUpload.single({ name: "coverPhoto", maxCount: 1 }),
+        MulterHelper.contentImageUpload.single("coverPhoto"),
         buildBodyValidationChain(
             PARAM_CONSTANTS.PROJECT_ID,
             PARAM_CONSTANTS.TITLE
@@ -115,7 +121,7 @@ router.route('/')
             req.body.minDuration ? updates.min_duration = req.body.minDuration : null;
             req.body.selectedPosts ? updates.post_ids = req.body.selectedPosts : null;
             req.body.labels ? updates.labels = req.body.labels : null;
-            return findByID(
+            return findByIDAndUpdate(
                 ModelConstants.PROJECT,
                 req.body.projectID,
                 updates)
@@ -170,29 +176,43 @@ router.route('/')
             return next();
         },
         (req, res, next) => {
-            const indexUserID = req.query.indexUserID;
-            const userID = req.query.userID;
-            const userPreviewID = req.query.userPreviewID;
-            const resolvedDeletion = res.locals.shouldDeletePosts ?
-                deleteManyByID(ModelConstants.POST, res.locals.toBeDeletedPosts) : null;
-            const oldProject = partialDelete(res.locals.project);
             const _removeProject = (array, ID) => {
                 for (let i = 0; i < array.length; i++) {
+                    console.log(array[i]);
                     if (array[i].content_id.toString() === ID) {
+
                         array.splice(i, 1)
                     }
                 }
             }
+            const indexUserID = req.query.indexUserID;
+            const userID = req.query.userID;
+            const userPreviewID = req.query.userPreviewID;
+            const shouldPreserve = res.locals.project.children.length > 0;
+            let promisedDeletionProcess = null;
 
-            return Promise.all([
-                findAndUpdateIndexUserMeta(indexUserID, res.locals.pursuit, SUBTRACT),
-                findByID(ModelConstants.USER, userID),
-                findByID(ModelConstants.USER_PREVIEW, userPreviewID)
-            ])
+            if (shouldPreserve) {
+                promisedDeletionProcess = Promise.all([
+                    findAndUpdateIndexUserMeta(indexUserID, res.locals.pursuit, SUBTRACT),
+                    findByID(ModelConstants.USER, userID),
+                    findByID(ModelConstants.USER_PREVIEW, userPreviewID),
+                ])
+            }
+            else {
+                promisedDeletionProcess = Promise.all([
+                    findAndUpdateIndexUserMeta(indexUserID, res.locals.pursuit, SUBTRACT),
+                    findByID(ModelConstants.USER, userID),
+                    findByID(ModelConstants.USER_PREVIEW, userPreviewID),
+                    findByID(ModelConstants.PROJECT, res.locals.project.parent)
+                ])
+            }
+
+            return promisedDeletionProcess
                 .then((results => {
                     const indexUser = results[0];
                     const completeUser = results[1];
                     const userPreview = results[2];
+
                     _removeProject(completeUser.pursuits[0].projects, req.query.projectID);
                     for (let i = 1; i < completeUser.pursuits.length; i++) {
                         if (completeUser.pursuits[i].name === res.locals.pursuit) {
@@ -205,8 +225,35 @@ router.route('/')
                             _removeProject(userPreview.pursuits[i].projects, req.query.projectID)
                         }
                     }
+                    if (shouldPreserve) {
+                        return Promise.all([
+                            res.locals.shouldDeletePosts ?
+                                deleteManyByID(ModelConstants.POST, res.locals.toBeDeletedPosts) : null,
+                            partialDelete(res.locals.project).save(),
+                            indexUser.save(),
+                            completeUser.save(),
+                            userPreview.save()
+                        ])
+                    }
+                    else {
+                        let oldProject = results[3];
+                        const childrenLength = oldProject.children.length;
+                        oldProject.children = oldProject.children
+                            .filter(item => item.toString() !== req.query.projectID);
+                        oldProject.children_length = oldProject.children_length - 1;
+                        if (childrenLength === oldProject.children.length
+                            || oldProject.children_length !== oldProject.children.length) { throw new Error("Unable To Remove from children of parent project"); }
+                        return Promise.all([
+                            res.locals.shouldDeletePosts ?
+                                deleteManyByID(ModelConstants.POST, res.locals.toBeDeletedPosts) : null,
+                            oldProject.save(),
+                            deleteByID(ModelConstants.PROJECT, res.locals.project._id),
+                            indexUser.save(),
+                            completeUser.save(),
+                            userPreview.save()
+                        ])
+                    }
 
-                    return Promise.all([resolvedDeletion, oldProject.save(), indexUser.save(), completeUser.save(), userPreview.save()])
                 }))
                 .then(() => {
                     return res.status(200).send('Success');
@@ -313,6 +360,7 @@ router.route('/fork').put(
         let newProject = new (selectModel(ModelConstants.PROJECT))({
             ...projectData,
             index_user_id: authorID,
+            display_photo_key: displayPhoto,
             username: username,
             parent: oldProjectID,
             ancestors: ancestors,
@@ -439,12 +487,104 @@ router.route('/spotlight')
         ),
         doesValidationErrorExist,
         (req, res, next) => {
-            const quantity = req.params.quantity;
-            const pursuitArray = req.params.pursuitArray;
-            // return 
-            return res.status(200).send();
-
+            const quantity = parseInt(req.query.quantity);
+            const pursuitArray = req.query.pursuitArray;
+            return retrieveSpotlightProjects(quantity)
+                .then(results => res.status(200).json({ projects: results }))
+                .catch(next);
         }
-    )
+    );
+
+router.route('/vote')
+    .put(
+        buildBodyValidationChain(
+            PARAM_CONSTANTS.PROJECT_ID,
+            PARAM_CONSTANTS.VOTE_VALUE,
+            PARAM_CONSTANTS.USER_PREVIEW_ID
+        ),
+        doesValidationErrorExist,
+        (req, res, next) => {
+            const projectID = req.body.projectID;
+            const voteValue = req.body.voteValue;
+            const userPreviewID = req.body.userPreviewID;
+            return findByID(ModelConstants.PROJECT, projectID)
+                .then(
+                    results => {
+                        if (!results) throw new Error(204);
+                        switch (voteValue) {
+                            case (-1):
+                                results.dislikes.push(userPreviewID);
+                                results.likes = removeVote(results.likes, userPreviewID);
+                                break;
+                            case (1):
+                                results.likes.push(userPreviewID);
+                                results.dislikes = removeVote(results.dislikes, userPreviewID);
+                                break;
+                            case (-2):
+                                results.dislikes = removeVote(results.dislikes, userPreviewID);
+                                break;
+                            case (2):
+                                results.likes = removeVote(results.likes, userPreviewID);
+                                break;
+                            default:
+                                console.log("Nothing matched?");
+                                throw new Error("Nothing matched for vote value");
+                        }
+                        return results.save()
+                    }
+                )
+                .then(results => res.status(200).send());
+        }
+    );
+
+router.route('/bookmark')
+    .put(
+        buildBodyValidationChain(
+            PARAM_CONSTANTS.BOOKMARK_STATE,
+            PARAM_CONSTANTS.PROJECT_ID,
+            PARAM_CONSTANTS.USER_PREVIEW_ID,
+        ),
+        doesValidationErrorExist,
+        (req, res, next) => {
+            const projectID = req.body.projectID;
+            const userPreviewID = req.body.userPreviewID;
+            const bookmarkState = req.body.bookmarkState;
+            if (bookmarkState)
+                return findByID(ModelConstants.PROJECT, projectID)
+                    .then(result => {
+                        if (!result) throw new Error("No Content");
+                        result.bookmarks.push(userPreviewID);
+                        const newBookmark = (selectModel(ModelConstants.BOOKMARK)
+                            ({
+                                user_preview_id: userPreviewID,
+                                project_id: projectID,
+                            }));
+                        console.log(newBookmark);
+                        return Promise.all([
+                            result.save(),
+                            newBookmark.save()
+                        ])
+                    })
+                    .then(results => res.status(201).send())
+                    .catch(next);
+            else {
+                return findByID(ModelConstants.PROJECT, projectID)
+                    .then(result => {
+                        if (!result) throw new Error("No Content");
+                        result.bookmarks = result.bookmarks.filter(item => item.toString() !== userPreviewID);
+                        console.log(result.bookmarks);
+                        return Promise.all([
+                            result.save(),
+                            deleteOne(ModelConstants.BOOKMARK,
+                                { project_id: projectID, user_preview_id: userPreviewID })
+                        ])
+                    })
+                    .then(results => res.status(201).send())
+                    .catch(next)
+            }
+        }
+    );
+
+
 module.exports = router;
 

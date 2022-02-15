@@ -85,7 +85,7 @@ const IndexUserSchema = new Schema({
     recent_posts: {
         type: [mongoose.Types.ObjectId],
         default: []
-    } // 4 most recent posts
+    }, // 4 most recent posts
 }
 );
 

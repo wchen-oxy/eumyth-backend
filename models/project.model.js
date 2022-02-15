@@ -97,6 +97,22 @@ const ProjectSchema = new Schema({
   children_length: {
     type: Number,
     default: 0
+  },
+  
+  bookmarks:{
+    type: [mongoose.Types.ObjectId],
+    default: []
+  },
+
+  likes: {
+    type: [mongoose.Types.ObjectId],
+    default: [],
+    required: false,
+  },
+
+  dislikes: {
+    type: [mongoose.Types.ObjectId],
+    default: []
   }
 });
 
