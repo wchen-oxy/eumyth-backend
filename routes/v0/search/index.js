@@ -80,13 +80,17 @@ router.route('/posts')
 router.route('/projects').
     get(buildQueryValidationChain(
         PARAM_CONSTANTS.PURSUIT,
+        PARAM_CONSTANTS.REQUEST_QUANTITY,
+        PARAM_CONSTANTS.SUBMITTING_INDEX_USER_ID
     ),
         doesValidationErrorExist,
         (req, res, next) => {
             const pursuitList = req.query.pursuit;
-            console.log(pursuitList);
+            const indexUserID = req.query.submittingIndexUserID;
+            const requestQuantity = parseInt(req.query.requestQuantity);
+            console.log(indexUserID);
             const projectIDList = req.query.projectIDList ? req.query.projectIDList : [];
-            return searchServices.searchProjects(pursuitList, projectIDList)
+            return searchServices.searchProjects(pursuitList, projectIDList, requestQuantity, indexUserID)
                 .then(results => res.status(201).json(results))
                 .catch(next);
         }

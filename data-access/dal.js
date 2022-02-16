@@ -14,6 +14,16 @@ const find = (model, options) => (
             }
         ))
 
+const limitFind = (model, options, requestLimit) => (
+    selectModel(model).find({ ...options })
+        .limit(requestLimit)
+        .then(
+            result => {
+                doesContentExist(result);
+                return result;
+            }
+        )
+)
 
 const findByID = (model, ID) => (
     selectModel(model).findById(ID)
@@ -104,6 +114,7 @@ const deleteManyByID = (model, IDArray) => (
 
 module.exports = {
     insertMany,
+    limitFind,
     find,
     findByID,
     findOne,

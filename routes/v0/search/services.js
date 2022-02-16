@@ -8,6 +8,7 @@ const {
     findOne,
     findByID,
     findManyByID,
+    limitFind,
 } = require('../../../data-access/dal');
 
 
@@ -81,14 +82,16 @@ const appendPostData = (users, pursuit) => {
         })
 }
 
-const searchProjects = (pursuitList, IDList) => {
-    return find(ModelConstants.PROJECT, {
+const searchProjects = (pursuitList, IDList, requestQuantity, indexUserID) => {
+    return limitFind(ModelConstants.PROJECT, {
         _id: { $nin: IDList },
+        index_user_id: { $ne: mongoose.Types.ObjectId(indexUserID) },
         pursuit: { $in: pursuitList }
-    }).then(results => {
-        console.log(results);
-        return results;
-    });
+    }, requestQuantity)
+        .then(results => {
+            console.log(results);
+            return results;
+        });
 }
 exports.getBounds = getBounds;
 exports.searchByBounds = searchByBounds;

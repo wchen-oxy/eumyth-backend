@@ -23,7 +23,7 @@ const PARAM_CONSTANTS = {
     INDEX_USER_ID: 'indexUserID',
     IS_PAGINATED: 'isPaginated',
     IS_PRIVATE: 'isPrivate',
-    
+
     KEYS: 'keys',
     LAST_NAME: 'lastName',
     LATITUDE: 'latitude',
@@ -42,12 +42,14 @@ const PARAM_CONSTANTS = {
     PURSUIT: 'pursuit',
     PURSUIT_ARRAY: 'pursuitArray',
     QUANTITY: 'quantity',
+    REQUEST_QUANTITY: 'requestQuantity',
     REMOVE_COVER_PHOTO: 'removeCoverPhoto',
     ROOT_COMMENT_ID_ARRAY: 'rootCommentIDArray',
     SEARCH_MODE: 'searchMode',
     SELECTED_POSTS: 'selectedPosts',
     SHOULD_DELETE_POSTS: 'shouldDeletePosts',
     SHOULD_COPY_POSTS: 'shouldCopyPosts',
+    SUBMITTING_INDEX_USER_ID: 'submittingIndexUserID',
     TARGET_USERNAME: 'targetUsername',
     TARGET_USER_PREVIEW_ID: 'targetUserPreviewID',
     TARGET_USER_RELATION_ID: 'targetUserRelationID',
