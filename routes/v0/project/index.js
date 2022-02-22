@@ -37,7 +37,9 @@ router.route('/')
             PARAM_CONSTANTS.USER_ID,
             PARAM_CONSTANTS.INDEX_USER_ID,
             PARAM_CONSTANTS.USER_PREVIEW_ID,
-            PARAM_CONSTANTS.TITLE
+            PARAM_CONSTANTS.TITLE,
+            PARAM_CONSTANTS.STATUS
+
         ),
         doesValidationErrorExist,
         (req, res, next) => {
@@ -46,6 +48,7 @@ router.route('/')
             const userID = req.body.userID;
             const indexUserID = req.body.indexUserID;
             const userPreviewID = req.body.userPreviewID;
+            const status = req.body.status;
             const selectedPosts = req.body.selectedPosts ?
                 req.body.selectedPosts : [];
             const title = req.body.title ? req.body.title : null;
@@ -53,7 +56,6 @@ router.route('/')
             const pursuit = req.body.pursuit ? req.body.pursuit : null;
             const startDate = req.body.startDate ? req.body.startDate : null;
             const endDate = req.body.endDate ? req.body.endDate : null;
-            const status = req.body.status ? req.body.status : null;
             const minDuration = req.body.minDuration ? req.body.minDuration : null;
             const coverPhotoURL = req.files ? req.files.coverPhoto[0].key : null;
 
@@ -106,7 +108,9 @@ router.route('/')
         MulterHelper.contentImageUpload.single("coverPhoto"),
         buildBodyValidationChain(
             PARAM_CONSTANTS.PROJECT_ID,
-            PARAM_CONSTANTS.TITLE
+            PARAM_CONSTANTS.TITLE,
+            PARAM_CONSTANTS.STATUS
+
         ),
         doesValidationErrorExist,
         (req, res, next) => {
@@ -114,13 +118,15 @@ router.route('/')
             req.file ? updates.cover_photo_key = req.file.key : null;
             req.body.title ? updates.title = req.body.title : null;
             req.body.overview ? updates.overview = req.body.overview : null;
-            req.body.pursuitCategory ? updates.pursuit = req.body.pursuitCategory : null;
+            req.body.pursuit ? updates.pursuit = req.body.pursuit : null;
             req.body.startDate ? updates.start_date = req.body.startDate : null;
             req.body.endDate ? updates.end_date = req.body.endDate : null;
             req.body.status ? updates.status = req.body.status : null;
             req.body.minDuration ? updates.min_duration = req.body.minDuration : null;
             req.body.selectedPosts ? updates.post_ids = req.body.selectedPosts : null;
             req.body.labels ? updates.labels = req.body.labels : null;
+            console.log(req.body.pursuit);
+
             return findByIDAndUpdate(
                 ModelConstants.PROJECT,
                 req.body.projectID,

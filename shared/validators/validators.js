@@ -47,6 +47,7 @@ const PARAM_CONSTANTS = {
     ROOT_COMMENT_ID_ARRAY: 'rootCommentIDArray',
     SEARCH_MODE: 'searchMode',
     SELECTED_POSTS: 'selectedPosts',
+    STATUS: 'status',
     SHOULD_DELETE_POSTS: 'shouldDeletePosts',
     SHOULD_COPY_POSTS: 'shouldCopyPosts',
     SUBMITTING_INDEX_USER_ID: 'submittingIndexUserID',

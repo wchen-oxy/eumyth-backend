@@ -25,7 +25,17 @@ router.route('/spotlight')
                 .searchByBounds(userPreviewIDList, limits)
                 .then(results => {
                     let shuffled = results
-                        .map((value) => ({ value, sort: Math.random() }))
+                        .map((value) => {
+                            console.log(value.latitude);
+                            value['distance'] = searchServices
+                                .getDistance(
+                                    lat,
+                                    value.coordinates.latitude,
+                                    long,
+                                    value.coordinates.longitude
+                                );
+                            return ({ value, sort: Math.random() })
+                        })
                         .sort((a, b) => a.sort - b.sort)
                         .map(({ value }) => value);
                     return res.status(200).json({ users: shuffled.slice(0, 2) });
@@ -52,6 +62,18 @@ router.route('/people')
             const limits = searchServices.getBounds(distance, { lat, long });
             return searchServices
                 .searchByBoundedPursuits(userPreviewIDList, limits, pursuit)
+                .then(results =>
+                    results.map(value => {
+                        value['distance'] = searchServices
+                            .getDistance(
+                                lat,
+                                value.coordinates.latitude,
+                                long,
+                                value.coordinates.longitude
+                            );
+                        return value;
+                    })
+                )
                 .then(searchServices.appendPostData)
                 .then(results => res.status(200).json({ users: results }))
                 .catch(next)
@@ -70,6 +92,7 @@ router.route('/posts')
         (req, res, next) => {
             const difficulty = req.query.difficulty;
             const progression = req.query.progression;
+
             return searchServices
                 .searchByBounds(userPreviewIDList, limits)
                 .then()
