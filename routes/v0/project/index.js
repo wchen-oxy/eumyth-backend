@@ -20,8 +20,14 @@ const {
     deleteOne
 } = require('../../../data-access/dal');
 const ModelConstants = require('../../../models/constants');
-const { findAndUpdateIndexUserMeta, partialDelete, updateParentProject, retrieveSpotlightProjects, updatePursuitObject, removeVote } = require('./services');
+const { findAndUpdateIndexUserMeta,
+    partialDelete,
+    updateParentProject,
+    retrieveSpotlightProjects,
+    updatePursuitObject,
+    removeVote } = require('./services');
 const { ADD, SUBTRACT } = require('./constants');
+const { PROJECT } = require('../../../models/constants');
 
 router.route('/')
     .post(
@@ -38,10 +44,25 @@ router.route('/')
             PARAM_CONSTANTS.INDEX_USER_ID,
             PARAM_CONSTANTS.USER_PREVIEW_ID,
             PARAM_CONSTANTS.TITLE,
-            PARAM_CONSTANTS.STATUS
+            PARAM_CONSTANTS.STATUS,
 
         ),
         doesValidationErrorExist,
+        (req, res, next) => {
+            const parentProjectID = req.body.parentProjectID ? req.body.parentProjectID : null;
+
+            if (parentProjectID) {
+                findByID(PROJECT, parentProjectID).then(
+                    result => {
+                        res.locals.parentProject = result;
+
+                    }
+                ).catch(next)
+            }
+            else {
+                return next();
+            }
+        },
         (req, res, next) => {
             const username = req.body.username;
             const displayPhoto = req.body.displayPhoto;
@@ -84,19 +105,24 @@ router.route('/')
                 newProject.pursuit
             );
             const resolvedUser = updatePursuitObject(ModelConstants.USER, userID, newProject._id);
-
             return Promise.all([resolvedIndexUser, resolvedUser, resolvedUserPreview])
                 .then((result) => {
                     const savedIndexUser = result[0].save();
                     const savedUser = result[1].save();
                     const savedUserPreview = result[2].save();
                     const savedProject = newProject.save();
-                    return Promise.all([
+                    const promisedSaves = [
                         savedIndexUser,
                         savedUser,
                         savedUserPreview,
                         savedProject
-                    ]);
+                    ];
+                    if (res.locals.parentProject) {
+                        const savedParentProject = res.locals.parentProject;
+                        savedParentProject.children.push(newProject._id);
+                        promisedSaves.push(savedParentProject.save());
+                    }
+                    return Promise.all(promisedSaves);
                 })
                 .then((result) => {
                     return res.status(201).send(newProject._id);
@@ -219,6 +245,8 @@ router.route('/')
                     const completeUser = results[1];
                     const userPreview = results[2];
 
+                    _removeProject(indexUser.drafts, req, query.projectID);
+
                     _removeProject(completeUser.pursuits[0].projects, req.query.projectID);
                     for (let i = 1; i < completeUser.pursuits.length; i++) {
                         if (completeUser.pursuits[i].name === res.locals.pursuit) {
@@ -231,6 +259,7 @@ router.route('/')
                             _removeProject(userPreview.pursuits[i].projects, req.query.projectID)
                         }
                     }
+                    
                     if (shouldPreserve) {
                         return Promise.all([
                             res.locals.shouldDeletePosts ?
@@ -329,6 +358,7 @@ const refreshPostImageData = (posts, imageKeyMap) => {
 router.route('/fork').put(
     buildBodyValidationChain(
         PARAM_CONSTANTS.PROJECT_DATA,
+        PARAM_CONSTANTS.TITLE,
         PARAM_CONSTANTS.USERNAME,
         PARAM_CONSTANTS.INDEX_USER_ID,
         PARAM_CONSTANTS.USER_ID,
@@ -341,7 +371,7 @@ router.route('/fork').put(
         return resolvedProject.then(
             result => {
                 res.locals.oldProject = result;
-                next();
+                return next();
             }
         )
 
@@ -350,14 +380,15 @@ router.route('/fork').put(
         let projectData = res.locals.oldProject.toObject();
         const username = req.body.username;
         const authorID = req.body.indexUserID;
-        const displayPhoto = req.body.displayPhoto;
+        const displayPhoto = req.body.displayPhotoKey;
+        const title = req.body.title;
         const shouldCopyPosts = req.body.shouldCopyPosts;
         const oldProjectID = projectData._id;
         const ancestors = [...projectData.ancestors];
         const newPostIDList = [];
         const imageKeyMap = new Map();
-
         let projectPosts = null;
+        delete projectData.cover_photo_key;
         delete projectData._id;
         delete projectData.username;
         delete projectData.children;
@@ -371,7 +402,7 @@ router.route('/fork').put(
             parent: oldProjectID,
             ancestors: ancestors,
             status: 'DRAFT',
-            title: projectData.title
+            title: title
         });
         res.locals.title = newProject.title;
         res.locals.id = newProject._id;
@@ -433,12 +464,12 @@ router.route('/fork').put(
         else {
             newProject.post_ids = [];
             res.locals.project = newProject;
-            res.locals.oldProject = updateParentProject(res.locals.oldProject, newProject._id);
+            // res.locals.oldProject = updateParentProject(res.locals.oldProject, newProject._id);
             next();
         }
     },
     (req, res, next) => {
-        const oldProject = res.locals.oldProject;
+        // const oldProject = res.locals.oldProject;
         const project = res.locals.project;
         const promisedUserInfo = findByID(ModelConstants.USER, req.body.userID);
         const promisedIndexUser = findByID(ModelConstants.INDEX_USER, req.body.indexUserID)
@@ -476,7 +507,7 @@ router.route('/fork').put(
                 return Promise.all([
                     user.save(),
                     indexUser.save(),
-                    oldProject.save(),
+                    // oldProject.save(),
                     project.save(),
                 ]);
             })
