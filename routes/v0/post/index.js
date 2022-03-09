@@ -65,7 +65,6 @@ router.route('/').post(
     const coverPhotoKey = req.files && req.files.coverPhoto ? req.files.coverPhoto[0].key : null;
     const imageData = req.files && req.files.images ? postServices.getImageUrls(req.files.images) : [];
     const textSnippet = textData ? postServices.makeTextSnippet(postType, isPaginated, textData) : null;
-    console.log(res.locals);
     const indexUser = res.locals.indexUser;
     const user = res.locals.completeUser;
     const userPreview = res.locals.userPreview;

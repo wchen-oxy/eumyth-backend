@@ -9,8 +9,9 @@ const imageRouter = require('./image');
 const draftRouter = require('./draft');
 const relationRouter = require('./relation');
 const projectRouter = require('./project');
+const projectPreviewRouter = require('./projectPreview');
 const commentRouter = require('./comment');
-const userPreviewRouter = require('./user-preview');
+const userPreviewRouter = require('./userPreview');
 const searchRouter = require('./search');
 
 router.use('/pursuit', pursuitRouter);
@@ -20,6 +21,7 @@ router.use('/test', testRouter);
 router.use('/post', postRouter);
 router.use('/relation', relationRouter);
 router.use('/project', projectRouter);
+router.use('/project-preview', projectPreviewRouter);
 router.use('/image', imageRouter);
 router.use('/draft', draftRouter);
 router.use('/comment', commentRouter);

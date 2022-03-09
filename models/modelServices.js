@@ -15,6 +15,7 @@ const UserPreview = require('./user.preview.model');
 const UserRelation = require('./user.relation.model');
 const UserRelationStatus = require('./user.relation.status.model');
 const ModelConstants = require('./constants');
+const ProjectPreview = require('./project.preview.model');
 
 const selectModel = (type) => {
     switch (type) {
@@ -38,6 +39,10 @@ const selectModel = (type) => {
             return PostTree.Model;
         case (ModelConstants.PROJECT):
             return Project.Model;
+        case (ModelConstants.PROJECT_PREVIEW_WITH_ID):
+            return ProjectPreview.Model.WithID;
+        case (ModelConstants.PROJECT_PREVIEW_NO_ID):
+            return ProjectPreview.Model.NoID;
         case (ModelConstants.PURSUIT):
             return Pursuit.Model;
         case (ModelConstants.REF):

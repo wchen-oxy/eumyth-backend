@@ -27,7 +27,6 @@ const { findAndUpdateIndexUserMeta,
     updatePursuitObject,
     removeVote } = require('./services');
 const { ADD, SUBTRACT } = require('./constants');
-const { PROJECT } = require('../../../models/constants');
 
 router.route('/')
     .post(
@@ -78,6 +77,8 @@ router.route('/')
             const startDate = req.body.startDate ? req.body.startDate : null;
             const endDate = req.body.endDate ? req.body.endDate : null;
             const minDuration = req.body.minDuration ? req.body.minDuration : null;
+            const labels = req.body.labels ? req.body.labels : [];
+            const remix = req.body.remix ? req.body.remix : null;
             const coverPhotoURL = req.files ? req.files.coverPhoto[0].key : null;
 
             const newProject = selectModel(ModelConstants.PROJECT)
@@ -95,6 +96,7 @@ router.route('/')
                         min_duration: minDuration,
                         cover_photo_key: coverPhotoURL,
                         post_ids: selectedPosts,
+                        labels: labels
                     });
 
             const resolvedIndexUser = findAndUpdateIndexUserMeta(indexUserID, pursuit, ADD);
@@ -119,7 +121,12 @@ router.route('/')
                     ];
                     if (res.locals.parentProject) {
                         const savedParentProject = res.locals.parentProject;
-                        savedParentProject.children.push(newProject._id);
+                        savedParentProject.children.push(
+                            new (selectModel(ModelConstants.PROJECT_PREVIEW_NO_ID)({
+                                title,
+                                remix,
+                                project_id: newProject._id
+                            })));
                         promisedSaves.push(savedParentProject.save());
                     }
                     return Promise.all(promisedSaves);
@@ -134,29 +141,61 @@ router.route('/')
         MulterHelper.contentImageUpload.single("coverPhoto"),
         buildBodyValidationChain(
             PARAM_CONSTANTS.PROJECT_ID,
+            PARAM_CONSTANTS.PROJECT_PREVIEW_ID,
             PARAM_CONSTANTS.TITLE,
-            PARAM_CONSTANTS.STATUS
-
+            PARAM_CONSTANTS.STATUS,
+            PARAM_CONSTANTS.IS_FORKED
         ),
         doesValidationErrorExist,
         (req, res, next) => {
+            let promisedUpdate = null;
             const updates = {};
+            const previewUpdates = {};
             req.file ? updates.cover_photo_key = req.file.key : null;
             req.body.title ? updates.title = req.body.title : null;
             req.body.overview ? updates.overview = req.body.overview : null;
             req.body.pursuit ? updates.pursuit = req.body.pursuit : null;
             req.body.startDate ? updates.start_date = req.body.startDate : null;
             req.body.endDate ? updates.end_date = req.body.endDate : null;
-            req.body.status ? updates.status = req.body.status : null;
             req.body.minDuration ? updates.min_duration = req.body.minDuration : null;
             req.body.selectedPosts ? updates.post_ids = req.body.selectedPosts : null;
-            req.body.labels ? updates.labels = req.body.labels : null;
-            console.log(req.body.pursuit);
+            console.log(req.body.remix);
+            if (req.body.labels) {
+                updates.labels = req.body.labels;
+                previewUpdates.labels = req.body.labels;
+            }
 
-            return findByIDAndUpdate(
-                ModelConstants.PROJECT,
-                req.body.projectID,
-                updates)
+            if (req.body.status) {
+                updates.status = req.body.status;
+                previewUpdates.status = req.body.status;
+            }
+
+            if (req.body.remix) {
+                updates.remix = req.body.remix;
+                previewUpdates.remix = req.body.remix;
+            }
+
+            if (req.body.isForked) {
+                promisedUpdate = Promise.all([
+                    findByIDAndUpdate(
+                        ModelConstants.PROJECT,
+                        req.body.projectID,
+                        updates),
+                    findByIDAndUpdate(
+                        ModelConstants.PROJECT_PREVIEW_WITH_ID,
+                        req.body.projectPreviewID,
+                        previewUpdates
+                    )
+                ]);
+            }
+            else {
+                promisedUpdate = findByIDAndUpdate(
+                    ModelConstants.PROJECT,
+                    req.body.projectID,
+                    updates);
+            }
+
+            return promisedUpdate
                 .then((result) => {
                     return res.status(200).send();
                 });
@@ -231,11 +270,12 @@ router.route('/')
                 ])
             }
             else {
+                const last = res.locals.project.ancestors.length - 1;
                 promisedDeletionProcess = Promise.all([
                     findAndUpdateIndexUserMeta(indexUserID, res.locals.pursuit, SUBTRACT),
                     findByID(ModelConstants.USER, userID),
                     findByID(ModelConstants.USER_PREVIEW, userPreviewID),
-                    findByID(ModelConstants.PROJECT, res.locals.project.parent)
+                    findByID(ModelConstants.PROJECT, res.locals.project.ancestors[last])
                 ])
             }
 
@@ -253,13 +293,14 @@ router.route('/')
                             _removeProject(completeUser.pursuits[i].projects, req.query.projectID)
                         }
                     }
+
                     _removeProject(userPreview.pursuits[0].projects, req.query.projectID);
                     for (let i = 1; i < userPreview.pursuits.length; i++) {
                         if (userPreview.pursuits[i].name === res.locals.pursuit) {
                             _removeProject(userPreview.pursuits[i].projects, req.query.projectID)
                         }
                     }
-                    
+
                     if (shouldPreserve) {
                         return Promise.all([
                             res.locals.shouldDeletePosts ?
@@ -277,7 +318,9 @@ router.route('/')
                             .filter(item => item.toString() !== req.query.projectID);
                         oldProject.children_length = oldProject.children_length - 1;
                         if (childrenLength === oldProject.children.length
-                            || oldProject.children_length !== oldProject.children.length) { throw new Error("Unable To Remove from children of parent project"); }
+                            || oldProject.children_length !== oldProject.children.length) {
+                            throw new Error("Unable To Remove from children of parent project");
+                        }
                         return Promise.all([
                             res.locals.shouldDeletePosts ?
                                 deleteManyByID(ModelConstants.POST, res.locals.toBeDeletedPosts) : null,
@@ -355,6 +398,7 @@ const refreshPostImageData = (posts, imageKeyMap) => {
         }
     }
 }
+
 router.route('/fork').put(
     buildBodyValidationChain(
         PARAM_CONSTANTS.PROJECT_DATA,
@@ -366,8 +410,7 @@ router.route('/fork').put(
     ),
     doesValidationErrorExist,
     (req, res, next) => {
-        const oldProjectID = req.body.projectData._id;
-        const resolvedProject = findByID(ModelConstants.PROJECT, oldProjectID);
+        const resolvedProject = findByID(ModelConstants.PROJECT, req.body.projectData._id);
         return resolvedProject.then(
             result => {
                 res.locals.oldProject = result;
@@ -382,30 +425,58 @@ router.route('/fork').put(
         const authorID = req.body.indexUserID;
         const displayPhoto = req.body.displayPhotoKey;
         const title = req.body.title;
+        const remix = req.body.remix;
         const shouldCopyPosts = req.body.shouldCopyPosts;
         const oldProjectID = projectData._id;
+        const oldProjectRemix = projectData.remix ? projectData.remix : null;
         const ancestors = [...projectData.ancestors];
         const newPostIDList = [];
         const imageKeyMap = new Map();
         let projectPosts = null;
+
+        ancestors.push(
+            selectModel(ModelConstants.PROJECT_PREVIEW_NO_ID)
+                ({
+                    title: projectData.title,
+                    remix: oldProjectRemix,
+                    project_id: oldProjectID,
+                    parent_project_id: projectData._id
+                })
+        );
+
         delete projectData.cover_photo_key;
         delete projectData._id;
         delete projectData.username;
         delete projectData.children;
         delete projectData.children_length;
-        ancestors.push(oldProjectID);
-        let newProject = new (selectModel(ModelConstants.PROJECT))({
+        delete projectData.labels;
+
+        let newProject = (selectModel(ModelConstants.PROJECT))({
             ...projectData,
             index_user_id: authorID,
             display_photo_key: displayPhoto,
             username: username,
-            parent: oldProjectID,
             ancestors: ancestors,
             status: 'DRAFT',
-            title: title
+            title: title,
+            remix: remix
         });
+
+        const newProjectPreview = selectModel(ModelConstants.PROJECT_PREVIEW_WITH_ID)
+            ({
+                title: newProject.title,
+                remix: newProject.remix,
+                project_id: newProject._id,
+                parent_project_id: oldProjectID,
+                status: 'DRAFT',
+                labels: []
+            });
+
+        newProject.project_preview_id = newProjectPreview._id;
         res.locals.title = newProject.title;
         res.locals.id = newProject._id;
+        res.locals.newProjectPreview = newProjectPreview;
+
         if (shouldCopyPosts) {
             return findManyByID(ModelConstants.POST, projectData.post_ids, true)
                 .then((results) => {
@@ -451,7 +522,12 @@ router.route('/fork').put(
                 .then(response => {
                     refreshPostImageData(projectPosts, imageKeyMap);
                     res.locals.project = newProject;
-                    res.locals.oldProject = updateParentProject(res.locals.oldProject, newProject._id);
+
+                    res.locals.oldProject = updateParentProject(
+                        res.locals.oldProject,
+                        newProject._id,
+                        title,
+                        remix);
                     return insertMany(
                         ModelConstants.POST, projectPosts, { ordered: true })
                 })
@@ -464,13 +540,18 @@ router.route('/fork').put(
         else {
             newProject.post_ids = [];
             res.locals.project = newProject;
-            // res.locals.oldProject = updateParentProject(res.locals.oldProject, newProject._id);
+            res.locals.oldProject = updateParentProject(
+                res.locals.oldProject,
+                newProject._id,
+                title,
+                remix);
             next();
         }
     },
     (req, res, next) => {
-        // const oldProject = res.locals.oldProject;
+        const oldProject = res.locals.oldProject;
         const project = res.locals.project;
+        const newProjectPreview = res.locals.newProjectPreview;
         const promisedUserInfo = findByID(ModelConstants.USER, req.body.userID);
         const promisedIndexUser = findByID(ModelConstants.INDEX_USER, req.body.indexUserID)
         return Promise.all([promisedUserInfo, promisedIndexUser])
@@ -478,22 +559,22 @@ router.route('/fork').put(
                 const user = results[0];
                 const indexUser = results[1];
                 user.pursuits[0].projects.unshift(
-                    selectModel(ModelConstants.CONTENT_PREVIEW)(
+                    (selectModel(ModelConstants.CONTENT_PREVIEW)(
                         {
                             content_id: project._id,
                             date: new Date().toISOString().substr(0, 10),
                             labels: project.labels,
-                        }));
+                        })));
                 for (let i = 1; i < user.pursuits.length; i++) {
                     if (user.pursuits[i].name === project.pursuit) {
                         user.pursuits[i].projects.unshift(
-                            selectModel(ModelConstants.CONTENT_PREVIEW)
+                            (selectModel(ModelConstants.CONTENT_PREVIEW)
                                 (
                                     {
                                         content_id: project._id,
                                         date: new Date().toISOString().substr(0, 10),
                                         labels: project.labels,
-                                    })
+                                    }))
                         )
                     }
                 }
@@ -507,8 +588,9 @@ router.route('/fork').put(
                 return Promise.all([
                     user.save(),
                     indexUser.save(),
-                    // oldProject.save(),
+                    oldProject.save(),
                     project.save(),
+                    newProjectPreview.save()
                 ]);
             })
             .then(result => res.status(200).send())
@@ -574,53 +656,53 @@ router.route('/vote')
         }
     );
 
-router.route('/bookmark')
-    .put(
-        buildBodyValidationChain(
-            PARAM_CONSTANTS.BOOKMARK_STATE,
-            PARAM_CONSTANTS.PROJECT_ID,
-            PARAM_CONSTANTS.USER_PREVIEW_ID,
-        ),
-        doesValidationErrorExist,
-        (req, res, next) => {
-            const projectID = req.body.projectID;
-            const userPreviewID = req.body.userPreviewID;
-            const bookmarkState = req.body.bookmarkState;
-            if (bookmarkState)
-                return findByID(ModelConstants.PROJECT, projectID)
-                    .then(result => {
-                        if (!result) throw new Error("No Content");
-                        result.bookmarks.push(userPreviewID);
-                        const newBookmark = (selectModel(ModelConstants.BOOKMARK)
-                            ({
-                                user_preview_id: userPreviewID,
-                                project_id: projectID,
-                            }));
-                        console.log(newBookmark);
-                        return Promise.all([
-                            result.save(),
-                            newBookmark.save()
-                        ])
-                    })
-                    .then(results => res.status(201).send())
-                    .catch(next);
-            else {
-                return findByID(ModelConstants.PROJECT, projectID)
-                    .then(result => {
-                        if (!result) throw new Error("No Content");
-                        result.bookmarks = result.bookmarks.filter(item => item.toString() !== userPreviewID);
-                        console.log(result.bookmarks);
-                        return Promise.all([
-                            result.save(),
-                            deleteOne(ModelConstants.BOOKMARK,
-                                { project_id: projectID, user_preview_id: userPreviewID })
-                        ])
-                    })
-                    .then(results => res.status(201).send())
-                    .catch(next)
-            }
-        }
-    );
+
+// router.route('/bookmark')
+//     .put(
+//         buildBodyValidationChain(
+//             PARAM_CONSTANTS.BOOKMARK_STATE,
+//             PARAM_CONSTANTS.PROJECT_ID,
+//             PARAM_CONSTANTS.USER_PREVIEW_ID,
+//         ),
+//         doesValidationErrorExist,
+//         (req, res, next) => {
+//             const projectID = req.body.projectID;
+//             const userPreviewID = req.body.userPreviewID;
+//             const bookmarkState = req.body.bookmarkState;
+//             if (bookmarkState)
+//                 return findByID(ModelConstants.PROJECT, projectID)
+//                     .then(result => {
+//                         if (!result) throw new Error("No Content");
+//                         result.bookmarks.push(userPreviewID);
+//                         const newBookmark = (selectModel(ModelConstants.BOOKMARK)
+//                             ({
+//                                 user_preview_id: userPreviewID,
+//                                 content_type: ModelConstants.PROJECT,
+//                                 content_id: projectID,
+//                             }));
+//                         return Promise.all([
+//                             result.save(),
+//                             newBookmark.save()
+//                         ])
+//                     })
+//                     .then(results => res.status(201).send())
+//                     .catch(next);
+//             else {
+//                 return findByID(ModelConstants.PROJECT, projectID)
+//                     .then(result => {
+//                         if (!result) throw new Error("No Content");
+//                         result.bookmarks = result.bookmarks.filter(item => item.toString() !== userPreviewID);
+//                         return Promise.all([
+//                             result.save(),
+//                             deleteOne(ModelConstants.BOOKMARK,
+//                                 { content_id: projectID, user_preview_id: userPreviewID })
+//                         ])
+//                     })
+//                     .then(results => res.status(201).send())
+//                     .catch(next)
+//             }
+//         }
+//     );
 
 
 module.exports = router;

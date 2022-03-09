@@ -80,8 +80,12 @@ const retrieveSpotlightProjects = (limit) => {
     // )
 }
 
-const updateParentProject = (oldProject, newProjectID) => {
-    oldProject.children.push(newProjectID);
+const updateParentProject = (oldProject, newProjectID, title, remix) => {
+    oldProject.children.push( selectModel(ModelConstants.PROJECT_PREVIEW_NO_ID)({
+        project_id: newProjectID,
+        title,
+        remix
+    }));
     oldProject.children_length = oldProject.children_length + 1;
     return oldProject;
 

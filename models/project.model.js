@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const ProjectPreview = require('./project.preview.model');
 const Schema = mongoose.Schema;
 
 const ProjectSchema = new Schema({
@@ -12,6 +13,11 @@ const ProjectSchema = new Schema({
     type: mongoose.Types.ObjectId,
     required: false,
     trim: true
+  },
+
+  project_preview_id: {
+    type: mongoose.Types.ObjectId,
+    required: false,
   },
 
   display_photo_key: {
@@ -72,25 +78,23 @@ const ProjectSchema = new Schema({
 
   post_ids: {
     type: [mongoose.Types.ObjectId],
+    default: [],
     required: false,
   },
 
   labels: {
     type: [String],
+    default: [],
     required: false,
   },
 
-  parent: {
-    type: mongoose.Types.ObjectId
-  },
-
   ancestors: {
-    type: [mongoose.Types.ObjectId],
+    type: [ProjectPreview.Schema.NoID],
     default: []
   },
 
   children: {
-    type: [mongoose.Types.ObjectId],
+    type: [ProjectPreview.Schema.NoID],
     default: []
   },
 
@@ -98,8 +102,12 @@ const ProjectSchema = new Schema({
     type: Number,
     default: 0
   },
-  
-  bookmarks:{
+
+  remix: {
+    type: String
+  },
+
+  bookmarks: {
     type: [mongoose.Types.ObjectId],
     default: []
   },

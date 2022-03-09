@@ -117,6 +117,11 @@ const PostSchema = new Schema({
     default: []
   },
 
+  bookmarks: {
+    type: [mongoose.Types.ObjectId],
+    default: []
+  }
+
 }, {
   timestamps: true,
 });

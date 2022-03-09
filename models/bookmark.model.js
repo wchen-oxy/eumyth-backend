@@ -3,11 +3,18 @@ const Schema = mongoose.Schema;
 
 const BookmarkSchema = new Schema({
     user_preview_id: {
-        type: mongoose.Types.ObjectId
+        type: mongoose.Types.ObjectId,
+        required: true
     },
 
-    project_id: {
-        type: mongoose.Types.ObjectId
+    content_type: {
+        type: String,
+        required: true
+    },
+
+    content_id: {
+        type: mongoose.Types.ObjectId,
+        required: true
     }
 
 })
