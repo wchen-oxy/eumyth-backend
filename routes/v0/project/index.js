@@ -1,9 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const MulterHelper = require('../../../shared/utils/multer');
 const Helper = require('../../../shared/helper');
 const selectModel = require('../../../models/modelServices');
-const imageServices = require('../image/services');
 const {
     PARAM_CONSTANTS,
     buildQueryValidationChain,
@@ -14,19 +12,17 @@ const {
     findByID,
     findManyByID,
     insertMany,
-    deleteManyByID,
-    deleteByID,
-    findByIDAndUpdate,
-    deleteOne
 } = require('../../../data-access/dal');
 const ModelConstants = require('../../../models/constants');
-const { findAndUpdateIndexUserMeta,
-    partialDelete,
+const {
     updateParentProject,
     retrieveSpotlightProjects,
-    updatePursuitObject,
     removeVote } = require('./services');
-const { ADD, SUBTRACT } = require('./constants');
+const create = require('./create');
+const find = require('./find');
+const update = require('./update');
+const deletion = require('./delete');
+const MulterHelper = require('../../../shared/utils/multer');
 
 router.route('/')
     .post(
@@ -44,101 +40,18 @@ router.route('/')
             PARAM_CONSTANTS.USER_PREVIEW_ID,
             PARAM_CONSTANTS.TITLE,
             PARAM_CONSTANTS.STATUS,
-
         ),
         doesValidationErrorExist,
-        (req, res, next) => {
-            const parentProjectID = req.body.parentProjectID ? req.body.parentProjectID : null;
-
-            if (parentProjectID) {
-                findByID(PROJECT, parentProjectID).then(
-                    result => {
-                        res.locals.parentProject = result;
-
-                    }
-                ).catch(next)
-            }
-            else {
-                return next();
-            }
-        },
-        (req, res, next) => {
-            const username = req.body.username;
-            const displayPhoto = req.body.displayPhoto;
-            const userID = req.body.userID;
-            const indexUserID = req.body.indexUserID;
-            const userPreviewID = req.body.userPreviewID;
-            const status = req.body.status;
-            const selectedPosts = req.body.selectedPosts ?
-                req.body.selectedPosts : [];
-            const title = req.body.title ? req.body.title : null;
-            const overview = req.body.overview ? req.body.overview : null;
-            const pursuit = req.body.pursuit ? req.body.pursuit : null;
-            const startDate = req.body.startDate ? req.body.startDate : null;
-            const endDate = req.body.endDate ? req.body.endDate : null;
-            const minDuration = req.body.minDuration ? req.body.minDuration : null;
-            const labels = req.body.labels ? req.body.labels : [];
-            const remix = req.body.remix ? req.body.remix : null;
-            const coverPhotoURL = req.files ? req.files.coverPhoto[0].key : null;
-
-            const newProject = selectModel(ModelConstants.PROJECT)
-                (
-                    {
-                        username: username,
-                        index_user_id: indexUserID,
-                        display_photo_key: displayPhoto,
-                        title: title,
-                        overview: overview,
-                        pursuit: pursuit,
-                        start_date: startDate,
-                        end_date: endDate,
-                        status: status,
-                        min_duration: minDuration,
-                        cover_photo_key: coverPhotoURL,
-                        post_ids: selectedPosts,
-                        labels: labels
-                    });
-
-            const resolvedIndexUser = findAndUpdateIndexUserMeta(indexUserID, pursuit, ADD);
-            const resolvedUserPreview = updatePursuitObject(
-                ModelConstants.USER_PREVIEW,
-                userPreviewID,
-                newProject._id,
-                newProject.pursuit
-            );
-            const resolvedUser = updatePursuitObject(ModelConstants.USER, userID, newProject._id);
-            return Promise.all([resolvedIndexUser, resolvedUser, resolvedUserPreview])
-                .then((result) => {
-                    const savedIndexUser = result[0].save();
-                    const savedUser = result[1].save();
-                    const savedUserPreview = result[2].save();
-                    const savedProject = newProject.save();
-                    const promisedSaves = [
-                        savedIndexUser,
-                        savedUser,
-                        savedUserPreview,
-                        savedProject
-                    ];
-                    if (res.locals.parentProject) {
-                        const savedParentProject = res.locals.parentProject;
-                        savedParentProject.children.push(
-                            new (selectModel(ModelConstants.PROJECT_PREVIEW_NO_ID)({
-                                title,
-                                remix,
-                                project_id: newProject._id
-                            })));
-                        promisedSaves.push(savedParentProject.save());
-                    }
-                    return Promise.all(promisedSaves);
-                })
-                .then((result) => {
-                    return res.status(201).send(newProject._id);
-                })
-                .catch(next)
-
-        })
+        find,
+        create)
     .put(
-        MulterHelper.contentImageUpload.single("coverPhoto"),
+        MulterHelper
+            .contentImageUpload
+            .single(
+                {
+                    name: "coverPhoto",
+                    maxCount: 1
+                }),
         buildBodyValidationChain(
             PARAM_CONSTANTS.PROJECT_ID,
             PARAM_CONSTANTS.PROJECT_PREVIEW_ID,
@@ -147,59 +60,7 @@ router.route('/')
             PARAM_CONSTANTS.IS_FORKED
         ),
         doesValidationErrorExist,
-        (req, res, next) => {
-            let promisedUpdate = null;
-            const updates = {};
-            const previewUpdates = {};
-            req.file ? updates.cover_photo_key = req.file.key : null;
-            req.body.title ? updates.title = req.body.title : null;
-            req.body.overview ? updates.overview = req.body.overview : null;
-            req.body.pursuit ? updates.pursuit = req.body.pursuit : null;
-            req.body.startDate ? updates.start_date = req.body.startDate : null;
-            req.body.endDate ? updates.end_date = req.body.endDate : null;
-            req.body.minDuration ? updates.min_duration = req.body.minDuration : null;
-            req.body.selectedPosts ? updates.post_ids = req.body.selectedPosts : null;
-            console.log(req.body.remix);
-            if (req.body.labels) {
-                updates.labels = req.body.labels;
-                previewUpdates.labels = req.body.labels;
-            }
-
-            if (req.body.status) {
-                updates.status = req.body.status;
-                previewUpdates.status = req.body.status;
-            }
-
-            if (req.body.remix) {
-                updates.remix = req.body.remix;
-                previewUpdates.remix = req.body.remix;
-            }
-
-            if (req.body.isForked) {
-                promisedUpdate = Promise.all([
-                    findByIDAndUpdate(
-                        ModelConstants.PROJECT,
-                        req.body.projectID,
-                        updates),
-                    findByIDAndUpdate(
-                        ModelConstants.PROJECT_PREVIEW_WITH_ID,
-                        req.body.projectPreviewID,
-                        previewUpdates
-                    )
-                ]);
-            }
-            else {
-                promisedUpdate = findByIDAndUpdate(
-                    ModelConstants.PROJECT,
-                    req.body.projectID,
-                    updates);
-            }
-
-            return promisedUpdate
-                .then((result) => {
-                    return res.status(200).send();
-                });
-        })
+        update)
     .delete(
         buildQueryValidationChain(
             PARAM_CONSTANTS.PROJECT_ID,
@@ -209,135 +70,9 @@ router.route('/')
             PARAM_CONSTANTS.USER_ID,
         ),
         doesValidationErrorExist,
-        (req, res, next) => {
-            const projectID = req.query.projectID;
-            let toBeDeletedImages = [];
-            res.locals.shouldDeletePosts = req.query.shouldDeletePosts === 'true'
-                || req.query.shouldDeletePost === true;
-            return findByID(ModelConstants.PROJECT, projectID)
-                .then((result) => {
-                    if (result.cover_photo_key) {
-                        toBeDeletedImages.push(result.cover_photo_key);
-                    }
-                    res.locals.project = result;
-                    res.locals.toBeDeletedPosts = result.post_ids;
-                    res.locals.pursuit = result.pursuit;
-                    return findManyByID(ModelConstants.POST, result.post_ids)
-                })
-                .then((results) => {
-                    for (const post of results) {
-                        if (post.cover_photo_key) {
-                            toBeDeletedImages.push(post.cover_photo_key);
-                        }
-                        if (post.image_data) {
-                            toBeDeletedImages = toBeDeletedImages.concat(post.image_data)
-                        }
-                    }
-                    res.locals.toBeDeletedImages = toBeDeletedImages;
-                    return next();
-                })
-        },
-        (req, res, next) => {
-            const imagesExist = res.locals.toBeDeletedImages.length > 0;
-            if (res.locals.shouldDeletePosts && imagesExist) {
-                return imageServices.deleteMultiple(res.locals.toBeDeletedImages)
-                    .then(next)
-                    .catch(next);
-            }
-            return next();
-        },
-        (req, res, next) => {
-            const _removeProject = (array, ID) => {
-                for (let i = 0; i < array.length; i++) {
-                    console.log(array[i]);
-                    if (array[i].content_id.toString() === ID) {
-
-                        array.splice(i, 1)
-                    }
-                }
-            }
-            const indexUserID = req.query.indexUserID;
-            const userID = req.query.userID;
-            const userPreviewID = req.query.userPreviewID;
-            const shouldPreserve = res.locals.project.children.length > 0;
-            let promisedDeletionProcess = null;
-
-            if (shouldPreserve) {
-                promisedDeletionProcess = Promise.all([
-                    findAndUpdateIndexUserMeta(indexUserID, res.locals.pursuit, SUBTRACT),
-                    findByID(ModelConstants.USER, userID),
-                    findByID(ModelConstants.USER_PREVIEW, userPreviewID),
-                ])
-            }
-            else {
-                const last = res.locals.project.ancestors.length - 1;
-                promisedDeletionProcess = Promise.all([
-                    findAndUpdateIndexUserMeta(indexUserID, res.locals.pursuit, SUBTRACT),
-                    findByID(ModelConstants.USER, userID),
-                    findByID(ModelConstants.USER_PREVIEW, userPreviewID),
-                    findByID(ModelConstants.PROJECT, res.locals.project.ancestors[last])
-                ])
-            }
-
-            return promisedDeletionProcess
-                .then((results => {
-                    const indexUser = results[0];
-                    const completeUser = results[1];
-                    const userPreview = results[2];
-
-                    _removeProject(indexUser.drafts, req, query.projectID);
-
-                    _removeProject(completeUser.pursuits[0].projects, req.query.projectID);
-                    for (let i = 1; i < completeUser.pursuits.length; i++) {
-                        if (completeUser.pursuits[i].name === res.locals.pursuit) {
-                            _removeProject(completeUser.pursuits[i].projects, req.query.projectID)
-                        }
-                    }
-
-                    _removeProject(userPreview.pursuits[0].projects, req.query.projectID);
-                    for (let i = 1; i < userPreview.pursuits.length; i++) {
-                        if (userPreview.pursuits[i].name === res.locals.pursuit) {
-                            _removeProject(userPreview.pursuits[i].projects, req.query.projectID)
-                        }
-                    }
-
-                    if (shouldPreserve) {
-                        return Promise.all([
-                            res.locals.shouldDeletePosts ?
-                                deleteManyByID(ModelConstants.POST, res.locals.toBeDeletedPosts) : null,
-                            partialDelete(res.locals.project).save(),
-                            indexUser.save(),
-                            completeUser.save(),
-                            userPreview.save()
-                        ])
-                    }
-                    else {
-                        let oldProject = results[3];
-                        const childrenLength = oldProject.children.length;
-                        oldProject.children = oldProject.children
-                            .filter(item => item.toString() !== req.query.projectID);
-                        oldProject.children_length = oldProject.children_length - 1;
-                        if (childrenLength === oldProject.children.length
-                            || oldProject.children_length !== oldProject.children.length) {
-                            throw new Error("Unable To Remove from children of parent project");
-                        }
-                        return Promise.all([
-                            res.locals.shouldDeletePosts ?
-                                deleteManyByID(ModelConstants.POST, res.locals.toBeDeletedPosts) : null,
-                            oldProject.save(),
-                            deleteByID(ModelConstants.PROJECT, res.locals.project._id),
-                            indexUser.save(),
-                            completeUser.save(),
-                            userPreview.save()
-                        ])
-                    }
-
-                }))
-                .then(() => {
-                    return res.status(200).send('Success');
-                })
-                .catch(next);
-        }
+        deletion.getImageKeys,
+        deletion.callMulter,
+        deletion.updateIndexes
     );
 
 router.route('/single').get(

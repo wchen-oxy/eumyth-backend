@@ -204,7 +204,7 @@ const retrieveRelevantUserInfo = (req, res, next) => {
 
 const createPost = (postType, username, title, subtitle, postPrivacyType, date, authorID,
     pursuitCategory, displayPhoto, coverPhotoKey, postFormat, isPaginated, progression,
-    imageData, textSnippet, textData, minDuration, difficulty, labels) => {
+    imageData, textSnippet, textData, minDuration, difficulty, labels, projectID) => {
     switch (postType) {
         case (SHORT):
             return selectModel(
@@ -228,6 +228,7 @@ const createPost = (postType, username, title, subtitle, postPrivacyType, date, 
                         min_duration: minDuration,
                         difficulty: difficulty,
                         labels: labels,
+                        project_id: projectID
                     }
                 );
         case (LONG):

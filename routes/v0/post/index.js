@@ -32,20 +32,27 @@ router.route('/').post(
     PARAM_CONSTANTS.POST_PRIVACY,
     PARAM_CONSTANTS.POST_TYPE,
     PARAM_CONSTANTS.PROGRESSION,
-    PARAM_CONSTANTS.IS_PAGINATED
+    PARAM_CONSTANTS.IS_PAGINATED,
+    PARAM_CONSTANTS.THREAD_TYPE,
+    PARAM_CONSTANTS.SELECTED_DRAFT_ID
   ),
   doesValidationErrorExist,
   postServices.retrieveRelevantUserInfo,
   (req, res, next) => {
-    const selectedDraft = req.body.selectedDraftID ? req.body.selectedDraftID : null;
-    console.log(req.body.selectedDraftID);
-    if (!selectedDraft) return next();
+    const threadType = req.body.threadType;
+    const threadTitle = req.body.threadTitle;
+    const threadTitlePrivacy = req.body.threadTitlePrivacy;
+
+    const selectedDraft = req.body.selectedDraftID;
+    console.log(req.body);
+
     return findByID(ModelConstants.PROJECT, selectedDraft)
       .then((result) => {
         console.log(result);
         res.locals.project = result;
         return next();
       });
+
   },
   (req, res, next) => {
     const postType = req.body.postType;
@@ -88,7 +95,8 @@ router.route('/').post(
       textData,
       minDuration,
       difficulty,
-      labels
+      labels,
+      project._id
     );
     const postPreview = postServices.createContentPreview(post._id, post.date);
     res.locals.post_id = post._id;
@@ -214,7 +222,7 @@ router.route('/').post(
           );
           return Promise.all(promisedUpdatedFollowerArray)
             .then((result) => {
-              res.status(201).send(res.locals.post_id)
+              return res.status(201).send(res.locals.post_id)
             });
         }
       )

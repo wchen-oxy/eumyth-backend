@@ -5,7 +5,7 @@ const ProjectPreviewWithIDSchema = new Schema({
     title: String,
     remix: String,
     project_id: mongoose.Types.ObjectId,
-    parent_project_id: mongoose.Types.ObjectId,
+    parent_project_id: mongoose.Types.ObjectId, //needed for searching related parent projects
     status: String,
     labels: {
         type: [String],
@@ -20,7 +20,7 @@ const ProjectPreviewNoIDSchema = new Schema({
     title: String,
     remix: String,
     project_id: mongoose.Types.ObjectId,
-    parent_project_id: mongoose.Types.ObjectId,
+    parent_project_id: mongoose.Types.ObjectId, //needed for searching related parent projects
     status: String,
     labels: {
         type: [String],

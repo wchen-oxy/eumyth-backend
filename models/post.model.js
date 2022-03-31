@@ -97,13 +97,8 @@ const PostSchema = new Schema({
     required: false,
   },
 
-  internal_ref: {
-    type: Ref.Schema,
-    required: false
-  },
-
-  external_ref: {
-    type: Ref.Schema,
+  project_id: {
+    type: mongoose.Types.ObjectId,
     required: false
   },
 
