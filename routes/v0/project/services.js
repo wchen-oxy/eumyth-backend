@@ -13,7 +13,7 @@ const adjustEntryLength = (array, max) => {
     }
 }
 
-const findAndUpdateIndexUserMeta = (indexUserID, pursuit, updateType) => {
+const findAndUpdateIndexUserMeta = (updateType, indexUserID, pursuit, draftObject) => {
     const _numProjectSetter = (count, updateType) => {
         if (updateType === "ADD") {
             count++;
@@ -26,6 +26,12 @@ const findAndUpdateIndexUserMeta = (indexUserID, pursuit, updateType) => {
     return findByID(ModelConstants.INDEX_USER, indexUserID)
         .then(result => {
             let user = result;
+            user.drafts.unshift(
+                selectModel(ModelConstants.DRAFT_PREVIEW)
+                    ({
+                        title: draftObject.title,
+                        content_id: draftObject.content_id
+                    }));
             _numProjectSetter(user.pursuits[0].num_projects, updateType);
             if (pursuit) {
                 for (const pursuitMeta of user.pursuits) {
@@ -80,8 +86,21 @@ const retrieveSpotlightProjects = (limit) => {
     // )
 }
 
+const removeProjectDraft = (drafts, ID) => {
+    console.log(drafts);
+    console.log(ID);
+    const condition = (element) => ID.toString() === element.content_id.toString();
+    const index = drafts.findIndex(condition);
+    if (index === -1) {
+        throw new Error("draft not found");
+    }
+    else {
+        return drafts.splice(index, 1);
+    }
+}
+
 const updateParentProject = (oldProject, newProjectID, title, remix) => {
-    oldProject.children.push( selectModel(ModelConstants.PROJECT_PREVIEW_NO_ID)({
+    oldProject.children.push(selectModel(ModelConstants.PROJECT_PREVIEW_NO_ID)({
         project_id: newProjectID,
         title,
         remix
@@ -124,3 +143,4 @@ exports.updatePursuitObject = updatePursuitObject;
 exports.updateParentProject = updateParentProject;
 exports.retrieveSpotlightProjects = retrieveSpotlightProjects;
 exports.removeVote = removeVote;
+exports.removeProjectDraft = removeProjectDraft;

@@ -97,7 +97,7 @@ const PostSchema = new Schema({
     required: false,
   },
 
-  project_id: {
+  project_preview_id: {
     type: mongoose.Types.ObjectId,
     required: false
   },

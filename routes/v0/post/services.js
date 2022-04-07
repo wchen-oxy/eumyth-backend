@@ -187,12 +187,11 @@ const retrieveRelevantUserInfo = (req, res, next) => {
         })
         .then((result) => {
             res.locals.indexUser = result;
-        })
-        .then(() =>
-            Promise.all([
+            return Promise.all([
                 findByID(ModelConstants.USER, res.locals.indexUser.user_profile_id),
                 findByID(ModelConstants.USER_RELATION, res.locals.indexUser.user_relation_id)
             ])
+        }
         )
         .then((results) => {
             res.locals.completeUser = results[0];
@@ -204,7 +203,7 @@ const retrieveRelevantUserInfo = (req, res, next) => {
 
 const createPost = (postType, username, title, subtitle, postPrivacyType, date, authorID,
     pursuitCategory, displayPhoto, coverPhotoKey, postFormat, isPaginated, progression,
-    imageData, textSnippet, textData, minDuration, difficulty, labels, projectID) => {
+    imageData, textSnippet, textData, minDuration, difficulty, labels, projectpreviewID) => {
     switch (postType) {
         case (SHORT):
             return selectModel(
@@ -228,7 +227,7 @@ const createPost = (postType, username, title, subtitle, postPrivacyType, date, 
                         min_duration: minDuration,
                         difficulty: difficulty,
                         labels: labels,
-                        project_id: projectID
+                        project_preview_id: projectpreviewID
                     }
                 );
         case (LONG):

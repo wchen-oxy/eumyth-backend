@@ -40,16 +40,33 @@ module.exports = (req, res, next) => {
                 min_duration: minDuration,
                 cover_photo_key: coverPhotoURL,
                 post_ids: selectedPosts,
-                labels: labels
+                labels: labels,
+                project_preview_id: null,
+                remix
             });
 
-    const resolvedIndexUser = findAndUpdateIndexUserMeta(indexUserID, pursuit, ADD);
+    const projectPreview = selectModel(ModelConstants.PROJECT_PREVIEW_WITH_ID)
+        ({
+            title: title,
+            project_id: newProject._id,
+            status: 'DRAFT',
+            labels: labels
+        });
+
+    const resolvedIndexUser = findAndUpdateIndexUserMeta(
+        ADD,
+        indexUserID,
+        pursuit,
+        { title: newProject.title, content_id: newProject._id, }
+    );
+    newProject.project_preview_id = projectPreview;
     const resolvedUserPreview = updatePursuitObject(
         ModelConstants.USER_PREVIEW,
         userPreviewID,
         newProject._id,
         newProject.pursuit
     );
+    
     const resolvedUser = updatePursuitObject(ModelConstants.USER, userID, newProject._id);
     return Promise.all([resolvedIndexUser, resolvedUser, resolvedUserPreview])
         .then((result) => {
@@ -57,11 +74,13 @@ module.exports = (req, res, next) => {
             const savedUser = result[1].save();
             const savedUserPreview = result[2].save();
             const savedProject = newProject.save();
+            const savedProjectPreview = projectPreview.save();
             const promisedSaves = [
                 savedIndexUser,
                 savedUser,
                 savedUserPreview,
-                savedProject
+                savedProject,
+                savedProjectPreview
             ];
             if (res.locals.parentProject) {
                 const savedParentProject = res.locals.parentProject;
@@ -77,7 +96,7 @@ module.exports = (req, res, next) => {
         })
         .then((result) => {
             res.locals.selectedDraftID = newProject._id;
-            return res.status(201).json({id: newProject._id});
+            return res.status(201).json({ id: newProject._id });
         })
         .catch(next)
 

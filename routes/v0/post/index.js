@@ -18,9 +18,9 @@ const {
   checkStringBoolean,
   verifyArray
 } = require('../../../shared/helper');
-
+const selectModel = require('../../../models/modelServices');
 const postServices = require('./services');
-
+const projectServices = require('../project/services');
 const postImageFields = [
   { name: "images" },
   { name: "coverPhoto", maxCount: 1 }];
@@ -33,19 +33,14 @@ router.route('/').post(
     PARAM_CONSTANTS.POST_TYPE,
     PARAM_CONSTANTS.PROGRESSION,
     PARAM_CONSTANTS.IS_PAGINATED,
-    PARAM_CONSTANTS.THREAD_TYPE,
     PARAM_CONSTANTS.SELECTED_DRAFT_ID
   ),
   doesValidationErrorExist,
   postServices.retrieveRelevantUserInfo,
   (req, res, next) => {
-    const threadType = req.body.threadType;
     const threadTitle = req.body.threadTitle;
     const threadTitlePrivacy = req.body.threadTitlePrivacy;
-
     const selectedDraft = req.body.selectedDraftID;
-    console.log(req.body);
-
     return findByID(ModelConstants.PROJECT, selectedDraft)
       .then((result) => {
         console.log(result);
@@ -53,6 +48,21 @@ router.route('/').post(
         return next();
       });
 
+  },
+  (req, res, next) => {
+    const isCompleteProject = req.body.completeProject ? req.body.completeProject : false;
+    if (isCompleteProject) {
+      // const res.locals.project = result;
+      // res.locals.project = result;
+      return selectModel(ModelConstants.PROJECT_PREVIEW_WITH_ID)
+        .findOne({ project_id: res.locals.project._id })
+        .then((result) => {
+          console.log(result);
+          res.locals.projectPreview = result;
+          return next();
+        });
+    }
+    return next();
   },
   (req, res, next) => {
     const postType = req.body.postType;
@@ -72,10 +82,13 @@ router.route('/').post(
     const coverPhotoKey = req.files && req.files.coverPhoto ? req.files.coverPhoto[0].key : null;
     const imageData = req.files && req.files.images ? postServices.getImageUrls(req.files.images) : [];
     const textSnippet = textData ? postServices.makeTextSnippet(postType, isPaginated, textData) : null;
+    const isCompleteProject = req.body.completeProject ? checkStringBoolean(req.body.completeProject) : false;
     const indexUser = res.locals.indexUser;
     const user = res.locals.completeUser;
     const userPreview = res.locals.userPreview;
-    const project = res.locals.project;
+    let projectPreview = res.locals.projectPreview;
+    let project = res.locals.project;
+
     const post = postServices.createPost(
       postType,
       username,
@@ -96,7 +109,7 @@ router.route('/').post(
       minDuration,
       difficulty,
       labels,
-      project._id
+      project.project_preview_id
     );
     const postPreview = postServices.createContentPreview(post._id, post.date);
     res.locals.post_id = post._id;
@@ -104,8 +117,13 @@ router.route('/').post(
     if (indexUser.preferred_post_privacy !== postPrivacyType) {
       indexUser.preferred_post_privacy = postPrivacyType;
     }
+    if (isCompleteProject) {
+      console.log("yes");
+      projectServices.removeProjectDraft(indexUser.drafts, project._id);
+      projectPreview.status = "COMPLETE";
+      project.status = "COMPLETE";
+    }
     postServices.setRecentPosts(postPreview.content_id, indexUser.recent_posts);
-
     postServices.updatePostLists(
       postPreview,
       post.pursuit_category,
@@ -183,7 +201,10 @@ router.route('/').post(
           res.status(500).json('Error: ' + error);
         }
       });
-      return Promise.all([savedUserPreview, savedIndexUser, savedUser, savedPost, savedProject])
+      const promises = [savedUserPreview, savedIndexUser, savedUser, savedPost, savedProject];
+      if (isCompleteProject) promises.push(projectPreview.save());
+      console.log(promises);
+      return Promise.all(promises)
         .then(() => next());
     }
     else {
@@ -388,7 +409,6 @@ router.route('/multiple').get(
   (req, res, next) => {
     const postIDList = req.query.postIDList;
     const includePostText = req.query.includePostText;
-    console.log(postIDList);
     return Promise.all([
       postServices.findPosts(postIDList, includePostText),
       postServices.countComments(postIDList)])
