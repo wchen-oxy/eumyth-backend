@@ -13,11 +13,12 @@ module.exports = (req, res, next) => {
     const indexUserID = req.body.indexUserID;
     const userPreviewID = req.body.userPreviewID;
     const status = req.body.status;
+    const pursuit = req.body.pursuit ;
+
     const selectedPosts = req.body.selectedPosts ?
         req.body.selectedPosts : [];
     const title = req.body.title ? req.body.title : null;
     const overview = req.body.overview ? req.body.overview : null;
-    const pursuit = req.body.pursuit ? req.body.pursuit : null;
     const startDate = req.body.startDate ? req.body.startDate : null;
     const endDate = req.body.endDate ? req.body.endDate : null;
     const minDuration = req.body.minDuration ? req.body.minDuration : null;
@@ -50,7 +51,8 @@ module.exports = (req, res, next) => {
             title: title,
             project_id: newProject._id,
             status: 'DRAFT',
-            labels: labels
+            labels: labels,
+            pursuit: pursuit
         });
 
     const resolvedIndexUser = findAndUpdateIndexUserMeta(

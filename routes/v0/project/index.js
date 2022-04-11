@@ -34,6 +34,7 @@ router.route('/')
                     maxCount: 1
                 }),
         buildBodyValidationChain(
+            PARAM_CONSTANTS.PURSUIT,
             PARAM_CONSTANTS.USERNAME,
             PARAM_CONSTANTS.USER_ID,
             PARAM_CONSTANTS.INDEX_USER_ID,

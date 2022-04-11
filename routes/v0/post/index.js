@@ -33,7 +33,8 @@ router.route('/').post(
     PARAM_CONSTANTS.POST_TYPE,
     PARAM_CONSTANTS.PROGRESSION,
     PARAM_CONSTANTS.IS_PAGINATED,
-    PARAM_CONSTANTS.SELECTED_DRAFT_ID
+    PARAM_CONSTANTS.SELECTED_DRAFT_ID, 
+    PARAM_CONSTANTS.PURSUIT
   ),
   doesValidationErrorExist,
   postServices.retrieveRelevantUserInfo,
@@ -69,12 +70,12 @@ router.route('/').post(
     const username = req.body.username;
     const postPrivacyType = req.body.postPrivacyType;
     const progression = req.body.progression;
+    const pursuitCategory = req.body.pursuit;
     const isPaginated = checkStringBoolean(req.body.isPaginated);
     const displayPhoto = req.body.displayPhoto ? req.body.displayPhoto : null;
     const difficulty = req.body.difficulty ? req.body.difficulty : null;
     const title = req.body.title ? req.body.title : null;
     const subtitle = req.body.subtitle ? req.body.subtitle : null;
-    const pursuitCategory = req.body.pursuit ? req.body.pursuit : null;
     const labels = req.body.labels ? verifyArray(req.body.labels) : [];
     const date = req.body.date ? new Date(req.body.date) : null;
     const textData = req.body.textData ? req.body.textData : null;
