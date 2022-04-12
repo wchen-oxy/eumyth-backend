@@ -33,7 +33,7 @@ router.route('/').post(
     PARAM_CONSTANTS.POST_TYPE,
     PARAM_CONSTANTS.PROGRESSION,
     PARAM_CONSTANTS.IS_PAGINATED,
-    PARAM_CONSTANTS.SELECTED_DRAFT_ID, 
+    PARAM_CONSTANTS.SELECTED_DRAFT_ID,
     PARAM_CONSTANTS.PURSUIT
   ),
   doesValidationErrorExist,
@@ -44,7 +44,7 @@ router.route('/').post(
     const selectedDraft = req.body.selectedDraftID;
     return findByID(ModelConstants.PROJECT, selectedDraft)
       .then((result) => {
-        console.log(result);
+        console.log('project', result);
         res.locals.project = result;
         return next();
       });
@@ -58,7 +58,7 @@ router.route('/').post(
       return selectModel(ModelConstants.PROJECT_PREVIEW_WITH_ID)
         .findOne({ project_id: res.locals.project._id })
         .then((result) => {
-          console.log(result);
+          console.log('projectpreview', result);
           res.locals.projectPreview = result;
           return next();
         });
