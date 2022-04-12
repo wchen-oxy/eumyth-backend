@@ -50,10 +50,12 @@ const updatePursuitObject = (model, modelID, contentID, pursuit) =>
             let user = result;
             const newContent = selectModel(ModelConstants.CONTENT_PREVIEW)({ content_id: contentID });
             user.pursuits[0].projects.unshift(newContent);
-            adjustEntryLength(user.pursuits[0].projects, EMBEDDED_FEED_LIMIT)
-            for (const pursuit of user.pursuits) {
-                if (pursuit.name === pursuit) {
-                    pursuit.projects.unshift(newContent);
+            adjustEntryLength(user.pursuits[0].projects, EMBEDDED_FEED_LIMIT) //CAREFUL THIS WILL NEED FURTHER IMPLEMENTATION
+            console.log(pursuit);
+            for (const pursuitObject of user.pursuits) {
+                console.log(pursuitObject.name);
+                if (pursuitObject.name === pursuit) {console.log('yes');
+                pursuitObject.projects.unshift(newContent);
                 }
             }
             return user;

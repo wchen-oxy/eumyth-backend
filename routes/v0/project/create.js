@@ -69,7 +69,7 @@ module.exports = (req, res, next) => {
         newProject.pursuit
     );
     
-    const resolvedUser = updatePursuitObject(ModelConstants.USER, userID, newProject._id);
+    const resolvedUser = updatePursuitObject(ModelConstants.USER, userID, newProject._id, newProject.pursuit);
     return Promise.all([resolvedIndexUser, resolvedUser, resolvedUserPreview])
         .then((result) => {
             const savedIndexUser = result[0].save();
