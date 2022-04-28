@@ -29,8 +29,7 @@ const findAndUpdateIndexUserMeta = (updateType, indexUserID, pursuit, draftObjec
             user.drafts.unshift(
                 selectModel(ModelConstants.DRAFT_PREVIEW)
                     ({
-                        title: draftObject.title,
-                        content_id: draftObject.content_id
+                        ...draftObject
                     }));
             _numProjectSetter(user.pursuits[0].num_projects, updateType);
             if (pursuit) {
@@ -54,8 +53,9 @@ const updatePursuitObject = (model, modelID, contentID, pursuit) =>
             console.log(pursuit);
             for (const pursuitObject of user.pursuits) {
                 console.log(pursuitObject.name);
-                if (pursuitObject.name === pursuit) {console.log('yes');
-                pursuitObject.projects.unshift(newContent);
+                if (pursuitObject.name === pursuit) {
+                    console.log('yes');
+                    pursuitObject.projects.unshift(newContent);
                 }
             }
             return user;
@@ -89,8 +89,6 @@ const retrieveSpotlightProjects = (limit) => {
 }
 
 const removeProjectDraft = (drafts, ID) => {
-    console.log(drafts);
-    console.log(ID);
     const condition = (element) => ID.toString() === element.content_id.toString();
     const index = drafts.findIndex(condition);
     if (index === -1) {

@@ -15,6 +15,8 @@ const ProjectSchema = new Schema({
     trim: true
   },
 
+  parent_project_id: mongoose.Types.ObjectId,
+
   project_preview_id: {
     type: mongoose.Types.ObjectId,
     required: false,

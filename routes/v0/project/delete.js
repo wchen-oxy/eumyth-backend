@@ -1,7 +1,6 @@
 const { findByID, findManyByID } = require('../../../data-access/dal');
 const ModelConstants = require('../../../models/constants');
 
-
 const getImageKeys = (req, res, next) => {
     const projectID = req.query.projectID;
     let toBeDeletedImages = [];

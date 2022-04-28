@@ -117,12 +117,13 @@ router.route('/').post(
     if (indexUser.preferred_post_privacy !== postPrivacyType) {
       indexUser.preferred_post_privacy = postPrivacyType;
     }
+    
     if (isCompleteProject) {
-      console.log("yes");
       projectServices.removeProjectDraft(indexUser.drafts, project._id);
       projectPreview.status = "COMPLETE";
       project.status = "COMPLETE";
     }
+
     postServices.setRecentPosts(postPreview.content_id, indexUser.recent_posts);
     postServices.updatePostLists(
       postPreview,

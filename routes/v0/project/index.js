@@ -23,6 +23,8 @@ const find = require('./find');
 const update = require('./update');
 const deletion = require('./delete');
 const MulterHelper = require('../../../shared/utils/multer');
+const thread = require('./thread');
+const publish = require('./publish');
 
 router.route('/')
     .post(
@@ -135,6 +137,16 @@ const refreshPostImageData = (posts, imageKeyMap) => {
     }
 }
 
+router.route('/thread').put(
+    buildBodyValidationChain(
+        PARAM_CONSTANTS.PROJECT_ID,
+        PARAM_CONSTANTS.PROJECT_PREVIEW_ID,
+        PARAM_CONSTANTS.POST_ID
+    ),
+    doesValidationErrorExist,
+    thread
+)
+
 router.route('/fork').put(
     buildBodyValidationChain(
         PARAM_CONSTANTS.PROJECT_DATA,
@@ -163,8 +175,8 @@ router.route('/fork').put(
         const title = req.body.title;
         const remix = req.body.remix;
         const shouldCopyPosts = req.body.shouldCopyPosts;
-        const oldProjectID = projectData._id;
-        const oldProjectRemix = projectData.remix ? projectData.remix : null;
+        const projectDataID = projectData._id;
+        const projectDataRemix = projectData.remix ? projectData.remix : null;
         const ancestors = [...projectData.ancestors];
         const newPostIDList = [];
         const imageKeyMap = new Map();
@@ -174,9 +186,9 @@ router.route('/fork').put(
             selectModel(ModelConstants.PROJECT_PREVIEW_NO_ID)
                 ({
                     title: projectData.title,
-                    remix: oldProjectRemix,
-                    project_id: oldProjectID,
-                    parent_project_id: projectData._id
+                    remix: projectDataRemix,
+                    project_id: projectDataID,
+                    parent_project_id: projectData.parent_project_id
                 })
         );
 
@@ -189,6 +201,7 @@ router.route('/fork').put(
 
         let newProject = (selectModel(ModelConstants.PROJECT))({
             ...projectData,
+            parent_project_id: projectDataID,
             index_user_id: authorID,
             display_photo_key: displayPhoto,
             username: username,
@@ -203,7 +216,7 @@ router.route('/fork').put(
                 title: newProject.title,
                 remix: newProject.remix,
                 project_id: newProject._id,
-                parent_project_id: oldProjectID,
+                parent_project_id: projectDataID,
                 status: 'DRAFT',
                 labels: []
             });
@@ -391,11 +404,20 @@ router.route('/vote')
                 .then(results => res.status(200).send());
         }
     );
-    // router.route('/bookmark').put(
-    //     (req, res, next) => {
-    //         const 
-    //     }
-    // )
+
+router.route('/publish')
+    .put(
+        buildBodyValidationChain(
+            PARAM_CONSTANTS.PROJECT_ID
+        ),
+        doesValidationErrorExist,
+        publish
+    )
+// router.route('/bookmark').put(
+//     (req, res, next) => {
+//         const 
+//     }
+// )
 
 // router.route('/bookmark')
 //     .put(

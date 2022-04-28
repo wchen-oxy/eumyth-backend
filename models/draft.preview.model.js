@@ -2,8 +2,10 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const DraftPreviewSchema = new Schema({
+    _id: false,
     title: String,
-    content_id: mongoose.Types.ObjectId
+    content_id: mongoose.Types.ObjectId,
+    project_preview_id: mongoose.Types.ObjectId
 })
 
 const DraftPreviewModel = mongoose.model('draft_preview', DraftPreviewSchema);

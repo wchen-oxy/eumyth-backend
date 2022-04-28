@@ -13,7 +13,7 @@ module.exports = (req, res, next) => {
     const indexUserID = req.body.indexUserID;
     const userPreviewID = req.body.userPreviewID;
     const status = req.body.status;
-    const pursuit = req.body.pursuit ;
+    const pursuit = req.body.pursuit;
 
     const selectedPosts = req.body.selectedPosts ?
         req.body.selectedPosts : [];
@@ -59,16 +59,16 @@ module.exports = (req, res, next) => {
         ADD,
         indexUserID,
         pursuit,
-        { title: newProject.title, content_id: newProject._id, }
+        { title: newProject.title, content_id: newProject._id, project_preview_id: projectPreview._id }
     );
-    newProject.project_preview_id = projectPreview;
+    newProject.project_preview_id = projectPreview._id;
     const resolvedUserPreview = updatePursuitObject(
         ModelConstants.USER_PREVIEW,
         userPreviewID,
         newProject._id,
         newProject.pursuit
     );
-    
+
     const resolvedUser = updatePursuitObject(ModelConstants.USER, userID, newProject._id, newProject.pursuit);
     return Promise.all([resolvedIndexUser, resolvedUser, resolvedUserPreview])
         .then((result) => {
