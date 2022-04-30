@@ -30,11 +30,7 @@ router.route('/')
     .post(
         MulterHelper
             .contentImageUpload
-            .single(
-                {
-                    name: "coverPhoto",
-                    maxCount: 1
-                }),
+            .single("coverPhoto"),
         buildBodyValidationChain(
             PARAM_CONSTANTS.PURSUIT,
             PARAM_CONSTANTS.USERNAME,
@@ -50,17 +46,12 @@ router.route('/')
     .put(
         MulterHelper
             .contentImageUpload
-            .single(
-                {
-                    name: "coverPhoto",
-                    maxCount: 1
-                }),
+            .single("coverPhoto"),
         buildBodyValidationChain(
             PARAM_CONSTANTS.PROJECT_ID,
-            PARAM_CONSTANTS.PROJECT_PREVIEW_ID,
+            PARAM_CONSTANTS.SHOULD_UPDATE_PREVIEW,
             PARAM_CONSTANTS.TITLE,
             PARAM_CONSTANTS.STATUS,
-            PARAM_CONSTANTS.IS_FORKED
         ),
         doesValidationErrorExist,
         update)

@@ -57,6 +57,7 @@ const PARAM_CONSTANTS = {
     SELECTED_DRAFT_ID: 'selectedDraftID',
     SELECTED_POSTS: 'selectedPosts',
     STATUS: 'status',
+    SHOULD_UPDATE_PREVIEW: 'shouldUpdatePreview',
     SHOULD_DELETE_POSTS: 'shouldDeletePosts',
     SHOULD_COPY_POSTS: 'shouldCopyPosts',
     SUBMITTING_INDEX_USER_ID: 'submittingIndexUserID',
