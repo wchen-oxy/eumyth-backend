@@ -58,6 +58,11 @@ const ProjectSchema = new Schema({
     trim: false
   },
 
+  mini_cover_photo_key: {
+    type: String,
+    required: false,
+  },
+
   start_date: {
     type: Date,
     required: false

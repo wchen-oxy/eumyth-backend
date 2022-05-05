@@ -25,12 +25,16 @@ const deletion = require('./delete');
 const MulterHelper = require('../../../shared/utils/multer');
 const thread = require('./thread');
 const publish = require('./publish');
+const imageFields = [
+    { name: "miniCoverPhoto", maxCount: 1 },
+    { name: "coverPhoto", maxCount: 1 }
+]
 
 router.route('/')
     .post(
         MulterHelper
             .contentImageUpload
-            .single("coverPhoto"),
+            .fields(imageFields),
         buildBodyValidationChain(
             PARAM_CONSTANTS.PURSUIT,
             PARAM_CONSTANTS.USERNAME,
@@ -46,7 +50,7 @@ router.route('/')
     .put(
         MulterHelper
             .contentImageUpload
-            .single("coverPhoto"),
+            .fields(imageFields),
         buildBodyValidationChain(
             PARAM_CONSTANTS.PROJECT_ID,
             PARAM_CONSTANTS.SHOULD_UPDATE_PREVIEW,
