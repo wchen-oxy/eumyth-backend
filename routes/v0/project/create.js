@@ -24,8 +24,8 @@ module.exports = (req, res, next) => {
     const minDuration = req.body.minDuration ? req.body.minDuration : null;
     const labels = req.body.labels ? req.body.labels : [];
     const remix = req.body.remix ? req.body.remix : null;
-    const miniCoverPhotoURL = req.files ? req.files.miniCoverPhoto[0].key : null;
-    const coverPhotoURL = req.files ? req.files.coverPhoto[0].key : null;
+    const miniCoverPhotoURL = req.files.miniCoverPhoto ? req.files.miniCoverPhoto[0].key : null;
+    const coverPhotoURL = req.files.coverPhoto ? req.files.coverPhoto[0].key : null;
     const newProject = selectModel(ModelConstants.PROJECT)
         (
             {
