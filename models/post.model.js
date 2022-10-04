@@ -69,7 +69,6 @@ const PostSchema = new Schema({
 
   post_format: {
     type: String,
-    required: true,
   },
 
   is_milestone: {

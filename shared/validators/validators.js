@@ -14,6 +14,7 @@ const PARAM_CONSTANTS = {
     COORDINATES: 'coordinates',
     CURRENT_USERNAME: 'currentUsername',
     CURRENT_USER_RELATION_ID: 'currentUserRelationID',
+    DATE: 'date',
     DISPLAY_PHOTO: 'displayPhoto',
     DISTANCE: 'distance',
     DIFFICULTY: 'difficulty',

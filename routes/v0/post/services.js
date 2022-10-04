@@ -7,7 +7,7 @@ const {
     findManyByID,
 } = require('../../../data-access/dal');
 
-const { SHORT, LONG, ALL } = require("../../../shared/utils/flags");
+const { ALL } = require("../../../shared/utils/flags");
 const ModelConstants = require('../../../models/constants');
 const RECENT_POSTS_LIMIT = 5;
 
@@ -53,10 +53,8 @@ const setRecentPosts = (post, inputRecentPosts) => {
 const updateDeletedPostMeta = (
     pursuit,
     minDuration,
-    isMilestone,
     isIndexUser
 ) => {
-    if (isMilestone) { pursuit.num_milestones -= 1; }
     if (minDuration) { pursuit.total_min -= pursuit.minDuration; }
     if (isIndexUser) { pursuit.num_posts -= 1; }
 
@@ -77,24 +75,18 @@ const setPursuitAttributes = (
     isIndexUser,
     pursuits,
     pursuitCategory,
-    progression,
     minDuration) => {
     for (const pursuit of pursuits) {
         if (pursuit.name === ALL) {
             if (isIndexUser) {
                 pursuit.num_posts = Number(pursuit.num_posts) + 1;
             }
-            if (progression === 2) {
-                pursuit.num_milestones = Number(pursuit.num_milestones) + 1;
-            }
             if (minDuration) {
                 pursuit.total_min = Number(pursuit.total_min) + minDuration;
             }
         }
         else if (pursuit.name === pursuitCategory) {
-            if (progression === 2) {
-                pursuit.num_milestones = Number(pursuit.num_milestones) + 1;
-            }
+
             if (minDuration) {
                 pursuit.total_min = Number(pursuit.total_min) + minDuration;
             }
@@ -110,26 +102,18 @@ const getImageUrls = (array) => {
     return imageArray;
 }
 
-const makeTextSnippet = (postType, isPaginated, textData) => {
-    if (postType === SHORT) {
-        if (isPaginated) {
-            return (textData[0].length > 140
-                ? (textData[0].substring(0, 140).trim()) + "..."
-                : textData[0]);
-        }
-        else {
-            return (textData.length > 140
-                ? textData.substring(0, 140).trim() + "..."
-                : textData);
-        }
+const makeTextSnippet = (isPaginated, textData) => {
+    if (isPaginated) {
+        return (textData[0].length > 140
+            ? (textData[0].substring(0, 140).trim()) + "..."
+            : textData[0]);
     }
     else {
-        const completeText = JSON.parse(textData).blocks[0].text;
-
-        return completeText.length > 140
-            ? completeText.substring(0, 140).trim() + "..."
-            : completeText.trim();
+        return (textData.length > 140
+            ? textData.substring(0, 140).trim() + "..."
+            : textData);
     }
+
 }
 
 const findPosts = (postIDList, includePostText) => {
@@ -201,59 +185,46 @@ const retrieveRelevantUserInfo = (req, res, next) => {
         .catch(next);
 };
 
-const createPost = (postType, username, title, subtitle, postPrivacyType, date, authorID,
-    pursuitCategory, displayPhoto, coverPhotoKey, postFormat, isPaginated, progression,
-    imageData, textSnippet, textData, minDuration, difficulty, labels, projectpreviewID) => {
-    switch (postType) {
-        case (SHORT):
-            return selectModel(
-                ModelConstants.POST)
-                (
-                    {
-                        username: username,
-                        title: title,
-                        post_privacy_type: postPrivacyType,
-                        date: date,
-                        author_id: authorID,
-                        pursuit_category: pursuitCategory,
-                        display_photo_key: displayPhoto,
-                        cover_photo_key: coverPhotoKey,
-                        post_format: postFormat,
-                        is_paginated: isPaginated,
-                        progression: progression,
-                        image_data: imageData,
-                        text_snippet: textSnippet,
-                        text_data: textData,
-                        min_duration: minDuration,
-                        difficulty: difficulty,
-                        labels: labels,
-                        project_preview_id: projectpreviewID
-                    }
-                );
-        case (LONG):
-            return selectModel(
-                ModelConstants.POST)
-                ({
-                    username: username,
-                    title: title,
-                    subtitle: subtitle,
-                    post_privacy_type: postPrivacyType,
-                    author_id: authorID,
-                    pursuit_category: pursuitCategory,
-                    display_photo_key: displayPhoto,
-                    cover_photo_key: coverPhotoKey,
-                    post_format: postFormat,
-                    is_paginated: isPaginated,
-                    progression: progression,
-                    text_snippet: textSnippet,
-                    text_data: textData,
-                    min_duration: minDuration,
-                    difficulty: difficulty,
-                    labels: labels,
-                });
-        default:
-            throw new Error("No post type matched.");
-    }
+const createPost = (
+    username,
+    title,
+    subtitle,
+    postPrivacyType,
+    date,
+    authorID,
+    pursuitCategory,
+    displayPhoto,
+    coverPhotoKey,
+    isPaginated,
+    imageData,
+    textSnippet,
+    textData,
+    minDuration,
+    difficulty,
+    labels,
+    projectpreviewID) => {
+    return selectModel(
+        ModelConstants.POST)
+        (
+            {
+                username: username,
+                title: title,
+                post_privacy_type: postPrivacyType,
+                date: date,
+                author_id: authorID,
+                pursuit_category: pursuitCategory,
+                display_photo_key: displayPhoto,
+                cover_photo_key: coverPhotoKey,
+                is_paginated: isPaginated,
+                image_data: imageData,
+                text_snippet: textSnippet,
+                text_data: textData,
+                min_duration: minDuration,
+                difficulty: difficulty,
+                labels: labels,
+                project_preview_id: projectpreviewID
+            }
+        );
 }
 
 const updateLabels = (completeUser, indexUser, labels) => {

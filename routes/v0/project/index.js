@@ -242,7 +242,6 @@ router.route('/fork').put(
                                 author_id: authorID,
                                 username: username,
                                 display_photo_key: displayPhoto,
-                                post_format: "SHORT",
                                 internal_ref: {
                                     id: newProject._id,
                                     title: newProject.title
@@ -337,7 +336,7 @@ router.route('/fork').put(
                     newProjectPreview.save()
                 ]);
             })
-            .then(result => res.status(200).send())
+            .then(result => res.status(200).json({ projectID: project._id }))
             .catch(next);
     }
 )

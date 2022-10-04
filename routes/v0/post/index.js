@@ -29,9 +29,10 @@ router.route('/').post(
   MulterHelper.contentImageUpload.fields(postImageFields),
   buildBodyValidationChain(
     PARAM_CONSTANTS.USERNAME,
+    PARAM_CONSTANTS.TITLE,
+    PARAM_CONSTANTS.DISPLAY_PHOTO,
+    PARAM_CONSTANTS.TEXT,
     PARAM_CONSTANTS.POST_PRIVACY,
-    PARAM_CONSTANTS.POST_TYPE,
-    PARAM_CONSTANTS.PROGRESSION,
     PARAM_CONSTANTS.IS_PAGINATED,
     PARAM_CONSTANTS.SELECTED_DRAFT_ID,
   ),
@@ -65,10 +66,8 @@ router.route('/').post(
     return next();
   },
   (req, res, next) => {
-    const postType = req.body.postType;
     const username = req.body.username;
     const postPrivacyType = req.body.postPrivacyType;
-    const progression = req.body.progression;
     const pursuitCategory = req.body.pursuit ? req.body.pursuit : res.locals.project.pursuit;
     const isPaginated = checkStringBoolean(req.body.isPaginated);
     const displayPhoto = req.body.displayPhoto ? req.body.displayPhoto : null;
@@ -81,16 +80,14 @@ router.route('/').post(
     const minDuration = !!req.body.minDuration ? parseInt(req.body.minDuration) : null;
     const coverPhotoKey = req.files && req.files.coverPhoto ? req.files.coverPhoto[0].key : null;
     const imageData = req.files && req.files.images ? postServices.getImageUrls(req.files.images) : [];
-    const textSnippet = textData ? postServices.makeTextSnippet(postType, isPaginated, textData) : null;
+    const textSnippet = textData ? postServices.makeTextSnippet(isPaginated, textData) : null;
     const isCompleteProject = req.body.completeProject ? checkStringBoolean(req.body.completeProject) : false;
     const indexUser = res.locals.indexUser;
     const user = res.locals.completeUser;
     const userPreview = res.locals.userPreview;
     let projectPreview = res.locals.projectPreview;
     let project = res.locals.project;
-
     const post = postServices.createPost(
-      postType,
       username,
       title,
       subtitle,
@@ -100,9 +97,7 @@ router.route('/').post(
       pursuitCategory,
       displayPhoto,
       coverPhotoKey,
-      postType,
       isPaginated,
-      progression,
       imageData,
       textSnippet,
       textData,
@@ -117,7 +112,7 @@ router.route('/').post(
     if (indexUser.preferred_post_privacy !== postPrivacyType) {
       indexUser.preferred_post_privacy = postPrivacyType;
     }
-    
+
     if (isCompleteProject) {
       projectServices.removeProjectDraft(indexUser.drafts, project._id);
       projectPreview.status = "COMPLETE";
@@ -141,14 +136,12 @@ router.route('/').post(
       true,
       indexUser.pursuits,
       pursuitCategory,
-      progression,
       minDuration);
 
     postServices.setPursuitAttributes(
       false,
       user.pursuits,
       pursuitCategory,
-      progression,
       minDuration,
       post._id,
       date);
@@ -157,7 +150,6 @@ router.route('/').post(
       false,
       userPreview.pursuits,
       pursuitCategory,
-      progression,
       minDuration,
       post._id,
       date);
@@ -255,17 +247,14 @@ router.route('/').post(
     buildBodyValidationChain(
       PARAM_CONSTANTS.POST_ID,
       PARAM_CONSTANTS.USERNAME,
-      PARAM_CONSTANTS.POST_TYPE,
-      PARAM_CONSTANTS.PROGRESSION,
       PARAM_CONSTANTS.IS_PAGINATED,
       PARAM_CONSTANTS.REMOVE_COVER_PHOTO
     ),
     doesValidationErrorExist,
     (req, res, next) => {
       const postID = req.body.postID;
-      const postType = req.body.postType;
+
       const username = req.body.username;
-      const progression = req.body.progression;
       const isPaginated = checkStringBoolean(req.body.isPaginated);
       const difficulty = req.body.difficulty ? req.body.difficulty : null;
       const postPrivacyType = req.body.postPrivacyType ? req.body.postPrivacyType : null;
@@ -304,10 +293,9 @@ router.route('/').post(
             post.pursuit_category = pursuitCategory;
             post.date = date;
             post.min_duration = minDuration;
-            post.progression = progression;
             post.is_paginated = isPaginated;
             post.text_data = textData;
-            post.text_snippet = textData ? postServices.makeTextSnippet(postType, isPaginated, textData) : null;
+            post.text_snippet = textData ? postServices.makeTextSnippet(isPaginated, textData) : null;
             return post.save()
           })
         .then(() => {
@@ -336,7 +324,6 @@ router.route('/').post(
       PARAM_CONSTANTS.INDEX_USER_ID,
       PARAM_CONSTANTS.USER_ID,
       PARAM_CONSTANTS.POST_ID,
-      PARAM_CONSTANTS.PROGRESSION,
     ),
     doesValidationErrorExist,
     (req, res, next) => {
@@ -346,12 +333,11 @@ router.route('/').post(
       const userPreviewID = req.body.userPreviewID;
       const pursuitCategory = req.body.pursuit;
       const minDuration = req.body.minDuration;
-      const progression = (req.body.progression === 2);
       const resolvedIndexUser =
         findByID(ModelConstants.INDEX_USER, indexUserID)
           .then((indexUser) => {
             postServices.spliceArray(postID, indexUser.recent_posts);
-            postServices.updateDeletedPostMeta(indexUser.pursuits, pursuitCategory, minDuration, progression, true)
+            postServices.updateDeletedPostMeta(indexUser.pursuits, pursuitCategory, minDuration, true)
 
             return indexUser.save();
           })
@@ -362,11 +348,11 @@ router.route('/').post(
           const index = user.pursuits.findIndex((pursuit) => pursuit.name === pursuitCategory);
           if (index !== -1) {
             postServices.spliceArray(postID, user.pursuits[index].posts);
-            postServices.updateDeletedPostMeta(user.pursuits[index], minDuration, progression, false);
+            postServices.updateDeletedPostMeta(user.pursuits[index], minDuration, false);
 
           }
           postServices.spliceArray(postID, user.pursuits[0].posts);
-          postServices.updateDeletedPostMeta(user.pursuits[0], minDuration, progression, false)
+          postServices.updateDeletedPostMeta(user.pursuits[0], minDuration, false)
           return user.save();
         })
         .catch((error) => {
@@ -378,10 +364,10 @@ router.route('/').post(
           const index = userPreview.pursuits.findIndex((pursuit) => pursuit.name === pursuitCategory);
           if (index !== -1) {
             postServices.spliceArray(postID, userPreview.pursuits[index].posts);
-            postServices.updateDeletedPostMeta(userPreview.pursuits[index], minDuration, progression, false);
+            postServices.updateDeletedPostMeta(userPreview.pursuits[index], minDuration, false);
           }
           postServices.spliceArray(postID, userPreview.pursuits[0].posts);
-          postServices.updateDeletedPostMeta(userPreview.pursuits[0], minDuration, progression, false)
+          postServices.updateDeletedPostMeta(userPreview.pursuits[0], minDuration, false)
           return userPreview.save();
         })
 
