@@ -265,6 +265,7 @@ router.route('/').post(
       const date = !!req.body.date ? req.body.date : null;
       const textData = !!req.body.textData ? req.body.textData : null;
       const minDuration = !!req.body.minDuration ? parseInt(req.body.minDuration) : null;
+      const projectPreviewID = !!req.body.projectPreviewID ? req.body.projectPreviewID : null;
       const coverPhotoKey = req.file ? req.file.key : null;
       const removeCoverPhoto = checkStringBoolean(req.body.removeCoverPhoto);
       let shouldUpdateLabels = false;
@@ -275,6 +276,9 @@ router.route('/').post(
             let post = result;
             if (postPrivacyType) {
               post.post_privacy_type = postPrivacyType;
+            }
+            if (projectPreviewID) {
+              post.project_preview_id = projectPreviewID;
             }
             if (removeCoverPhoto) {
               post.cover_photo_key = null;
