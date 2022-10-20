@@ -17,7 +17,7 @@ const PostSchema = new Schema({
 
   username: {
     type: String,
-    required: false,
+    required: true,
   },
 
   display_photo_key: {
@@ -78,7 +78,7 @@ const PostSchema = new Schema({
 
   is_paginated: {
     type: Boolean,
-    required: false
+    required: true
   },
 
   text_snippet: {

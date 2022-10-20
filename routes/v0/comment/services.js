@@ -82,19 +82,16 @@ const _nestCompleteComments = (rootCommentArray, userProfileHashTable, repliesAr
             !== allCommentsArray[nextValueIndex]._id.toString()) { //next comment id
             nextValueIndex++; //increment until reply finds its parent
         }
-        console.log(nextValueIndex);
-        if (reply.ancestor_post_ids.length > 0 &&
+         if (reply.ancestor_post_ids.length > 0 &&
             nextValueIndex < allCommentsArray.length
             && reply
                 .ancestor_post_ids[reply
                     .ancestor_post_ids.length - 1]
                 .toString() === allCommentsArray[nextValueIndex]._id.toString()) {
             if (!allCommentsArray[nextValueIndex].replies) {
-                console.log('set');
-                allCommentsArray[nextValueIndex].replies = [];
+                 allCommentsArray[nextValueIndex].replies = [];
             }
-            console.log(allCommentsArray[nextValueIndex]);
-            allCommentsArray[nextValueIndex].replies.push(reply);
+             allCommentsArray[nextValueIndex].replies.push(reply);
         }
         else {
             console.log("Orphaned/Root Comment: ", reply);
@@ -137,19 +134,16 @@ const _nestCompleteComments2 = (allCommentsArray, userProfileHashTable) => {
             !== allCommentsArray[nextValueIndex]._id.toString()) { //next comment id
             nextValueIndex++; //increment until reply finds its parent
         }
-        console.log(nextValueIndex);
-        if (reply.ancestor_post_ids.length > 0 &&
+         if (reply.ancestor_post_ids.length > 0 &&
             nextValueIndex < allCommentsArray.length
             && reply
                 .ancestor_post_ids[reply
                     .ancestor_post_ids.length - 1]
                 .toString() === allCommentsArray[nextValueIndex]._id.toString()) {
             if (!allCommentsArray[nextValueIndex].replies) {
-                console.log('set');
-                allCommentsArray[nextValueIndex].replies = [];
+                 allCommentsArray[nextValueIndex].replies = [];
             }
-            console.log(allCommentsArray[nextValueIndex]);
-            allCommentsArray[nextValueIndex].replies.push(reply);
+             allCommentsArray[nextValueIndex].replies.push(reply);
         }
         else {
             console.log("Orphaned/Root Comment: ", reply);

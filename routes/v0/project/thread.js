@@ -1,6 +1,8 @@
 const { findOne, findByID } = require("../../../data-access/dal");
+const ModelConstants = require('../../../models/constants');
 
 module.exports = (req, res, next) => {
+    console.log(req.body);
     const oldProjectPreviewID = req.body.projectPreviewID;
     const newProjectID = req.body.projectID;
     const postID = req.body.postID;
@@ -12,8 +14,9 @@ module.exports = (req, res, next) => {
             findByID(ModelConstants.PROJECT, newProjectID)
         ])
         .then((results) => {
-            const oldProject = results[0]._id.toString() === oldProjectID
-                ? results[0] : results[1];
+            const oldProject =
+                results[0].project_preview_id.toString() === oldProjectPreviewID
+                    ? results[0] : results[1];
             const newProject = results[0]._id.toString() === newProjectID
                 ? results[0] : results[1];
             const index = oldProject.post_ids.findIndex((item) => item === postID);

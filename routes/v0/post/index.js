@@ -248,12 +248,11 @@ router.route('/').post(
       PARAM_CONSTANTS.POST_ID,
       PARAM_CONSTANTS.USERNAME,
       PARAM_CONSTANTS.IS_PAGINATED,
-      PARAM_CONSTANTS.REMOVE_COVER_PHOTO
+      // PARAM_CONSTANTS.REMOVE_COVER_PHOTO
     ),
     doesValidationErrorExist,
     (req, res, next) => {
       const postID = req.body.postID;
-
       const username = req.body.username;
       const isPaginated = checkStringBoolean(req.body.isPaginated);
       const difficulty = req.body.difficulty ? req.body.difficulty : null;

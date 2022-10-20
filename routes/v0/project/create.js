@@ -69,6 +69,7 @@ module.exports = (req, res, next) => {
         newProject._id,
         newProject.pursuit
     );
+    console.log(userID);
 
     const resolvedUser = updatePursuitObject(ModelConstants.USER, userID, newProject._id, newProject.pursuit);
     return Promise.all([resolvedIndexUser, resolvedUser, resolvedUserPreview])
@@ -99,7 +100,10 @@ module.exports = (req, res, next) => {
         })
         .then((result) => {
             res.locals.selectedDraftID = newProject._id;
-            return res.status(201).json({ id: newProject._id });
+            return res.status(201).json({ 
+                id: newProject._id,
+                project_preview: newProject.project_preview_id 
+             });
         })
         .catch(next)
 
