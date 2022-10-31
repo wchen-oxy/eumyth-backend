@@ -12,6 +12,7 @@ const {
     findByID,
     findManyByID,
     insertMany,
+    findByIDAndUpdate,
 } = require('../../../data-access/dal');
 const ModelConstants = require('../../../models/constants');
 const {
@@ -153,10 +154,19 @@ router.route('/fork').put(
     ),
     doesValidationErrorExist,
     (req, res, next) => {
-        const resolvedProject = findByID(ModelConstants.PROJECT, req.body.projectData._id);
+        const resolvedProject =
+            Promise.all([
+                findByID(ModelConstants.PROJECT, req.body.projectData._id),
+                findByIDAndUpdate(
+                    ModelConstants.PROJECT_PREVIEW_WITH_ID,
+                    req.body.projectData.project_preview_id,
+                    { has_children: true }
+                )
+            ])
+        // findByID(ModelConstants.PROJECT, req.body.projectData._id);
         return resolvedProject.then(
             result => {
-                res.locals.oldProject = result;
+                res.locals.oldProject = result[0];
                 return next();
             }
         )

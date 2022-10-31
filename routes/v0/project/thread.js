@@ -2,7 +2,6 @@ const { findOne, findByID } = require("../../../data-access/dal");
 const ModelConstants = require('../../../models/constants');
 
 module.exports = (req, res, next) => {
-    console.log(req.body);
     const oldProjectPreviewID = req.body.projectPreviewID;
     const newProjectID = req.body.projectID;
     const postID = req.body.postID;

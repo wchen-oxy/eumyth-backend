@@ -3,15 +3,19 @@ const Schema = mongoose.Schema;
 
 const ProjectPreviewWithIDSchema = new Schema({
     title: String,
+    ancestor_id:  mongoose.Types.ObjectId, 
     remix: String,
     project_id: mongoose.Types.ObjectId,
     parent_project_id: mongoose.Types.ObjectId, //needed for searching related parent projects
+    has_children: {type: Boolean, default: false},
     status: String,
     pursuit: String,
     labels: {
         type: [String],
         default: []
     }
+}, {
+    timestamps: true,
 })
 
 const ProjectPreviewWithIDModel = mongoose.model('project_preview', ProjectPreviewWithIDSchema);

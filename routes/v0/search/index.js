@@ -1,6 +1,7 @@
 const express = require('express');
 const selectModel = require('../../../models/modelServices');
 const { doesValidationErrorExist, PARAM_CONSTANTS, buildQueryValidationChain } = require('../../../shared/validators/validators');
+const relevance = require('./relevance');
 const router = express.Router();
 const searchServices = require('./services');
 
@@ -60,10 +61,12 @@ router.route('/people')
             const lat = req.query.latitude;
             const long = req.query.longitude;
             const limits = searchServices.getBounds(distance, { lat, long });
+            console.log(req.query);
             return searchServices
                 .searchByBoundedPursuits(userPreviewIDList, limits, pursuit)
-                .then(results =>
-                    results.map(value => {
+                .then(results => {
+                    console.log(results);
+                    return results.map(value => {
                         value['distance'] = searchServices
                             .getDistance(
                                 lat,
@@ -73,6 +76,7 @@ router.route('/people')
                             );
                         return value;
                     })
+                }
                 )
                 .then(searchServices.appendPostData)
                 .then(results => res.status(200).json({ users: results }))
@@ -119,5 +123,10 @@ router.route('/projects').
         }
     );
 
+router.route('/relevant')
+    .get(buildQueryValidationChain(PARAM_CONSTANTS.PURSUIT_ARRAY),
+        doesValidationErrorExist,
+        relevance
+    )
 
 module.exports = router;
