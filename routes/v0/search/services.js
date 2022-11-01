@@ -11,6 +11,17 @@ const {
     limitFind,
 } = require('../../../data-access/dal');
 
+
+const _sortByDate = (a, b) => {
+    const aDate = new Date(a.updatedAt);
+    const bDate = new Date(b.updatedAt);
+
+    if (aDate.updatedAt < bDate.updatedAt) return -1;
+    else if (aDate.updatedAt > bDate.updatedAt) return 1;
+    else {
+        return 0;
+    }
+    }    ;
 const getDistance = (lat1, lat2, lon1, lon2) => {
     // The math module contains a function
     // named toRadians which converts from
@@ -37,7 +48,7 @@ const getDistance = (lat1, lat2, lon1, lon2) => {
     // calculate the result
     return (c * r);
 }
- 
+
 
 const getBounds = (distance, crd) => {
     const geopoint = new GeoPoint(parseFloat(crd.lat), parseFloat(crd.long));
@@ -82,6 +93,7 @@ const searchByBoundedPursuits = (IDs, limits, pursuits) => {
 }
 
 const appendPostData = (users, pursuit) => {
+    console.log(users);
     let mapping = {}
     let postIDs = [];
     for (const user of users) {
@@ -109,20 +121,23 @@ const appendPostData = (users, pursuit) => {
         })
 }
 
-const searchProjects = (pursuitList, IDList, requestQuantity, indexUserID) => {
-    return limitFind(ModelConstants.PROJECT, {
+const searchProjectData = (type, pursuitList, IDList, requestQuantity, indexUserID, childrenFlag) => {
+    return limitFind(type, {
         _id: { $nin: IDList },
         index_user_id: { $ne: mongoose.Types.ObjectId(indexUserID) },
-        pursuit: { $in: pursuitList }
+        pursuit: { $in: pursuitList },
+        ...(childrenFlag && { childrenFlag: true })
     }, requestQuantity)
         .then(results => {
             console.log(results);
             return results;
         });
 }
+
+exports._sortByDate = _sortByDate;
 exports.getDistance = getDistance;
 exports.getBounds = getBounds;
 exports.searchByBounds = searchByBounds;
 exports.searchByBoundedPursuits = searchByBoundedPursuits;
 exports.appendPostData = appendPostData;
-exports.searchProjects = searchProjects;
+exports.searchProjectData = searchProjectData;

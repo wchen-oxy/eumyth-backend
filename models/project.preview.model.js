@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 
 const ProjectPreviewWithIDSchema = new Schema({
     title: String,
+    index_user_id: mongoose.Types.ObjectId,
     ancestor_id:  mongoose.Types.ObjectId, 
     remix: String,
     project_id: mongoose.Types.ObjectId,

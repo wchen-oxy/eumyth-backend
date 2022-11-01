@@ -53,7 +53,8 @@ module.exports = (req, res, next) => {
             project_id: newProject._id,
             status: 'DRAFT',
             labels: labels,
-            pursuit: pursuit
+            pursuit: pursuit,
+            username: username
         });
 
     const resolvedIndexUser = findAndUpdateIndexUserMeta(

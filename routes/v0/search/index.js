@@ -1,9 +1,11 @@
 const express = require('express');
-const selectModel = require('../../../models/modelServices');
 const { doesValidationErrorExist, PARAM_CONSTANTS, buildQueryValidationChain } = require('../../../shared/validators/validators');
-const relevance = require('./relevance');
+const relevance = require('./branches');
 const router = express.Router();
 const searchServices = require('./services');
+const ModelConstants = require('../../../models/constants');
+const branches = require('./branches');
+const peopleFinder = require('./peopleFinder');
 
 //http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates
 //https://stackoverflow.com/questions/238260/how-to-calculate-the-bounding-box-for-a-given-lat-lng-location
@@ -45,7 +47,24 @@ router.route('/spotlight')
         }
     );
 
-router.route('/people')
+router.route('/simple_people')
+    .get(
+        buildQueryValidationChain(
+            PARAM_CONSTANTS.DISTANCE,
+            PARAM_CONSTANTS.PURSUIT,
+            PARAM_CONSTANTS.LATITUDE,
+            PARAM_CONSTANTS.LONGITUDE
+        ),
+        doesValidationErrorExist,
+        peopleFinder,
+        (req, res, next) => {
+            return searchServices.appendPostData(res.locals.users)
+                .then(results => res.status(200).json({ users: results }))
+                .catch(next);
+        }
+    );
+
+router.route('/advanced_people')
     .get(
         buildQueryValidationChain(
             PARAM_CONSTANTS.DISTANCE,
@@ -61,28 +80,34 @@ router.route('/people')
             const lat = req.query.latitude;
             const long = req.query.longitude;
             const limits = searchServices.getBounds(distance, { lat, long });
-            console.log(req.query);
-            return searchServices
-                .searchByBoundedPursuits(userPreviewIDList, limits, pursuit)
-                .then(results => {
-                    console.log(results);
-                    return results.map(value => {
-                        value['distance'] = searchServices
-                            .getDistance(
-                                lat,
-                                value.coordinates.latitude,
-                                long,
-                                value.coordinates.longitude
-                            );
-                        return value;
-                    })
-                }
-                )
-                .then(searchServices.appendPostData)
-                .then(results => res.status(200).json({ users: results }))
-                .catch(next)
+
+            //hardcode 10000 miles in for now for a limit
+
+
+            /**
+                people who are close by coordinates
+                of said people, how many are within the hobby
+                    if no results, search wider
+                    else, sort based off of experience level
+                        for those that have been found, sort by the last update
+            */
+
+
+
         }
+    )
+
+router.route('/branches')
+    .get(buildQueryValidationChain(
+        PARAM_CONSTANTS.DISTANCE,
+        PARAM_CONSTANTS.PURSUIT,
+        PARAM_CONSTANTS.LATITUDE,
+        PARAM_CONSTANTS.LONGITUDE
+    ),
+        doesValidationErrorExist,
+        branches
     );
+
 
 router.route('/posts')
     .get(
@@ -115,15 +140,14 @@ router.route('/projects').
             const pursuitList = req.query.pursuit;
             const indexUserID = req.query.submittingIndexUserID;
             const requestQuantity = parseInt(req.query.requestQuantity);
-            console.log(indexUserID);
             const projectIDList = req.query.projectIDList ? req.query.projectIDList : [];
-            return searchServices.searchProjects(pursuitList, projectIDList, requestQuantity, indexUserID)
+            return searchServices.searchProjectData(ModelConstants.PROJECT, pursuitList, projectIDList, requestQuantity, indexUserID)
                 .then(results => res.status(201).json(results))
                 .catch(next);
         }
     );
 
-router.route('/relevant')
+router.route('/branches')
     .get(buildQueryValidationChain(PARAM_CONSTANTS.PURSUIT_ARRAY),
         doesValidationErrorExist,
         relevance
