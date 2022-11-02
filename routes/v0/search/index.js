@@ -6,6 +6,7 @@ const searchServices = require('./services');
 const ModelConstants = require('../../../models/constants');
 const branches = require('./branches');
 const peopleFinder = require('./peopleFinder');
+const experience = require('./experience');
 
 //http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates
 //https://stackoverflow.com/questions/238260/how-to-calculate-the-bounding-box-for-a-given-lat-lng-location
@@ -73,27 +74,16 @@ router.route('/advanced_people')
             PARAM_CONSTANTS.LONGITUDE
         ),
         doesValidationErrorExist,
+        peopleFinder,
+        experience,
         (req, res, next) => {
-            const distance = req.query.distance;
-            const userPreviewIDList = req.query.userPreviewIDList ? req.query.userPreviewIDList : [];
-            const pursuit = req.query.pursuit;
-            const lat = req.query.latitude;
-            const long = req.query.longitude;
-            const limits = searchServices.getBounds(distance, { lat, long });
-
-            //hardcode 10000 miles in for now for a limit
-
-
-            /**
-                people who are close by coordinates
-                of said people, how many are within the hobby
-                    if no results, search wider
-                    else, sort based off of experience level
-                        for those that have been found, sort by the last update
-            */
-
-
-
+            const results = {
+                beginner: res.locals.beginner,
+                familiar: res.locals.familiar,
+                experienced: res.locals.experienced,
+                expert: res.locals.expert
+            }
+            return res.status(200).json(results);
         }
     )
 

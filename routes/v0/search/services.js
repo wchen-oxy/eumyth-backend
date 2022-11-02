@@ -1,6 +1,7 @@
 const GeoPoint = require('geopoint');
 const UserPreview = require('../../../models/user.preview.model');
 const ModelConstants = require('../../../models/constants');
+const {BEGINNER, FAMILIAR, EXPERIENCED, EXPERT} = require('../../../shared/utils/flags');
 const mongoose = require('mongoose');
 const selectModel = require('../../../models/modelServices');
 const {
@@ -11,6 +12,19 @@ const {
     limitFind,
 } = require('../../../data-access/dal');
 
+// const _sortByPursuit = (pursuits, names, beginner, familiar, experienced, expert) => {
+//     for (let i = 1; i < pursuits.length; i++){
+//         if ((names.includes(pursuits[i].name)) ){
+//             switch(pursuits[i].experience_level) {
+//                 case(BEGINNER):
+                
+//                 case(FAMILIAR):
+//                 case(EXPERIENCED):
+//                 case(EXPERT):
+//             }
+//         }
+//     }
+// }
 
 const _sortByDate = (a, b) => {
     const aDate = new Date(a.updatedAt);

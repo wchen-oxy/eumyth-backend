@@ -1,6 +1,10 @@
 const ALL = "ALL"
 const SHORT = "SHORT";
 const LONG = "LONG";
+const BEGINNER = 'BEGINNER';
+const FAMILIAR = 'FAMILIAR';
+const EXPERIENCED = "EXPERIENCED";
+const EXPERT = "EXPERT";
 
 //API FIELDS
 const USERNAME = 'username';
@@ -11,5 +15,10 @@ module.exports = {
     SHORT,
     LONG,
     PUBLIC_FEED,
-    USERNAME
+    USERNAME,
+
+    BEGINNER,
+    FAMILIAR,
+    EXPERIENCED,
+    EXPERT
 }
