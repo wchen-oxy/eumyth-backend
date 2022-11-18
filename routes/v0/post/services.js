@@ -188,7 +188,6 @@ const retrieveRelevantUserInfo = (req, res, next) => {
 const createPost = (
     username,
     title,
-    subtitle,
     postPrivacyType,
     date,
     authorID,
