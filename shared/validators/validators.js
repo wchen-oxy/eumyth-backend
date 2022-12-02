@@ -10,6 +10,7 @@ const PARAM_CONSTANTS = {
     COMMENT: 'comment',
     COMMENT_ID: 'commentID',
     CONTENT_ID: 'contentID',
+    CONTENT_ID_LIST: 'contentIDList',
     CONTENT_TYPE: 'contentType',
     COORDINATES: 'coordinates',
     CURRENT_USERNAME: 'currentUsername',

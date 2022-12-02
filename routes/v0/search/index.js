@@ -131,11 +131,40 @@ router.route('/projects').
             const indexUserID = req.query.submittingIndexUserID;
             const requestQuantity = parseInt(req.query.requestQuantity);
             const projectIDList = req.query.projectIDList ? req.query.projectIDList : [];
-            return searchServices.searchProjectData(ModelConstants.PROJECT, pursuitList, projectIDList, requestQuantity, indexUserID)
+            return searchServices.searchProjectData(
+                ModelConstants.PROJECT,
+                pursuitList,
+                projectIDList,
+                requestQuantity,
+                indexUserID
+            )
                 .then(results => res.status(201).json(results))
                 .catch(next);
         }
     );
+
+router.route('/uncached').get(
+    buildQueryValidationChain(
+        PARAM_CONSTANTS.CONTENT_ID_LIST,
+        PARAM_CONSTANTS.INDEX_USER_ID,
+        PARAM_CONSTANTS.REQUEST_QUANTITY,
+    ),
+    doesValidationErrorExist,
+    (req, res, next) => {
+        const contentType = req.query.contentType;
+        const contentIDList = req.query.contentIDList;
+        return searchServices.searchUncached(
+            contentType,
+            contentIDList,
+            parseInt(req.query.requestQuantity),
+            req.query.indexUserID
+        )
+        .then(results => res.locals.results = results);
+    },
+    (req, res, next) => { //package and send
+        return res.status(201).json(res.locals.results)
+    }
+)
 
 router.route('/branches')
     .get(buildQueryValidationChain(PARAM_CONSTANTS.PURSUIT_ARRAY),

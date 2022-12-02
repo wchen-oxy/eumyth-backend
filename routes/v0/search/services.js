@@ -1,7 +1,7 @@
 const GeoPoint = require('geopoint');
 const UserPreview = require('../../../models/user.preview.model');
 const ModelConstants = require('../../../models/constants');
-const {BEGINNER, FAMILIAR, EXPERIENCED, EXPERT} = require('../../../shared/utils/flags');
+const { BEGINNER, FAMILIAR, EXPERIENCED, EXPERT } = require('../../../shared/utils/flags');
 const mongoose = require('mongoose');
 const selectModel = require('../../../models/modelServices');
 const {
@@ -17,7 +17,7 @@ const {
 //         if ((names.includes(pursuits[i].name)) ){
 //             switch(pursuits[i].experience_level) {
 //                 case(BEGINNER):
-                
+
 //                 case(FAMILIAR):
 //                 case(EXPERIENCED):
 //                 case(EXPERT):
@@ -35,7 +35,7 @@ const _sortByDate = (a, b) => {
     else {
         return 0;
     }
-    }    ;
+};
 const getDistance = (lat1, lat2, lon1, lon2) => {
     // The math module contains a function
     // named toRadians which converts from
@@ -148,6 +148,17 @@ const searchProjectData = (type, pursuitList, IDList, requestQuantity, indexUser
         });
 }
 
+const searchUncached = (type, IDList, requestQuantity, indexUserID) => {
+    return limitFind(type, {
+        _id: { $nin: IDList },
+        index_user_id: { $ne: mongoose.Types.ObjectId(indexUserID) },
+    }, requestQuantity)
+        .then(results => {
+            return results;
+        });
+}
+
+
 exports._sortByDate = _sortByDate;
 exports.getDistance = getDistance;
 exports.getBounds = getBounds;
@@ -155,3 +166,4 @@ exports.searchByBounds = searchByBounds;
 exports.searchByBoundedPursuits = searchByBoundedPursuits;
 exports.appendPostData = appendPostData;
 exports.searchProjectData = searchProjectData;
+exports.searchUncached = searchUncached;

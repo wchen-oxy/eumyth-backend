@@ -175,6 +175,7 @@ router.route('/single').get(
       .catch(next);
   })
 
+
 router.route('/display-photo')
   .patch(
     buildBodyValidationChain(

@@ -5,15 +5,18 @@ const {
     findOne,
     findByID,
     findManyByID,
+    limitFind,
 } = require('../../../data-access/dal');
 
 const { ALL } = require("../../../shared/utils/flags");
 const ModelConstants = require('../../../models/constants');
-const RECENT_POSTS_LIMIT = 5;
-
+const { RECENT_POSTS_LIMIT, EMBEDDED_FEED_LIMIT } = require("../../../shared/constants/settings");
 
 const _insertAndSortIntoList = (postList, postPreview) => {
     postList.unshift(postPreview);
+    if (postList.length >  EMBEDDED_FEED_LIMIT){
+        postList.pop();
+    }
     if (postList.length > 1) {
         postList.sort((a, b) => {
             if (!b.date && !a.date) {
