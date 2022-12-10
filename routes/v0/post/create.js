@@ -76,7 +76,7 @@ const updateMetaInfo = (req, res, next) => {
     const date = req.body.date ? new Date(req.body.date) : null;
     const minDuration = !!req.body.minDuration ? parseInt(req.body.minDuration) : null;
     const indexUser = res.locals.indexUser;
-    console.log(res.locals.post);
+    console.log(pursuitCategory);
     let post = res.locals.post;
     let project = res.locals.project;
 

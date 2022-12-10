@@ -17,7 +17,7 @@ module.exports = (req, res, next) => {
 
     const selectedPosts = req.body.selectedPosts ?
         req.body.selectedPosts : [];
-    const title = req.body.title ? req.body.title : null;
+    const title = req.body.threadTitle ? req.body.threadTitle : null;
     const overview = req.body.overview ? req.body.overview : null;
     const startDate = req.body.startDate ? req.body.startDate : null;
     const endDate = req.body.endDate ? req.body.endDate : null;

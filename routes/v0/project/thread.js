@@ -7,6 +7,8 @@ module.exports = (req, res, next) => {
     const postID = req.body.postID;
     let previewProjectID = null;
 
+    console.log(req.body);
+
     return Promise
         .all([
             findOne(ModelConstants.PROJECT,

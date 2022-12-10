@@ -89,7 +89,6 @@ const setPursuitAttributes = (
             }
         }
         else if (pursuit.name === pursuitCategory) {
-
             if (minDuration) {
                 pursuit.total_min = Number(pursuit.total_min) + minDuration;
             }

@@ -14,7 +14,7 @@ const updatePost = (req, res, next) => {
     const labels = req.body.labels ? verifyArray(req.body.labels) : [];
     const indexUserID = req.body.indexUserID ? req.body.indexUserID : null;
     const title = !!req.body.title ? req.body.title : null;
-    const subtitle = !!req.body.subtitle ? req.body.subtitle : null;
+    // const subtitle = !!req.body.subtitle ? req.body.subtitle : null;
     const pursuitCategory = !!req.body.pursuitCategory ? req.body.pursuitCategory : null;
     const date = !!req.body.date ? req.body.date : null;
     const textData = !!req.body.textData ? req.body.textData : null;
@@ -34,20 +34,24 @@ const updatePost = (req, res, next) => {
                 if (projectPreviewID) {
                     post.project_preview_id = projectPreviewID;
                 }
+                if (pursuitCategory) {
+                    post.pursuit_category = pursuitCategory;
+                }
+
                 if (removeCoverPhoto) {
                     post.cover_photo_key = null;
                 }
                 else if (coverPhotoKey) {
                     post.cover_photo_key = coverPhotoKey;
                 }
+
                 shouldUpdateLabels = labels !== post.labels;
                 completeUserID = post.author_id;
                 post.labels = labels;
                 post.difficulty = difficulty;
                 post.username = username;
                 post.title = title;
-                post.subtitle = subtitle;
-                post.pursuit_category = pursuitCategory;
+                // post.subtitle = subtitle;
                 post.date = date;
                 post.min_duration = minDuration;
                 post.is_paginated = isPaginated;

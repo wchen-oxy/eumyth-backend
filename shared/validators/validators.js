@@ -68,6 +68,7 @@ const PARAM_CONSTANTS = {
     TARGET_USER_RELATION_ID: 'targetUserRelationID',
     TEXT: 'textData',
     TEXT_ONLY: 'textOnly',
+    THREAD_TITLE: 'threadTitle',
     THREAD_TYPE: 'threadType',
     TITLE: 'title',
     USER_ID: 'userID',
