@@ -1,4 +1,4 @@
-const EMBEDDED_FEED_LIMIT = 25;
+const EMBEDDED_FEED_LIMIT = 10;
 const RECENT_POSTS_LIMIT = 5;
 
 module.exports ={

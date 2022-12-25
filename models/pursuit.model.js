@@ -31,7 +31,7 @@ const PursuitSchema = new Schema({
     required: false,
   },
 
-  num_milestones: {
+  num_posts: {
     type: Number,
     required: false
   },

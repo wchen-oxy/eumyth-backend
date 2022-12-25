@@ -151,6 +151,7 @@ router.route('/uncached').get(
     ),
     doesValidationErrorExist,
     (req, res, next) => {
+
         const contentType = req.query.contentType;
         const contentIDList = req.query.contentIDList;
         return searchServices.searchUncached(
@@ -159,10 +160,15 @@ router.route('/uncached').get(
             parseInt(req.query.requestQuantity),
             req.query.indexUserID
         )
-        .then(results => res.locals.results = results);
+            .then(results => {
+                res.locals.results = results;
+                next();
+            });
+
     },
     (req, res, next) => { //package and send
-        return res.status(201).json(res.locals.results)
+        console.log(res.locals.results);
+        return res.status(201).json({ posts: res.locals.results })
     }
 )
 

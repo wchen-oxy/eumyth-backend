@@ -14,7 +14,7 @@ const { RECENT_POSTS_LIMIT, EMBEDDED_FEED_LIMIT } = require("../../../shared/con
 
 const _insertAndSortIntoList = (postList, postPreview) => {
     postList.unshift(postPreview);
-    if (postList.length >  EMBEDDED_FEED_LIMIT){
+    if (postList.length > EMBEDDED_FEED_LIMIT) {
         postList.pop();
     }
     if (postList.length > 1) {
@@ -74,25 +74,36 @@ const createContentPreview = (postID, date, labels, branch) => (
         })
 );
 
+const _incrementPursuitNum = (pursuit, minDuration) => {
+    if (pursuit.num_posts) {
+        pursuit.num_posts = Number(pursuit.num_posts) + 1;
+    }
+    if (minDuration) {
+        pursuit.total_min = Number(pursuit.total_min) + minDuration;
+    }
+}
+
 const setPursuitAttributes = (
-    isIndexUser,
     pursuits,
     pursuitCategory,
     minDuration) => {
+    // console.log(pursuits);
     for (const pursuit of pursuits) {
-        if (pursuit.name === ALL) {
-            if (isIndexUser) {
-                pursuit.num_posts = Number(pursuit.num_posts) + 1;
-            }
-            if (minDuration) {
-                pursuit.total_min = Number(pursuit.total_min) + minDuration;
-            }
+        if (pursuit.name === ALL || pursuit.name === pursuitCategory) {
+            _incrementPursuitNum(pursuit, minDuration);
         }
-        else if (pursuit.name === pursuitCategory) {
-            if (minDuration) {
-                pursuit.total_min = Number(pursuit.total_min) + minDuration;
-            }
-        }
+        // if (pursuit.name === ALL) {
+        //     pursuit.num_posts = Number(pursuit.num_posts) + 1;
+        //     if (minDuration) {
+        //         pursuit.total_min = Number(pursuit.total_min) + minDuration;
+        //     }
+        // }
+        // else if (pursuit.name === pursuitCategory) {
+        //     pursuit.num_posts = Number(pursuit.num_posts) + 1;
+        //     if (minDuration) {
+        //         pursuit.total_min = Number(pursuit.total_min) + minDuration;
+        //     }
+        // }
     }
 }
 

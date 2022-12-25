@@ -1,16 +1,15 @@
-const { findByID,    findManyByID} = require('../../../data-access/dal');
+const { findByID, findManyByID } = require('../../../data-access/dal');
 const postServices = require('./services');
 const projectServices = require('../project/services');
 const selectModel = require('../../../models/modelServices');
 const { checkStringBoolean, verifyArray } = require("../../../shared/helper");
 const ModelConstants = require('../../../models/constants');
- 
+
 const loadParentThread = (req, res, next) => {
     const selectedDraft = req.body.selectedDraftID;
     return findByID(ModelConstants.PROJECT, selectedDraft)
         .then((result) => {
-            console.log('project', result);
-            res.locals.project = result;
+             res.locals.project = result;
             return next();
         });
 }
@@ -64,7 +63,6 @@ const loadPostCreation = (req, res, next) => {
         labels,
         project.project_preview_id
     );
-    console.log(post);
     res.locals.post = post;
     return next();
 }
@@ -76,8 +74,7 @@ const updateMetaInfo = (req, res, next) => {
     const date = req.body.date ? new Date(req.body.date) : null;
     const minDuration = !!req.body.minDuration ? parseInt(req.body.minDuration) : null;
     const indexUser = res.locals.indexUser;
-    console.log(pursuitCategory);
-    let post = res.locals.post;
+     let post = res.locals.post;
     let project = res.locals.project;
 
     const isCompleteProject = req.body.completeProject ? checkStringBoolean(req.body.completeProject) : false;
@@ -113,13 +110,11 @@ const updateMetaInfo = (req, res, next) => {
     );
 
     postServices.setPursuitAttributes(
-        true,
         indexUser.pursuits,
         pursuitCategory,
         minDuration);
 
     postServices.setPursuitAttributes(
-        false,
         user.pursuits,
         pursuitCategory,
         minDuration,
@@ -127,7 +122,6 @@ const updateMetaInfo = (req, res, next) => {
         date);
 
     postServices.setPursuitAttributes(
-        false,
         userPreview.pursuits,
         pursuitCategory,
         minDuration,

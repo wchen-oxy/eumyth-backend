@@ -8,6 +8,35 @@ const {
     doesValidationErrorExist
 } = require('../../../shared/validators/validators');
 
+router.route('/').get(
+    (req, res, next) => {
+        const indexUserID = req.query.indexUserID ? req.query.indexUserID : null;
+        const userRelationID = req.query.userRelationID ? req.query.userRelationID : null;
+        const id = req.query.id ? req.query.id : null;
+        console.log(req.query);
+        let userPreview = null;
+        if (id) {
+            userPreview = findByID(ModelConstants.USER_PREVIEW, id);
+        }
+        if (indexUserID) {
+            userPreview = findOne(ModelConstants.USER_PREVIEW, { parent_index_user_id: indexUserID })
+
+        }
+        else if (userRelationID) {
+            userPreview = findOne(ModelConstants.USER_PREVIEW, { user_relation_id: userRelationID })
+
+        }
+
+        if (!userPreview) return res.status(500);
+        else {
+            userPreview.then(result => {
+                return res.status(201).json(result)
+            })
+        }
+
+    }
+)
+
 router.route('/id').get(
     buildQueryValidationChain(PARAM_CONSTANTS.USERNAME),
     doesValidationErrorExist,
@@ -31,7 +60,7 @@ router.route('/location')
             return findByID(ModelConstants.USER_PREVIEW, userPreviewID)
                 .then(result => {
                     const val = result.coordinates;
-                     if (!val.latitude && !val.longitude) {
+                    if (!val.latitude && !val.longitude) {
                         return res.status(204).send();
                     }
                     else {

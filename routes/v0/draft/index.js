@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const AWSConstants = require('../../../shared/utils/aws');
 const Helper = require('../../../shared/utils/helper');
+const ModelConstants = require('../../../models/constants');
 const {
     PARAM_CONSTANTS,
     buildQueryValidationChain,
@@ -9,7 +10,7 @@ const {
     doesValidationErrorExist,
 }
     = require('../../../shared/validators/validators');
-const { retrieveIndexUserByUsername } = require('../../../data-access/dal');
+const { retrieveIndexUserByUsername, findByID } = require('../../../data-access/dal');
 
 router.route('/')
     .get(
@@ -85,17 +86,25 @@ router.route('/')
 router.route('/title')
     .put(
         buildBodyValidationChain(
-            PARAM_CONSTANTS.USERNAME,
-            PARAM_CONSTANTS.DRAFT_TITLE
+            PARAM_CONSTANTS.INDEX_USER_ID,
+            PARAM_CONSTANTS.PROJECT_ID,
+            PARAM_CONSTANTS.TITLE
         ),
         doesValidationErrorExist,
         (req, res, next) => {
-            const username = req.body.username;
-            const draftTitle = req.body.draftTitle;
-            return retrieveIndexUserByUsername(username)
+            console.log(req.body);
+            const indexUserID = req.body.indexUserID;
+            const projectID = req.body.projectID;
+            const title = req.body.title;
+            return findByID(ModelConstants.INDEX_USER, indexUserID)
                 .then(
                     (indexUser) => {
-                        indexUser.draft.title = draftTitle;
+                        for (const draft of indexUser.drafts){
+                            if (draft.content_id.toString() === projectID){
+                                draft.title = title;
+                                break;
+                            }
+                        }
                         return indexUser.save();
                     }
                 )
