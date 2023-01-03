@@ -7,6 +7,7 @@ const {
 const { ADD } = require('./constants');
 
 module.exports = (req, res, next) => {
+    console.log(req.body)
     const username = req.body.username;
     const displayPhoto = req.body.displayPhoto;
     const userID = req.body.userID;

@@ -42,7 +42,7 @@ router.route('/')
             PARAM_CONSTANTS.USER_ID,
             PARAM_CONSTANTS.INDEX_USER_ID,
             PARAM_CONSTANTS.USER_PREVIEW_ID,
-            PARAM_CONSTANTS.THREAD_TITLE,
+            PARAM_CONSTANTS.TITLE,
             PARAM_CONSTANTS.STATUS,
         ),
         doesValidationErrorExist,
