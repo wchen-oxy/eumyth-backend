@@ -88,14 +88,14 @@ router.route('/title')
         buildBodyValidationChain(
             PARAM_CONSTANTS.INDEX_USER_ID,
             PARAM_CONSTANTS.PROJECT_ID,
-            PARAM_CONSTANTS.TITLE
+            PARAM_CONSTANTS.THREAD_TITLE
         ),
         doesValidationErrorExist,
         (req, res, next) => {
             console.log(req.body);
             const indexUserID = req.body.indexUserID;
             const projectID = req.body.projectID;
-            const title = req.body.title;
+            const title = req.body.threadTitle;
             return findByID(ModelConstants.INDEX_USER, indexUserID)
                 .then(
                     (indexUser) => {

@@ -9,7 +9,6 @@ module.exports = (req, res, next) => {
         findByID(ModelConstants.PROJECT, parentProjectID).then(
             result => {
                 res.locals.parentProject = result;
-
             }
         ).catch(next)
     }

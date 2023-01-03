@@ -12,6 +12,7 @@ module.exports = (req, res, next) => {
     req.body.endDate ? updates.end_date = req.body.endDate : null;
     req.body.minDuration ? updates.min_duration = req.body.minDuration : null;
     req.body.selectedPosts ? updates.post_ids = req.body.selectedPosts : null;
+    console.log(req.body);
 
     if (req.body.removeCoverPhoto) {
         updates.cover_photo_key = null;
@@ -33,9 +34,9 @@ module.exports = (req, res, next) => {
         previewUpdates.remix = req.body.remix;
     }
 
-    if (req.body.title) {
-        updates.title = req.body.title;
-        previewUpdates.title = req.body.title;
+    if (req.body.threadTitle) {
+        updates.title = req.body.threadTitle;
+        previewUpdates.title = req.body.threadTitle;
     }
 
     if (req.body.pursuit) {
