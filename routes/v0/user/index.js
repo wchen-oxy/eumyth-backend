@@ -74,12 +74,12 @@ router.route('/')
         mainPursuitsHolder.push(
           new (selectModel(ModelConstants.PURSUIT))
             ({
-              name: pursuit.name,
+              name: pursuit.name.toUpperCase(),
               display_photo_key: "",
               private: false,
               experience_level: pursuit.experience,
               total_min: 0,
-              num_milestones: 0,
+              num_posts: 0,
               posts: [],
               projects: [],
             }));
@@ -87,7 +87,7 @@ router.route('/')
         indexPursuitsHolder.push(
           new (selectModel(ModelConstants.INDEX_PURSUIT))
             ({
-              name: pursuit.name,
+              name: pursuit.name.toUpperCase(),
               experience_level: pursuit.experience,
               num_posts: 0,
               num_milestones: 0,

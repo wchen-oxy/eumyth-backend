@@ -33,7 +33,7 @@ const PursuitSchema = new Schema({
 
   num_posts: {
     type: Number,
-    required: false
+    required: true
   },
 
   posts: {
