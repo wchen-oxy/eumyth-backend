@@ -14,7 +14,7 @@ module.exports = (req, res, next) => {
     const indexUserID = req.body.indexUserID;
     const userPreviewID = req.body.userPreviewID;
     const status = req.body.status;
-    const pursuit = req.body.pursuit;
+    const pursuit = req.body.pursuit.toUpperCase();
 
     const selectedPosts = req.body.selectedPosts ?
         req.body.selectedPosts : [];

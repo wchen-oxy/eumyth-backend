@@ -30,7 +30,7 @@ const loadProjectPreview = (req, res, next) => {
 const loadPostCreation = (req, res, next) => {
     const username = req.body.username;
     const postPrivacyType = req.body.postPrivacyType;
-    const pursuitCategory = req.body.pursuit ? req.body.pursuit : res.locals.project.pursuit;
+    const pursuitCategory = req.body.pursuit ? req.body.pursuit.toUpperCase() : res.locals.project.pursuit.toUpperCase();
     const isPaginated = checkStringBoolean(req.body.isPaginated);
     const displayPhoto = req.body.displayPhoto ? req.body.displayPhoto : null;
     const difficulty = req.body.difficulty ? req.body.difficulty : null;

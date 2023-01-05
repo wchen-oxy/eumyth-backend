@@ -55,7 +55,7 @@ router.route('/')
           display_photo_key: "",
           private: false,
           total_min: 0,
-          num_milestones: 0,
+          num_posts: 0,
           posts: [],
           projects: [],
         }));
@@ -64,7 +64,6 @@ router.route('/')
         new (selectModel(ModelConstants.INDEX_PURSUIT))({
           name: "ALL",
           num_posts: 0,
-          num_milestones: 0,
           num_projects: 0,
           total_min: 0,
         })
@@ -77,7 +76,7 @@ router.route('/')
               name: pursuit.name.toUpperCase(),
               display_photo_key: "",
               private: false,
-              experience_level: pursuit.experience,
+              experience_level: pursuit.experience.toUpperCase(),
               total_min: 0,
               num_posts: 0,
               posts: [],
@@ -88,9 +87,8 @@ router.route('/')
           new (selectModel(ModelConstants.INDEX_PURSUIT))
             ({
               name: pursuit.name.toUpperCase(),
-              experience_level: pursuit.experience,
+              experience_level: pursuit.experience.toUpperCase(),
               num_posts: 0,
-              num_milestones: 0,
               num_projects: 0,
               total_min: 0,
             })

@@ -9,11 +9,9 @@ module.exports = (req, res, next) => {
     const familiar = [];
     const experienced = [];
     const expert = [];
-
-    for (const user of users) {
+     for (const user of users) {
         // console.log(user);
         for (let i = 1; i < user.pursuits.length; i++) {
-            console.log(names.includes(user.pursuits[i].name));
             if (names.includes(user.pursuits[i].name)) {
                 const data = {
                     parent_index_user_id: user.parent_index_user_id,
