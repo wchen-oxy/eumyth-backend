@@ -89,10 +89,7 @@ router.route('/advanced_people')
 
 router.route('/branches')
     .get(buildQueryValidationChain(
-        PARAM_CONSTANTS.DISTANCE,
-        PARAM_CONSTANTS.PURSUIT,
-        PARAM_CONSTANTS.LATITUDE,
-        PARAM_CONSTANTS.LONGITUDE
+        PARAM_CONSTANTS.PURSUIT
     ),
         doesValidationErrorExist,
         branches

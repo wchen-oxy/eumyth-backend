@@ -5,7 +5,7 @@ const { searchProjectData, _sortByDate } = require("./services");
 module.exports = (req, res, next) => {
     const pursuitArray = req.query.pursuitArray;
     const indexUserID = req.query.indexUserID;
-    const userPreviewIDLIst = req.query.userPreviewIDLIst;
+    // const userPreviewIDLIst = req.query.userPreviewIDLIst;
     const usedProjectPreviewIDList = req.query.projectPreviewIDList;
     const requestQuantity = parseInt(req.query.requestQuantity);
 

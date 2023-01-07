@@ -219,6 +219,8 @@ router.route('/fork').put(
             ({
                 title: newProject.title,
                 remix: newProject.remix,
+                index_user_id: authorID,
+                ancestor_id: ancestors[0].project_id, 
                 project_id: newProject._id,
                 parent_project_id: projectDataID,
                 status: 'DRAFT',
