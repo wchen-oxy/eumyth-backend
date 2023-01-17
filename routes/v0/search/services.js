@@ -94,6 +94,7 @@ const searchByBounds = (IDs, limits) => {
 
 const searchByBoundedPursuits = (IDs, limits, pursuits) => {
     const list = IDs.map(ID => mongoose.Types.ObjectId(ID));
+    console.log(list);
     const _bounds = getBoundOperator(limits);
     return UserPreview.Model.find({
         _id: { $nin: list },
@@ -135,6 +136,21 @@ const appendPostData = (users, pursuit) => {
         })
 }
 
+const searchBranchData = (type, indexUserID, requestQuantity) => {
+    return limitFind(type, {
+        index_user_id: mongoose.Types.ObjectId(indexUserID),
+        $or:
+            [
+                { 'ancestor_id': { $ne: null } },
+                { 'parent_project_id': { $ne: null } },
+            ]
+    }, requestQuantity)
+        .then(results => {
+            console.log(results);
+            return results;
+        });
+}
+
 const searchProjectData = (type, pursuitList, IDList, requestQuantity, indexUserID, childrenFlag) => {
     return limitFind(type, {
         _id: { $nin: IDList },
@@ -164,6 +180,7 @@ exports.getDistance = getDistance;
 exports.getBounds = getBounds;
 exports.searchByBounds = searchByBounds;
 exports.searchByBoundedPursuits = searchByBoundedPursuits;
+exports.searchBranchData = searchBranchData;
 exports.appendPostData = appendPostData;
 exports.searchProjectData = searchProjectData;
 exports.searchUncached = searchUncached;

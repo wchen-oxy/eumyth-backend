@@ -14,6 +14,7 @@ module.exports = (req, res, next) => {
         for (let i = 1; i < user.pursuits.length; i++) {
             if (names.includes(user.pursuits[i].name)) {
                 const data = {
+                    _id: user._id,
                     parent_index_user_id: user.parent_index_user_id,
                     parent_user_id: user.parent_user_id,
                     username: user.username,
