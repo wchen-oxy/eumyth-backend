@@ -2,6 +2,7 @@ const Bookmark = require('./bookmark.model');
 const Comment = require('./comment.model');
 const ContentPreview = require('./content.preview.model');
 const DraftPreview = require('./draft.preview.model');
+const Feed = require('./feed.model');
 const ImageAnnotation = require('./image.annotation.model');
 const IndexPursuit = require('./index.pursuit.model');
 const IndexUser = require('./index.user.model');
@@ -43,6 +44,8 @@ const selectModel = (type) => {
             return ProjectPreview.Model.WithID;
         case (ModelConstants.PROJECT_PREVIEW_NO_ID):
             return ProjectPreview.Model.NoID;
+        case(ModelConstants.FEED):
+            return Feed.Model;
         case (ModelConstants.PURSUIT):
             return Pursuit.Model;
         case (ModelConstants.REF):

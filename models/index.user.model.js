@@ -81,6 +81,7 @@ const IndexUserSchema = new Schema({
         type: [String], //limit 20?
     },
     pursuits: [IndexPursuit.Schema],
+    feed_id: mongoose.Types.ObjectId,
     following_feed: [mongoose.Types.ObjectId], //feed from others
     recent_posts: {
         type: [mongoose.Types.ObjectId],

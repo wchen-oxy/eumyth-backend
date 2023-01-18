@@ -1,11 +1,14 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+
+
 const ProjectPreviewWithIDSchema = new Schema({
     title: String,
     index_user_id: mongoose.Types.ObjectId,
     ancestor_id:  mongoose.Types.ObjectId, 
     remix: String,
+    feed_id: mongoose.Types.ObjectId,
     project_id: mongoose.Types.ObjectId,
     parent_project_id: mongoose.Types.ObjectId, //needed for searching related parent projects
     has_children: {type: Boolean, default: false},
@@ -25,6 +28,7 @@ const ProjectPreviewNoIDSchema = new Schema({
     _id: false,
     title: String,
     remix: String,
+    feed_id: mongoose.Types.ObjectId,
     project_id: mongoose.Types.ObjectId,
     parent_project_id: mongoose.Types.ObjectId, //needed for searching related parent projects
     status: String,
