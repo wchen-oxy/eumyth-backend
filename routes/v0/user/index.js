@@ -49,6 +49,7 @@ router.route('/')
       let mainPursuitsHolder = [];
       let indexPursuitsHolder = [];
 
+
       mainPursuitsHolder.push(
         new (selectModel(ModelConstants.PURSUIT))({
           name: "ALL",
@@ -95,6 +96,14 @@ router.route('/')
         );
       }
 
+      const newFeed = new (selectModel(ModelConstants.FEED))
+        ({
+          following: [],
+          parents: [],
+          siblings: [],
+          children: [],
+        })
+
       const newUser =
         new (selectModel(ModelConstants.USER))
           ({
@@ -108,8 +117,6 @@ router.route('/')
             pinned_projects: [],
             requests: [],
             labels: [],
-
-
           });
 
       const newIndexUser =
@@ -125,6 +132,7 @@ router.route('/')
             notifications: [],
             pursuits: indexPursuitsHolder,
             following_feed: [],
+            feed_id: newFeed._id,
             labels: [],
           });
 
@@ -148,8 +156,6 @@ router.route('/')
             user_preview_id: newUserPreview._id
           });
 
-
-
       newIndexUser.user_preview_id = newUserPreview._id;
       newIndexUser.user_relation_id = newUserRelation._id;
       newUserPreview.user_relation_id = newUserRelation._id;
@@ -157,12 +163,14 @@ router.route('/')
       newUser.user_relation_id = newUserRelation._id;
       newUser.user_preview_id = newUserPreview._id;
 
+      const savedFeed = newFeed.save();
       const savedUser = newUser.save();
       const savedIndexUser = newIndexUser.save();
       const savedUserRelation = newUserRelation.save();
       const savedUserPreview = newUserPreview.save();
-
+       
       return Promise.all([
+        savedFeed,
         savedIndexUser,
         savedUser,
         savedUserRelation,
