@@ -142,6 +142,8 @@ router.route('/thread').put(
     thread
 )
 
+//refactor when we do finds of user data
+//also add when feedID is retrieved to embed into each children/ancestor
 router.route('/fork').put(
     buildBodyValidationChain(
         PARAM_CONSTANTS.PROJECT_DATA,
@@ -173,6 +175,7 @@ router.route('/fork').put(
     },
     (req, res, next) => {
         let projectData = res.locals.oldProject.toObject();
+        const cachedFeedID = req.body.cachedFeedID;
         const username = req.body.username;
         const authorID = req.body.indexUserID;
         const displayPhoto = req.body.displayPhotoKey;
@@ -192,7 +195,8 @@ router.route('/fork').put(
                     title: projectData.title,
                     remix: projectDataRemix,
                     project_id: projectDataID,
-                    parent_project_id: projectData.parent_project_id
+                    parent_project_id: projectData.parent_project_id,
+                    cached_feed_id: cachedFeedID
                 })
         );
 
@@ -281,7 +285,8 @@ router.route('/fork').put(
                         res.locals.oldProject,
                         newProject._id,
                         title,
-                        remix);
+                        remix,
+                        cached_feed_id);
                     return insertMany(
                         ModelConstants.POST, projectPosts, { ordered: true })
                 })
@@ -298,7 +303,8 @@ router.route('/fork').put(
                 res.locals.oldProject,
                 newProject._id,
                 title,
-                remix);
+                remix,
+                cached_feed_id);
             next();
         }
     },

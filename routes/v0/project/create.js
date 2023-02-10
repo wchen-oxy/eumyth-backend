@@ -2,7 +2,7 @@ const selectModel = require('../../../models/modelServices');
 const ModelConstants = require('../../../models/constants');
 const {
     findAndUpdateIndexUserMeta,
-    updatePursuitObject
+    updatePursuitObjectAndReturnUser
 } = require('./services');
 const { ADD } = require('./constants');
 
@@ -65,16 +65,23 @@ module.exports = (req, res, next) => {
         { title: newProject.title, content_id: newProject._id, project_preview_id: projectPreview._id }
     );
     newProject.project_preview_id = projectPreview._id;
-    const resolvedUserPreview = updatePursuitObject(
+    const resolvedUserPreview = updatePursuitObjectAndReturnUser(
         ModelConstants.USER_PREVIEW,
         userPreviewID,
         newProject._id,
         newProject.pursuit
     );
 
-    const resolvedUser = updatePursuitObject(ModelConstants.USER, userID, newProject._id, newProject.pursuit);
+    const resolvedUser = updatePursuitObjectAndReturnUser(
+        ModelConstants.USER,
+        userID,
+        newProject._id,
+        newProject.pursuit
+    );
+
     return Promise.all([resolvedIndexUser, resolvedUser, resolvedUserPreview])
         .then((result) => {
+            projectPreview.cached_feed_id = result[1].cached_feed_id;
             const savedIndexUser = result[0].save();
             const savedUser = result[1].save();
             const savedUserPreview = result[2].save();
@@ -87,8 +94,8 @@ module.exports = (req, res, next) => {
                 savedProject,
                 savedProjectPreview
             ];
-            if (res.locals.parentProject) {
-                const savedParentProject = res.locals.parentProject;
+            if (res.locals.ownerProject) {
+                const savedParentProject = res.locals.ownerProject;
                 savedParentProject.children.push(
                     new (selectModel(ModelConstants.PROJECT_PREVIEW_NO_ID)({
                         title,
@@ -101,10 +108,10 @@ module.exports = (req, res, next) => {
         })
         .then((result) => {
             res.locals.selectedDraftID = newProject._id;
-            return res.status(201).json({ 
+            return res.status(201).json({
                 id: newProject._id,
-                project_preview: newProject.project_preview_id 
-             });
+                project_preview: newProject.project_preview_id
+            });
         })
         .catch(next)
 

@@ -16,7 +16,7 @@ const {
 const ModelConstants = require('../../../models/constants');
 
 const postServices = require('./services');
-const { updateMetaInfo, loadProjectPreview, loadParentThread, sendToFollowers, loadPostCreation } = require('./create');
+const { updateMetaInfo, loadProjectPreview, loadParentThread, sendToFollowers, loadPostCreation, sendToRecievers, findRecievers } = require('./create');
 const { updatePost } = require('./update');
 const postImageFields = [
   { name: "images" },
@@ -38,7 +38,8 @@ router.route('/').post(
   loadProjectPreview,
   loadPostCreation,
   updateMetaInfo,
-  sendToFollowers)
+  findRecievers,
+  sendToRecievers)
 
   .put(
     MulterHelper.contentImageUpload.single("coverPhoto"),

@@ -1,15 +1,130 @@
-const { findByID, findManyByID } = require('../../../data-access/dal');
+const { findByID, findManyByID, findOne, find } = require('../../../data-access/dal');
 const postServices = require('./services');
 const projectServices = require('../project/services');
 const selectModel = require('../../../models/modelServices');
 const { checkStringBoolean, verifyArray } = require("../../../shared/helper");
 const ModelConstants = require('../../../models/constants');
+const { CHILDREN, FOLLOWERS, PARENT, SIBLINGS } = require('../../../shared/utils/flags');
+const { CACHED_FEED_LIMIT } = require("../../../shared/constants/settings");
+
+const _getAncestorProjectID = (project) => {
+    if (project && project.remix) {
+        const index = project.ancestors.length - 1;
+        return project.ancestors[index].parent_project_id;
+    }
+    else {
+        return null;
+    }
+}
+const _saveOwnerPostInfo = (
+    userPreview,
+    indexUser,
+    user,
+    post,
+    newProject,
+    newProjectPreview,
+    isCompleteProject
+) => {
+
+    const savedUserPreview = _saveModel(userPreview);
+    const savedIndexUser = _saveModel(indexUser);
+    const savedUser = _saveModel(user);
+    const savedPost = _saveModel(post);
+
+    if (newProject) {
+        const savedProject = _saveModel(newProject);
+        const promises = [
+            savedUserPreview,
+            savedIndexUser,
+            savedUser,
+            savedPost,
+            savedProject
+        ];
+        if (isCompleteProject) promises.push(newProjectPreview.save());
+        return Promise.all(promises);
+    }
+    else {
+        return Promise.all([
+            savedUserPreview,
+            savedIndexUser,
+            savedUser,
+            savedPost
+        ]);
+    }
+}
+
+const _feedOrdering = (feed, postID) => {
+    feed.unshift(postID);
+    if (feed.length > CACHED_FEED_LIMIT) {
+        feed.shift();
+    }
+}
+
+const _feedDecider = (type, postID, feedArray) => {
+    //single parent that owns your project
+    switch (type) {
+        case (PARENT):
+            feedArray =
+                feedArray.map(feed => {
+                    _feedOrdering(feed.children, postID);
+                    return feed;
+                });
+            break;
+        case (CHILDREN):
+            feedArray =
+                feedArray.map(feed => {
+                    _feedOrdering(feed.parent, postID)
+                    return feed;
+                });
+            break;
+        case (SIBLINGS):
+            feedArray =
+                feedArray.map(feed => {
+                    _feedOrdering(feed.siblings, postID);
+                    return feed;
+                });
+            break;
+        case (FOLLOWERS): //these are list of feedIDS of people who are following the user in their feeds
+            feedArray =
+                feedArray.map(feed => {
+                    _feedOrdering(feed.following, postID);
+                    return feed;
+                });
+            break;
+        default:
+            throw new Error("Nothing Matched");
+    }
+    return feedArray;
+}
+
+const _getCachedFeedID = (users) => {
+    return users.map(user => user.cached_feed_id);
+}
+
+const _saveModel = (model) => {
+    return model.save().catch(error => {
+        if (error) {
+            console.log(error);
+            res.status(500).json('Error: ' + error);
+        }
+    });
+}
+
+const _feedFormatter =
+    (resolve) => {
+        indexUser.following_feed.unshift(res.locals.postID);
+        if (indexUser.following_feed.length > 50) {
+            indexUser.following_feed.shift();
+        }
+        indexUser.save().then(() => resolve("saved")).catch(next);
+    }
+
 
 const loadParentThread = (req, res, next) => {
     const selectedDraft = req.body.selectedDraftID;
     return findByID(ModelConstants.PROJECT, selectedDraft)
         .then((result) => {
-             res.locals.project = result;
+            res.locals.project = result;
             return next();
         });
 }
@@ -43,7 +158,7 @@ const loadPostCreation = (req, res, next) => {
     const imageData = req.files && req.files.images ? postServices.getImageUrls(req.files.images) : [];
     const textSnippet = textData ? postServices.makeTextSnippet(isPaginated, textData) : null;
     const indexUser = res.locals.indexUser;
-    let project = res.locals.project;
+    const project = res.locals.project;
 
     const post = postServices.createPost(
         username,
@@ -68,23 +183,22 @@ const loadPostCreation = (req, res, next) => {
 }
 
 const updateMetaInfo = (req, res, next) => {
+    let post = res.locals.post;
+    let project = res.locals.project;
+    let projectPreview = res.locals.projectPreview;
     const postPrivacyType = req.body.postPrivacyType;
     const pursuitCategory = req.body.pursuit ? req.body.pursuit : res.locals.project.pursuit;
     const labels = req.body.labels ? verifyArray(req.body.labels) : [];
     const date = req.body.date ? new Date(req.body.date) : null;
     const minDuration = !!req.body.minDuration ? parseInt(req.body.minDuration) : null;
     const indexUser = res.locals.indexUser;
-     let post = res.locals.post;
-    let project = res.locals.project;
-
     const isCompleteProject = req.body.completeProject ? checkStringBoolean(req.body.completeProject) : false;
     const user = res.locals.completeUser;
     const userPreview = res.locals.userPreview;
-    let projectPreview = res.locals.projectPreview;
-
-
     const postPreview = postServices.createContentPreview(post._id, post.date);
-    res.locals.post_id = post._id;
+
+    res.locals.postID = post._id;
+
     if (project) project.post_ids.unshift(post._id);
     if (indexUser.preferred_post_privacy !== postPrivacyType) {
         indexUser.preferred_post_privacy = postPrivacyType;
@@ -97,6 +211,7 @@ const updateMetaInfo = (req, res, next) => {
     }
 
     postServices.setRecentPosts(postPreview.content_id, indexUser.recent_posts);
+
     postServices.updatePostLists(
         postPreview,
         post.pursuit_category,
@@ -133,94 +248,121 @@ const updateMetaInfo = (req, res, next) => {
         indexUser,
         labels);
 
-    const savedUserPreview = userPreview
-        .save()
-        .catch(error => {
-            if (error) {
-                console.log(error);
-                res.status(500).json('Error: ' + error);
-            }
-        });
-    const savedIndexUser = indexUser
-        .save()
-        .catch(error => {
-            if (error) {
-                console.log(error);
-                res.status(500).json('Error: ' + error);
-            }
-        });
-    const savedUser = user.save().catch(error => {
-        if (error) {
-            console.log(error);
-            res.status(500).json('Error: ' + error);
-        }
-    });
-    const savedPost = post.save().catch(error => {
-        if (error) {
-            console.log(error);
-            res.status(500).json('Error: ' + error);
-        }
-    });
+    const savedUpdates = _saveOwnerPostInfo(
+        userPreview,
+        indexUser,
+        user,
+        post,
+        project,
+        projectPreview,
+        isCompleteProject
+    );
 
-    if (project) {
-        const savedProject = project.save().catch(error => {
-            if (error) {
-                console.log(error);
-                res.status(500).json('Error: ' + error);
-            }
-        });
-        const promises = [savedUserPreview, savedIndexUser, savedUser, savedPost, savedProject];
-        if (isCompleteProject) promises.push(projectPreview.save());
-        console.log(promises);
-        return Promise.all(promises)
-            .then(() => next());
-    }
-    else {
-        return Promise.all([savedUserPreview, savedIndexUser, savedUser, savedPost])
-            .then(() => next());
-    }
+    return savedUpdates.then(() => next());
+    // const savedUserPreview = _saveModel(userPreview);
+    // const savedIndexUser = _saveModel(indexUser);
+    // const savedUser = _saveModel(user);
+    // const savedPost = _saveModel(post);
+
+    // if (project) {
+    //     const savedProject = _saveModel(project);
+    //     const promises = [savedUserPreview, savedIndexUser, savedUser, savedPost, savedProject];
+    //     if (isCompleteProject) promises.push(projectPreview.save());
+    //     return Promise.all(promises)
+    //         .then(() => next());
+    // }
+    // else {
+    //     return Promise.all([savedUserPreview, savedIndexUser, savedUser, savedPost])
+    //         .then(() => next());
+    // }
 }
 
-const sendToFollowers = (req, res, next) => {
+const findRecievers = (req, res, next) => {
+    //find parent
+    const ancestorProjectID = _getAncestorProjectID(res.locals.project);
+    const ancestorProjectPreviewID = res.locals.project.project_preview_id;
+    const promisedProjectPreviews =
+        find(
+            ModelConstants.PROJECT_PREVIEW_WITH_ID,
+            { project_id: ancestorProjectID }
+        );
+    const promisedParentProjectPreview =
+        findByID(ModelConstants.PROJECT_PREVIEW_WITH_ID,
+            ancestorProjectPreviewID
+        );
 
-    let followersIDArray = [];
-    for (const user of res.locals.userRelation.followers) {
-        followersIDArray.push(user.user_preview_id);
-    }
-    return findManyByID(ModelConstants.USER_PREVIEW, followersIDArray)
-        .then((result) => {
-            if (result) {
-                let indexUserIDArray = []
-                for (const previewedUser of result) {
-                    indexUserIDArray.push(previewedUser.parent_index_user_id);
-                }
-                return findManyByID(ModelConstants.INDEX_USER, indexUserIDArray);
-            }
-            else {
-                throw new Error(500);
-            }
-        })
+    return Promise
+        .all([
+            promisedParentProjectPreview,
+            promisedProjectPreviews
+        ])
         .then(
-            (userArray) => {
-                const promisedUpdatedFollowerArray = userArray.map(
-                    indexUser => new Promise((resolve) => {
-                        indexUser.following_feed.unshift(res.locals.post_id);
-                        if (indexUser.following_feed.length > 50) {
-                            indexUser.following_feed.shift();
+            results => {
+                res.locals.parentFeedID = results[0] ? results[0].cached_feed_id : null;
+                res.locals.siblingsFeedID = results[1].length > 0 ? _getCachedFeedID(results[1]) : [];
+                res.locals.childrenFeedID = _getCachedFeedID(res.locals.project.children);
+                res.locals.followersFeedID = _getCachedFeedID(res.locals.userRelation.followers);
+                next();
+            }
+        );
+}
+
+const sendToRecievers = (req, res, next) => {
+    const postID = res.locals.postID;
+    const promisedParentFeed = findByID(ModelConstants.FEED, res.locals.parentFeedID);
+    const promisedSiblingsFeeds = findManyByID(ModelConstants.FEED, res.locals.siblingsFeedID);
+    const promisedChildrenFeeds = findManyByID(ModelConstants.FEED, res.locals.childrenFeedID);
+    const promisedFollowersFeeds = findManyByID(ModelConstants.FEED, res.locals.followersFeedID);
+
+    Promise
+        .all([
+            promisedParentFeed,
+            promisedSiblingsFeeds,
+            promisedChildrenFeeds,
+            promisedFollowersFeeds
+        ])
+        .then(
+            results => {
+                const updatedFeeds = [
+                    _feedDecider(PARENT, postID, [results[0]]),
+                    _feedDecider(SIBLINGS, postID, results[1]),
+                    _feedDecider(CHILDREN, postID, results[2]),
+                    _feedDecider(FOLLOWERS, postID, results[3]),
+                ]
+                const allFeeds = updatedFeeds[0]
+                    .concat(
+                        updatedFeeds[1],
+                        updatedFeeds[2],
+                        updatedFeeds[3]
+                    );
+                const savedFeeds = allFeeds.map(
+                    feed => new Promise(
+                        (resolve) => {
+                            feed.save().then(() => resolve("saved")).catch(next)
                         }
-                        indexUser.save().then(() => resolve("saved")).catch(next);
-                    })
-                );
-                return Promise.all(promisedUpdatedFollowerArray)
-                    .then((result) => {
-                        return res.status(201).send(res.locals.post_id)
-                    });
+                    )
+                )
+                return Promise.all(savedFeeds);
             }
         )
-        .catch(next);
+        .then(
+            (result) => {
+                return res.status(201).send(res.locals.postID);
+            });
+
+    // const promisedUpdatedFollowerArray = res.locals.followers.map(
+    //     indexUser => new Promise(_feedFormatter)
+    // );
+
+    // return Promise.all(promisedUpdatedFollowerArray)
+    //     .then((result) => {
+    //         return res.status(201).send(res.locals.postID)
+    //     });
 }
+
 exports.loadParentThread = loadParentThread;
 exports.loadProjectPreview = loadProjectPreview;
 exports.loadPostCreation = loadPostCreation;
 exports.updateMetaInfo = updateMetaInfo;
-exports.sendToFollowers = sendToFollowers;
+exports.findRecievers = findRecievers;
+exports.sendToRecievers = sendToRecievers;

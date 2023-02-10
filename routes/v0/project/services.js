@@ -43,7 +43,7 @@ const findAndUpdateIndexUserMeta = (updateType, indexUserID, pursuit, draftObjec
         });
 }
 
-const updatePursuitObject = (model, modelID, contentID, pursuit) =>
+const updatePursuitObjectAndReturnUser = (model, modelID, contentID, pursuit) =>
     findByID(model, modelID)
         .then((result => {
             let user = result;
@@ -99,11 +99,12 @@ const removeProjectDraft = (drafts, ID) => {
     }
 }
 
-const updateParentProject = (oldProject, newProjectID, title, remix) => {
+const updateParentProject = (oldProject, newProjectID, title, remix, cached_feed_id) => {
     oldProject.children.push(selectModel(ModelConstants.PROJECT_PREVIEW_NO_ID)({
         project_id: newProjectID,
         title,
-        remix
+        remix,
+        cached_feed_id
     }));
     oldProject.children_length = oldProject.children_length + 1;
     return oldProject;
@@ -139,7 +140,7 @@ const removeVote = (array, voteID) => {
 exports.partialDelete = partialDelete;
 exports.adjustEntryLength = adjustEntryLength;
 exports.findAndUpdateIndexUserMeta = findAndUpdateIndexUserMeta;
-exports.updatePursuitObject = updatePursuitObject;
+exports.updatePursuitObjectAndReturnUser = updatePursuitObjectAndReturnUser;
 exports.updateParentProject = updateParentProject;
 exports.retrieveSpotlightProjects = retrieveSpotlightProjects;
 exports.removeVote = removeVote;

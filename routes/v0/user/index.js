@@ -117,6 +117,7 @@ router.route('/')
             pinned_projects: [],
             requests: [],
             labels: [],
+            cached_feed_id: newFeed._id,
           });
 
       const newIndexUser =
@@ -132,7 +133,7 @@ router.route('/')
             notifications: [],
             pursuits: indexPursuitsHolder,
             following_feed: [],
-            feed_id: newFeed._id,
+            cached_feed_id: newFeed._id,
             labels: [],
           });
 
