@@ -38,6 +38,11 @@ const IndexUserSchema = new Schema({
         required: false
     },
 
+    cached_feed_id: {
+        type: mongoose.Types.ObjectId,
+        required: true,
+    },
+
     user_profile_id: {
         type: mongoose.Types.ObjectId,
         required: true,

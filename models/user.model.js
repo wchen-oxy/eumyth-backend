@@ -41,6 +41,10 @@ const UserSchema = new Schema({
     trim: true
   },
 
+  cached_feed_id: {
+    type: mongoose.Types.ObjectId,
+  },
+
   index_user_id: {
     type: mongoose.Types.ObjectId,
     required: true,

@@ -175,6 +175,20 @@ router.route('/single').get(
       .catch(next);
   })
 
+router.route('/cached-feed').get(
+  buildQueryValidationChain(
+  ),
+  doesValidationErrorExist,
+  (req, res, next) => {
+    const cachedFeedsID = req.query.cachedFeedsID;
+    console.log("thing", req.query);
+    return findByID(ModelConstants.FEED, cachedFeedsID)
+      .then(result => {
+        return res.status(200).json(result);
+      })
+      .catch((err) => {console.log(err)});
+  }
+)
 
 router.route('/display-photo')
   .patch(

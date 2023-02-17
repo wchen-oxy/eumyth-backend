@@ -23,7 +23,7 @@ const FeedSchema = new Schema({
     }
 })
 
-const FeedModel = mongose.model('feed', FeedSchema);
+const FeedModel = mongoose.model('feed', FeedSchema);
 
 module.exports = {
     Schema: FeedSchema,

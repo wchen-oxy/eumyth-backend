@@ -10,12 +10,24 @@ const EXPERT = "EXPERT";
 const USERNAME = 'username';
 const PUBLIC_FEED = "PUBLIC_FEED";
 
+//FEED FIELDS
+const PARENT = 'PARENT';
+const SIBLINGS = 'SIBLINGS';
+const CHILDREN = 'CHILDREN';
+const FOLLOWERS = 'FOLLOWERS';
+
 module.exports = {
     ALL,
     SHORT,
     LONG,
+
     PUBLIC_FEED,
     USERNAME,
+
+    PARENT,
+    SIBLINGS,
+    CHILDREN,
+    FOLLOWERS,
 
     BEGINNER,
     FAMILIAR,

@@ -18,6 +18,7 @@ router.get('/',
         if (isTruncated) {
           const truncatedUser = {
             drafts: result.drafts,
+            cached_feed_id: result.cached_feed_id,
             labels: result.labels,
             username: result.username,
             preferredPostType: result.preferred_post_privacy,
