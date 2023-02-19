@@ -169,6 +169,7 @@ router.route('/status').put(
             ? userRelation[1]
             : userRelation[0];
 
+            console.log(visitorUserRelation, targetUserRelation);
         relationServices.setAction(
           targetUserRelation,
           visitorUserRelation,

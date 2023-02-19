@@ -3,14 +3,15 @@ const selectModel = require('../../../models/modelServices.js')
 const ModelConstants = require('../../../models/constants');
 
 const _statusChanger = (action, target, array, isPrivate) => {
-    const indexUserID = target.index_user_id;
+    const indexUserID = target.parent_index_user_id;
     const userPreviewID = target.user_preview_id;
+    const stringID = userPreviewID.toString()
     switch (action) {
         case ("FOLLOW"):
             const state = isPrivate ? "FOLLOW_REQUESTED" : "FOLLOWING";
             array.push(selectModel(ModelConstants.USER_RELATION_STATUS)({
                 status: state,
-                index_user_id: indexUserID,
+                parent_index_user_id: indexUserID,
                 user_preview_id: userPreviewID,
             }));
         case ("DECLINE"):
