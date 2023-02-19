@@ -302,6 +302,7 @@ const findRecievers = (req, res, next) => {
                 res.locals.siblingsFeedID = results[1].length > 0 ? _getCachedFeedID(results[1]) : [];
                 res.locals.childrenFeedID = _getCachedFeedID(res.locals.project.children);
                 res.locals.followersFeedID = _getCachedFeedID(res.locals.userRelation.followers);
+                console.log(res.locals.followersFeedID);
                 next();
             }
         );

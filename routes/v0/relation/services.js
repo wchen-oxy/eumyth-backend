@@ -2,26 +2,28 @@
 const selectModel = require('../../../models/modelServices.js')
 const ModelConstants = require('../../../models/constants');
 
-const _statusChanger = (action, target, array, isPrivate) => {
-    const indexUserID = target.parent_index_user_id;
-    const userPreviewID = target.user_preview_id;
+const _statusChanger = (action, userRelation, members, cachedFeedID, isPrivate) => {
+    const indexUserID = userRelation.parent_index_user_id;
+    const userPreviewID = userRelation.user_preview_id;
     const stringID = userPreviewID.toString()
     switch (action) {
         case ("FOLLOW"):
             const state = isPrivate ? "FOLLOW_REQUESTED" : "FOLLOWING";
-            array.push(selectModel(ModelConstants.USER_RELATION_STATUS)({
+            members.push(selectModel(ModelConstants.USER_RELATION_STATUS)({
                 status: state,
                 parent_index_user_id: indexUserID,
                 user_preview_id: userPreviewID,
+                cached_feed_id: cachedFeedID
             }));
+
         case ("DECLINE"):
-            return array.filter(item => item.user_preview_id.toString() !== stringID);
+            return members.filter(item => item.user_preview_id.toString() !== stringID);
         case ("UNFOLLOW"):
-            return array.filter(item => item.user_preview_id.toString() !== stringID);
+            return members.filter(item => item.user_preview_id.toString() !== stringID);
         case ('ACCEPT'):
             for (let i = 0; i < array.length; i++) {
-                if (array[i].user_preview_id.toString() === stringID) {
-                    array[i].status = 'FOLLOWING';
+                if (members[i].user_preview_id.toString() === stringID) {
+                    members[i].status = 'FOLLOWING';
                     // console.log(array[i])
                     return null;
                 }
@@ -33,18 +35,42 @@ const _statusChanger = (action, target, array, isPrivate) => {
     }
 }
 exports.setAction = (
-    targetUserRelation,
-    visitorUserRelation,
+    target,
+    visitor,
+    cachedIDs,
     action,
     isPrivate) => {
     console.log(action);
     if (action === "FOLLOW" || action === "ACCEPT") {
-        _statusChanger(action, targetUserRelation, visitorUserRelation.following, isPrivate);
-        _statusChanger(action, visitorUserRelation, targetUserRelation.followers, isPrivate);
+        _statusChanger(
+            action,
+            target,
+            visitor.following,
+            cachedIDs.target,
+            isPrivate
+        );
+        _statusChanger(
+            action,
+            visitor,
+            target.followers,
+            cachedIDs.visitor,
+            isPrivate
+        );
     }
     else if ("UNFOLLOW" || 'DECLINE') {
-        visitorUserRelation.following = _statusChanger(action, targetUserRelation, visitorUserRelation.following);
-        targetUserRelation.followers = _statusChanger(action, visitorUserRelation, targetUserRelation.followers);
+        visitor.following = _statusChanger(
+            action,
+            target,
+            visitor.following,
+            cachedIDs.target
+        );
+
+        target.followers = _statusChanger(
+            action,
+            visitor,
+            target.followers,
+            cachedIDs.visitor
+        );
     }
     else {
         throw new Error('invalid action')

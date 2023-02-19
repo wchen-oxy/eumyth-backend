@@ -3,9 +3,9 @@ const Schema = mongoose.Schema;
 
 const UserRelationStatusSchema = new Schema({
     _id: false,
-
     index_user_id: mongoose.Types.ObjectId,
     user_preview_id: mongoose.Types.ObjectId,
+    cached_feed_id: mongoose.Types.ObjectId,
 
     status: { type: String },
 })

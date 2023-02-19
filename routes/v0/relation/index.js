@@ -147,32 +147,41 @@ router.route('/info').get(
 router.route('/status').put(
   buildBodyValidationChain(
     PARAM_CONSTANTS.VISITOR_USER_RELATION_ID,
+    PARAM_CONSTANTS.VISITOR_CACHED_FEED_ID,
     PARAM_CONSTANTS.TARGET_USER_RELATION_ID,
+    PARAM_CONSTANTS.TARGET_CACHED_FEED_ID,
     PARAM_CONSTANTS.ACTION
   ),
   doesValidationErrorExist,
   (req, res, next) => {
     const visitorUserRelationID = req.body.visitorUserRelationID;
+    const visitorCachedFeedID = req.body.visitorCachedFeedID;
     const targetUserRelationID = req.body.targetUserRelationID;
+    const targetCachedFeedID = req.body.targetCachedFeedID;
     const isPrivate = req.body.isPrivate;
     const action = req.body.action;
     const resolvedUpdate = findManyByID(
       ModelConstants.USER_RELATION,
       [targetUserRelationID, visitorUserRelationID])
       .then((userRelation) => {
-        const targetUserRelation =
+        let targetUserRelation =
           userRelation[0]._id.toString() === targetUserRelationID
             ? userRelation[0]
             : userRelation[1];
-        const visitorUserRelation =
+
+        let visitorUserRelation =
           userRelation[1]._id.toString() === visitorUserRelationID
             ? userRelation[1]
             : userRelation[0];
+        const cachedIDs = {
+          visitor: visitorCachedFeedID,
+          target: targetCachedFeedID,
+        }
 
-            console.log(visitorUserRelation, targetUserRelation);
         relationServices.setAction(
           targetUserRelation,
           visitorUserRelation,
+          cachedIDs,
           action,
           isPrivate)
         return Promise.all([
