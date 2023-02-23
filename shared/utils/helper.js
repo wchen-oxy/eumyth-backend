@@ -11,6 +11,5 @@ const errorCallback = (err) => {
 
 module.exports = {
     resultCallback: resultCallback,
-    errorCallback: errorCallback
-
+    errorCallback: errorCallback,
 }
