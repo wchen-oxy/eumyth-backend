@@ -89,7 +89,7 @@ router.route('/advanced_people')
 
 router.route('/branches')
     .get(buildQueryValidationChain(
-       PARAM_CONSTANTS.INDEX_USER_ID
+        PARAM_CONSTANTS.INDEX_USER_ID
     ),
         doesValidationErrorExist,
         branches
@@ -140,7 +140,7 @@ router.route('/projects').
         }
     );
 
-router.route('/uncached').get(
+router.route('/uncached').get( //overflow
     buildQueryValidationChain(
         PARAM_CONSTANTS.CONTENT_ID_LIST,
         PARAM_CONSTANTS.INDEX_USER_ID,
@@ -148,7 +148,6 @@ router.route('/uncached').get(
     ),
     doesValidationErrorExist,
     (req, res, next) => {
-
         const contentType = req.query.contentType;
         const contentIDList = req.query.contentIDList;
         return searchServices.searchUncached(

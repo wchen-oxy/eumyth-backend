@@ -12,6 +12,7 @@ const { ALL } = require("../../../shared/utils/flags");
 const ModelConstants = require('../../../models/constants');
 const { RECENT_POSTS_LIMIT, EMBEDDED_FEED_LIMIT } = require("../../../shared/constants/settings");
 
+
 const _insertAndSortIntoList = (postList, postPreview) => {
     postList.unshift(postPreview);
     if (postList.length > EMBEDDED_FEED_LIMIT) {
@@ -130,6 +131,7 @@ const makeTextSnippet = (isPaginated, textData) => {
 }
 
 const findPosts = (postIDList, includePostText) => {
+    console.log(postIDList);
     return findManyByID(ModelConstants.POST, postIDList, true)
         .then(
             (results) => {
@@ -263,7 +265,28 @@ const spliceArray = (postID, array) => {
     array.splice(index, 1);
 }
 
+const getInitialPost = (userPreview, IDArray) => {
+    console.log(userPreview);
+    const pursuitPosts = userPreview.pursuit.posts;
+    if (pursuitPosts.length > 0) {
+        IDArray.push(pursuitPosts[0].content_id)
+    }
 
+}
+
+const getPostIDsForExtraFeed = (feed) => {
+    const IDArray = [];
+    for (const formatted of feed) {
+       
+        if (formatted.type === ModelConstants.POST) {
+            IDArray.push(formatted.content);
+        }
+        else if (formatted.type === ModelConstants.USER) {
+            getInitialPost(formatted.content, IDArray);
+        }
+    }
+    return IDArray;
+}
 
 exports.updatePostLists = updatePostLists;
 exports.setRecentPosts = setRecentPosts;
@@ -278,3 +301,5 @@ exports.retrieveRelevantUserInfo = retrieveRelevantUserInfo;
 exports.createPost = createPost;
 exports.updateLabels = updateLabels;
 exports.spliceArray = spliceArray;
+exports.getPostIDsForExtraFeed = getPostIDsForExtraFeed;
+exports.getInitialPost = getInitialPost;

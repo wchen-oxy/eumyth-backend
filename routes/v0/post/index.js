@@ -18,6 +18,7 @@ const ModelConstants = require('../../../models/constants');
 const postServices = require('./services');
 const { updateMetaInfo, loadProjectPreview, loadParentThread, sendToFollowers, loadPostCreation, sendToRecievers, findRecievers } = require('./create');
 const { updatePost } = require('./update');
+const { POST, USER } = require('../../../models/constants');
 const postImageFields = [
   { name: "images" },
   { name: "coverPhoto", maxCount: 1 }];
@@ -175,20 +176,58 @@ router.route('/single').get(
       .catch(next);
   })
 
-router.route('/cached-feed').get(
-  buildQueryValidationChain(
-  ),
-  doesValidationErrorExist,
-  (req, res, next) => {
-    const cachedFeedsID = req.query.cachedFeedsID;
-    console.log("thing", req.query);
-    return findByID(ModelConstants.FEED, cachedFeedsID)
-      .then(result => {
-        return res.status(200).json(result);
-      })
-      .catch((err) => {console.log(err)});
-  }
-)
+router.route('/cached-feed')
+  .get(
+    buildQueryValidationChain(
+    ),
+    doesValidationErrorExist,
+    (req, res, next) => {
+      const cachedFeedsID = req.query.cachedFeedsID;
+      console.log("thing", req.query);
+      return findByID(ModelConstants.FEED, cachedFeedsID)
+        .then(result => {
+          return res.status(200).json(result);
+        })
+        .catch((err) => { console.log(err) });
+    }
+  );
+
+router.route('/extra-feed')
+  .get(
+    buildQueryValidationChain(
+
+    ),
+    doesValidationErrorExist,
+    (req, res, next) => {
+      const contentList = req.query.contentList.map(raw => JSON.parse(raw));
+      const postIDList = postServices.getPostIDsForExtraFeed(contentList);
+       return postServices.findPosts(postIDList, true)
+        .then((results) => {
+           const dictionary = {};
+          results.forEach(
+            (item) => {
+              dictionary[item._id] = item;
+            }
+          );
+
+          for (let object of contentList) {
+            if (object.type === POST) {
+               object.data = dictionary[object.content];
+            }
+            else if (object.type === USER) {
+              const userPursuit = object.content.pursuit;
+              if (userPursuit.posts.length > 0) {
+                object.data = dictionary[object.content.pursuit.posts[0].content_id];
+              }
+            }
+          }
+           return res.status(200).json({ contentList });
+        })
+        .catch(next);
+    }
+  )
+
+
 
 router.route('/display-photo')
   .patch(
