@@ -49,6 +49,7 @@ const PARAM_CONSTANTS = {
     PROJECT_ID: 'projectID',
     PROJECT_ID_LIST: 'projectIDList',
     PROJECT_PREVIEW_ID: 'projectPreviewID',
+    PURSUITS: 'pursuits',
     PURSUIT: 'pursuit',
     PURSUIT_ARRAY: 'pursuitArray',
     QUANTITY: 'quantity',

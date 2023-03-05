@@ -1,16 +1,18 @@
-const { BEGINNER, FAMILIAR, EXPERIENCED, EXPERT } = require("../../../shared/utils/flags");
+const { ALL, BEGINNER, FAMILIAR, EXPERIENCED, EXPERT } = require("../../../shared/utils/flags");
 
+const _filterAll = (pursuit) => { if (pursuit.name !== ALL) return true; else { return false } };
 
 module.exports = (req, res, next) => {
     //hardcode 10000 miles in for now for a limit
+    console.log(res.locals.users);
     const names = req.query.pursuit;
     const users = res.locals.users;
     const beginner = [];
     const familiar = [];
     const experienced = [];
     const expert = [];
-     for (const user of users) {
-        // console.log(user);
+    for (const user of users) {
+        let otherPursuits = user.pursuits.filter(_filterAll);
         for (let i = 1; i < user.pursuits.length; i++) {
             if (names.includes(user.pursuits[i].name)) {
                 const data = {
@@ -23,8 +25,10 @@ module.exports = (req, res, next) => {
                     distance: user.distance,
                     small_cropped_display_photo_key: user.small_cropped_display_photo_key,
                     tiny_cropped_display_photo_key: user.tiny_cropped_display_photo_key,
-                    pursuit: user.pursuits[i]
+                    pursuit: user.pursuits[i],
+                    other_pursuits: otherPursuits
                 };
+
                 switch (user.pursuits[i].experience_level) {
                     case (BEGINNER):
                         beginner.push(data);

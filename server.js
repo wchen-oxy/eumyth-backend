@@ -69,7 +69,9 @@ app.use((error, req, res, next) => {
     error.message = "An Unspecified/Uncaught Error Occured";
     next(createError(error.statusCode, error.message));
   }
-  if (process.env.IS_LOCAL) console.log(error.stack);
+  if (process.env.IS_LOCAL) {
+    console.log(error.stack);
+  }
   return res.status(error.statusCode).json({ error: error.message });
 });
 

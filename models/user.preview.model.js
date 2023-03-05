@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 const Pursuits = require('./pursuit.model');
 
 const UserPreviewSchema = new Schema({
-
+    
     bio: {
         type: String
     },
@@ -46,9 +46,8 @@ const UserPreviewSchema = new Schema({
 
     pursuits: [Pursuits.Schema],
 
-    coordinates: {
-        latitude: Number,
-        longitude: Number
+    location: {
+        coordinates: { type: [Number], index: '2dsphere'}
     },
 });
 

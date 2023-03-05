@@ -6,7 +6,8 @@ const searchServices = require('./services');
 const ModelConstants = require('../../../models/constants');
 const branches = require('./branches');
 const peopleFinder = require('./peopleFinder');
-const experience = require('./experience');
+const experience2 = require('./experience2');
+const peopleFinder2 = require('./peopleFinder2');
 
 //http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates
 //https://stackoverflow.com/questions/238260/how-to-calculate-the-bounding-box-for-a-given-lat-lng-location
@@ -69,21 +70,15 @@ router.route('/advanced_people')
     .get(
         buildQueryValidationChain(
             PARAM_CONSTANTS.DISTANCE,
-            PARAM_CONSTANTS.PURSUIT,
+            PARAM_CONSTANTS.PURSUITS,
             PARAM_CONSTANTS.LATITUDE,
             PARAM_CONSTANTS.LONGITUDE
         ),
         doesValidationErrorExist,
-        peopleFinder,
-        experience,
+        peopleFinder2,
+        experience2,
         (req, res, next) => {
-            const results = {
-                beginner: res.locals.beginner,
-                familiar: res.locals.familiar,
-                experienced: res.locals.experienced,
-                expert: res.locals.expert
-            }
-            return res.status(200).json(results);
+            return res.status(200).json(res.locals.formatted);
         }
     )
 

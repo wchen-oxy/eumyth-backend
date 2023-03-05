@@ -16,6 +16,9 @@ const SIBLINGS = 'SIBLINGS';
 const CHILDREN = 'CHILDREN';
 const FOLLOWERS = 'FOLLOWERS';
 
+const EXACT = "EXACT";
+const DIFFERENT = "DIFFERENT";
+
 module.exports = {
     ALL,
     SHORT,
@@ -32,5 +35,8 @@ module.exports = {
     BEGINNER,
     FAMILIAR,
     EXPERIENCED,
-    EXPERT
+    EXPERT,
+
+    EXACT,
+    DIFFERENT
 }

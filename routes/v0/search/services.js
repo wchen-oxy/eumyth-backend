@@ -1,7 +1,7 @@
 const GeoPoint = require('geopoint');
 const UserPreview = require('../../../models/user.preview.model');
 const ModelConstants = require('../../../models/constants');
-const { BEGINNER, FAMILIAR, EXPERIENCED, EXPERT } = require('../../../shared/utils/flags');
+const { BEGINNER, FAMILIAR, EXPERIENCED, EXPERT, EXACT, DIFFERENT } = require('../../../shared/utils/flags');
 const mongoose = require('mongoose');
 const selectModel = require('../../../models/modelServices');
 const {
@@ -94,7 +94,6 @@ const searchByBounds = (IDs, limits) => {
 
 const searchByBoundedPursuits = (IDs, limits, pursuits) => {
     const list = IDs.map(ID => mongoose.Types.ObjectId(ID));
-    console.log(list);
     const _bounds = getBoundOperator(limits);
     return UserPreview.Model.find({
         _id: { $nin: list },
@@ -105,6 +104,93 @@ const searchByBoundedPursuits = (IDs, limits, pursuits) => {
         },
         ..._bounds,
     }).lean();
+}
+
+const searchGeoSpatialByBoundedPursuit = (IDs, coordinates, max, pursuit, experience) => {
+    console.log(experience);
+    const list = IDs.map(ID => mongoose.Types.ObjectId(ID));
+    const nearLimit = {
+        "location.coordinates":
+        {
+            $near:
+            {
+                $geometry: { type: "Point", coordinates: coordinates },
+                $maxDistance: max
+            }
+        }
+    }
+    const returnedExactExperience =
+        UserPreview.Model
+            .find({
+                // _id: { $nin: list },
+                pursuits: {
+                    $elemMatch: {
+                        name: pursuit,
+                        experience_level: experience
+                    }
+                },
+                ...nearLimit
+            }
+            ).lean();
+
+    const returnedDifferentExperience
+        = UserPreview.Model
+            .find({
+                // _id: { $nin: list },
+                pursuits: {
+                    $elemMatch: {
+                        name: pursuit,
+                        experience_level: { $ne: experience }
+                    }
+                },
+                ...nearLimit
+            }
+            ).lean();
+
+    return Promise.all([returnedExactExperience, returnedDifferentExperience])
+        .then(results => {
+            return {
+                name: pursuit,
+                exact: results[0],
+                different: results[1]
+            }
+        }).catch(err => console.log(err));
+}
+
+const findRemainderUsersByExperience = (results) => {
+    let pursuits = {};
+    for (const pursuit of results) {
+        const beginner = [];
+        const familiar = [];
+        const experienced = [];
+        const expert = [];
+        for (const user of pursuit) {
+            for (let i = 1; i < user.pursuits.length; i++) {
+                if (user.pursuits[i] === results.type) {
+                    switch (user.pursuits[i].experience_level) {
+                        case (BEGINNER):
+                            beginner.push(data);
+                            break;
+                        case (FAMILIAR):
+                            familiar.push(data);
+                            break;
+                        case (EXPERIENCED):
+                            experienced.push(data);
+                            break;
+                        case (EXPERT):
+                            expert.push(data);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+            }
+        }
+        pursuits[results.type] = {
+            beginner
+        }
+    }
 }
 
 const appendPostData = (users, pursuit) => {
@@ -180,6 +266,7 @@ exports.getDistance = getDistance;
 exports.getBounds = getBounds;
 exports.searchByBounds = searchByBounds;
 exports.searchByBoundedPursuits = searchByBoundedPursuits;
+exports.searchGeoSpatialByBoundedPursuit = searchGeoSpatialByBoundedPursuit;
 exports.searchBranchData = searchBranchData;
 exports.appendPostData = appendPostData;
 exports.searchProjectData = searchProjectData;

@@ -148,8 +148,9 @@ router.route('/')
             small_cropped_display_photo_key: smallCroppedImage,
             tiny_cropped_display_photo_key: tinyCroppedImage,
             pursuits: mainPursuitsHolder,
-          })
-
+            location: { coordinates: [] }
+          });
+          console.log(newUserPreview);
       const newUserRelation =
         new (selectModel(ModelConstants.USER_RELATION))
           ({
@@ -169,7 +170,7 @@ router.route('/')
       const savedIndexUser = newIndexUser.save();
       const savedUserRelation = newUserRelation.save();
       const savedUserPreview = newUserPreview.save();
-       
+
       return Promise.all([
         savedFeed,
         savedIndexUser,

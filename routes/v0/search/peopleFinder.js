@@ -6,7 +6,7 @@ module.exports = (req, res, next) => {
     const pursuits = req.query.pursuit;
     const lat = req.query.latitude;
     const long = req.query.longitude;
-    const limits = searchServices.getBounds(distance, { lat, long });
+    const limits = searchServices.getBounds(distance, { lat, long }); //change to max
     return searchServices
         .searchByBoundedPursuits(userPreviewIDList, limits, pursuits)
         .then(results => {
