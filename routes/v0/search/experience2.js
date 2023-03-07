@@ -4,7 +4,7 @@ const _filterAll = (pursuit) => { if (pursuit.name !== ALL) return true; else { 
 
 module.exports = (req, res, next) => {
     const pursuits = res.locals.pursuits;
-    let formatted = {};
+    let formatted = [];
     for (const pursuit of pursuits) {
         const exact = [];
         const different = [];
@@ -16,7 +16,7 @@ module.exports = (req, res, next) => {
         for (const user of pursuit.different) {
             different.push(user);
         }
-        formatted[type] = { exact, different };
+        formatted.push({ type, exact, different });
     }
     res.locals.formatted = formatted;
     next();

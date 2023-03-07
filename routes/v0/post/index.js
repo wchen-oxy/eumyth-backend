@@ -191,40 +191,41 @@ router.route('/cached-feed')
     }
   );
 
-router.route('/extra-feed')
-  .get(
-    buildQueryValidationChain(
+//MIGHT BE OUTDATED BECAUSE IT DOESNT TAKE INTO ACCOUNT //USER ITEMS ARE TOO BIG
 
-    ),
-    doesValidationErrorExist,
-    (req, res, next) => {
-      const contentList = req.query.contentList.map(raw => JSON.parse(raw));
-      const postIDList = postServices.getPostIDsForExtraFeed(contentList);
-       return postServices.findPosts(postIDList, true)
-        .then((results) => {
-           const dictionary = {};
-          results.forEach(
-            (item) => {
-              dictionary[item._id] = item;
-            }
-          );
+// router.route('/extra-feed') 
+//   .get(
+//     buildQueryValidationChain(
+//     ),
+//     doesValidationErrorExist,
+//     (req, res, next) => {
+//       const contentList = req.query.contentList.map(raw => JSON.parse(raw));
+//       const postIDList = postServices.getPostIDsForExtraFeed(contentList);
+//        return postServices.findPosts(postIDList, true)
+//         .then((results) => {
+//            const dictionary = {};
+//           results.forEach(
+//             (item) => {
+//               dictionary[item._id] = item;
+//             }
+//           );
 
-          for (let object of contentList) {
-            if (object.type === POST) {
-               object.data = dictionary[object.content];
-            }
-            else if (object.type === USER) {
-              const userPursuit = object.content.pursuit;
-              if (userPursuit.posts.length > 0) {
-                object.data = dictionary[object.content.pursuit.posts[0].content_id];
-              }
-            }
-          }
-           return res.status(200).json({ contentList });
-        })
-        .catch(next);
-    }
-  )
+//           for (let object of contentList) {
+//             if (object.type === POST) {
+//                object.data = dictionary[object.content];
+//             }
+//             else if (object.type === USER) {
+//               const userPursuit = object.content.pursuit;
+//               if (userPursuit.posts.length > 0) {
+//                 object.data = dictionary[object.content.pursuit.posts[0].content_id];
+//               }
+//             }
+//           }
+//            return res.status(200).json({ contentList });
+//         })
+//         .catch(next);
+//     }
+//   )
 
 
 
