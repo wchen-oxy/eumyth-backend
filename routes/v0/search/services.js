@@ -107,7 +107,6 @@ const searchByBoundedPursuits = (IDs, limits, pursuits) => {
 }
 
 const searchGeoSpatialByBoundedPursuit = (IDs, coordinates, max, pursuit, experience) => {
-    console.log(experience);
     const list = IDs.map(ID => mongoose.Types.ObjectId(ID));
     const nearLimit = {
         "location.coordinates":
@@ -122,7 +121,7 @@ const searchGeoSpatialByBoundedPursuit = (IDs, coordinates, max, pursuit, experi
     const returnedExactExperience =
         UserPreview.Model
             .find({
-                // _id: { $nin: list },
+                _id: { $nin: list },
                 pursuits: {
                     $elemMatch: {
                         name: pursuit,
@@ -136,7 +135,7 @@ const searchGeoSpatialByBoundedPursuit = (IDs, coordinates, max, pursuit, experi
     const returnedDifferentExperience
         = UserPreview.Model
             .find({
-                // _id: { $nin: list },
+                _id: { $nin: list },
                 pursuits: {
                     $elemMatch: {
                         name: pursuit,
@@ -149,6 +148,7 @@ const searchGeoSpatialByBoundedPursuit = (IDs, coordinates, max, pursuit, experi
 
     return Promise.all([returnedExactExperience, returnedDifferentExperience])
         .then(results => {
+            console.log("Results", results[0].length, results[1].length);
             return {
                 name: pursuit,
                 exact: results[0],
@@ -157,41 +157,41 @@ const searchGeoSpatialByBoundedPursuit = (IDs, coordinates, max, pursuit, experi
         }).catch(err => console.log(err));
 }
 
-const findRemainderUsersByExperience = (results) => {
-    let pursuits = {};
-    for (const pursuit of results) {
-        const beginner = [];
-        const familiar = [];
-        const experienced = [];
-        const expert = [];
-        for (const user of pursuit) {
-            for (let i = 1; i < user.pursuits.length; i++) {
-                if (user.pursuits[i] === results.type) {
-                    switch (user.pursuits[i].experience_level) {
-                        case (BEGINNER):
-                            beginner.push(data);
-                            break;
-                        case (FAMILIAR):
-                            familiar.push(data);
-                            break;
-                        case (EXPERIENCED):
-                            experienced.push(data);
-                            break;
-                        case (EXPERT):
-                            expert.push(data);
-                            break;
-                        default:
-                            break;
-                    }
-                }
+// const findRemainderUsersByExperience = (results) => {
+//     let pursuits = {};
+//     for (const pursuit of results) {
+//         const beginner = [];
+//         const familiar = [];
+//         const experienced = [];
+//         const expert = [];
+//         for (const user of pursuit) {
+//             for (let i = 1; i < user.pursuits.length; i++) {
+//                 if (user.pursuits[i] === results.type) {
+//                     switch (user.pursuits[i].experience_level) {
+//                         case (BEGINNER):
+//                             beginner.push(data);
+//                             break;
+//                         case (FAMILIAR):
+//                             familiar.push(data);
+//                             break;
+//                         case (EXPERIENCED):
+//                             experienced.push(data);
+//                             break;
+//                         case (EXPERT):
+//                             expert.push(data);
+//                             break;
+//                         default:
+//                             break;
+//                     }
+//                 }
 
-            }
-        }
-        pursuits[results.type] = {
-            beginner
-        }
-    }
-}
+//             }
+//         }
+//         pursuits[results.type] = {
+//             beginner
+//         }
+//     }
+// }
 
 const appendPostData = (users, pursuit) => {
     console.log(users);

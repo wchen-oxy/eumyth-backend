@@ -1,6 +1,7 @@
 const searchServices = require('./services');
 
 module.exports = (req, res, next) => {
+    console.log(req.query);
     const distance = parseInt(req.query.distance);
     const userPreviewIDList = req.query.userPreviewIDList ? req.query.userPreviewIDList : [];
     const pursuits = req.query.pursuits;
