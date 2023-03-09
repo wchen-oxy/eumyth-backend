@@ -13,20 +13,16 @@ router.route('/').get(
         const indexUserID = req.query.indexUserID ? req.query.indexUserID : null;
         const userRelationID = req.query.userRelationID ? req.query.userRelationID : null;
         const id = req.query.id ? req.query.id : null;
-        console.log(req.query);
         let userPreview = null;
         if (id) {
             userPreview = findByID(ModelConstants.USER_PREVIEW, id);
         }
         if (indexUserID) {
             userPreview = findOne(ModelConstants.USER_PREVIEW, { parent_index_user_id: indexUserID })
-
         }
         else if (userRelationID) {
             userPreview = findOne(ModelConstants.USER_PREVIEW, { user_relation_id: userRelationID })
-
         }
-
         if (!userPreview) return res.status(500);
         else {
             userPreview.then(result => {
@@ -60,7 +56,6 @@ router.route('/location')
             return findByID(ModelConstants.USER_PREVIEW, userPreviewID)
                 .then(result => {
                     const val = result.location.coordinates;
-                    console.log(result.location.coordinates);
                     if (!val) {
                         return res.status(204).send();
                     }
@@ -82,7 +77,6 @@ router.route('/location')
             const latitude = req.body.latitude;
             const longitude = req.body.longitude;
             const userPreviewID = req.body.userPreviewID;
-
             return findByID(ModelConstants.USER_PREVIEW, userPreviewID)
                 .then(result => {
                     result.location.coordinates = [longitude, latitude];

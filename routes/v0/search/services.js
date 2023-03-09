@@ -148,7 +148,6 @@ const searchGeoSpatialByBoundedPursuit = (IDs, coordinates, max, pursuit, experi
 
     return Promise.all([returnedExactExperience, returnedDifferentExperience])
         .then(results => {
-            console.log("Results", results[0].length, results[1].length);
             return {
                 name: pursuit,
                 exact: results[0],
