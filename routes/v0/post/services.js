@@ -76,9 +76,11 @@ const createContentPreview = (postID, date, labels, branch) => (
 );
 
 const _incrementPursuitNum = (pursuit, minDuration) => {
-    if (pursuit.num_posts) {
-        pursuit.num_posts = Number(pursuit.num_posts) + 1;
-    }
+    console.log(pursuit.num_posts);
+    pursuit.num_posts = Number(pursuit.num_posts) + 1;
+    console.log(pursuit.num_posts);
+
+
     if (minDuration) {
         pursuit.total_min = Number(pursuit.total_min) + minDuration;
     }
@@ -277,7 +279,7 @@ const getInitialPost = (userPreview, IDArray) => {
 const getPostIDsForExtraFeed = (feed) => {
     const IDArray = [];
     for (const formatted of feed) {
-       
+
         if (formatted.type === ModelConstants.POST) {
             IDArray.push(formatted.content);
         }
