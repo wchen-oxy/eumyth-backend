@@ -280,13 +280,12 @@ router.route('/fork').put(
                 .then(response => {
                     refreshPostImageData(projectPosts, imageKeyMap);
                     res.locals.project = newProject;
-
                     res.locals.oldProject = updateParentProject(
                         res.locals.oldProject,
                         newProject._id,
                         title,
                         remix,
-                        cached_feed_id);
+                        cachedFeedID);
                     return insertMany(
                         ModelConstants.POST, projectPosts, { ordered: true })
                 })
@@ -304,7 +303,7 @@ router.route('/fork').put(
                 newProject._id,
                 title,
                 remix,
-                cached_feed_id);
+                cachedFeedID);
             next();
         }
     },

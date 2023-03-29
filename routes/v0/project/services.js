@@ -99,12 +99,12 @@ const removeProjectDraft = (drafts, ID) => {
     }
 }
 
-const updateParentProject = (oldProject, newProjectID, title, remix, cached_feed_id) => {
+const updateParentProject = (oldProject, newProjectID, title, remix, cachedFeedID) => {
     oldProject.children.push(selectModel(ModelConstants.PROJECT_PREVIEW_NO_ID)({
         project_id: newProjectID,
         title,
         remix,
-        cached_feed_id
+        cachedFeedID
     }));
     oldProject.children_length = oldProject.children_length + 1;
     return oldProject;
