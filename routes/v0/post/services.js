@@ -76,11 +76,7 @@ const createContentPreview = (postID, date, labels, branch) => (
 );
 
 const _incrementPursuitNum = (pursuit, minDuration) => {
-    console.log(pursuit.num_posts);
     pursuit.num_posts = Number(pursuit.num_posts) + 1;
-    console.log(pursuit.num_posts);
-
-
     if (minDuration) {
         pursuit.total_min = Number(pursuit.total_min) + minDuration;
     }

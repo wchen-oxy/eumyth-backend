@@ -27,6 +27,7 @@ router.route('/').post(
   MulterHelper.contentImageUpload.fields(postImageFields),
   buildBodyValidationChain(
     PARAM_CONSTANTS.USERNAME,
+    PARAM_CONSTANTS.USER_PREVIEW_ID,
     PARAM_CONSTANTS.TITLE,
     PARAM_CONSTANTS.POST_PRIVACY,
     PARAM_CONSTANTS.IS_PAGINATED,
