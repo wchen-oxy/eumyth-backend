@@ -14,12 +14,11 @@ module.exports = (req, res, next) => {
     const userPreviewID = req.body.userPreviewID;
     const status = req.body.status;
     const pursuit = req.body.pursuit.toUpperCase();
-
     const selectedPosts = req.body.selectedPosts ?
         req.body.selectedPosts : [];
     const title = req.body.threadTitle ? req.body.threadTitle : null;
     const overview = req.body.overview ? req.body.overview : null;
-    const startDate = req.body.startDate ? req.body.startDate : null;
+    const startDate = req.body.startDate ? req.body.startDate : Date.now();
     const endDate = req.body.endDate ? req.body.endDate : null;
     const minDuration = req.body.minDuration ? req.body.minDuration : null;
     const labels = req.body.labels ? req.body.labels : [];

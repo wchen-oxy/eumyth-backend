@@ -1,2 +1,2 @@
-# chathouse
-social networking project focused focused on making friends through shared hobbies
+# Eumyth (Working Title)
+# To switch between local and dev, add anything to the second field after "nodemon server.js"

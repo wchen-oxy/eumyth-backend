@@ -1,4 +1,4 @@
-const { ALL, BEGINNER, FAMILIAR, EXPERIENCED, EXPERT } = require("../../../shared/utils/flags");
+const { ALL } = require("../../../shared/utils/flags");
 
 const _filterAll = (pursuit) => { if (pursuit.name !== ALL) return true; else { return false } };
 
@@ -9,11 +9,17 @@ module.exports = (req, res, next) => {
         const exact = [];
         const different = [];
         const type = pursuit.name;
-        // console.log(pursuit.exact);
         for (const user of pursuit.exact) {
             exact.push(user);
         }
-        for (const user of pursuit.different) {
+        for (let user of pursuit.different) {
+            for (let obj of user.pursuits) {
+                const post = obj.posts.length > 0 ? [obj.posts[0]] : [];
+                const project = obj.projects.length > 0 ? [obj.projects[0]] : [];
+                obj.posts = post;
+                obj.projects = project;
+                console.log(obj);
+            }
             different.push(user);
         }
         formatted.push({ type, exact, different });
