@@ -21,6 +21,7 @@ const PARAM_CONSTANTS = {
     DIFFICULTY: 'difficulty',
     DRAFT: 'draft',
     DRAFT_TITLE: 'draftTitle',
+    EXCLUDED: 'excluded',
     FIRST_NAME: 'firstName',
     ID: 'ID',
     IMAGE_KEY: 'imageKey',

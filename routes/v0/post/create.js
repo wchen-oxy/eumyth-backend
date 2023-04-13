@@ -148,7 +148,7 @@ const loadPostCreation = (req, res, next) => {
     const pursuitCategory = req.body.pursuit ? req.body.pursuit.toUpperCase() : res.locals.project.pursuit.toUpperCase();
     const isPaginated = checkStringBoolean(req.body.isPaginated);
     const displayPhoto = req.body.displayPhoto ? req.body.displayPhoto : null;
-    const difficulty = req.body.difficulty ? req.body.difficulty : null;
+    const difficulty = req.body.difficulty ? req.body.difficulty : 0;
     const title = req.body.title ? req.body.title : null;
     const labels = req.body.labels ? verifyArray(req.body.labels) : [];
     const date = req.body.date ? new Date(req.body.date) : null;

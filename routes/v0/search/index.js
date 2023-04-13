@@ -83,8 +83,13 @@ router.route('/advanced_people')
         }
     )
 
-    router.route('/related-projects')
+router.route('/related-projects')
     .get(
+        buildQueryValidationChain(
+            PARAM_CONSTANTS.PURSUIT,
+            PARAM_CONSTANTS.EXCLUDED,
+        ),
+        doesValidationErrorExist,
         relatedProject,
         (req, res, next) => {
             return res.status(200).json(res.locals.projects);

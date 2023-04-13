@@ -258,12 +258,13 @@ const searchUncached = (type, IDList, requestQuantity, indexUserID) => {
         });
 }
 
-const searchRelated = (pursuit, labels) => {
+const searchRelatedWithKeys = (pursuit, labels, excluded) => {
     // https://stackoverflow.com/questions/28547309/how-do-i-find-documents-with-array-field-that-contains-as-many-of-the-keywords-a
     return selectModel(ModelConstants.PROJECT_PREVIEW_WITH_ID)
         .aggregate([
             {
                 $match: {
+                    "_id": { $ne:  mongoose.Types.ObjectId(excluded) },
                     "pursuit": { $eq: pursuit },
                     "labels": { $in: labels }
                 }
@@ -273,6 +274,9 @@ const searchRelated = (pursuit, labels) => {
                     "weight": { $size: { $setIntersection: ["$labels", labels] } },
                     "labels": "$labels",
                     "pursuit": 1,
+                    "title": 1,
+                    "project_id": 1,
+                    "has_children": 1,
                     "updatedAt": "$updatedAt"
                 }
             },
@@ -288,6 +292,48 @@ const searchRelated = (pursuit, labels) => {
                     "pursuit": 1,
                     "labels": 1,
                     "updatedAt": 1,
+                    "title": 1,
+                    "project_id": 1,
+                    "has_children": 1,
+                }
+            }
+        ])
+}
+
+const searchRelatedNoKeys = (pursuit) => {
+    // https://stackoverflow.com/questions/28547309/how-do-i-find-documents-with-array-field-that-contains-as-many-of-the-keywords-a
+    return selectModel(ModelConstants.PROJECT_PREVIEW_WITH_ID)
+        .aggregate([
+            {
+                $match: {
+                    "_id": { $ne:  mongoose.Types.ObjectId(excluded)},
+                    "pursuit": { $eq: pursuit },
+                }
+            },
+            {
+                $project: {
+                    "labels": "$labels",
+                    "pursuit": 1,
+                    "title": 1,
+                    "project_id": 1,
+                    "has_children": 1,
+                    "updatedAt": "$updatedAt"
+                }
+            },
+            {
+                $sort: {
+                    "updatedAt": -1,
+                }
+            },
+            { $limit: 3 },
+            {
+                $project: {
+                    "pursuit": 1,
+                    "labels": 1,
+                    "updatedAt": 1,
+                    "title": 1,
+                    "project_id": 1,
+                    "has_children": 1,
                 }
             }
         ])
@@ -304,4 +350,5 @@ exports.searchBranchData = searchBranchData;
 exports.appendPostData = appendPostData;
 exports.searchProjectData = searchProjectData;
 exports.searchUncached = searchUncached;
-exports.searchRelated = searchRelated;
+exports.searchRelatedWithKeys = searchRelatedWithKeys;
+exports.searchRelatedNoKeys = searchRelatedNoKeys;
