@@ -1,9 +1,8 @@
 const GeoPoint = require('geopoint');
-const UserPreview = require('../../../models/user.preview.model');
+const selectModel = require('../../../models/modelServices');
 const ModelConstants = require('../../../models/constants');
 const { BEGINNER, FAMILIAR, EXPERIENCED, EXPERT, EXACT, DIFFERENT } = require('../../../shared/utils/flags');
 const mongoose = require('mongoose');
-const selectModel = require('../../../models/modelServices');
 const {
     find,
     findOne,
@@ -84,7 +83,7 @@ const getBoundOperator = (limits) => {
 const searchByBounds = (IDs, limits) => {
     const list = IDs.map(ID => mongoose.Types.ObjectId(ID));
     const _bounds = getBoundOperator(limits);
-    return UserPreview.Model.find({
+    return selectModel(ModelConstants.USER_PREVIEW).find({
         _id: { $nin: list },
         ..._bounds,
 
@@ -95,7 +94,7 @@ const searchByBounds = (IDs, limits) => {
 const searchByBoundedPursuits = (IDs, limits, pursuits) => {
     const list = IDs.map(ID => mongoose.Types.ObjectId(ID));
     const _bounds = getBoundOperator(limits);
-    return UserPreview.Model.find({
+    return selectModel(ModelConstants.USER_PREVIEW).find({
         _id: { $nin: list },
         pursuits: {
             $elemMatch: {
@@ -119,7 +118,7 @@ const searchGeoSpatialByBoundedPursuit = (IDs, coordinates, max, pursuit, experi
         }
     }
     const returnedExactExperience =
-        UserPreview.Model
+        selectModel(ModelConstants.USER_PREVIEW)
             .find({
                 _id: { $nin: list },
                 pursuits: {
@@ -133,7 +132,7 @@ const searchGeoSpatialByBoundedPursuit = (IDs, coordinates, max, pursuit, experi
             ).lean();
 
     const returnedDifferentExperience
-        = UserPreview.Model
+        = selectModel(ModelConstants.USER_PREVIEW)
             .find({
                 _id: { $nin: list },
                 pursuits: {
@@ -259,6 +258,41 @@ const searchUncached = (type, IDList, requestQuantity, indexUserID) => {
         });
 }
 
+const searchRelated = (pursuit, labels) => {
+    // https://stackoverflow.com/questions/28547309/how-do-i-find-documents-with-array-field-that-contains-as-many-of-the-keywords-a
+    return selectModel(ModelConstants.PROJECT_PREVIEW_WITH_ID)
+        .aggregate([
+            {
+                $match: {
+                    "pursuit": { $eq: pursuit },
+                    "labels": { $in: labels }
+                }
+            },
+            {
+                $project: {
+                    "weight": { $size: { $setIntersection: ["$labels", labels] } },
+                    "labels": "$labels",
+                    "pursuit": 1,
+                    "updatedAt": "$updatedAt"
+                }
+            },
+            {
+                $sort: {
+                    "weight": -1,
+                    "updatedAt": -1,
+                }
+            },
+            { $limit: 3 },
+            {
+                $project: {
+                    "pursuit": 1,
+                    "labels": 1,
+                    "updatedAt": 1,
+                }
+            }
+        ])
+}
+
 
 exports._sortByDate = _sortByDate;
 exports.getDistance = getDistance;
@@ -270,3 +304,4 @@ exports.searchBranchData = searchBranchData;
 exports.appendPostData = appendPostData;
 exports.searchProjectData = searchProjectData;
 exports.searchUncached = searchUncached;
+exports.searchRelated = searchRelated;
