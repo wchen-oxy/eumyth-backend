@@ -137,7 +137,8 @@ const loadProjectPreview = (req, res, next) => {
             .then((result) => {
                 res.locals.projectPreview = result;
                 return next();
-            });
+            })
+            .catch(next);
     }
     return next();
 }
@@ -203,14 +204,19 @@ const updateMetaInfo = (req, res, next) => {
     if (indexUser.preferred_post_privacy !== postPrivacyType) {
         indexUser.preferred_post_privacy = postPrivacyType;
     }
+    console.log( project.project_preview_id);
 
     if (isCompleteProject) {
         projectServices.removeProjectDraft(indexUser.drafts, project._id);
         projectPreview.status = "COMPLETE";
         project.status = "COMPLETE";
     }
-
-    postServices.setRecentPosts(postPreview.content_id, indexUser.recent_posts);
+    postServices.setRecentPosts(
+        selectModel(ModelConstants.INDEX_RECENT)({
+            post_id: postPreview.content_id,
+            project_preview_id: project.project_preview_id
+        }),
+        indexUser.recent_posts);
 
     postServices.updatePostLists(
         postPreview,

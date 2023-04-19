@@ -4,6 +4,7 @@ module.exports = (req, res, next) => {
     const pursuit = req.query.pursuit;
     const labels = req.query.labels ? req.query.labels : [];
     const excluded = req.query.excluded;
+    console.log(req.query);
     const sendResults = results => {
         res.locals.projects = results;
         next();

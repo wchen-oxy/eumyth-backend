@@ -6,6 +6,7 @@ const Feed = require('./feed.model');
 const ImageAnnotation = require('./image.annotation.model');
 const IndexPursuit = require('./index.pursuit.model');
 const IndexUser = require('./index.user.model');
+const IndexRecent = require('./index.recent.model');
 const Post = require('./post.model');
 const PostTree = require('./post.tree.model');
 const Project = require('./project.model');
@@ -32,6 +33,8 @@ const selectModel = (type) => {
             return ImageAnnotation.Model;
         case (ModelConstants.INDEX_PURSUIT):
             return IndexPursuit.Model;
+        case (ModelConstants.INDEX_RECENT):
+            return IndexRecent.Model;
         case (ModelConstants.INDEX_USER):
             return IndexUser.Model;
         case (ModelConstants.POST):
@@ -44,7 +47,7 @@ const selectModel = (type) => {
             return ProjectPreview.Model.WithID;
         case (ModelConstants.PROJECT_PREVIEW_NO_ID):
             return ProjectPreview.Model.NoID;
-        case(ModelConstants.FEED):
+        case (ModelConstants.FEED):
             return Feed.Model;
         case (ModelConstants.PURSUIT):
             return Pursuit.Model;

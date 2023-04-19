@@ -6,17 +6,29 @@ module.exports = (req, res, next) => {
     const updates = {};
     const previewUpdates = {};
     req.files.coverPhoto ? updates.cover_photo_key = req.files.coverPhoto[0].key : null;
-    req.files.miniCoverPhoto ? updates.mini_cover_photo_key = req.files.miniCoverPhoto[0].key : null;
-    req.body.overview ? updates.overview = req.body.overview : null;
+
     req.body.startDate ? updates.start_date = req.body.startDate : null;
     req.body.endDate ? updates.end_date = req.body.endDate : null;
     req.body.minDuration ? updates.min_duration = req.body.minDuration : null;
     req.body.selectedPosts ? updates.post_ids = req.body.selectedPosts : null;
     console.log(req.body);
+    
+    if (req.files.miniCoverPhoto) {
+        const key = req.files.miniCoverPhoto[0].key;
+        updates.mini_cover_photo_key = key;
+        previewUpdates.mini_cover_photo_key = key;
 
+    }
     if (req.body.removeCoverPhoto) {
         updates.cover_photo_key = null;
         updates.mini_cover_photo_key = null;
+        previewUpdates.mini_cover_photo_key = null;
+
+    }
+
+    if (req.body.overview) {
+        updates.overview = req.body.overview;
+        previewUpdates.overview = req.body.overview;
     }
 
     if (req.body.labels) {

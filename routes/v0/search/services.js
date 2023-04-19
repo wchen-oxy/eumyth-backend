@@ -300,7 +300,7 @@ const searchRelatedWithKeys = (pursuit, labels, excluded) => {
         ])
 }
 
-const searchRelatedNoKeys = (pursuit) => {
+const searchRelatedNoKeys = (pursuit, excluded) => {
     // https://stackoverflow.com/questions/28547309/how-do-i-find-documents-with-array-field-that-contains-as-many-of-the-keywords-a
     return selectModel(ModelConstants.PROJECT_PREVIEW_WITH_ID)
         .aggregate([

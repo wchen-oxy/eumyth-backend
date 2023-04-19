@@ -51,6 +51,8 @@ module.exports = (req, res, next) => {
             title: title,
             project_id: newProject._id,
             index_user_id: indexUserID,
+            overview: overview,
+            mini_cover_photo_key: miniCoverPhotoURL,
             status: 'DRAFT',
             labels: labels,
             pursuit: pursuit,

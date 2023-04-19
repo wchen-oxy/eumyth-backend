@@ -5,7 +5,8 @@ const {
   findManyByID,
   findManyAndUpdate,
   findByID,
-  deleteByID
+  deleteByID,
+  findOne
 } = require('../../../data-access/dal');
 const {
   PARAM_CONSTANTS,
@@ -228,7 +229,25 @@ router.route('/cached-feed')
 //     }
 //   )
 
-
+router.route('/query-project-preview')
+  .get(buildQueryValidationChain(
+    PARAM_CONSTANTS.POST_ID
+  ),
+    doesValidationErrorExist,
+    (req, res, next) => {
+      const postID = req.query.postID;
+      return findByID(ModelConstants.POST, postID)
+        .then(result => {
+          if (result) return findByID(ModelConstants.PROJECT_PREVIEW_WITH_ID, result.project_preview_id);
+          else return res.status(500).send("Couldnt find a matching post");
+        })
+        .then(result => {
+          if (result) return res.status(200).json(result);
+          else return res.status(500).send("Couldn't find project preview");
+        })
+        .catch(next);
+    }
+  )
 
 router.route('/display-photo')
   .patch(
