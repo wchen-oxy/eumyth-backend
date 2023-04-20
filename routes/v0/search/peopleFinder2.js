@@ -8,7 +8,6 @@ module.exports = (req, res, next) => {
     const long = req.query.longitude;
     const coordinates = [parseInt(long), parseInt(lat)];
     let returnedPursuits = [];
-    console.log(req.query);
     for (const pursuit of pursuits) {
         const formatted = JSON.parse(pursuit);
         returnedPursuits.push(

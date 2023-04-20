@@ -1,7 +1,5 @@
 const { ALL } = require("../../../shared/utils/flags");
 
-const _filterAll = (pursuit) => { if (pursuit.name !== ALL) return true; else { return false } };
-
 module.exports = (req, res, next) => {
     const pursuits = res.locals.pursuits;
     let formatted = [];

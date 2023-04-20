@@ -255,7 +255,7 @@ const updateLabels = (completeUser, indexUser, labels) => {
 const spliceArray = (postID, array) => {
     let index = null;
     for (let i = 0; i < array.length; i++) {
-        if (array[i].post_id.toString() === postID) {
+        if (array[i].content_id.toString() === postID) {
             index = i;
             break;
         }
