@@ -44,7 +44,7 @@ app.listen(port, () => console.log(`Listening on port ${port}`));
 app.use('/api', indexRouter);
 try {
   const buildExists = fs.existsSync(path.join(__dirname, 'build'));
-  if (buildExists && process.argv.slice(2)[0]) {
+  if (buildExists || process.argv.slice(2)[0]) {
     console.log("Production Build")
     app.get('/*', function (req, res) {
       res.sendFile(path.join(__dirname, 'build', 'index.html'));
