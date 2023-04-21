@@ -1,7 +1,7 @@
 const GeoPoint = require('geopoint');
 const selectModel = require('../../../models/modelServices');
 const ModelConstants = require('../../../models/constants');
-const { BEGINNER, FAMILIAR, EXPERIENCED, EXPERT, EXACT, DIFFERENT } = require('../../../shared/utils/flags');
+const { BEGINNER, FAMILIAR, EXPERIENCED, EXPERT, EXACT, DIFFERENT, ALL } = require('../../../shared/utils/flags');
 const mongoose = require('mongoose');
 const {
     find,
@@ -248,12 +248,17 @@ const searchProjectData = (type, pursuitList, IDList, requestQuantity, indexUser
         });
 }
 
-const searchUncached = (type, IDList, requestQuantity, indexUserID) => {
-    return limitFind(type, {
+const searchUncached = (type, pursuit, IDList, requestQuantity, userID) => {
+    const filters = {
         _id: { $nin: IDList },
-        index_user_id: { $ne: mongoose.Types.ObjectId(indexUserID) },
-    }, requestQuantity)
+        author_id: { $eq: mongoose.Types.ObjectId(userID) }
+    }
+
+    if (pursuit !== ALL) filters.pursuit_category = pursuit;
+
+    return limitFind(type, filters, requestQuantity)
         .then(results => {
+            console.log(results.length);
             return results;
         });
 }
@@ -264,7 +269,7 @@ const searchRelatedWithKeys = (pursuit, labels, excluded) => {
         .aggregate([
             {
                 $match: {
-                    "_id": { $ne:  mongoose.Types.ObjectId(excluded) },
+                    "_id": { $ne: mongoose.Types.ObjectId(excluded) },
                     "pursuit": { $eq: pursuit },
                     "labels": { $in: labels }
                 }
@@ -306,7 +311,7 @@ const searchRelatedNoKeys = (pursuit, excluded) => {
         .aggregate([
             {
                 $match: {
-                    "_id": { $ne:  mongoose.Types.ObjectId(excluded)},
+                    "_id": { $ne: mongoose.Types.ObjectId(excluded) },
                     "pursuit": { $eq: pursuit },
                 }
             },

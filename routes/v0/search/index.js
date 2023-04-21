@@ -152,18 +152,21 @@ router.route('/projects').
 router.route('/uncached').get( //overflow
     buildQueryValidationChain(
         PARAM_CONSTANTS.CONTENT_ID_LIST,
-        PARAM_CONSTANTS.INDEX_USER_ID,
+        PARAM_CONSTANTS.USER_ID,
         PARAM_CONSTANTS.REQUEST_QUANTITY,
+        PARAM_CONSTANTS.PURSUIT,
     ),
     doesValidationErrorExist,
     (req, res, next) => {
         const contentType = req.query.contentType;
         const contentIDList = req.query.contentIDList;
+        const pursuit = req.query.pursuit;
         return searchServices.searchUncached(
             contentType,
+            pursuit,
             contentIDList,
             parseInt(req.query.requestQuantity),
-            req.query.indexUserID
+            req.query.userID
         )
             .then(results => {
                 res.locals.results = results;
@@ -172,7 +175,6 @@ router.route('/uncached').get( //overflow
 
     },
     (req, res, next) => { //package and send
-        console.log(res.locals.results);
         return res.status(201).json({ posts: res.locals.results })
     }
 )
