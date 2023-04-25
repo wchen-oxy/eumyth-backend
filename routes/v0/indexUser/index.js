@@ -15,6 +15,7 @@ router.get('/',
     const isTruncated = req.query.isTruncated;
     return findOne(ModelConstants.INDEX_USER, { username: username })
       .then(result => {
+        if (!result) return res.status(204).send()
         if (isTruncated) {
           const truncatedUser = {
             drafts: result.drafts,

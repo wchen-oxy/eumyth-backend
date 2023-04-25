@@ -289,7 +289,7 @@ const updateMetaInfo = (req, res, next) => {
 }
 
 const findRecievers = (req, res, next) => {
-
+    const indexUserID = res.locals.indexUser._id;
     const ancestorProjectID = res.locals.project?.parent_project_id ?? null;
     const promisedProjectPreview = //the actual ancestor
         findOne(ModelConstants.PROJECT_PREVIEW_WITH_ID,
@@ -316,11 +316,11 @@ const findRecievers = (req, res, next) => {
                         results[0].cached_feed_id : null; //first ancestor
                 res.locals.siblingsFeedID =
                     results[1].length > 0
-                        ? _getCachedFeedID(results[1], index_user_id) : []; //shared ancestor
+                        ? _getCachedFeedID(results[1], indexUserID) : []; //shared ancestor
                 res.locals.childrenFeedID =
-                    _getCachedFeedID(res.locals.project.children, index_user_id); //people who pulled from you
+                    _getCachedFeedID(res.locals.project.children, indexUserID); //people who pulled from you
                 res.locals.followersFeedID =
-                    _getCachedFeedID(res.locals.userRelation.followers, index_user_id); //people following
+                    _getCachedFeedID(res.locals.userRelation.followers, indexUserID); //people following
                 next();
             }
         )

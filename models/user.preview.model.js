@@ -48,6 +48,7 @@ const UserPreviewSchema = new Schema({
     pursuits: [Pursuits.Schema],
 
     location: {
+        default: undefined,
         type: PointSchema,
         index: '2dsphere'
     },

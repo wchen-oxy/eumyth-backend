@@ -55,13 +55,14 @@ router.route('/location')
             const userPreviewID = req.query.userPreviewID;
             return findByID(ModelConstants.USER_PREVIEW, userPreviewID)
                 .then(result => {
+                    console.log(result);
                     const val = result.location;
-                    if (!val) {
-                        return res.status(204).send();
+                    console.log(val);
+                    if (val) {
+                        return res.status(200).json({ coordinates: val.coordinates });
                     }
                     else {
-                        console.log(result.coordinates);
-                        return res.status(200).json({ coordinates: val });
+                        return res.status(204).send();
                     }
                 })
                 .catch(next);
@@ -83,7 +84,7 @@ router.route('/location')
                         type: 'Point',
                         coordinates: [longitude, latitude]
                     };
-
+                    // result.location.index({ location: '2dsphere' });
                     return result.save();
                 })
                 .then(() => res.status(200).send())
