@@ -47,9 +47,10 @@ const checkStringBoolean = (string) => {
     }
 }
 
-const doesContentExist = (result) => {
+const doesContentExist = (result, model) => {
     if (!result) {
-        throw new NoContentError(NO_CONTENT);
+        console.log("No Content Found for", model)
+        // throw new NoContentError(NO_CONTENT);
     };
 }
 

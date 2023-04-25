@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
+const PointSchema = require('./point.schema').Schema;
 const Schema = mongoose.Schema;
 const Pursuits = require('./pursuit.model');
 
 const UserPreviewSchema = new Schema({
-    
+
     bio: {
         type: String
     },
@@ -47,7 +48,8 @@ const UserPreviewSchema = new Schema({
     pursuits: [Pursuits.Schema],
 
     location: {
-        coordinates: { type: [Number], index: '2dsphere'}
+        type: PointSchema,
+        index: '2dsphere'
     },
 });
 

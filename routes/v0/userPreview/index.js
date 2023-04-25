@@ -55,7 +55,7 @@ router.route('/location')
             const userPreviewID = req.query.userPreviewID;
             return findByID(ModelConstants.USER_PREVIEW, userPreviewID)
                 .then(result => {
-                    const val = result.location.coordinates;
+                    const val = result.location;
                     if (!val) {
                         return res.status(204).send();
                     }
@@ -79,7 +79,11 @@ router.route('/location')
             const userPreviewID = req.body.userPreviewID;
             return findByID(ModelConstants.USER_PREVIEW, userPreviewID)
                 .then(result => {
-                    result.location.coordinates = [longitude, latitude];
+                    result.location = {
+                        type: 'Point',
+                        coordinates: [longitude, latitude]
+                    };
+
                     return result.save();
                 })
                 .then(() => res.status(200).send())

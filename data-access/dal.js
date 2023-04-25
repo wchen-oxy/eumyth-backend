@@ -9,7 +9,7 @@ const find = (model, options) => (
     selectModel(model).find({ ...options })
         .then(
             result => {
-                doesContentExist(result);
+                doesContentExist(result, model);
                 return result;
             }
         ))
@@ -19,7 +19,7 @@ const limitFind = (model, options, requestLimit) => (
         .limit(requestLimit)
         .then(
             result => {
-                doesContentExist(result);
+                doesContentExist(result, model);
                 return result;
             }
         )
@@ -28,7 +28,7 @@ const limitFind = (model, options, requestLimit) => (
 const findByID = (model, ID) => (
     selectModel(model).findById(ID)
         .then(result => {
-            doesContentExist(result);
+            doesContentExist(result, model);
             return result;
         }));
 
@@ -36,7 +36,7 @@ const findByID = (model, ID) => (
 const findOne = (model, criteria) => (
     selectModel(model).findOne(criteria)
         .then(result => {
-            doesContentExist(result);
+            doesContentExist(result, model);
             return result;
         }));
 

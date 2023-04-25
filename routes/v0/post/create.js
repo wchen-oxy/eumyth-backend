@@ -61,11 +61,12 @@ const _feedOrdering = (feed, postID) => {
 }
 
 const _feedDecider = (type, postID, feedArray) => {
+    if (feedArray === null || feedArray.length === 0) return [];
     //single parent that owns your project
     switch (type) {
         case (PARENT):
             feedArray =
-                feedArray.map(feed => {
+                [feedArray].map(feed => {
                     _feedOrdering(feed.children, postID);
                     return feed;
                 });
@@ -97,8 +98,12 @@ const _feedDecider = (type, postID, feedArray) => {
     return feedArray;
 }
 
-const _getCachedFeedID = (users) => {
-    return users.map(user => user.cached_feed_id);
+const _getCachedFeedID = (users, indexUserID) => {
+    const results = [];
+    for (const user of users) {
+        if (user.index_user_id !== indexUserID) results.push(user.cached_feed_id);
+    }
+    return results;
 }
 
 const _saveModel = (model) => {
@@ -204,7 +209,7 @@ const updateMetaInfo = (req, res, next) => {
     if (indexUser.preferred_post_privacy !== postPrivacyType) {
         indexUser.preferred_post_privacy = postPrivacyType;
     }
-    console.log( project.project_preview_id);
+    console.log(project.project_preview_id);
 
     if (isCompleteProject) {
         projectServices.removeProjectDraft(indexUser.drafts, project._id);
@@ -264,7 +269,7 @@ const updateMetaInfo = (req, res, next) => {
         isCompleteProject
     );
 
-    return savedUpdates.then(() => next());
+    return savedUpdates.then(() => next()).catch(next);
     // const savedUserPreview = _saveModel(userPreview);
     // const savedIndexUser = _saveModel(indexUser);
     // const savedUser = _saveModel(user);
@@ -284,34 +289,42 @@ const updateMetaInfo = (req, res, next) => {
 }
 
 const findRecievers = (req, res, next) => {
-    //find parent
-    const ancestorProjectID = _getAncestorProjectID(res.locals.project);
-    const ancestorProjectPreviewID = res.locals.project.project_preview_id;
-    const promisedProjectPreviews =
-        find(
-            ModelConstants.PROJECT_PREVIEW_WITH_ID,
+
+    const ancestorProjectID = res.locals.project?.parent_project_id ?? null;
+    const promisedProjectPreview = //the actual ancestor
+        findOne(ModelConstants.PROJECT_PREVIEW_WITH_ID,
             { project_id: ancestorProjectID }
         );
-    const promisedParentProjectPreview =
-        findByID(ModelConstants.PROJECT_PREVIEW_WITH_ID,
-            ancestorProjectPreviewID
+    const promisedProjectPreviews = //people who share first ancestor
+        find(
+            ModelConstants.PROJECT_PREVIEW_WITH_ID,
+            {
+                parent_project_id: ancestorProjectID,
+                project_id: { $ne: res.locals.project._id }
+            }
         );
 
     return Promise
         .all([
-            promisedParentProjectPreview,
+            promisedProjectPreview,
             promisedProjectPreviews
         ])
         .then(
             results => {
-                res.locals.parentFeedID = results[0] ? results[0].cached_feed_id : null;
-                res.locals.siblingsFeedID = results[1].length > 0 ? _getCachedFeedID(results[1]) : [];
-                res.locals.childrenFeedID = _getCachedFeedID(res.locals.project.children);
-                res.locals.followersFeedID = _getCachedFeedID(res.locals.userRelation.followers);
-                console.log(res.locals.followersFeedID);
+                res.locals.parentFeedID =
+                    results[0] ?
+                        results[0].cached_feed_id : null; //first ancestor
+                res.locals.siblingsFeedID =
+                    results[1].length > 0
+                        ? _getCachedFeedID(results[1], index_user_id) : []; //shared ancestor
+                res.locals.childrenFeedID =
+                    _getCachedFeedID(res.locals.project.children, index_user_id); //people who pulled from you
+                res.locals.followersFeedID =
+                    _getCachedFeedID(res.locals.userRelation.followers, index_user_id); //people following
                 next();
             }
-        );
+        )
+        .catch(next);
 }
 
 const sendToRecievers = (req, res, next) => {
@@ -321,7 +334,7 @@ const sendToRecievers = (req, res, next) => {
     const promisedChildrenFeeds = findManyByID(ModelConstants.FEED, res.locals.childrenFeedID);
     const promisedFollowersFeeds = findManyByID(ModelConstants.FEED, res.locals.followersFeedID);
 
-    Promise
+    return Promise
         .all([
             promisedParentFeed,
             promisedSiblingsFeeds,
@@ -331,7 +344,7 @@ const sendToRecievers = (req, res, next) => {
         .then(
             results => {
                 const updatedFeeds = [
-                    _feedDecider(PARENT, postID, [results[0]]),
+                    _feedDecider(PARENT, postID, results[0]),
                     _feedDecider(SIBLINGS, postID, results[1]),
                     _feedDecider(CHILDREN, postID, results[2]),
                     _feedDecider(FOLLOWERS, postID, results[3]),
@@ -355,7 +368,8 @@ const sendToRecievers = (req, res, next) => {
         .then(
             (result) => {
                 return res.status(201).send(res.locals.postID);
-            });
+            })
+        .catch(next);
 
     // const promisedUpdatedFollowerArray = res.locals.followers.map(
     //     indexUser => new Promise(_feedFormatter)

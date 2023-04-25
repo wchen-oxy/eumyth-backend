@@ -107,8 +107,10 @@ const searchByBoundedPursuits = (IDs, limits, pursuits) => {
 
 const searchGeoSpatialByBoundedPursuit = (IDs, coordinates, max, pursuit, experience) => {
     const list = IDs.map(ID => mongoose.Types.ObjectId(ID));
+        console.log('list', list);
+
     const nearLimit = {
-        "location.coordinates":
+        "location":
         {
             $near:
             {
@@ -147,6 +149,7 @@ const searchGeoSpatialByBoundedPursuit = (IDs, coordinates, max, pursuit, experi
 
     return Promise.all([returnedExactExperience, returnedDifferentExperience])
         .then(results => {
+            console.log(results);
             return {
                 name: pursuit,
                 exact: results[0],
