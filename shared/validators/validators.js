@@ -38,6 +38,7 @@ const PARAM_CONSTANTS = {
     LOCATION: 'location',
     OLD_PROJECT_ID: 'oldProjectID',
     NEW_PROJECT_ID: 'newProjectID',
+    PARENT_PROJECT_ID: 'parentProjectID',
     PARENT_PROJECT_PREVIEW_ID: 'parentProjectPreviewID',
     POST_ID: 'postID',
     POST_ID_LIST: 'postIDList',

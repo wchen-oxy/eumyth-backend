@@ -57,10 +57,11 @@ const setRecentPosts = (post, inputRecentPosts) => {
 const updateDeletedPostMeta = (
     pursuit,
     minDuration,
-    isIndexUser
 ) => {
+    console.log(pursuit);
+    pursuit.num_posts -= 1;
     if (minDuration) { pursuit.total_min -= pursuit.minDuration; }
-    if (isIndexUser) { pursuit.num_posts -= 1; }
+
 
 }
 
@@ -255,6 +256,7 @@ const updateLabels = (completeUser, indexUser, labels) => {
 const spliceArray = (postID, array) => {
     let index = null;
     for (let i = 0; i < array.length; i++) {
+        console.log(array[i]);
         if (array[i].content_id.toString() === postID) {
             index = i;
             break;

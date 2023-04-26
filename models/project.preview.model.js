@@ -31,6 +31,7 @@ const ProjectPreviewNoIDSchema = new Schema({
     title: String,
     remix: String,
     cached_feed_id: mongoose.Types.ObjectId,
+    index_user_id: mongoose.Types.ObjectId,
     project_id: mongoose.Types.ObjectId,
     parent_project_id: mongoose.Types.ObjectId, //needed for searching related parent projects
     status: String,

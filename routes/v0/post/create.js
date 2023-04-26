@@ -60,35 +60,41 @@ const _feedOrdering = (feed, postID) => {
     }
 }
 
-const _feedDecider = (type, postID, feedArray) => {
+const _feedDecider = (type, map, postID, feedArray) => {
     if (feedArray === null || feedArray.length === 0) return [];
     //single parent that owns your project
     switch (type) {
         case (PARENT):
             feedArray =
                 [feedArray].map(feed => {
-                    _feedOrdering(feed.children, postID);
+
+                    _feedOrdering(map[feed._id].children, postID);
                     return feed;
                 });
             break;
         case (CHILDREN):
+            console.log("parent", feedArray);
             feedArray =
                 feedArray.map(feed => {
-                    _feedOrdering(feed.parent, postID)
+                    _feedOrdering(map[feed._id].parents, postID)
                     return feed;
                 });
             break;
         case (SIBLINGS):
+            console.log("siblings", feedArray);
+
             feedArray =
                 feedArray.map(feed => {
-                    _feedOrdering(feed.siblings, postID);
+                    _feedOrdering(map[feed._id].siblings, postID);
                     return feed;
                 });
             break;
         case (FOLLOWERS): //these are list of feedIDS of people who are following the user in their feeds
+            console.log("followers", feedArray);
+
             feedArray =
                 feedArray.map(feed => {
-                    _feedOrdering(feed.following, postID);
+                    _feedOrdering(map[feed._id].following, postID);
                     return feed;
                 });
             break;
@@ -209,7 +215,6 @@ const updateMetaInfo = (req, res, next) => {
     if (indexUser.preferred_post_privacy !== postPrivacyType) {
         indexUser.preferred_post_privacy = postPrivacyType;
     }
-    console.log(project.project_preview_id);
 
     if (isCompleteProject) {
         projectServices.removeProjectDraft(indexUser.drafts, project._id);
@@ -218,7 +223,7 @@ const updateMetaInfo = (req, res, next) => {
     }
     postServices.setRecentPosts(
         selectModel(ModelConstants.INDEX_RECENT)({
-            post_id: postPreview.content_id,
+            content_id: postPreview.content_id,
             project_preview_id: project.project_preview_id
         }),
         indexUser.recent_posts);
@@ -299,7 +304,7 @@ const findRecievers = (req, res, next) => {
         find(
             ModelConstants.PROJECT_PREVIEW_WITH_ID,
             {
-                parent_project_id: ancestorProjectID,
+                parent_project_id: { $exists: true, $eq: ancestorProjectID },
                 project_id: { $ne: res.locals.project._id }
             }
         );
@@ -321,6 +326,7 @@ const findRecievers = (req, res, next) => {
                     _getCachedFeedID(res.locals.project.children, indexUserID); //people who pulled from you
                 res.locals.followersFeedID =
                     _getCachedFeedID(res.locals.userRelation.followers, indexUserID); //people following
+                console.log(res.locals.project.children, indexUserID);
                 next();
             }
         )
@@ -343,19 +349,37 @@ const sendToRecievers = (req, res, next) => {
         ])
         .then(
             results => {
-                const updatedFeeds = [
-                    _feedDecider(PARENT, postID, results[0]),
-                    _feedDecider(SIBLINGS, postID, results[1]),
-                    _feedDecider(CHILDREN, postID, results[2]),
-                    _feedDecider(FOLLOWERS, postID, results[3]),
-                ]
-                const allFeeds = updatedFeeds[0]
-                    .concat(
-                        updatedFeeds[1],
-                        updatedFeeds[2],
-                        updatedFeeds[3]
-                    );
-                const savedFeeds = allFeeds.map(
+                let map = {};
+                if (results[0]) { map[results[0]._id] = results[0]; }
+                for (let i = 1; i < results.length; i++) {
+                    results[i].forEach(
+                        (feed) => {
+                            if (!map[feed._id]) map[feed._id] = feed;
+                        }
+                    )
+                }
+
+                _feedDecider(PARENT, map, postID, results[0]);
+                _feedDecider(SIBLINGS, map, postID, results[1]);
+                _feedDecider(CHILDREN, map, postID, results[2]);
+                _feedDecider(FOLLOWERS, map, postID, results[3]);
+
+
+                //because a single entry can belong in multiple feed deciders, you are 
+                //inefficiently saving an item potentially 4 times
+                const toBeSaved = [];
+                for (const cachedFeedID in map) {
+                    toBeSaved.push(map[cachedFeedID]);
+                }
+                // const allFeeds = 
+
+                // updatedFeeds[0]
+                //     .concat(
+                //         updatedFeeds[1],
+                //         updatedFeeds[2],
+                //         updatedFeeds[3]
+                //     );
+                const savedFeeds = toBeSaved.map(
                     feed => new Promise(
                         (resolve) => {
                             feed.save().then(() => resolve("saved")).catch(next)

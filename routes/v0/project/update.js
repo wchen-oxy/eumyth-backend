@@ -11,7 +11,6 @@ module.exports = (req, res, next) => {
     req.body.endDate ? updates.end_date = req.body.endDate : null;
     req.body.minDuration ? updates.min_duration = req.body.minDuration : null;
     req.body.selectedPosts ? updates.post_ids = req.body.selectedPosts : null;
-    console.log(req.body);
     
     if (req.files.miniCoverPhoto) {
         const key = req.files.miniCoverPhoto[0].key;

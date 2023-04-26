@@ -29,7 +29,6 @@ router.route('/').post(
   buildBodyValidationChain(
     PARAM_CONSTANTS.USERNAME,
     PARAM_CONSTANTS.USER_PREVIEW_ID,
-    PARAM_CONSTANTS.TITLE,
     PARAM_CONSTANTS.POST_PRIVACY,
     PARAM_CONSTANTS.IS_PAGINATED,
     PARAM_CONSTANTS.SELECTED_DRAFT_ID,
@@ -59,6 +58,8 @@ router.route('/').post(
       PARAM_CONSTANTS.INDEX_USER_ID,
       PARAM_CONSTANTS.USER_ID,
       PARAM_CONSTANTS.POST_ID,
+      PARAM_CONSTANTS.PURSUIT,
+
     ),
     doesValidationErrorExist,
     (req, res, next) => {
@@ -68,11 +69,16 @@ router.route('/').post(
       const userPreviewID = req.body.userPreviewID;
       const pursuitCategory = req.body.pursuit;
       const minDuration = req.body.minDuration;
+      console.log(pursuitCategory);
       const resolvedIndexUser =
         findByID(ModelConstants.INDEX_USER, indexUserID)
           .then((indexUser) => {
+            const index = indexUser.pursuits.findIndex((pursuit) => pursuit.name === pursuitCategory);
+            if (index !== -1) {
+              postServices.updateDeletedPostMeta(indexUser.pursuits[index], minDuration);
+            }
             postServices.spliceArray(postID, indexUser.recent_posts);
-            postServices.updateDeletedPostMeta(indexUser.pursuits, pursuitCategory, minDuration, true)
+            postServices.updateDeletedPostMeta(indexUser.pursuits[0], minDuration)
 
             return indexUser.save();
           })
@@ -83,11 +89,10 @@ router.route('/').post(
           const index = user.pursuits.findIndex((pursuit) => pursuit.name === pursuitCategory);
           if (index !== -1) {
             postServices.spliceArray(postID, user.pursuits[index].posts);
-            postServices.updateDeletedPostMeta(user.pursuits[index], minDuration, false);
-
+            postServices.updateDeletedPostMeta(user.pursuits[index], minDuration);
           }
           postServices.spliceArray(postID, user.pursuits[0].posts);
-          postServices.updateDeletedPostMeta(user.pursuits[0], minDuration, false)
+          postServices.updateDeletedPostMeta(user.pursuits[0], minDuration)
           return user.save();
         })
         .catch((error) => {
@@ -99,10 +104,10 @@ router.route('/').post(
           const index = userPreview.pursuits.findIndex((pursuit) => pursuit.name === pursuitCategory);
           if (index !== -1) {
             postServices.spliceArray(postID, userPreview.pursuits[index].posts);
-            postServices.updateDeletedPostMeta(userPreview.pursuits[index], minDuration, false);
+            postServices.updateDeletedPostMeta(userPreview.pursuits[index], minDuration);
           }
           postServices.spliceArray(postID, userPreview.pursuits[0].posts);
-          postServices.updateDeletedPostMeta(userPreview.pursuits[0], minDuration, false)
+          postServices.updateDeletedPostMeta(userPreview.pursuits[0], minDuration)
           return userPreview.save();
         })
 
@@ -184,7 +189,6 @@ router.route('/cached-feed')
     doesValidationErrorExist,
     (req, res, next) => {
       const cachedFeedsID = req.query.cachedFeedsID;
-      console.log("thing", req.query);
       return findByID(ModelConstants.FEED, cachedFeedsID)
         .then(result => {
           return res.status(200).json(result);

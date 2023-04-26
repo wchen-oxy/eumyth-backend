@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const IndexRecentSchema = new Schema({
     _id: false,
-    post_id: {
+    content_id: {
         type: mongoose.Types.ObjectId,
     },
 

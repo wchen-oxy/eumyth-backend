@@ -25,17 +25,18 @@ router
     .route('/shared-parent')
     .get(
         buildQueryValidationChain(
-            PARAM_CONSTANTS.PARENT_PROJECT_PREVIEW_ID,
+            PARAM_CONSTANTS.PARENT_PROJECT_ID,
             PARAM_CONSTANTS.STATUS,
-            PARAM_CONSTANTS.BLOCKLIST
+            PARAM_CONSTANTS.EXCLUDED
         ),
         doesValidationErrorExist,
         (req, res, next) => {
-            const parentProjectPreviewID = req.query.parentProjectPreviewID;
+            const parentProjectPreviewID = req.query.parentProjectID;
             const status = req.query.status;
-            const blocklist = req.query.blocklist;
+            const excluded = req.query.excluded;
+            console.log(excluded)
             return find(ModelConstants.PROJECT_PREVIEW_WITH_ID,
-                { status, parent_project_id: parentProjectPreviewID, project_id: { $nin: blocklist } })
+                { status, parent_project_id: parentProjectPreviewID, project_id: { $nin: excluded } })
                 .then((result) => res.status(200).json(result))
                 .catch(next);
         }
