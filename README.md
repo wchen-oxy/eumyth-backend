@@ -29,9 +29,7 @@ influence on their local communities (geographically near users).
 The backend is built in Express.js and connects to a MongoDB instance for user data storage. 
 Media is uploaded to an AWS S3 instance.
 
-
-
 ---
 ##Dev Notes
-##### Note for dev
+
 To switch between local and dev, add anything to the second field after "nodemon server.js"
