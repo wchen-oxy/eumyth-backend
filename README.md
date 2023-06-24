@@ -1,7 +1,7 @@
 # Third Space Backend
-
-## Context
 ---
+## Context
+
 ### Summary
 Third Space is trying to make the world less lonely by making personal
 development more of a shared and relatable experience with others. To 
@@ -25,11 +25,11 @@ These collections become the primary means to discover one another or create an
 influence on their local communities (geographically near users).
 
 ## The Tech 
----
+
 The backend is built in Express.js and connects to a MongoDB instance for user data storage. 
 Media is uploaded to an AWS S3 instance.
 
----
+
 ## Dev Notes
 
 To switch between local and dev, add anything to the second field after "nodemon server.js"
