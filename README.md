@@ -30,6 +30,6 @@ The backend is built in Express.js and connects to a MongoDB instance for user d
 Media is uploaded to an AWS S3 instance.
 
 ---
-##Dev Notes
+## Dev Notes
 
 To switch between local and dev, add anything to the second field after "nodemon server.js"
